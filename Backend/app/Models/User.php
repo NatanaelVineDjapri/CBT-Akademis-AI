@@ -2,44 +2,70 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    protected $table = 'users';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name',
+        'nama',
         'email',
-        'password',
+        'password_hash',
+        'role',
+        'nim',
+        'nidn',
+        'no_telp',
+        'alamat',
+        'tahun_masuk',
+        'prodi_id',
+        'is_temporary',
+        'expired_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'is_temporary' => 'boolean',
+        'expired_at' => 'datetime',
+        'tahun_masuk' => 'integer',
     ];
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class);
+    }
+
+    public function mataKuliah()
+    {
+        return $this->hasMany(UserMataKuliah::class);
+    }
+
+    public function dosenMatkul()
+    {
+        return $this->hasMany(DosenMatkul::class);
+    }
+
+    public function bankSoal()
+    {
+        return $this->hasMany(BankSoal::class, 'created_by');
+    }
+
+    public function ujian()
+    {
+        return $this->hasMany(Ujian::class, 'created_by');
+    }
+
+    public function pesertaUjian()
+    {
+        return $this->hasMany(PesertaUjian::class);
+    }
+
+    public function pengumuman()
+    {
+        return $this->hasMany(Pengumuman::class, 'created_by');
+    }
+
+    public function aiGenerateLog()
+    {
+        return $this->hasMany(AiGenerateLog::class);
+    }
 }
