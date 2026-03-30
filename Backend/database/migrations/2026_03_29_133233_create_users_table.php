@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('nama');
             $table->string('email')->unique();
-            $table->string('password_hash');
+            $table->string('password');
             $table->string('role'); // admin, dosen, peserta
             $table->string('nim')->nullable();
             $table->string('nidn')->nullable();
