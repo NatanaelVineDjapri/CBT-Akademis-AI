@@ -2,10 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GradeSetting extends Model
 {
-    use HasFactory;
+    protected $table = 'grade_setting';
+
+    protected $fillable = [
+        'ujian_id',
+        'grade',
+        'nilai_min',
+        'nilai_max',
+    ];
+
+    protected $casts = [
+        'nilai_min' => 'float',
+        'nilai_max' => 'float',
+    ];
+
+    // Relasi
+    public function ujian()
+    {
+        return $this->belongsTo(Ujian::class);
+    }
 }

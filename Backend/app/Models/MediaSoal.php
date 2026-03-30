@@ -2,10 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MediaSoal extends Model
 {
-    use HasFactory;
+    protected $table = 'media_soal';
+
+    protected $fillable = [
+        'soal_id',
+        'tipe_media',
+        'url',
+    ];
+
+    // Relasi
+    public function soal()
+    {
+        return $this->belongsTo(Soal::class);
+    }
 }
