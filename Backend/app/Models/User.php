@@ -22,6 +22,7 @@ class User extends Authenticatable
         'tahun_masuk',
         'prodi_id',
         'is_temporary',
+        'foto',
         'expired_at',
     ];
 
