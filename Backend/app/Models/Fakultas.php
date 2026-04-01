@@ -24,4 +24,9 @@ class Fakultas extends Model
     {
         return $this->hasMany(Prodi::class);
     }
+
+    public function users()
+    {
+        return $this->hasManyThrough(User::class, Prodi::class);
+    }
 }

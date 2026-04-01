@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UniversitasController;
+use App\Http\Controllers\FakultasController;
+use App\Http\Controllers\ProdiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +43,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin Akademis AI only
     Route::middleware('role:admin_akademis_ai')->prefix('admin')->group(function () {
-        // nanti universitas, fakultas, prodi
+        Route::post('/universitas', [UniversitasController::class, 'store']);
+        Route::put('/universitas/{id}', [UniversitasController::class, 'update']);
+        Route::delete('/universitas/{id}', [UniversitasController::class, 'destroy']);
+
+        Route::post('/fakultas', [FakultasController::class, 'store']);
+        Route::put('/fakultas/{id}', [FakultasController::class, 'update']);
+        Route::delete('/fakultas/{id}', [FakultasController::class, 'destroy']);
+
+        Route::post('/prodi', [ProdiController::class, 'store']);
+        Route::put('/prodi/{id}', [ProdiController::class, 'update']);
+        Route::delete('/prodi/{id}', [ProdiController::class, 'destroy']);
     });
 
     // Admin Universitas only
@@ -55,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin Akademis AI & Admin Universitas
     Route::middleware('role:admin_akademis_ai,admin_universitas')->prefix('admin')->group(function () {
-        
+        Route::get('/universitas', [UniversitasController::class, 'index']);
+        Route::get('/fakultas', [FakultasController::class, 'index']);
+        Route::get('/prodi', [ProdiController::class, 'index']);
     });
 });

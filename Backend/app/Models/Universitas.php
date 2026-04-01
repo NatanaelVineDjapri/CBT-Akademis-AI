@@ -19,4 +19,9 @@ class Universitas extends Model
     {
         return $this->hasMany(Fakultas::class);
     }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }
