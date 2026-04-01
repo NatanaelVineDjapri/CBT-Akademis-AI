@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,8 +19,7 @@ class AuthController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:admin,dosen,mahasiswa,peserta_mahasiswa_baru',
-            'nim' => 'nullable|string',
+            'role' => 'required|in:admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',            'nim' => 'nullable|string',
             'nidn' => 'nullable|string',
             'no_telp' => 'nullable|string',
             'alamat' => 'nullable|string',
@@ -127,6 +127,7 @@ class AuthController extends Controller
                 'no_telp' => $request->user()->no_telp,
                 'alamat' => $request->user()->alamat,
                 'tahun_masuk' => $request->user()->tahun_masuk,
+                'universitas_id' => $request->user()->universitas_id,
                 'prodi_id' => $request->user()->prodi_id,
             ],
         ], 200);

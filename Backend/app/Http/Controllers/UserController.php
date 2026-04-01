@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -12,7 +14,10 @@ class UserController extends Controller
     //Admin
     public function index(Request $request)
     {
+        $authUser = $request->user();
+
         $users = User::with('prodi')
+            ->when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
             ->when($request->role, fn($q) => $q->where('role', $request->role))
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
             ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
@@ -65,7 +70,7 @@ class UserController extends Controller
         }
 
         // Import Excel
-        $import = new UsersImport($fotoMap);
+        $import = new UsersImport($fotoMap, $request->user()->universitas_id);     //tambah parameter universitas_id dri admin untuk assign ke user baru
         Excel::import($import, $request->file('file_excel'));
 
         $failedRows = [];
@@ -84,9 +89,13 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $user = User::with('prodi.fakultas.universitas')->findOrFail($id);
+        $authUser = $request->user();
+
+        $user = User::with('prodi.fakultas.universitas')
+            ->when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
+            ->findOrFail($id);
 
         return response()->json([
             'message' => 'Detail user berhasil diambil!',
@@ -96,12 +105,14 @@ class UserController extends Controller
 
     public function updateByAdmin(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $authUser = $request->user();
+        $user = User::when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
+            ->findOrFail($id);
 
         $request->validate([
             'nama' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
-            'role' => 'sometimes|in:admin,dosen,mahasiswa,peserta_mahasiswa_baru',
+            'role' => 'sometimes|in:admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',
             'nim' => 'nullable|string',
             'nidn' => 'nullable|string',
             'no_telp' => 'nullable|string',
@@ -205,5 +216,74 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Password berhasil diupdate!',
         ], 200);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $user = User::when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
+            ->findOrFail($id);
+
+        if ($user->foto) {
+            Storage::disk('public')->delete($user->foto);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User berhasil dihapus!',
+        ], 200);
+    }
+
+    public function store(Request $request)
+    {
+        $authUser = $request->user();
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
+            'role' => 'required|in:admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',
+            'nim' => 'nullable|string',
+            'nidn' => 'nullable|string',
+            'no_telp' => 'nullable|string',
+            'alamat' => 'nullable|string',
+            'tahun_masuk' => 'nullable|integer',
+            'prodi_id' => 'nullable|exists:prodi,id',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'nama.required' => 'Nama wajib diisi!',
+            'email.required' => 'Email wajib diisi!',
+            'email.unique' => 'Email sudah terdaftar!',
+            'password.min' => 'Password minimal 8 karakter!',
+            'role.in' => 'Role tidak valid!',
+        ]);
+
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('users', 'public');
+        }
+
+        $user = User::create([
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'nim' => $request->nim,
+            'nidn' => $request->nidn,
+            'no_telp' => $request->no_telp,
+            'alamat' => $request->alamat,
+            'tahun_masuk' => $request->tahun_masuk,
+            'prodi_id' => $request->prodi_id,
+            'universitas_id' => $authUser->universitas_id,
+            'foto' => $fotoPath,
+            'is_temporary' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'User berhasil dibuat!',
+            'data' => $user,
+        ], 201);
     }
 }

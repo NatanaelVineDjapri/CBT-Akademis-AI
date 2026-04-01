@@ -21,6 +21,7 @@ class User extends Authenticatable
         'alamat',
         'tahun_masuk',
         'prodi_id',
+        'universitas_id',
         'is_temporary',
         'foto',
         'expired_at',
@@ -32,6 +33,11 @@ class User extends Authenticatable
         'tahun_masuk' => 'integer',
     ];
 
+    public function universitas()
+    {
+        return $this->belongsTo(Universitas::class);
+    }
+    
     public function prodi()
     {
         return $this->belongsTo(Prodi::class);
