@@ -7,7 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UniversitasController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\ProdiController;
-
+use App\Http\Controllers\PengumumanController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,6 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/prodi', [ProdiController::class, 'store']);
         Route::put('/prodi/{id}', [ProdiController::class, 'update']);
         Route::delete('/prodi/{id}', [ProdiController::class, 'destroy']);
+
+
     });
 
     // Admin Universitas only
@@ -64,6 +66,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/users/{id}', [UserController::class, 'updateByAdmin']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
         Route::post('/users/import', [UserController::class, 'importBulk']);
+
+        Route::post('/pengumuman', [PengumumanController::class, 'store']);
+        Route::put('/pengumuman/{id}', [PengumumanController::class, 'update']);
+        Route::delete('/pengumuman/{id}', [PengumumanController::class, 'destroy']);
+        Route::get('/pengumuman/dropdown-ujian', [PengumumanController::class, 'dropdown']);
     });
 
     // Admin Akademis AI & Admin Universitas

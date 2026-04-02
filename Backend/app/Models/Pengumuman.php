@@ -10,7 +10,6 @@ class Pengumuman extends Model
 
     protected $fillable = [
         'created_by',
-        'ujian_id',
         'judul',
         'isi',
         'expired_at',
@@ -26,8 +25,5 @@ class Pengumuman extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function ujian()
-    {
-        return $this->belongsTo(Ujian::class);
-    }
+ 
 }
