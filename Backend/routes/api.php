@@ -8,6 +8,7 @@ use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\BankSoalController;
+use App\Http\Controllers\MataKuliahController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -75,6 +76,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [PengumumanController::class, 'store']);
             Route::put('/{id}', [PengumumanController::class, 'update']);
             Route::delete('/{id}', [PengumumanController::class, 'destroy']);
+        });
+
+        Route::prefix('mata-kuliah')->group(function () {
+            Route::get('/', [MataKuliahController::class, 'index']);
+            Route::post('/', [MataKuliahController::class, 'store']);
+            Route::put('/{id}', [MataKuliahController::class, 'update']);
+            Route::delete('/{id}', [MataKuliahController::class, 'destroy']);
         });
     });
 
