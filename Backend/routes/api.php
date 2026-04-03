@@ -9,6 +9,7 @@ use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\MataKuliahController;
+use App\Http\Controllers\BabController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -88,12 +89,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {
         Route::prefix('bank-soal')->group(function () {
-            Route::post('/', [BankSoalController::class, 'store']);
             Route::put('/{id}', [BankSoalController::class, 'update']);
             Route::delete('/{id}', [BankSoalController::class, 'destroy']);
             Route::post('/{id}/share-email', [BankSoalController::class, 'shareByEmail']);
             Route::post('/{id}/generate-link', [BankSoalController::class, 'generateLink']);
             Route::delete('/{id}/remove-shared', [BankSoalController::class, 'removeShared']);
+        });
+
+        Route::prefix('bab')->group(function () {
+            Route::get('/', [BabController::class, 'index']);
+            Route::post('/', [BabController::class, 'store']);
+            Route::put('/{id}', [BabController::class, 'update']);
+            Route::delete('/{id}', [BabController::class, 'destroy']);
         });
     });
 });

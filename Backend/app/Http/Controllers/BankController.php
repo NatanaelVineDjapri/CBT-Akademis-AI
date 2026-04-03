@@ -44,35 +44,6 @@ class BankSoalController extends Controller
         ], 200);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'permission' => 'required|in:public,shared,private',
-        ], [
-            'mata_kuliah_id.required' => 'Mata kuliah wajib dipilih!',
-            'mata_kuliah_id.exists' => 'Mata kuliah tidak ditemukan!',
-            'nama.required' => 'Nama bank soal wajib diisi!',
-            'permission.required' => 'Permission wajib dipilih!',
-            'permission.in' => 'Permission tidak valid!',
-        ]);
-
-        $bankSoal = BankSoal::create([
-            'created_by' => $request->user()->id,
-            'mata_kuliah_id' => $request->mata_kuliah_id,
-            'nama' => $request->nama,
-            'deskripsi' => $request->deskripsi,
-            'permission' => $request->permission,
-        ]);
-
-        return response()->json([
-            'message' => 'Bank soal berhasil dibuat!',
-            'data' => $bankSoal,
-        ], 201);
-    }
-
     public function update(Request $request, $id)
     {
         $authUser = $request->user();
