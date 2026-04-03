@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -8,17 +7,8 @@ use App\Http\Controllers\UniversitasController;
 use App\Http\Controllers\FakultasController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\PengumumanController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-// Route public 
+use App\Http\Controllers\BankSoalController;
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
@@ -26,57 +16,76 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 
-//Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Auth
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
     });
 
-    // Profile - Semua Role
     Route::prefix('profile')->group(function () {
         Route::put('/', [UserController::class, 'updateProfile']);
         Route::put('/password', [UserController::class, 'updatePassword']);
     });
 
-    // Admin Akademis AI only
-    Route::middleware('role:admin_akademis_ai')->prefix('admin')->group(function () {
-        Route::post('/universitas', [UniversitasController::class, 'store']);
-        Route::put('/universitas/{id}', [UniversitasController::class, 'update']);
-        Route::delete('/universitas/{id}', [UniversitasController::class, 'destroy']);
+    Route::get('/pengumuman', [PengumumanController::class, 'index']);
 
-        Route::post('/fakultas', [FakultasController::class, 'store']);
-        Route::put('/fakultas/{id}', [FakultasController::class, 'update']);
-        Route::delete('/fakultas/{id}', [FakultasController::class, 'destroy']);
-
-        Route::post('/prodi', [ProdiController::class, 'store']);
-        Route::put('/prodi/{id}', [ProdiController::class, 'update']);
-        Route::delete('/prodi/{id}', [ProdiController::class, 'destroy']);
-
-
+    Route::prefix('bank-soal')->group(function () {
+        Route::get('/', [BankSoalController::class, 'index']);
+        Route::post('/join', [BankSoalController::class, 'joinByLink']);
     });
 
-    // Admin Universitas only
-    Route::middleware('role:admin_universitas')->prefix('admin')->group(function () {
-        Route::get('/users', [UserController::class, 'index']);
-        Route::post('/users', [UserController::class, 'store']);
-        Route::get('/users/{id}', [UserController::class, 'show']);
-        Route::put('/users/{id}', [UserController::class, 'updateByAdmin']);
-        Route::delete('/users/{id}', [UserController::class, 'destroy']);
-        Route::post('/users/import', [UserController::class, 'importBulk']);
+    Route::middleware('role:admin_akademis_ai')->group(function () {
+        Route::prefix('universitas')->group(function () {
+            Route::post('/', [UniversitasController::class, 'store']);
+            Route::put('/{id}', [UniversitasController::class, 'update']);
+            Route::delete('/{id}', [UniversitasController::class, 'destroy']);
+        });
 
-        Route::post('/pengumuman', [PengumumanController::class, 'store']);
-        Route::put('/pengumuman/{id}', [PengumumanController::class, 'update']);
-        Route::delete('/pengumuman/{id}', [PengumumanController::class, 'destroy']);
-        Route::get('/pengumuman/dropdown-ujian', [PengumumanController::class, 'dropdown']);
+        Route::prefix('fakultas')->group(function () {
+            Route::post('/', [FakultasController::class, 'store']);
+            Route::put('/{id}', [FakultasController::class, 'update']);
+            Route::delete('/{id}', [FakultasController::class, 'destroy']);
+        });
+
+        Route::prefix('prodi')->group(function () {
+            Route::post('/', [ProdiController::class, 'store']);
+            Route::put('/{id}', [ProdiController::class, 'update']);
+            Route::delete('/{id}', [ProdiController::class, 'destroy']);
+        });
     });
 
-    // Admin Akademis AI & Admin Universitas
-    Route::middleware('role:admin_akademis_ai,admin_universitas')->prefix('admin')->group(function () {
+    Route::middleware('role:admin_akademis_ai,admin_universitas')->group(function () {
         Route::get('/universitas', [UniversitasController::class, 'index']);
         Route::get('/fakultas', [FakultasController::class, 'index']);
         Route::get('/prodi', [ProdiController::class, 'index']);
+    });
+
+    Route::middleware('role:admin_universitas')->group(function () {
+        Route::prefix('users')->group(function () {
+            Route::get('/', [UserController::class, 'index']);
+            Route::post('/', [UserController::class, 'store']);
+            Route::get('/{id}', [UserController::class, 'show']);
+            Route::put('/{id}', [UserController::class, 'updateByAdmin']);
+            Route::delete('/{id}', [UserController::class, 'destroy']);
+            Route::post('/import', [UserController::class, 'importBulk']);
+        });
+
+        Route::prefix('pengumuman')->group(function () {
+            Route::post('/', [PengumumanController::class, 'store']);
+            Route::put('/{id}', [PengumumanController::class, 'update']);
+            Route::delete('/{id}', [PengumumanController::class, 'destroy']);
+        });
+    });
+
+    Route::middleware('role:admin_universitas,dosen')->group(function () {
+        Route::prefix('bank-soal')->group(function () {
+            Route::post('/', [BankSoalController::class, 'store']);
+            Route::put('/{id}', [BankSoalController::class, 'update']);
+            Route::delete('/{id}', [BankSoalController::class, 'destroy']);
+            Route::post('/{id}/share-email', [BankSoalController::class, 'shareByEmail']);
+            Route::post('/{id}/generate-link', [BankSoalController::class, 'generateLink']);
+            Route::delete('/{id}/remove-shared', [BankSoalController::class, 'removeShared']);
+        });
     });
 });

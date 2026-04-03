@@ -35,4 +35,9 @@ class BankSoal extends Model
     {
         return $this->hasMany(AiGenerateLog::class);
     }
+
+    public function sharedUsers()
+    {
+        return $this->hasMany(BankSoalShared::class);
+    }
 }
