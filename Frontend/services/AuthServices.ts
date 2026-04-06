@@ -29,7 +29,7 @@ export const login = async (credentials: LoginCredentials): Promise<User> => {
   await getCsrfCookie();
 
   const res = await api.post("/auth/login", credentials);
-    document.cookie = 'is_logged_in=true; path=/; max-age=86400'
+  document.cookie = 'is_logged_in=true; path=/; max-age=86400'
 
   return res.data.user;
 };
@@ -38,7 +38,7 @@ export const logout = async (): Promise<void> => {
   await getCsrfCookie();
 
   await api.post("/auth/logout");
-    document.cookie = 'is_logged_in=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+  document.cookie = 'is_logged_in=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
 
 };
 

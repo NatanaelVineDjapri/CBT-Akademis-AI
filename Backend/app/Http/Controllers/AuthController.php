@@ -114,7 +114,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logout berhasil!',
-        ], 200);
+        ], 200)->withoutCookie('laravel_session');
     }
 
     public function me(Request $request)
