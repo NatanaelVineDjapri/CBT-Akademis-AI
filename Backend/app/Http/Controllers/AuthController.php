@@ -19,7 +19,8 @@ class AuthController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',            'nim' => 'nullable|string',
+            'role' => 'required|in:admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',
+            'nim' => 'nullable|string',
             'nidn' => 'nullable|string',
             'no_telp' => 'nullable|string',
             'alamat' => 'nullable|string',
@@ -106,7 +107,9 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->session()->invalidate(); // Invalidate the session after logout
+        Auth::logout(); 
+        
+        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return response()->json([
