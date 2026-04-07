@@ -2,33 +2,132 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 8px; max-width: 500px; margin: auto; }
-        .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
-        .content { padding: 20px 0; }
-        .btn { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; margin: 15px 0; }
-        .warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 10px 15px; font-size: 13px; color: #92400e; }
-        .footer { text-align: center; color: #94a3b8; font-size: 12px; margin-top: 20px; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            background: white;
+            max-width: 520px;
+            margin: auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .header {
+            padding: 36px 40px 28px;
+            text-align: center;
+            border-bottom: 1px solid #f0f4f8;
+        }
+        .header img {
+            height: 44px;
+            width: auto;
+        }
+        .body {
+            padding: 36px 40px 28px;
+            text-align: center;
+        }
+        .greeting {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 6px;
+        }
+        .role-badge {
+            display: inline-block;
+            background: #e0f2f7;
+            color: #097797;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #6b7280;
+            margin: 0 0 28px;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            background: #097797;
+            color: white !important;
+            text-decoration: none;
+            padding: 15px 48px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-bottom: 28px;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 24px 0;
+        }
+        .fallback {
+            font-size: 12px;
+            color: #9ca3af;
+            margin: 0 0 6px;
+        }
+        .link {
+            font-size: 11px;
+            color: #097797;
+            word-break: break-all;
+            text-decoration: none;
+        }
+        .footer {
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 40px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h2>CBT Akademis AI</h2>
+            <img src="{{ $message->embed($logoPath) }}" alt="akademis.ai">
         </div>
-        <div class="content">
-            <p>Halo, <strong>{{ $nama }}</strong>!</p>
-            <p>Kami menerima permintaan reset password untuk akun kamu. Klik tombol di bawah untuk melanjutkan:</p>
-            <div style="text-align: center;">
-                <a href="{{ $resetLink }}" class="btn">Reset Password</a>
-            </div>
-            <div class="warning">
-                ⚠️ Link ini hanya berlaku selama <strong>60 menit</strong>. Jika kamu tidak merasa melakukan permintaan ini, abaikan email ini.
-            </div>
+
+        <div class="body">
+            <p class="greeting">Halo, {{ $nama }}!</p>
+            <span class="role-badge">
+                {{ $roleLabel }}{{ $universitasKode ? ' ' . $universitasKode : '' }}
+            </span>
+            <p class="subtitle">Kami menerima permintaan untuk mereset password akun CBT Akademis AI kamu.</p>
+
+            <a href="{{ $resetLink }}" class="btn">Reset Password</a>
+
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="background:#fff7ed; border:1.5px solid #fb923c; border-radius:12px; padding:14px 18px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="vertical-align:middle; text-align:center;">
+                                    <span style="font-size:14px; font-weight:700; color:#c2410c;">Link berlaku 60 menit</span><br>
+                                    <span style="font-size:12px; color:#9a3412; line-height:1.5;">Setelah 60 menit, link akan kadaluarsa dan kamu perlu meminta ulang.</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <hr class="divider">
+
+            <p class="fallback">Jika tombol tidak berfungsi, salin link berikut ke browser:</p>
+            <a href="{{ $resetLink }}" class="link">{{ $resetLink }}</a>
         </div>
+
         <div class="footer">
-            <p>© 2026 CBT Akademis AI. All rights reserved.</p>
+            <p style="font-size:12px; color:#9ca3af; margin:0;">Jika kamu tidak meminta reset password, abaikan email ini.</p>
+            <p style="font-size:12px; color:#9ca3af; margin:8px 0 0;">© 2026 CBT Akademis AI. All rights reserved.</p>
         </div>
     </div>
 </body>

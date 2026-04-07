@@ -131,6 +131,7 @@ class AuthController extends Controller
                 'alamat' => $request->user()->alamat,
                 'tahun_masuk' => $request->user()->tahun_masuk,
                 'universitas_id' => $request->user()->universitas_id,
+                'universitas_kode' => $request->user()->universitas?->kode,
                 'prodi_id' => $request->user()->prodi_id,
             ],
         ], 200);
@@ -161,7 +162,17 @@ class AuthController extends Controller
 
         $resetLink = env('FRONTEND_URL') . '/reset-password?token=' . $token . '&email=' . $request->email;
 
-        Mail::to($request->email)->send(new ResetPasswordMail($user->nama, $resetLink));
+        $roleLabels = [
+            'admin_akademis_ai'      => 'Admin Akademis AI',
+            'admin_universitas'      => 'Admin Universitas',
+            'dosen'                  => 'Dosen',
+            'mahasiswa'              => 'Mahasiswa',
+            'peserta_mahasiswa_baru' => 'Peserta Mahasiswa Baru',
+        ];
+        $roleLabel       = $roleLabels[$user->role] ?? $user->role;
+        $universitasKode = $user->universitas?->kode ?? null;
+
+        Mail::to($request->email)->send(new ResetPasswordMail($user->nama, $resetLink, $roleLabel, $universitasKode));
 
         return response()->json([
             'message' => 'Link reset password telah dikirim ke email kamu!',

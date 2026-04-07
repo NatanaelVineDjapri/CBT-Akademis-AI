@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthLayout from "../../../components/AuthLayout";
-import { login } from '../../../services/AuthServices'
+import { login } from "../../../services/AuthServices";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,20 +13,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const user = await login({ email, password })
+      const user = await login({ email, password });
 
-        if (user.role === 'admin_akademis_ai') router.push('/admin-akademis')
-        else if (user.role === 'admin_universitas') router.push('/admin-universitas')
-        else if (user.role === 'dosen') router.push('/dosen')
-        else if (user.role === 'mahasiswa') router.push('/mahasiswa')
-        else if (user.role === 'peserta_mahasiswa_baru') router.push('/pmb')
+      if (user.role === "admin_akademis_ai") router.push("/admin-akademis");
+      else if (user.role === "admin_universitas")
+        router.push("/admin-universitas");
+      else if (user.role === "dosen") router.push("/dosen");
+      else if (user.role === "mahasiswa") router.push("/mahasiswa");
+      else if (user.role === "peserta_mahasiswa_baru") router.push("/pmb");
     } catch (err: any) {
       setError(err.response?.data?.message || "Terjadi kesalahan!");
     } finally {
@@ -46,19 +48,34 @@ export default function LoginPage() {
             placeholder="admin2026@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500  placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"            required
+            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500  placeholder-gray-300 focus:outline-none"
+            required
           />
         </div>
 
         <div>
           <label className="text-sm text-gray-600 mb-1 block">Password</label>
-          <input
-            type="password"
-            placeholder="Admin123"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500  placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"            required
-          />
+          <div className="flex items-center border border-gray-200 rounded-lg px-4 py-2.5 bg-white ">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Admin123"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="flex-1 text-sm text-gray-500 placeholder-gray-300 outline-none bg-white"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="ml-2 text-gray-400"
+            >
+              {showPassword ? (
+                <EyeOff className="w-[18px] h-[18px]" />
+              ) : (
+                <Eye className="w-[18px] h-[18px]" />
+              )}
+            </button>
+          </div>
           <div className="text-right mt-1">
             <Link
               href="/forgot-password"
@@ -70,10 +87,10 @@ export default function LoginPage() {
           </div>
 
           {error && (
-        <div className="bg-red-50 text-red-600 text-sm px-4 py-2 mt-2 rounded-lg mb-4 text-center">
-          {error}
-        </div>
-      )}
+            <div className="bg-red-50 text-red-600 text-sm px-4 py-2 mt-2 rounded-lg mb-4 text-center">
+              {error}
+            </div>
+          )}
         </div>
 
         <button

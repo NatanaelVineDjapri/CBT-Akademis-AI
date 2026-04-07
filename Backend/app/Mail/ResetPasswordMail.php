@@ -4,8 +4,6 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class ResetPasswordMail extends Mailable
@@ -14,24 +12,23 @@ class ResetPasswordMail extends Mailable
 
     public string $nama;
     public string $resetLink;
+    public string $roleLabel;
+    public ?string $universitasKode;
 
-    public function __construct(string $nama, string $resetLink)
+    public function __construct(string $nama, string $resetLink, string $roleLabel, ?string $universitasKode = null)
     {
-        $this->nama      = $nama;
-        $this->resetLink = $resetLink;
+        $this->nama           = $nama;
+        $this->resetLink      = $resetLink;
+        $this->roleLabel      = $roleLabel;
+        $this->universitasKode = $universitasKode;
     }
 
-    public function envelope(): Envelope
+    public function build(): static
     {
-        return new Envelope(
-            subject: 'Reset Password CBT Akademis AI',
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.reset-password',
-        );
+        return $this->subject('Reset Password CBT Akademis AI')
+            ->view('emails.reset-password')
+            ->with([
+                'logoPath' => public_path('images/logo-email.png'),
+            ]);
     }
 }

@@ -1,0 +1,193 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class UserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $untar = DB::table('universitas')->where('kode', 'UNTAR')->value('id');
+        $ti = DB::table('prodi')->where('kode', 'TI')->value('id');
+        $si = DB::table('prodi')->where('kode', 'SI')->value('id');
+        $ts = DB::table('prodi')->where('kode', 'TS')->value('id');
+        $mnj = DB::table('prodi')->where('kode', 'MNJ')->value('id');
+
+        DB::table('users')->insert([
+            [
+                'nama' => 'Super Admin',
+                'email' => 'admin@akademis.ai',
+                'password' => Hash::make('password123'),
+                'role' => 'admin_akademis_ai',
+                'nidn' => null,
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => null,
+                'prodi_id' => null,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Admin UNTAR',
+                'email' => 'admin@untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'admin_universitas',
+                'nidn' => null,
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => $untar,
+                'prodi_id' => null,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // DOSEN
+            [
+                'nama' => 'Dr. Budi Santoso',
+                'email' => 'budi.santoso@untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'dosen',
+                'nidn' => '0101019001',
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => $untar,
+                'prodi_id' => $ti,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Dr. Siti Rahma',
+                'email' => 'siti.rahma@untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'dosen',
+                'nidn' => '0202029002',
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => $untar,
+                'prodi_id' => $si,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Prof. Ahmad Wijaya',
+                'email' => 'ahmad.wijaya@untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'dosen',
+                'nidn' => '0303039003',
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => $untar,
+                'prodi_id' => $ts,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // MAHASISWA
+            [
+                'nama' => 'Andi Pratama',
+                'email' => 'andi.pratama@student.untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '115220001',
+                'tahun_masuk' => 2022,
+                'universitas_id' => $untar,
+                'prodi_id' => $ti,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Dewi Lestari',
+                'email' => 'dewi.lestari@student.untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '115220002',
+                'tahun_masuk' => 2022,
+                'universitas_id' => $untar,
+                'prodi_id' => $ti,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Rizky Firmansyah',
+                'email' => 'rizky.firmansyah@student.untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '125220001',
+                'tahun_masuk' => 2022,
+                'universitas_id' => $untar,
+                'prodi_id' => $si,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Maya Putri',
+                'email' => 'maya.putri@student.untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '135220001',
+                'tahun_masuk' => 2022,
+                'universitas_id' => $untar,
+                'prodi_id' => $mnj,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // PESERTA PMB
+            [
+                'nama' => 'Calon Mahasiswa A',
+                'email' => 'calon.a@gmail.com',
+                'password' => Hash::make('password123'),
+                'role' => 'peserta_mahasiswa_baru',
+                'nidn' => null,
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => $untar,
+                'prodi_id' => null,
+                'is_temporary' => true,
+                'expired_at' => now()->addDays(30),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Calon Mahasiswa B',
+                'email' => 'calon.b@gmail.com',
+                'password' => Hash::make('password123'),
+                'role' => 'peserta_mahasiswa_baru',
+                'nidn' => null,
+                'nim' => null,
+                'tahun_masuk' => null,
+                'universitas_id' => $untar,
+                'prodi_id' => null,
+                'is_temporary' => true,
+                'expired_at' => now()->addDays(30),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+    }
+}

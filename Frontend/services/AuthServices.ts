@@ -10,6 +10,7 @@ export interface User {
   no_telp?: string;
   alamat?: string;
   universitas_id?: number;
+  universitas_kode?: string;
   prodi_id?: number;
 }
 
@@ -48,6 +49,7 @@ export const me = async (): Promise<User> => {
 };
 
 export const forgotPassword = async (email: string): Promise<string> => {
+  await getCsrfCookie();
   const res = await api.post("/auth/forgot-password", { email });
   return res.data.message;
 };
@@ -58,6 +60,7 @@ export const resetPassword = async (data: {
   password: string;
   password_confirmation: string;
 }): Promise<string> => {
+  await getCsrfCookie();
   const res = await api.post("/auth/reset-password", data);
   return res.data.message;
 };
