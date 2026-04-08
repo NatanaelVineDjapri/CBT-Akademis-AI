@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -130,9 +131,12 @@ class AuthController extends Controller
                 'no_telp' => $request->user()->no_telp,
                 'alamat' => $request->user()->alamat,
                 'tahun_masuk' => $request->user()->tahun_masuk,
+                'foto' => $request->user()->foto ? Storage::disk('public')->url($request->user()->foto) : null,
                 'universitas_id' => $request->user()->universitas_id,
                 'universitas_kode' => $request->user()->universitas?->kode,
+                'universitas_nama' => $request->user()->universitas?->nama,
                 'prodi_id' => $request->user()->prodi_id,
+                'prodi_nama' => $request->user()->prodi?->nama,
             ],
         ], 200);
     }

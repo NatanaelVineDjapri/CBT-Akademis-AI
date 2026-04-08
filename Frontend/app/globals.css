@@ -5,6 +5,14 @@
   --foreground: #171717;
   --color-primary: #097797;
 
+  --akademik-univ-bg: #eff6ff;
+  --akademik-univ-icon: #3b82f6;
+  --akademik-prodi-bg: #f0fdf4;
+  --akademik-prodi-icon: #22c55e;
+  --akademik-tahun-bg: #faf5ff;
+  --akademik-tahun-icon: #a855f7;
+  --akademik-alamat-bg: #fff7ed;
+  --akademik-alamat-icon: #f97316;
 }
 
 @theme inline {

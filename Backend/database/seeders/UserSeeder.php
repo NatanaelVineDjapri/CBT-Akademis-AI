@@ -17,6 +17,7 @@ class UserSeeder extends Seeder
         $mnj = DB::table('prodi')->where('kode', 'MNJ')->value('id');
 
         DB::table('users')->insert([
+            //Admin Akademis AI
             [
                 'nama' => 'Super Admin',
                 'email' => 'admin@akademis.ai',
@@ -32,6 +33,8 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+
+            // Admin Universitas
             [
                 'nama' => 'Admin UNTAR',
                 'email' => 'admin@untar.ac.id',
@@ -95,7 +98,53 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
 
-            // MAHASISWA
+            //Mahasiswa
+            [
+                'nama' => 'Natanael Vine Djapri',
+                'email' => 'natanaelvinedj@gmail.com',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '535240042',
+                'tahun_masuk' => 2024,
+                'universitas_id' => $untar,
+                'prodi_id' => $ti,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Andi Kurniawan',
+                'email' => 'andi.kurniawan@student.untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '535240043',
+                'tahun_masuk' => 2024,
+                'universitas_id' => $untar,
+                'prodi_id' => $ti,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'nama' => 'Siti Rahayu',
+                'email' => 'siti.rahayu@student.untar.ac.id',
+                'password' => Hash::make('password123'),
+                'role' => 'mahasiswa',
+                'nidn' => null,
+                'nim' => '535240044',
+                'tahun_masuk' => 2024,
+                'universitas_id' => $untar,
+                'prodi_id' => $ti,
+                'is_temporary' => false,
+                'expired_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
             [
                 'nama' => 'Andi Pratama',
                 'email' => 'andi.pratama@student.untar.ac.id',

@@ -138,7 +138,7 @@ const menuByRole: Record<string, MenuItem[]> = {
     },
     {
       label: "Profil",
-      href: "/mahasiswa/profil",
+      href: "/mahasiswa/profile",
       icon: <UserCircle size={18} />,
     },
   ],

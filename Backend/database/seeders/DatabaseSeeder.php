@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             FakultasSeeder::class,
             ProdiSeeder::class,
             UserSeeder::class,
+            DemoSeeder::class,
         ]);
     }
 }

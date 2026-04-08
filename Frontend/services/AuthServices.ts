@@ -1,5 +1,7 @@
 import api from "./api";
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ?? "";
+
 export interface User {
   id: number;
   nama: string;
@@ -9,9 +11,13 @@ export interface User {
   nidn?: string;
   no_telp?: string;
   alamat?: string;
+  foto?: string | null;
   universitas_id?: number;
   universitas_kode?: string;
+  universitas_nama?: string;
   prodi_id?: number;
+  prodi_nama?: string;
+  tahun_masuk?: number;
 }
 
 export interface LoginCredentials {
@@ -21,7 +27,7 @@ export interface LoginCredentials {
 }
 
 const getCsrfCookie = async () => {
-  await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+  await fetch("http://localhost:8080/sanctum/csrf-cookie", {
     credentials: "include",
   });
 };
@@ -43,9 +49,14 @@ export const logout = async (): Promise<void> => {
 
 };
 
+
 export const me = async (): Promise<User> => {
   const res = await api.get("/auth/me");
-  return res.data.user;
+  const user = res.data.user;
+  if (user.foto && !user.foto.startsWith("http")) {
+    user.foto = `${baseUrl}${user.foto}`;
+  }
+  return user;
 };
 
 export const forgotPassword = async (email: string): Promise<string> => {

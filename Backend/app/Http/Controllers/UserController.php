@@ -195,12 +195,12 @@ class UserController extends Controller
 
         $request->validate([
             'password_lama' => 'required',
-            'password_baru' => 'required|min:8|confirmed',
+            'password' => 'required|min:8|confirmed',
         ], [
             'password_lama.required' => 'Password lama wajib diisi!',
-            'password_baru.required' => 'Password baru wajib diisi!',
-            'password_baru.min' => 'Password baru minimal 8 karakter!',
-            'password_baru.confirmed' => 'Konfirmasi password tidak cocok!',
+            'password.required' => 'Password baru wajib diisi!',
+            'password.min' => 'Password baru minimal 8 karakter!',
+            'password.confirmed' => 'Konfirmasi password tidak cocok!',
         ]);
 
         if (!Hash::check($request->password_lama, $user->password)) {
@@ -210,13 +210,14 @@ class UserController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($request->password_baru),
+            'password' => Hash::make($request->password),
         ]);
 
         return response()->json([
             'message' => 'Password berhasil diupdate!',
         ], 200);
     }
+
 
     public function destroy(Request $request, $id)
     {
