@@ -17,7 +17,6 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-     Route::post('/logout', [AuthController::class, 'logout']);
 
 });
 
@@ -25,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/logout', [AuthController::class, 'logout']);
     });
 
     Route::prefix('profile')->group(function () {

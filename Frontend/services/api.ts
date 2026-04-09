@@ -10,18 +10,18 @@ const api = axios.create({
     },
 })
 
-// Interceptor - otomatis tambah X-XSRF-TOKEN ke setiap request
-api.interceptors.request.use((config) => {
-    const token = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1]
-
-    if (token) {
-        config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token)
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401 && typeof window !== 'undefined') {
+            const authPages = ['/login', '/forgot-password', '/reset-password']
+            const isAuthPage = authPages.some(p => window.location.pathname.startsWith(p))
+            if (!isAuthPage) {
+                window.location.href = '/login'
+            }
+        }
+        return Promise.reject(error)
     }
-
-    return config
-})
+)
 
 export default api

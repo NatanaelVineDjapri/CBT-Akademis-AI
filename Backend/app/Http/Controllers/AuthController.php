@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cookie;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
+
 
 class AuthController extends Controller
 {
@@ -108,14 +109,15 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout(); 
-        
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Logout berhasil!',
-        ], 200)->withoutCookie('laravel_session');
+        ], 200)
+            ->withCookie(Cookie::forget('laravel_session', '/'))
+            ->withCookie(Cookie::forget('XSRF-TOKEN', '/'));
     }
 
     public function me(Request $request)
@@ -131,7 +133,7 @@ class AuthController extends Controller
                 'no_telp' => $request->user()->no_telp,
                 'alamat' => $request->user()->alamat,
                 'tahun_masuk' => $request->user()->tahun_masuk,
-                'foto' => $request->user()->foto ? Storage::disk('public')->url($request->user()->foto) : null,
+                'foto' => $request->user()->foto,
                 'universitas_id' => $request->user()->universitas_id,
                 'universitas_kode' => $request->user()->universitas?->kode,
                 'universitas_nama' => $request->user()->universitas?->nama,
@@ -167,13 +169,13 @@ class AuthController extends Controller
         $resetLink = env('FRONTEND_URL') . '/reset-password?token=' . $token . '&email=' . $request->email;
 
         $roleLabels = [
-            'admin_akademis_ai'      => 'Admin Akademis AI',
-            'admin_universitas'      => 'Admin Universitas',
-            'dosen'                  => 'Dosen',
-            'mahasiswa'              => 'Mahasiswa',
+            'admin_akademis_ai' => 'Admin Akademis AI',
+            'admin_universitas' => 'Admin Universitas',
+            'dosen' => 'Dosen',
+            'mahasiswa' => 'Mahasiswa',
             'peserta_mahasiswa_baru' => 'Peserta Mahasiswa Baru',
         ];
-        $roleLabel       = $roleLabels[$user->role] ?? $user->role;
+        $roleLabel = $roleLabels[$user->role] ?? $user->role;
         $universitasKode = $user->universitas?->kode ?? null;
 
         Mail::to($request->email)->send(new ResetPasswordMail($user->nama, $resetLink, $roleLabel, $universitasKode));

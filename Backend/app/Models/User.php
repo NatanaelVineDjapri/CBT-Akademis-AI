@@ -77,4 +77,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(AiGenerateLog::class);
     }
+
+    public function deleteCloudinaryFoto(): void
+    {
+        if (!$this->foto) return;
+        preg_match('/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i', $this->foto, $matches);
+        if (!empty($matches[1])) {
+            cloudinary()->destroy($matches[1]);
+        }
+    }
 }

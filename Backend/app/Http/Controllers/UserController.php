@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -128,10 +127,9 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            if ($user->foto) {
-                Storage::disk('public')->delete($user->foto);
-            }
-            $user->foto = $request->file('foto')->store('users', 'public');
+            $user->deleteCloudinaryFoto();
+            $uploaded = cloudinary()->uploadFile($request->file('foto')->getRealPath(), ['folder' => 'users']);
+            $user->foto = $uploaded->getSecurePath();
         }
 
         $user->update([
@@ -169,10 +167,9 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            if ($user->foto) {
-                Storage::disk('public')->delete($user->foto);
-            }
-            $user->foto = $request->file('foto')->store('users', 'public');
+            $user->deleteCloudinaryFoto();
+            $uploaded = cloudinary()->uploadFile($request->file('foto')->getRealPath(), ['folder' => 'users']);
+            $user->foto = $uploaded->getSecurePath();
         }
 
         $user->update([
@@ -226,10 +223,7 @@ class UserController extends Controller
         $user = User::when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
             ->findOrFail($id);
 
-        if ($user->foto) {
-            Storage::disk('public')->delete($user->foto);
-        }
-
+        $user->deleteCloudinaryFoto();
         $user->delete();
 
         return response()->json([
@@ -263,7 +257,8 @@ class UserController extends Controller
 
         $fotoPath = null;
         if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('users', 'public');
+            $uploaded = cloudinary()->uploadFile($request->file('foto')->getRealPath(), ['folder' => 'users']);
+            $fotoPath = $uploaded->getSecurePath();
         }
 
         $user = User::create([

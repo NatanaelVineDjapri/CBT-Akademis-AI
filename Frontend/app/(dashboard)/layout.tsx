@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { Menu } from "lucide-react";
 import { UserProvider, useUser } from "../../context/UserContext";
 import Sidebar from "../../components/Sidebar";
 import Avatar from "../../components/Avatar";
@@ -20,22 +22,31 @@ function getRoleLabel(user: { role: string; universitas_kode?: string }) {
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!user) return null;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar user={user} />
-      <div className="sidebar-width shrink-0" />
+      <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="sidebar-width shrink-0 hidden lg:block" />
       <div className="flex-1 min-w-0 flex flex-col">
         <div
-          className="w-full h-20 flex items-center justify-end px-8 sticky top-0 z-10"
+          className="w-full h-20 flex items-center justify-between lg:justify-end px-4 lg:px-8 sticky top-0 z-10"
           style={{
             backgroundImage: "url('/images/navbar.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
+          {/* Hamburger — mobile only */}
+          <button
+            className="lg:hidden w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu size={20} style={{ color: "var(--color-primary)" }} />
+          </button>
+
           <div className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm">
             <div className="text-right">
               <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-primary)" }}>{user.nama}</p>

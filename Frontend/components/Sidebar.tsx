@@ -167,7 +167,7 @@ function getRoleLabel(user: User) {
   return base;
 }
 
-export default function Sidebar({ user }: { user: User }) {
+export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const menuItems = menuByRole[user.role] ?? [];
@@ -181,7 +181,17 @@ export default function Sidebar({ user }: { user: User }) {
   };
 
   return (
-    <div className="sidebar-width shrink-0 fixed left-0 top-0 h-screen bg-white flex flex-col border-r border-gray-100 shadow-sm py-3 px-4 overflow-y-auto">
+    <>
+      {/* Overlay mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <div className={`sidebar-width shrink-0 fixed left-0 top-0 h-screen bg-white flex flex-col border-r border-gray-100 shadow-sm py-3 px-4 overflow-y-auto z-40 transition-transform duration-300
+        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       {/* Logo */}
       <div className="px-6 py-6 flex items-center justify-center">
         <Image
@@ -262,5 +272,6 @@ export default function Sidebar({ user }: { user: User }) {
         </button>
       </div>
     </div>
+    </>
   );
 }
