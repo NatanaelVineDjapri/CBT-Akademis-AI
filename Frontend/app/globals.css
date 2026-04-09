@@ -13,6 +13,10 @@
   --akademik-tahun-icon: #a855f7;
   --akademik-alamat-bg: #fff7ed;
   --akademik-alamat-icon: #f97316;
+
+  --calendar-today-bg: #eff9fb;
+  --calendar-border-color: #e5e7eb;
+  --calendar-day-number-color: #374151;
 }
 
 @theme inline {

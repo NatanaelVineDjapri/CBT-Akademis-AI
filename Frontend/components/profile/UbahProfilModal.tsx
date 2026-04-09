@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { X } from "lucide-react";
 import Cropper from "react-easy-crop";
-import { User } from "../../services/AuthServices";
+import { User } from "@/types";
 import { updateProfile } from "../../services/UserServices";
 import { getCroppedImg, Area } from "../../utils/cropImage";
 import Avatar from "../Avatar";

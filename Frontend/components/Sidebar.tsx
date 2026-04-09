@@ -20,7 +20,8 @@ import {
   Building2,
   LogOut,
 } from "lucide-react";
-import { User, logout } from "../services/AuthServices";
+import { User } from "@/types";
+import { logout } from "../services/AuthServices";
 
 interface MenuItem {
   label: string;

@@ -10,6 +10,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\BabController;
+use App\Http\Controllers\UjianController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -32,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/pengumuman', [PengumumanController::class, 'index']);
+    Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
 
     Route::prefix('bank-soal')->group(function () {
         Route::get('/', [BankSoalController::class, 'index']);

@@ -44,7 +44,15 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             <Avatar user={user} size={36} />
           </div>
         </div>
-        <main className="flex-1 p-8">{children}</main>
+        <main
+          className="flex-1 p-8"
+          style={{
+            backgroundImage: "url('/images/background-dashboard.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed",
+          }}
+        >{children}</main>
       </div>
     </div>
   );
