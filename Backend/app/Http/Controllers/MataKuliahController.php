@@ -12,12 +12,40 @@ class MataKuliahController extends Controller
     {
         $authUser = $request->user();
 
-        $mataKuliah = MataKuliah::with('prodi.fakultas')
+        $mataKuliah = MataKuliah::with('prodi.fakultas', 'dosenMatkul.user')
             ->whereHas('prodi.fakultas.universitas', fn($q) => $q->where('id', $authUser->universitas_id))
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
             ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
                 ->orWhere('kode', 'like', '%' . $request->search . '%'))
             ->paginate($request->per_page ?? 10);
+
+        return response()->json([
+            'message' => 'Data mata kuliah berhasil diambil!',
+            'data' => $mataKuliah->items(),
+            'meta' => [
+                'total' => $mataKuliah->total(),
+                'per_page' => $mataKuliah->perPage(),
+                'current_page' => $mataKuliah->currentPage(),
+                'last_page' => $mataKuliah->lastPage(),
+            ],
+        ], 200);
+    }
+
+    public function myMataKuliah(Request $request)
+    {
+        $authUser = $request->user();
+
+        $mataKuliah = MataKuliah::with('prodi.fakultas', 'dosenMatkul.user')
+            ->whereHas('userMataKuliah', fn($q) => $q->where('user_id', $authUser->id))
+            ->when($request->search, function ($q) use ($request) {
+                $term = '%' . strtolower($request->search) . '%';
+                $q->where(fn($q2) => $q2
+                    ->whereRaw('LOWER(nama) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(kode) LIKE ?', [$term])
+                );
+            })
+            ->orderBy('nama', in_array($request->sort, ['asc', 'desc']) ? $request->sort : 'asc')
+            ->paginate($request->per_page ?? 30);
 
         return response()->json([
             'message' => 'Data mata kuliah berhasil diambil!',

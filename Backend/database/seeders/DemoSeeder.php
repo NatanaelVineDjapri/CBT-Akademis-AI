@@ -17,23 +17,82 @@ class DemoSeeder extends Seeder
         $mhs2Id     = DB::table('users')->where('email', 'andi.kurniawan@student.untar.ac.id')->value('id');
         $mhs3Id     = DB::table('users')->where('email', 'siti.rahayu@student.untar.ac.id')->value('id');
 
-        // Mata Kuliah 
-        DB::table('mata_kuliah')->insertOrIgnore([
-            ['nama' => 'Pemrograman Web', 'kode' => 'TI301', 'prodi_id' => $prodiTI->id, 'created_at' => now(), 'updated_at' => now()],
-            ['nama' => 'Basis Data',      'kode' => 'TI302', 'prodi_id' => $prodiTI->id, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // Mata Kuliah (30 total)
+        $allMatkul = [
+            ['nama' => 'Pemrograman Web',               'kode' => 'TI301'],
+            ['nama' => 'Basis Data',                     'kode' => 'TI302'],
+            ['nama' => 'Algoritma dan Pemrograman',      'kode' => 'TI101'],
+            ['nama' => 'Struktur Data',                  'kode' => 'TI102'],
+            ['nama' => 'Sistem Operasi',                 'kode' => 'TI201'],
+            ['nama' => 'Jaringan Komputer',              'kode' => 'TI202'],
+            ['nama' => 'Pemrograman Berorientasi Objek', 'kode' => 'TI203'],
+            ['nama' => 'Rekayasa Perangkat Lunak',       'kode' => 'TI204'],
+            ['nama' => 'Kecerdasan Buatan',              'kode' => 'TI401'],
+            ['nama' => 'Machine Learning',               'kode' => 'TI402'],
+            ['nama' => 'Pengolahan Citra Digital',       'kode' => 'TI403'],
+            ['nama' => 'Keamanan Sistem Informasi',      'kode' => 'TI404'],
+            ['nama' => 'Pemrograman Mobile',             'kode' => 'TI303'],
+            ['nama' => 'Cloud Computing',                'kode' => 'TI405'],
+            ['nama' => 'Data Mining',                    'kode' => 'TI406'],
+            ['nama' => 'Interaksi Manusia Komputer',     'kode' => 'TI304'],
+            ['nama' => 'Matematika Diskrit',             'kode' => 'TI103'],
+            ['nama' => 'Kalkulus',                       'kode' => 'TI104'],
+            ['nama' => 'Statistika dan Probabilitas',    'kode' => 'TI105'],
+            ['nama' => 'Logika Matematika',              'kode' => 'TI106'],
+            ['nama' => 'Sistem Informasi',               'kode' => 'TI205'],
+            ['nama' => 'Basis Data Lanjut',              'kode' => 'TI305'],
+            ['nama' => 'Pemrograman Fungsional',         'kode' => 'TI306'],
+            ['nama' => 'Arsitektur Komputer',            'kode' => 'TI206'],
+            ['nama' => 'Kompilator',                     'kode' => 'TI407'],
+            ['nama' => 'Grafika Komputer',               'kode' => 'TI408'],
+            ['nama' => 'Internet of Things',             'kode' => 'TI409'],
+            ['nama' => 'Big Data Analytics',             'kode' => 'TI410'],
+            ['nama' => 'DevOps',                         'kode' => 'TI411'],
+            ['nama' => 'Etika Profesi TI',               'kode' => 'TI001'],
+        ];
+
+        $insertMatkul = array_map(fn($m) => [
+            'nama'       => $m['nama'],
+            'kode'       => $m['kode'],
+            'prodi_id'   => $prodiTI->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $allMatkul);
+
+        DB::table('mata_kuliah')->insertOrIgnore($insertMatkul);
 
         $matkul1Id = DB::table('mata_kuliah')->where('kode', 'TI301')->value('id');
         $matkul2Id = DB::table('mata_kuliah')->where('kode', 'TI302')->value('id');
 
-        // Dosen Matkul
-        DB::table('dosen_matkul')->insertOrIgnore([
-            ['user_id' => $dosenId, 'mata_kuliah_id' => $matkul1Id, 'tahun_ajaran' => '2025/2026', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $dosenId, 'mata_kuliah_id' => $matkul2Id, 'tahun_ajaran' => '2025/2026', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        $allMatkulIds = DB::table('mata_kuliah')
+            ->whereIn('kode', array_column($allMatkul, 'kode'))
+            ->pluck('id')
+            ->toArray();
 
-        //User Mata Kuliah 
-        foreach ([$natanaelId, $mhs2Id, $mhs3Id] as $mhsId) {
+        // Dosen Matkul (semua ke Budi Santoso)
+        $dosenMatkulInsert = array_map(fn($id) => [
+            'user_id'        => $dosenId,
+            'mata_kuliah_id' => $id,
+            'tahun_ajaran'   => '2025/2026',
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ], $allMatkulIds);
+
+        DB::table('dosen_matkul')->insertOrIgnore($dosenMatkulInsert);
+
+        // User Mata Kuliah — Natanael dapat semua 30, mhs lain hanya 2
+        $natanaelMatkul = array_map(fn($id) => [
+            'user_id'        => $natanaelId,
+            'mata_kuliah_id' => $id,
+            'tahun_ajaran'   => '2025/2026',
+            'is_aktif'       => true,
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ], $allMatkulIds);
+
+        DB::table('user_mata_kuliah')->insertOrIgnore($natanaelMatkul);
+
+        foreach ([$mhs2Id, $mhs3Id] as $mhsId) {
             DB::table('user_mata_kuliah')->insertOrIgnore([
                 ['user_id' => $mhsId, 'mata_kuliah_id' => $matkul1Id, 'tahun_ajaran' => '2025/2026', 'is_aktif' => true, 'created_at' => now(), 'updated_at' => now()],
                 ['user_id' => $mhsId, 'mata_kuliah_id' => $matkul2Id, 'tahun_ajaran' => '2025/2026', 'is_aktif' => true, 'created_at' => now(), 'updated_at' => now()],

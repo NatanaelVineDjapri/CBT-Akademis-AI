@@ -139,6 +139,11 @@ class AuthController extends Controller
                 'universitas_nama' => $request->user()->universitas?->nama,
                 'prodi_id' => $request->user()->prodi_id,
                 'prodi_nama' => $request->user()->prodi?->nama,
+                'fakultas_id' => $request->user()->prodi?->fakultas_id,
+                'fakultas_nama' => $request->user()->prodi?->fakultas?->nama,
+                'status' => $request->user()->status,
+                'created_at' => $request->user()->created_at,
+                'updated_at' => $request->user()->updated_at,
             ],
         ], 200);
     }
