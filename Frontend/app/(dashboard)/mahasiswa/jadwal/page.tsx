@@ -1,18 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { getJadwal } from "../../../../services/UserServices";
-import type { JadwalEvent } from "@/types";
 import JadwalKalender from "../../../../components/kalender/JadwalKalender";
 import DetailJadwalModal from "../../../../components/kalender/KalenderDetail";
+import type { JadwalEvent } from "@/types";
 
 export default function MahasiswaJadwalPage() {
-  const [events, setEvents] = useState<JadwalEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<JadwalEvent | null>(null);
-
-  useEffect(() => {
-    getJadwal().then(setEvents).catch(() => {});
-  }, []);
+  const { data: events = [] } = useSWR("/jadwal", getJadwal, { revalidateOnFocus: false });
 
   return (
     <div className="h-full">
@@ -21,18 +18,15 @@ export default function MahasiswaJadwalPage() {
         <p className="text-sm text-gray-500 mt-1">Lihat jadwal ujian yang akan datang</p>
       </div>
 
-      {/* Kalender */}
       <JadwalKalender
         events={events}
         onEventClick={(event) => setSelectedEvent(event)}
       />
 
-      {/* Modal Detail */}
       <DetailJadwalModal
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
       />
-      
     </div>
   );
 }

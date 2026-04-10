@@ -4,6 +4,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --color-primary: #097797;
+  --color-primary-light: #E1F5EE;
 
   --akademik-univ-bg: #eff6ff;
   --akademik-univ-icon: #3b82f6;
@@ -13,6 +14,20 @@
   --akademik-tahun-icon: #a855f7;
   --akademik-alamat-bg: #fff7ed;
   --akademik-alamat-icon: #f97316;
+  --akademik-fakultas-bg: #ecfeff;
+  --akademik-fakultas-icon: #06b6d4;
+  --akademik-status-bg: #fff1f2;
+  --akademik-status-icon: #f43f5e;
+
+  --info-akun-dibuat-bg: #eff6ff;
+  --info-akun-dibuat-icon: #3b82f6;
+
+  --info-akun-updated-bg: #f0fdf4;
+  --info-akun-updated-icon: #22c55e;
+
+  --info-akun-role-bg: #faf5ff;
+  --info-akun-role-icon: #a855f7;
+
 
   --calendar-today-bg: #eff9fb;
   --calendar-border-color: #e5e7eb;

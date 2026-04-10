@@ -20,8 +20,12 @@ import {
   Building2,
   LogOut,
 } from "lucide-react";
+import { preload } from "swr";
 import { User } from "@/types";
 import { logout } from "../services/AuthServices";
+import { getMyMataKuliah } from "../services/MataKuliahServices";
+import { getJadwal } from "../services/UserServices";
+import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
   label: string;
@@ -245,6 +249,18 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
             <Link
               key={item.href}
               href={item.href}
+              onMouseEnter={() => {
+                if (item.href === "/mahasiswa/mata-kuliah") {
+                  const pp = calcPerPage(230, 4);
+                  preload(
+                    ["/mata-kuliah/my", "", 1, pp, ""],
+                    ([, s, p, perPg, so]: [string, string, number, number, string]) =>
+                      getMyMataKuliah({ search: s, page: p, per_page: perPg, sort: (so || undefined) as "asc" | "desc" | undefined })
+                  );
+                } else if (item.href === "/mahasiswa/jadwal") {
+                  preload("/jadwal", getJadwal);
+                }
+              }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 isActive
                   ? "text-white font-medium"

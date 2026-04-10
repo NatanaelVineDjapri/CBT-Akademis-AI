@@ -5,16 +5,12 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import type { JadwalEvent } from "@/types";
+import { months } from "@/types";
 
 interface Props {
   events: JadwalEvent[];
   onEventClick: (event: JadwalEvent) => void;
 }
-
-const MONTHS = [
-  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-  "Juli", "Agustus", "September", "Oktober", "November", "Desember",
-];
 
 export default function JadwalKalender({ events, onEventClick }: Props) {
   const calendarRef = useRef<InstanceType<typeof FullCalendar>>(null);
@@ -40,7 +36,6 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
     setShowPicker(false);
   };
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -51,12 +46,10 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Sync title on mount
   useEffect(() => {
     setTimeout(updateTitle, 0);
   }, []);
 
-  // Get current active month from calendar
   const getCurrentMonth = () => {
     const date = getApi()?.getDate();
     return date ? date.getMonth() : -1;
@@ -134,7 +127,7 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
 
                 {/* Month grid */}
                 <div className="grid grid-cols-3 gap-1.5">
-                  {MONTHS.map((name, i) => {
+                  {months.map((name, i) => {
                     const isActive =
                       pickerYear === (getApi()?.getDate().getFullYear() ?? -1) &&
                       i === getCurrentMonth();

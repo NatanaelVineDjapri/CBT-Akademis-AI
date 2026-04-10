@@ -1,6 +1,5 @@
 "use client";
 
-// import { User } from "../../services/AuthServices";
 import { User } from "../../types";
 import Avatar from "../Avatar";
 

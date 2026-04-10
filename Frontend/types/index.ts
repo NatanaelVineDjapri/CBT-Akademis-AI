@@ -13,7 +13,12 @@ export interface User {
   universitas_nama?: string;
   prodi_id?: number;
   prodi_nama?: string;
+  fakultas_id?: number;
+  fakultas_nama?: string;
   tahun_masuk?: number;
+  status?: 'aktif' | 'cuti' | 'non aktif';
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface LoginCredentials {
@@ -22,6 +27,21 @@ export interface LoginCredentials {
   remember?: boolean;
 }
 
+export interface MataKuliah {
+  id: number;
+  nama: string;
+  kode: string;
+  prodi_id: number;
+  prodi?: { id: number; nama: string; fakultas?: { id: number; nama: string } };
+  dosen_matkul?: { id: number; user_id: number; tahun_ajaran?: string; user: { id: number; nama: string; nidn?: string } }[];
+}
+
+export interface MataKuliahMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+}
 
 export interface JadwalEvent {
   id: string | number;
@@ -31,3 +51,28 @@ export interface JadwalEvent {
   end?: string;
   status?: string;
 }
+export const months = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+];
+
+export const labels: Record<string, string> = {
+  beranda: "Beranda",
+  jadwal: "Jadwal",
+  ujian: "Ujian",
+  settings: "Settings",
+};
+
+export const roleLabels: Record<string, string> = {
+  admin_akademis_ai: "Admin Akademis AI",
+  admin_universitas: "Admin Universitas",
+  dosen: "Dosen",
+  mahasiswa: "Mahasiswa",
+  peserta_mahasiswa_baru: "Peserta Mahasiswa Baru",
+};
+
+export const tips = [
+  "Jangan bagikan password ke siapapun",
+  "Gunakan kombinasi huruf, angka & simbol",
+  "Logout setelah selesai menggunakan",
+];

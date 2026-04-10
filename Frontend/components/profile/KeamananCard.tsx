@@ -6,8 +6,8 @@ interface Props {
 
 export default function KeamananCard({ onUbahPassword }: Props) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
-      <h2 className="text-lg font-bold mb-4" style={{ color: "var(--color-primary)" }}>
+    <div className="bg-white rounded-2xl p-6 shadow-sm h-[180px]">
+      <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-primary)" }}>
         Keamanan
       </h2>
       <div>

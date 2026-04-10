@@ -1,7 +1,14 @@
 "use client";
 
-import { User } from "../../services/AuthServices";
-import { Building2, BookOpen, CalendarDays, MapPin } from "lucide-react";
+import { User } from "@/types";
+import {
+  Building2,
+  BookOpen,
+  CalendarDays,
+  MapPin,
+  GraduationCap,
+  BadgeCheck,
+} from "lucide-react";
 
 interface Props {
   user: User;
@@ -9,10 +16,50 @@ interface Props {
 
 export default function AkademikCard({ user }: Props) {
   const items = [
-    { icon: Building2,    label: "Universitas",   value: user.universitas_nama || user.universitas_kode || "-", bg: "var(--akademik-univ-bg)",  color: "var(--akademik-univ-icon)" },
-    { icon: BookOpen,     label: "Program Studi", value: user.prodi_nama || "-",                                bg: "var(--akademik-prodi-bg)", color: "var(--akademik-prodi-icon)" },
-    { icon: CalendarDays, label: "Tahun Ajaran",  value: user.tahun_masuk ? `${user.tahun_masuk}/${user.tahun_masuk + 1}` : "-",               bg: "var(--akademik-tahun-bg)", color: "var(--akademik-tahun-icon)" },
-    { icon: MapPin,       label: "Alamat",        value: user.alamat || "-",                                   bg: "var(--akademik-alamat-bg)", color: "var(--akademik-alamat-icon)" },
+    {
+      icon: Building2,
+      label: "Universitas",
+      value: user.universitas_nama || user.universitas_kode || "-",
+      bg: "var(--akademik-univ-bg)",
+      color: "var(--akademik-univ-icon)",
+    },
+    {
+      icon: GraduationCap,
+      label: "Fakultas",
+      value: user.fakultas_nama || "-",
+      bg: "var(--akademik-fakultas-bg)",
+      color: "var(--akademik-fakultas-icon)",
+    },
+    {
+      icon: BookOpen,
+      label: "Program Studi",
+      value: user.prodi_nama || "-",
+      bg: "var(--akademik-prodi-bg)",
+      color: "var(--akademik-prodi-icon)",
+    },
+    {
+      icon: CalendarDays,
+      label: "Tahun Ajaran",
+      value: user.tahun_masuk
+        ? `${user.tahun_masuk}/${user.tahun_masuk + 1}`
+        : "-",
+      bg: "var(--akademik-tahun-bg)",
+      color: "var(--akademik-tahun-icon)",
+    },
+    {
+      icon: BadgeCheck,
+      label: "Status",
+      value: user.status || "-",
+      bg: "var(--akademik-status-bg)",
+      color: "var(--akademik-status-icon)",
+    },
+    {
+      icon: MapPin,
+      label: "Alamat",
+      value: user.alamat || "-",
+      bg: "var(--akademik-alamat-bg)",
+      color: "var(--akademik-alamat-icon)",
+    },
   ];
 
   return (
@@ -20,15 +67,20 @@ export default function AkademikCard({ user }: Props) {
       <h2 className="text-lg font-bold mb-4" style={{ color: "#097797" }}>
         Informasi Akademik
       </h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {items.map(({ icon: Icon, label, value, bg, color }) => (
-          <div key={label} className="flex items-start gap-3 border border-gray-100 rounded-xl p-3">
-            <div className="p-2 rounded-lg" style={{ backgroundColor: bg }}>
-              <Icon className="w-4 h-4" style={{ color }} />
+          <div
+            key={label}
+            className="flex items-start gap-3 border border-gray-100 rounded-xl p-3"
+          >
+            <div className="p-4 rounded-lg" style={{ backgroundColor: bg }}>
+              <Icon className="w-5 h-5" style={{ color }} />
             </div>
             <div className="min-w-0">
               <p className="text-xs text-gray-400">{label}</p>
-              <p className="text-sm text-gray-700 font-medium truncate">{value}</p>
+              <p className="text-sm text-gray-700 font-medium truncate">
+                {value}
+              </p>
             </div>
           </div>
         ))}
