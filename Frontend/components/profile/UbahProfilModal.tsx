@@ -76,7 +76,7 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
   // Crop screen
   if (rawImageSrc) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
         <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
             <h3 className="text-base font-bold text-white">Crop Foto</h3>
@@ -134,16 +134,16 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
           <h3 className="text-base font-bold text-white">Ubah Profil</h3>
           <button onClick={onClose} className="text-white/70 hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
           <div>
             <label className="text-sm text-gray-600 mb-1 block">Nama Lengkap</label>
             <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} className={inputClass} required />

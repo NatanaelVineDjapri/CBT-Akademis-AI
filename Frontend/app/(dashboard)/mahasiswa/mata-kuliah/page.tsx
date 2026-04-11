@@ -40,7 +40,7 @@ export default function MataKuliahPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4 flex items-start justify-between gap-4 shrink-0">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 shrink-0">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
             Mata Kuliah

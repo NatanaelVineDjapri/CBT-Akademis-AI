@@ -25,6 +25,7 @@ import { User } from "@/types";
 import { logout } from "../services/AuthServices";
 import { getMyMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal } from "../services/UserServices";
+import { getNilai } from "../services/NilaiServices";
 import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
@@ -259,6 +260,8 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                   );
                 } else if (item.href === "/mahasiswa/jadwal") {
                   preload("/jadwal", getJadwal);
+                } else if (item.href === "/mahasiswa/nilai") {
+                  preload(["/nilai", "", 1], ([, s, p]: [string, string, number]) => getNilai({ search: s, page: p, per_page: 10 }));
                 }
               }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${

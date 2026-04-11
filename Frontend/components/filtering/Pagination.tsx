@@ -25,7 +25,7 @@ export default function Pagination({ currentPage, lastPage, total, perPage, onPa
   const to = Math.min(currentPage * perPage, total);
 
   return (
-    <div className="shrink-0 flex items-center justify-between pt-4">
+    <div className="shrink-0 flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-2 pt-4">
       <p className="text-xs text-gray-400">{from}–{to} dari {total} data</p>
       <div className="flex items-center gap-1">
         <button

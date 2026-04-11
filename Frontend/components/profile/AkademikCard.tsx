@@ -67,7 +67,7 @@ export default function AkademikCard({ user }: Props) {
       <h2 className="text-lg font-bold mb-4" style={{ color: "#097797" }}>
         Informasi Akademik
       </h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {items.map(({ icon: Icon, label, value, bg, color }) => (
           <div
             key={label}

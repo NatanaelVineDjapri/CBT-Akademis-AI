@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ProdiSeeder::class,
             UserSeeder::class,
             DemoSeeder::class,
+            NilaiSeeder::class,
         ]);
     }
 }

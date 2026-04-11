@@ -43,6 +43,23 @@ export interface MataKuliahMeta {
   last_page: number;
 }
 
+export interface Nilai {
+  id: number;
+  nama_ujian: string;
+  tanggal: string;
+  pukul: string;
+  nilai: number;
+  grade: string;
+  lulus: boolean;
+}
+
+export interface NilaiMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+}
+
 export interface JadwalEvent {
   id: string | number;
   title: string;
