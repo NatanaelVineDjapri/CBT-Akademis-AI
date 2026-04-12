@@ -26,6 +26,7 @@ import { logout } from "../services/AuthServices";
 import { getMyMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
+import { getMyUjian } from "../services/UjianServices";
 import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
@@ -262,6 +263,9 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                   preload("/jadwal", getJadwal);
                 } else if (item.href === "/mahasiswa/nilai") {
                   preload(["/nilai", "", 1], ([, s, p]: [string, string, number]) => getNilai({ search: s, page: p, per_page: 10 }));
+                } else if (item.href === "/mahasiswa/ujian") {
+                  preload(["/ujian/my", "sedang_berlangsung", "", "", 1, 8], ([, st, s, sd, p, pp]: [string, string, string, string, number, number]) =>
+                    getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: pp }));
                 }
               }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${

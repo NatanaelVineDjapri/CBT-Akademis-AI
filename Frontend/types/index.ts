@@ -43,6 +43,31 @@ export interface MataKuliahMeta {
   last_page: number;
 }
 
+export interface UjianMahasiswa {
+  peserta_ujian_id: number;
+  ujian_id: number;
+  nama_ujian: string;
+  mata_kuliah: string;
+  start_date: string;
+  end_date: string;
+  durasi_menit: number;
+  passing_grade: number | null;
+  status: "belum_mulai" | "sedang_berlangsung" | "selesai";
+  attempt_ke: number;
+  max_attempt: number | null;
+  jumlah_soal: number;
+  nilai: number | null;
+  grade: string | null;
+  lulus: boolean | null;
+}
+
+export interface UjianMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
 export interface Nilai {
   id: number;
   nama_ujian: string;

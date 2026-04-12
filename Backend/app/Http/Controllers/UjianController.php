@@ -8,6 +8,61 @@ use Illuminate\Http\Request;
 
 class UjianController extends Controller
 {
+    public function ujianMahasiswa(Request $request)
+    {
+        $authUser = $request->user();
+        $search   = $request->query('search', '');
+        $status   = $request->query('status', '');
+        $sortDir  = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
+        $perPage  = (int) $request->query('per_page', 8);
+
+        $query = PesertaUjian::with([
+            'ujian.mataKuliah',
+            'ujian.ujianSetting',
+            'ujian.ujianSoal',
+            'nilaiAkhir',
+        ])
+            ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
+            ->where('peserta_ujian.user_id', $authUser->id)
+            ->select('peserta_ujian.*')
+            ->when($status, fn($q) => $q->where('peserta_ujian.status', $status))
+            ->when($search, fn($q) =>
+                $q->whereRaw('LOWER(ujian.nama_ujian) LIKE ?', ['%' . strtolower($search) . '%'])
+            )
+            ->orderBy('ujian.nama_ujian', $sortDir);
+
+        $paginated = $query->paginate($perPage);
+
+        $data = collect($paginated->items())->map(fn($p) => [
+            'peserta_ujian_id' => $p->id,
+            'ujian_id'         => $p->ujian->id,
+            'nama_ujian'       => $p->ujian->nama_ujian,
+            'mata_kuliah'      => $p->ujian->mataKuliah?->nama ?? '-',
+            'start_date'       => $p->ujian->start_date,
+            'end_date'         => $p->ujian->end_date,
+            'durasi_menit'     => $p->ujian->durasi_menit,
+            'passing_grade'    => $p->ujian->ujianSetting?->passing_grade,
+            'status'           => $p->status,
+            'attempt_ke'       => $p->attempt_ke,
+            'max_attempt'      => $p->ujian->ujianSetting?->max_attempt,
+            'jumlah_soal'      => $p->ujian->ujianSoal->count(),
+            'nilai'            => $p->nilaiAkhir?->nilai_total,
+            'grade'            => $p->nilaiAkhir?->grade,
+            'lulus'            => $p->nilaiAkhir?->lulus,
+        ]);
+
+        return response()->json([
+            'message' => 'Daftar ujian berhasil diambil!',
+            'data'    => $data,
+            'meta'    => [
+                'current_page' => $paginated->currentPage(),
+                'last_page'    => $paginated->lastPage(),
+                'per_page'     => $paginated->perPage(),
+                'total'        => $paginated->total(),
+            ],
+        ]);
+    }
+
     public function jadwalMahasiswa(Request $request)
     {
         $authUser = $request->user();

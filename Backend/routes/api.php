@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/pengumuman', [PengumumanController::class, 'index']);
+    Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
     Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
     Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
     Route::get('/mata-kuliah/my', [MataKuliahController::class, 'myMataKuliah']);
