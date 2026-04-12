@@ -5,6 +5,10 @@
   --foreground: #171717;
   --color-primary: #097797;
   --color-primary-light: #E1F5EE;
+  --color-danger: #ef4444;
+  --color-danger-light: #fef2f2;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
 
   --akademik-univ-bg: #eff6ff;
   --akademik-univ-icon: #3b82f6;
@@ -32,6 +36,8 @@
   --calendar-today-bg: #eff9fb;
   --calendar-border-color: #e5e7eb;
   --calendar-day-number-color: #374151;
+
+  --ujianperbulan-akan-datang: #2baaa4;
 }
 
 @theme inline {
