@@ -32,6 +32,12 @@
   --calendar-today-bg: #eff9fb;
   --calendar-border-color: #e5e7eb;
   --calendar-day-number-color: #374151;
+
+  --nilai-a: #92d69b;
+  --nilai-b: #92d6ce;
+  --nilai-c: #d6bd92;
+  --nilai-d: #d69292;
+  --nilai-e: #a292d6;
 }
 
 @theme inline {
