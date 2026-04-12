@@ -62,7 +62,7 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
         .fc .fc-daygrid-day-number { font-size: 0.8rem; color: var(--calendar-day-number-color); padding: 4px 6px; }
         .fc .fc-daygrid-day.fc-day-today { background-color: var(--calendar-today-bg) !important; }
         .fc .fc-event { border-radius: 6px; font-size: 0.75rem; padding: 3px 6px; border: none; cursor: pointer; }
-        .fc .fc-daygrid-day-frame { min-height: unset; }
+        .fc .fc-daygrid-day-frame { min-height: 90px; }
         .fc-theme-standard td, .fc-theme-standard th { border-color: var(--calendar-border-color); }
         .fc .fc-toolbar { display: none; }
         .fc .fc-daygrid-day.fc-day-other .fc-daygrid-day-number { color: #d1d5db; }
@@ -71,8 +71,7 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
 
       {/* HEADER */}
       <div className="flex items-center justify-between px-6 py-4">
-        <h2 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
-        </h2>
+        <h2 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>Jadwal</h2>
 
         <div className="flex items-center gap-2">
           <button
@@ -154,7 +153,7 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
       </div>
 
       {/* CALENDAR */}
-      <div className="px-10 pb-10">
+      <div className="px-10 pb-4">
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin]}
@@ -175,11 +174,12 @@ export default function JadwalKalender({ events, onEventClick }: Props) {
             const original = info.event.extendedProps.original as JadwalEvent;
             onEventClick(original);
           }}
-          height="50vh"
+          height="auto"
           eventDisplay="block"
           displayEventTime={false}
         />
       </div>
+
     </div>
   );
 }

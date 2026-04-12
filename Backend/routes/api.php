@@ -11,6 +11,7 @@ use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\BabController;
 use App\Http\Controllers\UjianController;
+use App\Http\Controllers\DashboardController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -32,7 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/password', [UserController::class, 'updatePassword']);
     });
 
+    Route::get('/dashboard/mahasiswa', [DashboardController::class, 'mahasiswa']);
     Route::get('/pengumuman', [PengumumanController::class, 'index']);
+    Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
     Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
     Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
     Route::get('/mata-kuliah/my', [MataKuliahController::class, 'myMataKuliah']);

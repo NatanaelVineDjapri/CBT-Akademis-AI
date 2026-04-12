@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import useSWR from "swr";
+import { TriangleAlert } from "lucide-react";
 import { getJadwal } from "../../../../services/UserServices";
 import JadwalKalender from "../../../../components/kalender/JadwalKalender";
 import DetailJadwalModal from "../../../../components/kalender/KalenderDetail";
@@ -22,6 +23,13 @@ export default function MahasiswaJadwalPage() {
         events={events}
         onEventClick={(event) => setSelectedEvent(event)}
       />
+
+      <div className="mt-4 bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex items-start gap-3">
+        <TriangleAlert size={16} className="text-amber-500 shrink-0 mt-0.5" />
+        <p className="text-xs text-gray-500 leading-relaxed">
+          Selalu pantau jadwal ujian Anda secara berkala. Perubahan jadwal dapat terjadi sewaktu-waktu dan menjadi tanggung jawab mahasiswa untuk memastikan kehadiran tepat waktu.
+        </p>
+      </div>
 
       <DetailJadwalModal
         event={selectedEvent}
