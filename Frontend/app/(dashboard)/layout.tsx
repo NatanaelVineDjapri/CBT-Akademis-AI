@@ -27,7 +27,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="sidebar-width shrink-0 hidden lg:block" />
       <div className="flex-1 min-w-0 flex flex-col">
@@ -68,7 +68,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <main
-          className="flex-1 p-8"
+          className="flex-1 overflow-y-auto p-8"
           style={{
             backgroundImage: "url('/images/background-dashboard.png')",
             backgroundSize: "cover",

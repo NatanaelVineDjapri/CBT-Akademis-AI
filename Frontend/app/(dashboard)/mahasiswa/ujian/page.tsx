@@ -8,7 +8,7 @@ import { usePerPage } from "../../../../hooks/usePerPage";
 import SearchInput from "../../../../components/filtering/SearchInput";
 import SortButton, { SortOrder } from "../../../../components/filtering/SortButton";
 import Pagination from "../../../../components/filtering/Pagination";
-import UjianCard from "../../../../components/ujian/UjianCard";
+import UjianCard from "../../../../components/dashboard/mahasiswa/ujian/UjianCard";
 import EmptyState from "../../../../components/EmptyState";
 import UjianCardSkeleton from "../../../../components/skeleton/UjianCardSkeleton";
 
@@ -26,7 +26,7 @@ export default function UjianPage() {
   const [sort, setSort] = useState<SortOrder>(null);
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
-  const perPage = usePerPage(230, 4, 580);
+  const perPage = usePerPage(245, 4, 255);
 
   useEffect(() => { setPage(1); }, [tab, debouncedSearch, sort]);
   useEffect(() => { setPage(1); }, [perPage]);

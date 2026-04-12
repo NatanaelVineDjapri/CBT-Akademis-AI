@@ -13,13 +13,13 @@ class DashboardController extends Controller
     {
         $userId = $request->user()->id;
 
-        // ── Stats ────────────────────────────────────────────────
+        // Stats
         $ujianSelesai   = PesertaUjian::where('user_id', $userId)->where('status', 'selesai')->count();
         $ujianAkanDatang = PesertaUjian::where('user_id', $userId)->where('status', 'belum_mulai')->count();
         $rataRata       = NilaiAkhir::whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))->avg('nilai_total');
         $tertinggi      = NilaiAkhir::whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))->max('nilai_total');
 
-        // ── Ujian segera berlangsung ──────────────────────────────
+        // Ujian segera berlangsung
         $segera = PesertaUjian::with(['ujian.mataKuliah'])
             ->where('user_id', $userId)
             ->where('status', 'sedang_berlangsung')
@@ -37,7 +37,7 @@ class DashboardController extends Controller
             'end_date'         => $segera->ujian->end_date,
         ] : null;
 
-        // ── Ujian akan datang (3 terdekat) ───────────────────────
+        // Ujian akan datang (3 terdekat) 
         $akanDatangList = PesertaUjian::with(['ujian.mataKuliah'])
             ->where('peserta_ujian.user_id', $userId)
             ->where('peserta_ujian.status', 'belum_mulai')
@@ -55,7 +55,7 @@ class DashboardController extends Controller
                 'end_date'         => $p->ujian->end_date,
             ]);
 
-        // ── Nilai terbaru (5 terakhir) ────────────────────────────
+        // Nilai terbaru (5 terakhir) 
         $nilaiTerbaru = NilaiAkhir::with(['pesertaUjian.ujian.mataKuliah'])
             ->whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))
             ->orderBy('graded_at', 'desc')
@@ -70,7 +70,7 @@ class DashboardController extends Controller
                 'lulus'      => $n->lulus,
             ]);
 
-        // ── Ujian per bulan (6 bulan terakhir) ───────────────────
+        // Ujian per bulan (6 bulan terakhir)
         $ujianRaw = PesertaUjian::with('ujian')
             ->where('user_id', $userId)
             ->whereHas('ujian', fn($q) => $q->where('start_date', '>=', now()->subMonths(6)->startOfMonth()))
@@ -87,7 +87,7 @@ class DashboardController extends Controller
             ->sortBy('bulan_sort')
             ->values();
 
-        // ── Perkembangan nilai per bulan (6 bulan terakhir) ──────
+        // Perkembangan nilai per bulan (6 bulan terakhir)
         $nilaiRaw = NilaiAkhir::with(['pesertaUjian.ujian'])
             ->whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))
             ->where('graded_at', '>=', now()->subMonths(6)->startOfMonth())

@@ -2,49 +2,43 @@
 
 import { Calendar, Clock, BookOpen, CheckCircle, XCircle, Timer } from "lucide-react";
 import type { UjianMahasiswa } from "@/types";
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
-}
-function formatTime(dateStr: string) {
-  return new Date(dateStr).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-}
+import { formatDate, formatTime } from "@/utils/format";
 
 export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
   const selesai = ujian.status === "selesai";
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3">
-      {/* Icon */}
-      <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-        style={{ background: "var(--color-primary)" }}
-      >
-        <BookOpen className="w-6 h-6 text-white" />
-      </div>
-
-      {/* Nama + Mata Kuliah */}
-      <div className="flex flex-col gap-0.5">
-        <p className="text-sm font-bold text-gray-800 leading-snug">{ujian.nama_ujian}</p>
-        <p className="text-xs text-gray-400">{ujian.mata_kuliah}</p>
+    <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col gap-2">
+      {/* Icon + Nama + Mata Kuliah */}
+      <div className="flex items-center gap-3">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: "var(--color-primary)" }}
+        >
+          <BookOpen className="w-5 h-5 text-white" />
+        </div>
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <p className="text-sm font-bold text-gray-800 leading-snug truncate">{ujian.nama_ujian}</p>
+          <p className="text-xs text-gray-400 truncate">{ujian.mata_kuliah}</p>
+        </div>
       </div>
 
       <div className="border-t border-gray-200" />
 
-      {/* Tanggal & Waktu */}
-      <div className="flex flex-col gap-1.5 text-xs text-gray-500">
-        <div className="flex items-center gap-1.5">
-          <Calendar size={12} className="shrink-0" />
+      {/* Tanggal & Waktu — satu baris */}
+      <div className="flex items-center gap-3 text-xs text-gray-500">
+        <div className="flex items-center gap-1">
+          <Calendar size={11} className="shrink-0" />
           <span>{formatDate(ujian.start_date)}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Clock size={12} className="shrink-0" />
+        <div className="flex items-center gap-1">
+          <Clock size={11} className="shrink-0" />
           <span>{formatTime(ujian.start_date)} – {formatTime(ujian.end_date)}</span>
         </div>
       </div>
 
       {/* Durasi & Soal */}
-      <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-200 pt-3">
+      <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-200 pt-1">
         <div className="flex items-center gap-1">
           <Timer size={12} />
           <span>Durasi: {ujian.durasi_menit} menit</span>
@@ -63,11 +57,11 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
           >
             <p className="text-xs text-gray-500">Nilai Anda</p>
             <div className="flex items-end gap-3">
-              <p className="text-3xl font-bold" style={{ color: ujian.lulus ? "var(--color-primary)" : "#ef4444" }}>
+              <p className="text-xl font-bold" style={{ color: ujian.lulus ? "var(--color-primary)" : "#ef4444" }}>
                 {ujian.nilai}
               </p>
               <span className="text-gray-300 mb-1">|</span>
-              <p className="text-2xl font-bold mb-0.5" style={{ color: ujian.lulus ? "var(--color-primary)" : "#ef4444" }}>
+              <p className="text-xl font-bold mb-0.5" style={{ color: ujian.lulus ? "var(--color-primary)" : "#ef4444" }}>
                 {ujian.grade}
               </p>
             </div>

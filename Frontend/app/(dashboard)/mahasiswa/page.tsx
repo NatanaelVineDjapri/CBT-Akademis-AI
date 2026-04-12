@@ -3,12 +3,12 @@
 import useSWR from "swr";
 import { getMahasiswaDashboard } from "@/services/DashboardServices";
 import StatCard from "@/components/dashboard/mahasiswa/StatCard";
-import UjianSegeraCard from "@/components/dashboard/mahasiswa/UjianSegeraCard";
-import UjianAkanDatangCard from "@/components/dashboard/mahasiswa/UjianAkanDatang";
+import UjianSegeraCard from "@/components/dashboard/mahasiswa/ujian/UjianSegeraCard";
+import UjianAkanDatangCard from "@/components/dashboard/mahasiswa/ujian/UjianAkanDatang";
 import NilaiTerbaruCard from "@/components/dashboard/mahasiswa/NilaiTerbaruCard";
 import PengumumanCard from "@/components/dashboard/PengumumanCard";
 import PerkembanganNilaiChart from "@/components/dashboard/mahasiswa/PerkembanganNilaiChart";
-import UjianPerBulanChart from "@/components/dashboard/mahasiswa/UjianPerBulanChart";
+import UjianPerBulanChart from "@/components/dashboard/mahasiswa/ujian/UjianPerBulanChart";
 
 export default function BerandaMahasiswaPage() {
   const { data } = useSWR("/dashboard/mahasiswa", getMahasiswaDashboard, {
@@ -19,7 +19,7 @@ export default function BerandaMahasiswaPage() {
   const stats = data?.stats;
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4 pb-4">
       <div className="shrink-0">
         <h1
           className="text-2xl font-bold"
