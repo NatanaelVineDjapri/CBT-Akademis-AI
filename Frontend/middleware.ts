@@ -13,14 +13,16 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // Biarkan app yang handle redirect kalau sudah login
-    // (jangan redirect dari /login di middleware — bisa loop kalau session sudah invalid)
+    // if (hasSession && isAuthRoute) {
+    //     return NextResponse.redirect(new URL('/', request.url))
+    // }
 
     return NextResponse.next()
 }
 
 export const config = {
     matcher: [
+        '/',
         '/admin-akademis/:path*',
         '/admin-universitas/:path*',
         '/dosen/:path*',

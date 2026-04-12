@@ -7,11 +7,12 @@ import { getNilai } from "../../../../services/NilaiServices";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import SearchInput from "../../../../components/filtering/SearchInput";
 import Pagination from "../../../../components/filtering/Pagination";
+import NilaiTableSkeleton from "../../../../components/skeleton/NilaiTableSkeleton";
+import EmptyState from "../../../../components/EmptyState";
+import { usePerPage } from "../../../../hooks/usePerPage";
 
 type SortBy = "nama_ujian" | "tanggal" | "nilai" | "grade";
 type SortDir = "asc" | "desc";
-
-const PER_PAGE = 10;
 
 function ColHeader({ label, col, sortBy, sortDir, onSort, center, className }: {
   label: string; col: SortBy; sortBy: SortBy; sortDir: SortDir;
@@ -33,6 +34,7 @@ function ColHeader({ label, col, sortBy, sortDir, onSort, center, className }: {
 }
 
 export default function NilaiPage() {
+  const perPage = usePerPage(53, 1, 400);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>("tanggal");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -51,9 +53,9 @@ export default function NilaiPage() {
   };
 
   const { data, isValidating } = useSWR(
-    ["/nilai", debouncedSearch, page, sortBy, sortDir],
-    ([, s, p, sb, sd]: [string, string, number, SortBy, SortDir]) =>
-      getNilai({ search: s, page: p, per_page: PER_PAGE, sort_by: sb, sort_dir: sd }),
+    ["/nilai", debouncedSearch, page, perPage, sortBy, sortDir],
+    ([, s, p, pp, sb, sd]: [string, string, number, number, SortBy, SortDir]) =>
+      getNilai({ search: s, page: p, per_page: pp, sort_by: sb, sort_dir: sd }),
     { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
   );
 
@@ -74,19 +76,19 @@ export default function NilaiPage() {
         <p className="text-sm text-gray-500 mt-1">Lihat hasil ujian dan perkembangan belajar Anda</p>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden px-3 pb-2">
-          <div className="flex items-center justify-between px-4 pt-4 pb-2">
-            <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Riwayat Nilai</h2>
+          <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-4">
+            <h2 className="text-base font-bold shrink-0" style={{ color: "var(--color-primary)" }}>Riwayat Nilai</h2>
             <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Cari nama ujian..." />
           </div>
 
           <table className="w-full text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
-              <col className="w-64" />
-              <col className="hidden sm:table-column w-32" />
-              <col className="hidden sm:table-column w-24" />
+              <col className="w-56" />
+              <col className="w-32" />
+              <col className="w-24" />
               <col className="w-20" />
               <col className="w-20" />
             </colgroup>
@@ -94,38 +96,24 @@ export default function NilaiPage() {
               <tr className="border-b border-gray-100">
                 <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">#</th>
                 <ColHeader label="Nama Ujian" col="nama_ujian" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                <ColHeader label="Tanggal" col="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="hidden sm:table-cell" />
-                <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold hidden sm:table-cell">Pukul</th>
+                <ColHeader label="Tanggal" col="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">Pukul</th>
                 <ColHeader label="Nilai" col="nilai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <ColHeader label="Grade" col="grade" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} center />
               </tr>
             </thead>
             <tbody>
               {showSkeleton ? (
-                Array.from({ length: PER_PAGE }).map((_, i) => (
-                  <tr key={i} className="border-b border-gray-50">
-                    {[...Array(6)].map((_, j) => (
-                      <td key={j} className="px-4 py-4">
-                        <div className="h-3 bg-gray-100 rounded animate-pulse" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : !data ? null : nilaiList.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">
-                    Belum ada riwayat nilai.
-                  </td>
-                </tr>
+                <NilaiTableSkeleton count={perPage} />
               ) : (
                 nilaiList.map((item, idx) => {
-                  const no = ((meta?.current_page ?? 1) - 1) * PER_PAGE + idx + 1;
+                  const no = ((meta?.current_page ?? 1) - 1) * perPage + idx + 1;
                   return (
                     <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-4 text-gray-400">{String(no).padStart(2, "0")}</td>
                       <td className="px-4 py-4 text-gray-700 font-medium truncate">{item.nama_ujian}</td>
-                      <td className="px-4 py-4 text-gray-500 hidden sm:table-cell">{item.tanggal}</td>
-                      <td className="px-4 py-4 text-gray-500 hidden sm:table-cell">{item.pukul}</td>
+                      <td className="px-4 py-4 text-gray-500">{item.tanggal}</td>
+                      <td className="px-4 py-4 text-gray-500">{item.pukul}</td>
                       <td className="px-4 py-4 text-gray-700">{item.nilai}</td>
                       <td className="px-4 py-4 text-center">
                         <span className="font-semibold" style={{ color: item.lulus ? "var(--color-primary)" : "#ef4444" }}>
@@ -138,6 +126,11 @@ export default function NilaiPage() {
               )}
             </tbody>
           </table>
+          {data && !showSkeleton && nilaiList.length === 0 && (
+            <div className="px-3 pb-3">
+              <EmptyState message="Belum ada riwayat nilai." />
+            </div>
+          )}
         </div>
       </div>
 
