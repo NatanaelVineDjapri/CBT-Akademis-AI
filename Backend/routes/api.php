@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
     Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
     Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
+    Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
     Route::get('/mata-kuliah/my', [MataKuliahController::class, 'myMataKuliah']);
 
     Route::prefix('bank-soal')->group(function () {

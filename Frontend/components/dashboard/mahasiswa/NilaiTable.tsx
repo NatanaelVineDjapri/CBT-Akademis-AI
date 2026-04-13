@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import type { Nilai, NilaiMeta } from "@/types";
 import NilaiTableSkeleton from "@/components/skeleton/NilaiTableSkeleton";
@@ -58,6 +59,7 @@ export default function NilaiTable({
           <col className="w-24" />
           <col className="w-20" />
           <col className="w-20" />
+          <col className="w-24" />
         </colgroup>
         <thead>
           <tr className="border-b border-gray-100">
@@ -67,6 +69,7 @@ export default function NilaiTable({
             <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">Pukul</th>
             <ColHeader label="Nilai" col="nilai" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
             <ColHeader label="Grade" col="grade" sortBy={sortBy} sortDir={sortDir} onSort={onSort} center />
+            <th className="px-4 py-3" />
           </tr>
         </thead>
         <tbody>
@@ -86,6 +89,15 @@ export default function NilaiTable({
                     <span className="font-semibold" style={{ color: item.lulus ? "var(--color-primary)" : "var(--color-danger, #ef4444)" }}>
                       {item.grade}
                     </span>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <Link
+                      href={`/mahasiswa/nilai/${item.id}`}
+                      className="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
+                      style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
+                    >
+                      Detail
+                    </Link>
                   </td>
                 </tr>
               );

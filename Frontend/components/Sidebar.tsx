@@ -253,7 +253,7 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
               href={item.href}
               onMouseEnter={() => {
                 if (item.href === "/mahasiswa/mata-kuliah") {
-                  const pp = calcPerPage(230, 4);
+                  const pp = calcPerPage(128, 4, 200);
                   preload(
                     ["/mata-kuliah/my", "", 1, pp, ""],
                     ([, s, p, perPg, so]: [string, string, number, number, string]) =>
@@ -262,10 +262,13 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                 } else if (item.href === "/mahasiswa/jadwal") {
                   preload("/jadwal", getJadwal);
                 } else if (item.href === "/mahasiswa/nilai") {
-                  preload(["/nilai", "", 1], ([, s, p]: [string, string, number]) => getNilai({ search: s, page: p, per_page: 10 }));
+                  const pp = calcPerPage(53, 1, 300);
+                  preload(["/nilai", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg]: [string, string, number, number, string, string]) =>
+                    getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" }));
                 } else if (item.href === "/mahasiswa/ujian") {
-                  preload(["/ujian/my", "sedang_berlangsung", "", "", 1, 8], ([, st, s, sd, p, pp]: [string, string, string, string, number, number]) =>
-                    getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: pp }));
+                  const pp = calcPerPage(245, 4, 255);
+                  preload(["/ujian/my", "sedang_berlangsung", "", "", 1, pp], ([, st, s, sd, p, perPg]: [string, string, string, string, number, number]) =>
+                    getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: perPg }));
                 }
               }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${

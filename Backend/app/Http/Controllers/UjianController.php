@@ -85,6 +85,87 @@ class UjianController extends Controller
         ], 200);
     }
 
+    public function nilaiDetail(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $nilai = NilaiAkhir::with([
+            'pesertaUjian.ujian.mataKuliah',
+            'pesertaUjian.ujian.gradeSetting',
+            'pesertaUjian.jawabanPeserta.ujianSoal.soal.jenisSoal.opsiJawaban',
+        ])->findOrFail($id);
+
+        if ($nilai->pesertaUjian->user_id !== $authUser->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $peserta = $nilai->pesertaUjian;
+        $ujian   = $peserta->ujian;
+
+        $gradeSetting = $ujian->gradeSetting
+            ->sortBy('nilai_min')
+            ->map(fn($g) => [
+                'grade'     => $g->grade,
+                'nilai_min' => $g->nilai_min,
+                'nilai_max' => $g->nilai_max,
+            ])->values();
+
+        $info = [
+            'nama_ujian'    => $ujian->nama_ujian,
+            'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
+            'tanggal'       => $nilai->graded_at?->format('d/m/Y'),
+            'waktu'         => $nilai->graded_at?->format('H:i'),
+            'nilai'         => $nilai->nilai_total,
+            'grade'         => $nilai->grade,
+            'lulus'         => $nilai->lulus,
+            'grade_setting' => $gradeSetting,
+        ];
+
+        $pilihan_ganda = [];
+        $checklist     = [];
+        $essay         = [];
+
+        foreach ($peserta->jawabanPeserta->sortBy('ujianSoal.urutan') as $jwb) {
+            $soal      = $jwb->ujianSoal?->soal;
+            $jenisSoal = $soal?->jenisSoal->first();
+            $tipe      = $jenisSoal?->jenis_soal ?? 'essay';
+            $urutan    = $jwb->ujianSoal?->urutan ?? 0;
+
+            $kunci = $jenisSoal?->opsiJawaban
+                ->where('is_correct', true)
+                ->pluck('opsi')
+                ->sort()
+                ->implode(',') ?? '-';
+
+            $row = [
+                'no'      => $urutan,
+                'soal'    => $soal?->deskripsi ?? '-',
+                'jawaban' => $jwb->jawaban ?? '-',
+                'poin'    => $jwb->final_nilai ?? $jwb->nilai ?? 0,
+            ];
+
+            if ($tipe === 'pilihan_ganda') {
+                $pilihan_ganda[] = array_merge($row, ['kunci' => $kunci]);
+            } elseif ($tipe === 'checklist') {
+                $checklist[] = array_merge($row, ['kunci' => $kunci]);
+            } else {
+                $essay[] = array_merge($row, [
+                    'ai_feedback' => $jwb->ai_feedback,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Detail nilai berhasil diambil!',
+            'info'    => $info,
+            'jawaban' => [
+                'pilihan_ganda' => $pilihan_ganda,
+                'checklist'     => $checklist,
+                'essay'         => $essay,
+            ],
+        ]);
+    }
+
     public function nilaiMahasiswa(Request $request)
     {
         $authUser = $request->user();

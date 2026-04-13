@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CalendarDays, Calendar, Clock } from "lucide-react";
 import type { DashboardUjianItem } from "@/services/DashboardServices";
 import { formatDateShort, formatTime } from "@/utils/format";
@@ -16,7 +17,8 @@ export default function UjianAkanDatangCard({
             Ujian Akan Datang
           </span>
         </div>
-        <button
+        <Link
+          href="/mahasiswa/ujian?tab=akan_datang"
           className="text-xs rounded-lg px-3 py-1 border transition-colors"
           style={{
             color: "var(--color-primary)",
@@ -24,7 +26,7 @@ export default function UjianAkanDatangCard({
           }}
         >
           Lihat Semua
-        </button>
+        </Link>
       </div>
       {data.length === 0 ? (
         <p className="text-xs text-gray-400">Tidak ada ujian akan datang.</p>

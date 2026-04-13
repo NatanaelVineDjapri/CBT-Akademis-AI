@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import type { DashboardNilaiItem } from "@/services/DashboardServices";
 import { getBarColor, getInsight } from "@/utils/nilai";
@@ -77,12 +78,13 @@ export default function NilaiTerbaruCard({
         </div>
       )}
 
-      <button
-        className="w-full text-white text-xs font-medium py-2.5 rounded-xl transition-colors"
+      <Link
+        href="/mahasiswa/nilai"
+        className="w-full text-white text-xs font-medium py-2.5 rounded-xl transition-colors text-center block"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
         Lihat Semua
-      </button>
+      </Link>
     </div>
   );
 }

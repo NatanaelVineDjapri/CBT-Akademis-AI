@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { getMahasiswaDashboard } from "@/services/DashboardServices";
+import BerandaSkeleton from "@/components/skeleton/BerandaSkeleton";
 import StatCard from "@/components/dashboard/mahasiswa/StatCard";
 import UjianSegeraCard from "@/components/dashboard/mahasiswa/ujian/UjianSegeraCard";
 import UjianAkanDatangCard from "@/components/dashboard/mahasiswa/ujian/UjianAkanDatang";
@@ -9,6 +10,7 @@ import NilaiTerbaruCard from "@/components/dashboard/mahasiswa/NilaiTerbaruCard"
 import PengumumanCard from "@/components/dashboard/PengumumanCard";
 import PerkembanganNilaiChart from "@/components/dashboard/mahasiswa/PerkembanganNilaiChart";
 import UjianPerBulanChart from "@/components/dashboard/mahasiswa/ujian/UjianPerBulanChart";
+import SemangatCard from "@/components/dashboard/mahasiswa/SemangatCard";
 
 export default function BerandaMahasiswaPage() {
   const { data } = useSWR("/dashboard/mahasiswa", getMahasiswaDashboard, {
@@ -16,7 +18,6 @@ export default function BerandaMahasiswaPage() {
     shouldRetryOnError: false,
   });
 
-  const stats = data?.stats;
 
   return (
     <div className="flex flex-col gap-4 pb-4">
@@ -31,44 +32,30 @@ export default function BerandaMahasiswaPage() {
           Selamat datang kembali! Lihat ringkasan aktivitas Anda.
         </p>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard
-          label="Ujian Selesai"
-          value={stats ? String(stats.ujian_selesai) : "-"}
-          color="green"
-          icon="check"
-        />
-        <StatCard
-          label="Ujian Akan Datang"
-          value={stats ? String(stats.ujian_akan_datang) : "-"}
-          color="blue"
-          icon="clock"
-        />
-        <StatCard
-          label="Rata-rata Nilai"
-          value={stats ? String(stats.rata_rata_nilai) : "-"}
-          color="pink"
-          icon="chart"
-        />
-        <StatCard
-          label="Nilai Tertinggi"
-          value={stats ? String(stats.nilai_tertinggi) : "-"}
-          color="amber"
-          icon="trophy"
-        />
-      </div>
-      <PengumumanCard />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-        <div className="flex flex-col gap-4">
-          <UjianSegeraCard data={data?.ujian_segera ?? null} />
-          <UjianAkanDatangCard data={data?.ujian_akan_datang ?? []} />
-          <UjianPerBulanChart data={data?.ujian_per_bulan ?? []} />
-        </div>
-        <div className="flex flex-col gap-4">
-          <NilaiTerbaruCard data={data?.nilai_terbaru ?? []} />
-          <PerkembanganNilaiChart data={data?.perkembangan_nilai ?? []} />
-        </div>
-      </div>
+
+      {!data ? <BerandaSkeleton /> : (
+        <>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard label="Ujian Selesai" value={String(data.stats.ujian_selesai)} color="green" icon="check" />
+            <StatCard label="Ujian Akan Datang" value={String(data.stats.ujian_akan_datang)} color="blue" icon="clock" />
+            <StatCard label="Rata-rata Nilai" value={String(data.stats.rata_rata_nilai)} color="pink" icon="chart" />
+            <StatCard label="Nilai Tertinggi" value={String(data.stats.nilai_tertinggi)} color="amber" icon="trophy" />
+          </div>
+          <PengumumanCard />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+            <div className="flex flex-col gap-4">
+              <UjianSegeraCard data={data.ujian_segera ?? null} />
+              <UjianAkanDatangCard data={data.ujian_akan_datang ?? []} />
+              <UjianPerBulanChart data={data.ujian_per_bulan ?? []} />
+            </div>
+            <div className="flex flex-col gap-4">
+              <NilaiTerbaruCard data={data.nilai_terbaru ?? []} />
+              <PerkembanganNilaiChart data={data.perkembangan_nilai ?? []} />
+            </div>
+          </div>
+          <SemangatCard />
+        </>
+      )}
     </div>
   );
 }

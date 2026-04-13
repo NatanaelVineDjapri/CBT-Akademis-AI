@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Bell, Calendar, Clock } from "lucide-react";
 import type { DashboardUjianItem } from "@/services/DashboardServices";
 import { formatDate, formatTime } from "@/utils/format";
@@ -9,11 +10,20 @@ export default function UjianSegeraCard({
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <Bell size={15} style={{ color: "var(--color-primary)" }} />
-        <span className="text-sm font-semibold text-gray-800">
-          Ujian Sedang Berlangsung
-        </span>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Bell size={15} style={{ color: "var(--color-primary)" }} />
+          <span className="text-sm font-semibold text-gray-800">
+            Ujian Sedang Berlangsung
+          </span>
+        </div>
+        <Link
+          href="/mahasiswa/ujian?tab=berlangsung"
+          className="text-xs rounded-lg px-3 py-1 border transition-colors"
+          style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
+        >
+          Lihat Semua
+        </Link>
       </div>
       {data ? (
         <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
