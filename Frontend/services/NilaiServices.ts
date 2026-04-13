@@ -1,5 +1,5 @@
 import api from "./api";
-import { Nilai, NilaiMeta } from "../types";
+import { Nilai, NilaiMeta, NilaiDetail } from "../types";
 
 export const getNilai = async (params?: {
   search?: string;
@@ -12,4 +12,9 @@ export const getNilai = async (params?: {
 }): Promise<{ data: Nilai[]; meta: NilaiMeta }> => {
   const res = await api.get("/nilai", { params });
   return { data: res.data.data, meta: res.data.meta };
+};
+
+export const getNilaiDetail = async (id: number | string): Promise<NilaiDetail> => {
+  const res = await api.get(`/nilai/${id}`);
+  return { info: res.data.info, jawaban: res.data.jawaban };
 };

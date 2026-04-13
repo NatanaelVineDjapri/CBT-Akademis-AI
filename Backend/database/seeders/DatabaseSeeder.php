@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             DemoSeeder::class,
             NilaiSeeder::class,
             UjianAktifSeeder::class,
+            UjianDenganSoalSeeder::class,
         ]);
     }
 }

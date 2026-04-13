@@ -85,6 +85,56 @@ export interface NilaiMeta {
   last_page: number;
 }
 
+export interface GradeSettingItem {
+  grade: string;
+  nilai_min: number;
+  nilai_max: number;
+}
+
+export interface NilaiDetailInfo {
+  nama_ujian: string;
+  mata_kuliah: string;
+  tanggal: string;
+  waktu: string;
+  nilai: number;
+  grade: string;
+  lulus: boolean;
+  grade_setting: GradeSettingItem[];
+}
+
+export interface JawabanPG {
+  no: number;
+  soal: string;
+  kunci: string;
+  jawaban: string;
+  poin: number;
+}
+
+export interface JawabanCheckbox {
+  no: number;
+  soal: string;
+  kunci: string;
+  jawaban: string;
+  poin: number;
+}
+
+export interface JawabanEssay {
+  no: number;
+  soal: string;
+  jawaban: string;
+  poin: number;
+  ai_feedback: string | null;
+}
+
+export interface NilaiDetail {
+  info: NilaiDetailInfo;
+  jawaban: {
+    pilihan_ganda: JawabanPG[];
+    checklist: JawabanCheckbox[];
+    essay: JawabanEssay[];
+  };
+}
+
 export interface JadwalEvent {
   id: string | number;
   title: string;
@@ -117,4 +167,27 @@ export const tips = [
   "Jangan bagikan password ke siapapun",
   "Gunakan kombinasi huruf, angka & simbol",
   "Logout setelah selesai menggunakan",
+];
+
+export const quotes = [
+  "Setiap langkah kecil yang kamu ambil hari ini adalah investasi untuk masa depanmu. Terus bergerak maju!",
+  "Kesulitan bukan penghalang, melainkan batu loncatan menuju versi terbaik dirimu.",
+  "Belajar itu bukan tentang seberapa cepat kamu selesai, tapi seberapa dalam kamu memahami.",
+  "Hari ini adalah kesempatan baru untuk menjadi lebih baik dari kemarin. Manfaatkan sebaik-baiknya!",
+  "Semangat yang konsisten mengalahkan bakat yang malas. Kamu sudah di jalur yang benar!",
+  "Setiap soal yang kamu kerjakan menambah bekal untuk masa depan cerahmu.",
+  "Jangan takut gagal — setiap kesalahan adalah guru terbaik yang tidak memungut bayaran.",
+  "Proses tidak pernah mengkhianati hasil. Terus belajar dan percaya pada prosesmu!",
+  "Kamu lebih kuat dari yang kamu kira, lebih pintar dari yang kamu percaya. Buktikan hari ini!",
+  "Satu hari penuh usaha lebih berharga dari seribu hari penuh niat tanpa aksi.",
+  "Impianmu layak diperjuangkan. Mulai dari yang kecil, konsisten setiap hari.",
+  "Nilai bukan segalanya, tapi usaha terbaikmu selalu layak untuk diberikan.",
+  "Setiap mata kuliah yang kamu kuasai membuka pintu kesempatan yang belum pernah kamu bayangkan.",
+  "Rasa lelah yang kamu rasakan sekarang adalah bukti bahwa kamu sedang tumbuh.",
+  "Sukses bukan milik yang paling berbakat, tapi milik yang paling pantang menyerah.",
+  "Waktu yang kamu investasikan untuk belajar hari ini tidak akan pernah sia-sia.",
+  "Kamu sedang menulis babak terbaik dalam hidupmu. Buat setiap halamannya berarti!",
+  "Percayalah pada kemampuanmu. Kamu sudah sejauh ini — itu bukan kebetulan.",
+  "Setiap ujian yang kamu hadapi adalah bukti bahwa kamu dipercaya untuk melewatinya.",
+  "Tetap fokus, tetap semangat. Hasil terbaik menanti mereka yang tidak berhenti berusaha.",
 ];

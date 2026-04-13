@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getMyUjian } from "../../../../services/UjianServices";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import { usePerPage } from "../../../../hooks/usePerPage";
@@ -21,7 +22,15 @@ const TABS: { key: Tab; label: string; status: string }[] = [
 ];
 
 export default function UjianPage() {
-  const [tab, setTab] = useState<Tab>("berlangsung");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialTab = (searchParams.get("tab") as Tab) ?? "berlangsung";
+  const [tab, setTab] = useState<Tab>(initialTab);
+
+  const handleTabChange = (newTab: Tab) => {
+    setTab(newTab);
+    router.replace(`/mahasiswa/ujian?tab=${newTab}`, { scroll: false });
+  };
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOrder>(null);
   const [page, setPage] = useState(1);
@@ -63,7 +72,7 @@ export default function UjianPage() {
           {TABS.map(t => (
             <button
               key={t.key}
-              onClick={() => { setTab(t.key); setPage(1); }}
+              onClick={() => { handleTabChange(t.key); setPage(1); }}
               className="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
               style={tab === t.key
                 ? { backgroundColor: "var(--color-primary)", color: "white" }
