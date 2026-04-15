@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { preload } from "swr";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { getNilaiDetail } from "@/services/NilaiServices";
 import type { Nilai, NilaiMeta } from "@/types";
 import NilaiTableSkeleton from "@/components/skeleton/NilaiTableSkeleton";
 import EmptyState from "@/components/EmptyState";
@@ -95,6 +97,7 @@ export default function NilaiTable({
                       href={`/mahasiswa/nilai/${item.id}`}
                       className="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
                       style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
+                      onMouseEnter={() => preload(`/nilai/${item.id}`, () => getNilaiDetail(item.id))}
                     >
                       Detail
                     </Link>

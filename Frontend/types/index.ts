@@ -36,6 +36,22 @@ export interface MataKuliah {
   dosen_matkul?: { id: number; user_id: number; tahun_ajaran?: string; user: { id: number; nama: string; nidn?: string } }[];
 }
 
+export interface BabItem {
+  id: number;
+  nama_bab: string;
+  urutan: number;
+  jumlah_soal: number;
+}
+
+export interface MataKuliahDetail {
+  id: number;
+  nama: string;
+  kode: string;
+  dosen: string;
+  total_bab: number;
+  bab: BabItem[];
+}
+
 export interface MataKuliahMeta {
   total: number;
   per_page: number;
@@ -153,6 +169,14 @@ export const labels: Record<string, string> = {
   jadwal: "Jadwal",
   ujian: "Ujian",
   settings: "Settings",
+  dosen: "Dosen",
+  mahasiswa: "Mahasiswa",
+  profile: "Profil",
+  nilai: "Nilai",
+  "mata-kuliah": "Mata Kuliah",
+  "bank-soal": "Bank Soal",
+  monitoring: "Monitoring",
+  "hasil-ujian": "Hasil Ujian",
 };
 
 export const roleLabels: Record<string, string> = {
@@ -164,9 +188,9 @@ export const roleLabels: Record<string, string> = {
 };
 
 export const tips = [
-  "Jangan bagikan password ke siapapun",
-  "Gunakan kombinasi huruf, angka & simbol",
-  "Logout setelah selesai menggunakan",
+  "Jangan pernah membagikan password Anda kepada siapapun, termasuk pihak yang mengaku dari layanan resmi, karena hal ini bisa membahayakan keamanan akun Anda.",
+  "Gunakan kombinasi huruf besar, huruf kecil, angka, dan simbol agar password lebih kuat dan tidak mudah ditebak oleh orang lain.",
+  "Selalu logout setelah selesai menggunakan akun, terutama jika Anda memakai perangkat umum atau milik orang lain, untuk mencegah akses tanpa izin.",
 ];
 
 export const quotes = [

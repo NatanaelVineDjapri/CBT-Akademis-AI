@@ -1,5 +1,5 @@
 import api from "./api";
-import { MataKuliah, MataKuliahMeta } from "../types";
+import { MataKuliah, MataKuliahMeta, MataKuliahDetail } from "../types";
 
 export const getMataKuliah = async (params?: {
   page?: number;
@@ -40,4 +40,14 @@ export const updateMataKuliah = async (
 
 export const deleteMataKuliah = async (id: number): Promise<void> => {
   await api.delete(`/mata-kuliah/${id}`);
+};
+
+export const getMyMataKuliahDetail = async (id: number | string): Promise<MataKuliahDetail> => {
+  const res = await api.get(`/mata-kuliah/my/${id}`);
+  return res.data.data;
+};
+
+export const getDosenMataKuliah = async (): Promise<{ id: number; nama: string; kode: string }[]> => {
+  const res = await api.get("/mata-kuliah/dosen");
+  return res.data.data;
 };

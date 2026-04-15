@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\NilaiAkhir;
 use App\Models\PesertaUjian;
+use App\Models\Ujian;
 use Illuminate\Http\Request;
 
 class UjianController extends Controller
 {
     public function ujianMahasiswa(Request $request)
     {
+        PesertaUjian::autoExpire();
+
         $authUser = $request->user();
         $search   = $request->query('search', '');
         $status   = $request->query('status', '');
@@ -83,6 +86,28 @@ class UjianController extends Controller
             'message' => 'Jadwal ujian berhasil diambil!',
             'data'    => $ujianList,
         ], 200);
+    }
+
+    public function jadwalDosen(Request $request)
+    {
+        $authUser = $request->user();
+
+        $ujianList = Ujian::with('mataKuliah')
+            ->where('created_by', $authUser->id)
+            ->get()
+            ->map(fn($ujian) => [
+                'id'          => $ujian->id,
+                'title'       => $ujian->nama_ujian,
+                'mata_kuliah' => $ujian->mataKuliah?->nama,
+                'start'       => $ujian->start_date,
+                'end'         => $ujian->end_date,
+                'status'      => $ujian->status ?? null,
+            ]);
+
+        return response()->json([
+            'message' => 'Jadwal ujian dosen berhasil diambil!',
+            'data'    => $ujianList,
+        ]);
     }
 
     public function nilaiDetail(Request $request, $id)

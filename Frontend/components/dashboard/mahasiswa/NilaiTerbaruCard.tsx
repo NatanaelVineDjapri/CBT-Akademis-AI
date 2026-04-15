@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { preload } from "swr";
 import { GraduationCap } from "lucide-react";
 import type { DashboardNilaiItem } from "@/services/DashboardServices";
 import { getBarColor, getInsight } from "@/utils/nilai";
+import { getNilai } from "@/services/NilaiServices";
+import { calcPerPage } from "@/hooks/usePerPage";
 
 export default function NilaiTerbaruCard({
   data,
@@ -82,6 +85,12 @@ export default function NilaiTerbaruCard({
         href="/mahasiswa/nilai"
         className="w-full text-white text-xs font-medium py-2.5 rounded-xl transition-colors text-center block"
         style={{ backgroundColor: "var(--color-primary)" }}
+        onMouseEnter={() => {
+          const pp = calcPerPage(53, 1, 300);
+          preload(["/nilai", "", 1, pp, "tanggal", "desc"],
+            ([, s, p, perPg]: [string, string, number, number, string, string]) =>
+              getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" }));
+        }}
       >
         Lihat Semua
       </Link>

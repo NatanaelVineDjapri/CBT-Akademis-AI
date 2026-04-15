@@ -13,6 +13,7 @@ class UjianAktifSeeder extends Seeder
         $natanaelId = DB::table('users')->where('email', 'natanaelvinedj@gmail.com')->value('id');
         $dosenId    = DB::table('users')->where('email', 'budi.santoso@untar.ac.id')->value('id');
         $allMatkul  = DB::table('mata_kuliah')->orderBy('id')->get();
+        DB::table('ujian')->whereIn('kode_akses', ['PWLX01','KBAX01','BDLX01','RPLX01'])->delete();
 
         $now = Carbon::now();
 
@@ -93,6 +94,7 @@ class UjianAktifSeeder extends Seeder
                 'selesai_at' => null,
                 'created_at' => now(), 'updated_at' => now(),
             ]);
+
         }
     }
 }

@@ -59,6 +59,49 @@ class MataKuliahController extends Controller
         ], 200);
     }
 
+    public function dosenMataKuliah(Request $request)
+    {
+        $authUser = $request->user();
+
+        $mataKuliah = MataKuliah::whereHas('dosenMatkul', fn($q) => $q->where('user_id', $authUser->id))
+            ->orderBy('nama')
+            ->get(['id', 'nama', 'kode']);
+
+        return response()->json([
+            'message' => 'Data mata kuliah dosen berhasil diambil!',
+            'data' => $mataKuliah,
+        ]);
+    }
+
+    public function myMataKuliahDetail(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $mataKuliah = MataKuliah::with([
+            'dosenMatkul.user',
+            'bab' => fn($q) => $q->withCount('soal')->orderBy('urutan'),
+        ])
+        ->whereHas('userMataKuliah', fn($q) => $q->where('user_id', $authUser->id))
+        ->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Detail mata kuliah berhasil diambil!',
+            'data' => [
+                'id'        => $mataKuliah->id,
+                'nama'      => $mataKuliah->nama,
+                'kode'      => $mataKuliah->kode,
+                'dosen'     => $mataKuliah->dosenMatkul->first()?->user?->nama ?? '-',
+                'total_bab' => $mataKuliah->bab->count(),
+                'bab'       => $mataKuliah->bab->map(fn($b) => [
+                    'id'          => $b->id,
+                    'nama_bab'    => $b->nama_bab,
+                    'urutan'      => $b->urutan,
+                    'jumlah_soal' => $b->soal_count,
+                ])->values(),
+            ],
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

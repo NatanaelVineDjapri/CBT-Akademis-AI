@@ -21,7 +21,7 @@ export default function RataRataNilaiCard() {
           {data.map((d) => (
             <div key={d.mk} className="flex items-center justify-between py-2">
               <span className="text-xs font-medium text-gray-800">{d.mk.replace("...", "")}</span>
-              <span className="text-xs font-medium text-teal-600">{d.nilai}%</span>
+              <span className="text-xs font-medium" style={{ color: "var(--color-primary)" }}>{d.nilai}%</span>
             </div>
           ))}
           <div className="flex items-start gap-1 pt-2">
@@ -38,7 +38,7 @@ export default function RataRataNilaiCard() {
             <BarChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
               <XAxis dataKey="mk" tick={{ fontSize: 9, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
               <YAxis domain={[20, 100]} ticks={[20,40,60,80,100]} tick={{ fontSize: 9, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
-              <Bar dataKey="nilai" fill="#0d9488" radius={[3, 3, 0, 0]} barSize={14} />
+              <Bar dataKey="nilai" fill="var(--color-primary)" radius={[3, 3, 0, 0]} barSize={14} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -44,7 +44,8 @@ export default function PerformaChart() {
       <div className="flex items-center justify-center gap-4 mb-5">
         <button
           onClick={() => setIndex((i) => (i - 1 + matkul.length) % matkul.length)}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-colors"
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           <ChevronLeft size={16} />
         </button>
@@ -53,7 +54,8 @@ export default function PerformaChart() {
         </span>
         <button
           onClick={() => setIndex((i) => (i + 1) % matkul.length)}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-colors"
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           <ChevronRight size={16} />
         </button>
@@ -63,13 +65,13 @@ export default function PerformaChart() {
       <div className="flex gap-4">
         {/* Stats kiri */}
         <div className="flex flex-col gap-3 min-w-[160px]">
-          <div className="flex items-center gap-3 bg-teal-50 rounded-xl px-3 py-3">
-            <div className="w-9 h-9 bg-teal-400 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="flex items-center gap-3 rounded-xl px-3 py-3" style={{ backgroundColor: "var(--color-primary-light, #e0f7fa)" }}>
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
               <BarChart2 size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-xs text-teal-700 font-medium leading-tight">Rata – rata Nilai</p>
-              <p className="text-sm font-semibold text-teal-800">78.69</p>
+              <p className="text-xs font-medium leading-tight" style={{ color: "var(--color-primary)" }}>Rata – rata Nilai</p>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>78.69</p>
             </div>
           </div>
 
@@ -140,7 +142,7 @@ export default function PerformaChart() {
                     border: "0.5px solid #e5e7eb",
                     fontSize: "12px",
                   }}
-                  formatter={(value: number) => [`${value}`, "Nilai rata-rata"]}
+                  formatter={(value) => [`${value}`, "Nilai rata-rata"]}
                 />
                 <Line
                   type="linear"

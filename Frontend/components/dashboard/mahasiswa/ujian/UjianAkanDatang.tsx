@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { preload } from "swr";
 import { CalendarDays, Calendar, Clock } from "lucide-react";
 import type { DashboardUjianItem } from "@/services/DashboardServices";
 import { formatDateShort, formatTime } from "@/utils/format";
+import { getMyUjian } from "@/services/UjianServices";
+import { calcPerPage } from "@/hooks/usePerPage";
 
 export default function UjianAkanDatangCard({
   data,
@@ -20,9 +23,12 @@ export default function UjianAkanDatangCard({
         <Link
           href="/mahasiswa/ujian?tab=akan_datang"
           className="text-xs rounded-lg px-3 py-1 border transition-colors"
-          style={{
-            color: "var(--color-primary)",
-            borderColor: "var(--color-primary)",
+          style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
+          onMouseEnter={() => {
+            const pp = calcPerPage(245, 4, 255);
+            preload(["/ujian/my", "belum_mulai", "", "", 1, pp],
+              ([, st, s, sd, p, perPg]: [string, string, string, string, number, number]) =>
+                getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: perPg }));
           }}
         >
           Lihat Semua
