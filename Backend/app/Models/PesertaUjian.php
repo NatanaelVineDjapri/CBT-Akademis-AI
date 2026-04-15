@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PesertaUjian extends Model
 {
@@ -46,5 +47,25 @@ class PesertaUjian extends Model
     public function nilaiAkhir()
     {
         return $this->hasOne(NilaiAkhir::class);
+    }
+
+    /**
+     * Auto-expire peserta ujian yang end_date-nya sudah lewat
+     * tapi statusnya masih sedang_berlangsung.
+     */
+    public static function autoExpire(): void
+    {
+        DB::table('peserta_ujian')
+            ->where('status', 'sedang_berlangsung')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('ujian')
+                    ->whereColumn('ujian.id', 'peserta_ujian.ujian_id')
+                    ->where('ujian.end_date', '<', now());
+            })
+            ->update([
+                'status'     => 'selesai',
+                'selesai_at' => now(),
+            ]);
     }
 }

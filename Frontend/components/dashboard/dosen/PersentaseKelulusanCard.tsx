@@ -22,7 +22,7 @@ export default function PersentaseKelulusanCard() {
               <p className="text-xs font-medium text-gray-800">{d.nama}</p>
               <p className="text-xs text-gray-400">{d.tanggal}</p>
             </div>
-            <span className="text-xs font-medium bg-teal-600 text-white px-3 py-1 rounded-lg">
+            <span className="text-xs font-medium text-white px-3 py-1 rounded-lg" style={{ backgroundColor: "var(--color-primary)" }}>
               {d.jumlah} Pelanggaran
             </span>
           </div>
@@ -32,7 +32,7 @@ export default function PersentaseKelulusanCard() {
         <AlertTriangle size={12} className="text-amber-500" />
         <span className="text-xs text-amber-600">Ujian PPKn B memiliki total pelanggaran tinggi</span>
       </div>
-      <button className="mt-3 w-full bg-teal-600 text-white text-xs font-medium py-2 rounded-xl hover:bg-teal-700 transition-colors">
+      <button className="mt-3 w-full text-white text-xs font-medium py-2 rounded-xl hover:opacity-90 transition-colors" style={{ backgroundColor: "var(--color-primary)" }}>
         Lihat Semua
       </button>
     </div>

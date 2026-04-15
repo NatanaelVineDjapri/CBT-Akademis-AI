@@ -2,15 +2,70 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankSoal;
 use App\Models\NilaiAkhir;
 use App\Models\PesertaUjian;
+use App\Models\Ujian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function dosen(Request $request)
+    {
+        PesertaUjian::autoExpire();
+
+        $userId = $request->user()->id;
+        $now = now();
+
+        $allUjian = Ujian::with('mataKuliah')
+            ->where('created_by', $userId)
+            ->orderByDesc('start_date')
+            ->get();
+
+        $berlangsung = $allUjian->filter(fn($u) => $u->start_date <= $now && $u->end_date >= $now);
+        $selesai     = $allUjian->filter(fn($u) => $u->end_date < $now);
+
+        $formatUjian = fn($u) => [
+            'id'          => $u->id,
+            'nama'        => $u->nama_ujian,
+            'mata_kuliah' => $u->mataKuliah?->nama ?? '-',
+            'start_date'  => $u->start_date?->format('d M Y'),
+            'end_date'    => $u->end_date?->format('d M Y'),
+            'jam'         => ($u->start_date?->format('H:i') ?? '') . ' – ' . ($u->end_date?->format('H:i') ?? ''),
+        ];
+
+        $bankSoal = BankSoal::withCount('soal')
+            ->where('created_by', $userId)
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get()
+            ->map(fn($b) => [
+                'id'         => $b->id,
+                'nama'       => $b->nama,
+                'jumlah_soal' => $b->soal_count,
+                'permission' => $b->permission,
+            ]);
+
+        return response()->json([
+            'message' => 'Data dashboard dosen berhasil diambil!',
+            'stats'   => [
+                'total_bank_soal'   => BankSoal::where('created_by', $userId)->count(),
+                'total_ujian'       => $allUjian->count(),
+                'ujian_berlangsung' => $berlangsung->count(),
+                'ujian_selesai'     => $selesai->count(),
+            ],
+            'bank_soal'          => $bankSoal,
+            'ujian_terbaru'      => $allUjian->take(3)->map($formatUjian)->values(),
+            'ujian_berlangsung'  => $berlangsung->take(3)->map($formatUjian)->values(),
+            'ujian_selesai'      => $selesai->take(3)->map($formatUjian)->values(),
+        ]);
+    }
+
     public function mahasiswa(Request $request)
     {
+        PesertaUjian::autoExpire();
+
         $userId = $request->user()->id;
 
         // Stats

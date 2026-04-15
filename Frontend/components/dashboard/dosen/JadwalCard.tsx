@@ -36,7 +36,7 @@ export default function JadwalCard() {
           <div key={d} className="text-center text-xs text-gray-400 py-1">{d}</div>
         ))}
         {dates.flat().map((d, i) => (
-          <div key={i} className={`text-center text-xs py-1.5 rounded-md ${!d ? "text-transparent" : d === today ? "bg-teal-600 text-white font-medium" : "text-gray-600"}`}>
+          <div key={i} className={`text-center text-xs py-1.5 rounded-md ${!d ? "text-transparent" : d === today ? "text-white font-medium" : "text-gray-600"}`} style={d === today ? { backgroundColor: "var(--color-primary)" } : {}}>
             {d ?? "."}
           </div>
         ))}

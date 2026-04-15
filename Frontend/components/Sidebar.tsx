@@ -116,9 +116,9 @@ const menuByRole: Record<string, MenuItem[]> = {
     },
     { label: "Jadwal", href: "/dosen/jadwal", icon: <Calendar size={18} /> },
     {
-      label: "Settings",
-      href: "/dosen/settings",
-      icon: <Settings size={18} />,
+      label: "Profil",
+      href: "/dosen/profile",
+      icon: <UserCircle size={18} />,
     },
   ],
   mahasiswa: [

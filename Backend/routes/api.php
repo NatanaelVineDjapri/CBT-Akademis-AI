@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
     Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
     Route::get('/mata-kuliah/my', [MataKuliahController::class, 'myMataKuliah']);
+    Route::get('/mata-kuliah/my/{id}', [MataKuliahController::class, 'myMataKuliahDetail']);
 
     Route::prefix('bank-soal')->group(function () {
         Route::get('/', [BankSoalController::class, 'index']);
@@ -94,6 +95,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{id}', [MataKuliahController::class, 'update']);
             Route::delete('/{id}', [MataKuliahController::class, 'destroy']);
         });
+    });
+
+    Route::middleware('role:dosen')->group(function () {
+        Route::get('/dashboard/dosen', [DashboardController::class, 'dosen']);
+        Route::get('/mata-kuliah/dosen', [MataKuliahController::class, 'dosenMataKuliah']);
+        Route::get('/jadwal/dosen', [UjianController::class, 'jadwalDosen']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {

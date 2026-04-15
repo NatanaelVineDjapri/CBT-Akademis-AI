@@ -19,3 +19,8 @@ export const getJadwal = async (): Promise<JadwalEvent[]> => {
   const res = await api.get("/jadwal");
   return res.data.data;
 };
+
+export const getJadwalDosen = async (): Promise<JadwalEvent[]> => {
+  const res = await api.get("/jadwal/dosen");
+  return res.data.data;
+};

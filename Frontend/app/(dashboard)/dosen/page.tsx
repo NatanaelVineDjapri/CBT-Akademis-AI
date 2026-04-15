@@ -1,5 +1,8 @@
 "use client";
 
+import useSWR from "swr";
+import { useUser } from "../../../context/UserContext";
+import { getDosenDashboard } from "@/services/DashboardServices";
 import BankSoalCard from "@/components/dashboard/dosen/BankSoalCard";
 import UjianTerbaruCard from "@/components/dashboard/dosen/UjianTerbaruCard";
 import UjianBerlangsungCard from "@/components/dashboard/dosen/UjianBerlangsungCard";
@@ -12,35 +15,24 @@ import TotalPelanggaranCard from "@/components/dashboard/dosen/TotalPelanggaranC
 import JadwalCard from "@/components/dashboard/dosen/JadwalCard";
 import PengumumanCard from "@/components/dashboard/PengumumanCard";
 
-export default function DashboardPage() {
-  const userName = "Nama";
+export default function DashboardDosenPage() {
+  const { user } = useUser();
+  const { data } = useSWR("/dashboard/dosen", getDosenDashboard, { revalidateOnFocus: false });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-
+    <div className="min-h-screen p-3">
       {/* Greeting */}
       <div className="mb-6">
-        <p className="text-sm text-gray-500">Hello</p>
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Welcome back {userName}!
-        </h1>
+        <p className="text-2xl font-semibold" style={{color: "var(--color-primary)"}}>Hello</p>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--color-primary)" }}>Welcome Back {user?.nama ?? "Dosen"}</h1>
       </div>
 
-      {/* Baris 1: Kiri (Bank Soal + Ujian Terbaru) | Kanan (Berlangsung + Selesai) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 items-stretch">
-        
-        {/* Kolom Kiri */}
-        <div className="flex flex-col gap-4">
-          <BankSoalCard />
-          <UjianTerbaruCard />
-        </div>
-
-        {/* Kolom Kanan */}
-        <div className="flex flex-col gap-4">
-          <UjianBerlangsungCard />
-          <UjianSelesaiCard />
-        </div>
-
+      {/* Baris 1: Grid 2x2 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        <BankSoalCard data={data?.bank_soal ?? []} />
+        <UjianBerlangsungCard data={data?.ujian_berlangsung ?? []} />
+        <UjianTerbaruCard data={data?.ujian_terbaru ?? []} />
+        <UjianSelesaiCard data={data?.ujian_selesai ?? []} />
       </div>
 
       {/* Baris 2: Performa Chart */}
@@ -65,7 +57,6 @@ export default function DashboardPage() {
         <JadwalCard />
         <PengumumanCard />
       </div>
-
     </div>
   );
 }

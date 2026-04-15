@@ -52,3 +52,37 @@ export const getMahasiswaDashboard = async (): Promise<MahasiswaDashboard> => {
   const res = await api.get("/dashboard/mahasiswa");
   return res.data;
 };
+
+export interface DosenUjianItem {
+  id: number;
+  nama: string;
+  mata_kuliah: string;
+  start_date: string;
+  end_date: string;
+  jam: string;
+}
+
+export interface DosenBankSoalItem {
+  id: number;
+  nama: string;
+  jumlah_soal: number;
+  permission: string;
+}
+
+export interface DosenDashboard {
+  stats: {
+    total_bank_soal: number;
+    total_ujian: number;
+    ujian_berlangsung: number;
+    ujian_selesai: number;
+  };
+  bank_soal: DosenBankSoalItem[];
+  ujian_terbaru: DosenUjianItem[];
+  ujian_berlangsung: DosenUjianItem[];
+  ujian_selesai: DosenUjianItem[];
+}
+
+export const getDosenDashboard = async (): Promise<DosenDashboard> => {
+  const res = await api.get("/dashboard/dosen");
+  return res.data;
+};
