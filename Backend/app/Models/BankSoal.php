@@ -11,6 +11,7 @@ class BankSoal extends Model
     protected $fillable = [
         'created_by',
         'mata_kuliah_id',
+        'bab_id',
         'nama',
         'deskripsi',
         'permission',
@@ -24,6 +25,11 @@ class BankSoal extends Model
     public function mataKuliah()
     {
         return $this->belongsTo(MataKuliah::class);
+    }
+
+    public function bab()
+    {
+        return $this->belongsTo(Bab::class);
     }
 
     public function soal()

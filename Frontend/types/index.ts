@@ -36,6 +36,27 @@ export interface MataKuliah {
   dosen_matkul?: { id: number; user_id: number; tahun_ajaran?: string; user: { id: number; nama: string; nidn?: string } }[];
 }
 
+export interface BankSoalItem {
+  id: number;
+  nama: string;
+  deskripsi?: string;
+  permission: 'public' | 'shared' | 'private';
+  created_by: number;
+  mata_kuliah_id?: number;
+  mata_kuliah?: { id: number; nama: string; kode: string };
+  bab_id?: number | null;
+  bab?: { id: number; nama_bab: string } | null;
+  creator?: { id: number; nama: string };
+  soal_count?: number;
+}
+
+export interface BankSoalMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+}
+
 export interface BabItem {
   id: number;
   nama_bab: string;

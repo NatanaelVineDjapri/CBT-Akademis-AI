@@ -39,7 +39,7 @@ export default function MataKuliahPage() {
   }, [isValidating, data]);
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4 pb-4">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
@@ -68,7 +68,7 @@ export default function MataKuliahPage() {
       </div>
 
       {meta && (
-        <div className="mt-auto">
+        <div>
           <Pagination
             currentPage={meta.current_page}
             lastPage={meta.last_page}

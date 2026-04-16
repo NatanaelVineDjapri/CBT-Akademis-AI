@@ -14,7 +14,7 @@ class BankSoalController extends Controller
     {
         $authUser = $request->user();
 
-        $bankSoal = BankSoal::with('mataKuliah', 'creator')
+        $bankSoal = BankSoal::with('mataKuliah', 'bab', 'creator')->withCount('soal')
             ->where(function ($q) use ($authUser) {
                 $q
                     // Punya sendiri
@@ -29,7 +29,7 @@ class BankSoalController extends Controller
                 }
             })
             ->when($request->mata_kuliah_id, fn($q) => $q->where('mata_kuliah_id', $request->mata_kuliah_id))
-            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%'))
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($request->search) . '%']))
             ->paginate($request->per_page ?? 10);
 
         return response()->json([
@@ -44,6 +44,36 @@ class BankSoalController extends Controller
         ], 200);
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama'           => 'required|string|max:255',
+            'deskripsi'      => 'nullable|string',
+            'mata_kuliah_id' => 'nullable|exists:mata_kuliah,id',
+            'bab_id'         => 'nullable|exists:bab,id',
+            'permission'     => 'required|in:public,shared,private',
+        ], [
+            'nama.required'         => 'Nama bank soal wajib diisi!',
+            'permission.in'         => 'Permission tidak valid!',
+            'mata_kuliah_id.exists' => 'Mata kuliah tidak ditemukan!',
+            'bab_id.exists'         => 'Bab tidak ditemukan!',
+        ]);
+
+        $bankSoal = BankSoal::create([
+            'created_by'     => $request->user()->id,
+            'mata_kuliah_id' => $request->mata_kuliah_id,
+            'bab_id'         => $request->bab_id,
+            'nama'           => $request->nama,
+            'deskripsi'      => $request->deskripsi,
+            'permission'     => $request->permission,
+        ]);
+
+        return response()->json([
+            'message' => 'Bank soal berhasil dibuat!',
+            'data'    => $bankSoal->load('mataKuliah', 'bab'),
+        ], 201);
+    }
+
     public function update(Request $request, $id)
     {
         $authUser = $request->user();
@@ -54,23 +84,25 @@ class BankSoalController extends Controller
         }
 
         $request->validate([
-            'nama' => 'sometimes|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'permission' => 'sometimes|in:public,shared,private',
+            'nama'           => 'sometimes|string|max:255',
+            'deskripsi'      => 'nullable|string',
+            'mata_kuliah_id' => 'nullable|exists:mata_kuliah,id',
+            'bab_id'         => 'nullable|exists:bab,id',
+            'permission'     => 'sometimes|in:public,shared,private',
         ], [
             'permission.in' => 'Permission tidak valid!',
         ]);
 
-        // Kalau permission diubah jadi private →
-        // hapus semua akses shared yang sudah ada
         if ($request->permission === 'private') {
             BankSoalShared::where('bank_soal_id', $id)->delete();
         }
 
         $bankSoal->update([
-            'nama' => $request->nama ?? $bankSoal->nama,
-            'deskripsi' => $request->deskripsi ?? $bankSoal->deskripsi,
-            'permission' => $request->permission ?? $bankSoal->permission,
+            'nama'           => $request->nama ?? $bankSoal->nama,
+            'deskripsi'      => $request->deskripsi ?? $bankSoal->deskripsi,
+            'mata_kuliah_id' => $request->has('mata_kuliah_id') ? $request->mata_kuliah_id : $bankSoal->mata_kuliah_id,
+            'bab_id'         => $request->has('bab_id') ? $request->bab_id : $bankSoal->bab_id,
+            'permission'     => $request->permission ?? $bankSoal->permission,
         ]);
 
         return response()->json([
