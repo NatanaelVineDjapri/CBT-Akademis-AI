@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Imports\UsersImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -127,8 +128,13 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            $user->deleteCloudinaryFoto();
-            $uploaded = cloudinary()->uploadFile($request->file('foto')->getRealPath(), ['folder' => 'users']);
+            $tmpPath = $this->compressImage($request->file('foto')->getRealPath());
+            $uploaded = cloudinary()->uploadFile($tmpPath, [
+                'public_id'  => 'users/user_' . $user->id,
+                'overwrite'  => true,
+                'invalidate' => true,
+            ]);
+            @unlink($tmpPath);
             $user->foto = $uploaded->getSecurePath();
         }
 
@@ -156,28 +162,23 @@ class UserController extends Controller
         $user = $request->user();
 
         $request->validate([
-            'nama' => 'sometimes|string|max:255',
-            'nim' => 'nullable|string',
-            'no_telp' => 'nullable|string',
-            'alamat' => 'nullable|string',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'foto.image' => 'Foto harus berupa gambar!',
-            'foto.max' => 'Ukuran foto maksimal 2MB!',
+            'nama'     => 'sometimes|string|max:255',
+            'nim'      => 'nullable|string',
+            'no_telp'  => 'nullable|string',
+            'alamat'   => 'nullable|string',
+            'foto_url' => 'nullable|url',
         ]);
 
-        if ($request->hasFile('foto')) {
-            $user->deleteCloudinaryFoto();
-            $uploaded = cloudinary()->uploadFile($request->file('foto')->getRealPath(), ['folder' => 'users']);
-            $user->foto = $uploaded->getSecurePath();
+        if ($request->foto_url) {
+            $user->foto = $request->foto_url;
         }
 
         $user->update([
-            'nama' => $request->nama ?? $user->nama,
-            'nim' => $request->nim ?? $user->nim,
+            'nama'    => $request->nama ?? $user->nama,
+            'nim'     => $request->nim ?? $user->nim,
             'no_telp' => $request->no_telp ?? $user->no_telp,
-            'alamat' => $request->alamat ?? $user->alamat,
-            'foto' => $user->foto,
+            'alamat'  => $request->alamat ?? $user->alamat,
+            'foto'    => $user->foto,
         ]);
 
         return response()->json([
@@ -255,12 +256,6 @@ class UserController extends Controller
             'role.in' => 'Role tidak valid!',
         ]);
 
-        $fotoPath = null;
-        if ($request->hasFile('foto')) {
-            $uploaded = cloudinary()->uploadFile($request->file('foto')->getRealPath(), ['folder' => 'users']);
-            $fotoPath = $uploaded->getSecurePath();
-        }
-
         $user = User::create([
             'nama' => $request->nama,
             'email' => $request->email,
@@ -273,13 +268,63 @@ class UserController extends Controller
             'tahun_masuk' => $request->tahun_masuk,
             'prodi_id' => $request->prodi_id,
             'universitas_id' => $authUser->universitas_id,
-            'foto' => $fotoPath,
             'is_temporary' => false,
         ]);
+
+        if ($request->hasFile('foto')) {
+            $tmpPath = $this->compressImage($request->file('foto')->getRealPath());
+            $uploaded = cloudinary()->uploadFile($tmpPath, [
+                'public_id'  => 'users/user_' . $user->id,
+                'overwrite'  => true,
+                'invalidate' => true,
+            ]);
+            @unlink($tmpPath);
+            $user->update(['foto' => $uploaded->getSecurePath()]);
+        }
 
         return response()->json([
             'message' => 'User berhasil dibuat!',
             'data' => $user,
         ], 201);
+    }
+
+    private function compressImage(string $sourcePath): string
+    {
+        $info = getimagesize($sourcePath);
+        $mime = $info['mime'] ?? 'image/jpeg';
+
+        $src = match ($mime) {
+            'image/png'  => imagecreatefrompng($sourcePath),
+            'image/jpeg' => imagecreatefromjpeg($sourcePath),
+            default      => imagecreatefromjpeg($sourcePath),
+        };
+
+        $origW  = imagesx($src);
+        $origH  = imagesy($src);
+        $maxDim = 800;
+
+        if ($origW > $maxDim || $origH > $maxDim) {
+            $ratio = min($maxDim / $origW, $maxDim / $origH);
+            $newW  = (int) ($origW * $ratio);
+            $newH  = (int) ($origH * $ratio);
+            $dst   = imagecreatetruecolor($newW, $newH);
+
+            if ($mime === 'image/png') {
+                imagealphablending($dst, false);
+                imagesavealpha($dst, true);
+                $white = imagecolorallocate($dst, 255, 255, 255);
+                imagefill($dst, 0, 0, $white);
+            }
+
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+            imagedestroy($src);
+            $src = $dst;
+        }
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'foto_') . '.jpg';
+        imagejpeg($src, $tmpPath, 80);
+        imagedestroy($src);
+
+        return $tmpPath;
     }
 }

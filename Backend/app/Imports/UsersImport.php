@@ -34,7 +34,7 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
         $expiredAt   = $isTemporary ? now()->addMonths(6) : null;
         $prodi       = Prodi::where('kode', $row['kode_prodi'] ?? null)->first();
 
-        Mail::to($row['email'])->send(new AkunTerbuatMail(
+        Mail::to($row['email'])->queue(new AkunTerbuatMail(
             $row['nama'],
             $row['email'],
             $password
