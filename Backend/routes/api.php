@@ -12,6 +12,7 @@ use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\BabController;
 use App\Http\Controllers\UjianController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UploadController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -32,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/', [UserController::class, 'updateProfile']);
         Route::put('/password', [UserController::class, 'updatePassword']);
     });
+
+    Route::post('/upload/signature', [UploadController::class, 'signature']);
 
     Route::get('/dashboard/mahasiswa', [DashboardController::class, 'mahasiswa']);
     Route::get('/pengumuman', [PengumumanController::class, 'index']);

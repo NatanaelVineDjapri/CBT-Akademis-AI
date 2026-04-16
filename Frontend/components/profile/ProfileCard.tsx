@@ -27,9 +27,9 @@ export default function ProfileCard({ user, onUbahProfil }: Props) {
           </div>
         </div>
         <div>
-          <label className="text-xs text-gray-500">NIM</label>
+          <label className="text-xs text-gray-500">{user.role === "dosen" ? "NIDN" : "NIM"}</label>
           <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50">
-            {user.nim || "-"}
+            {(user.role === "dosen" ? user.nidn : user.nim) || "-"}
           </div>
         </div>
         <div>

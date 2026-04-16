@@ -122,28 +122,30 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
+        $user = $request->user()->load('universitas', 'prodi.fakultas');
+
         return response()->json([
             'user' => [
-                'id' => $request->user()->id,
-                'nama' => $request->user()->nama,
-                'email' => $request->user()->email,
-                'role' => $request->user()->role,
-                'nim' => $request->user()->nim,
-                'nidn' => $request->user()->nidn,
-                'no_telp' => $request->user()->no_telp,
-                'alamat' => $request->user()->alamat,
-                'tahun_masuk' => $request->user()->tahun_masuk,
-                'foto' => $request->user()->foto,
-                'universitas_id' => $request->user()->universitas_id,
-                'universitas_kode' => $request->user()->universitas?->kode,
-                'universitas_nama' => $request->user()->universitas?->nama,
-                'prodi_id' => $request->user()->prodi_id,
-                'prodi_nama' => $request->user()->prodi?->nama,
-                'fakultas_id' => $request->user()->prodi?->fakultas_id,
-                'fakultas_nama' => $request->user()->prodi?->fakultas?->nama,
-                'status' => $request->user()->status,
-                'created_at' => $request->user()->created_at,
-                'updated_at' => $request->user()->updated_at,
+                'id'               => $user->id,
+                'nama'             => $user->nama,
+                'email'            => $user->email,
+                'role'             => $user->role,
+                'nim'              => $user->nim,
+                'nidn'             => $user->nidn,
+                'no_telp'          => $user->no_telp,
+                'alamat'           => $user->alamat,
+                'tahun_masuk'      => $user->tahun_masuk,
+                'foto'             => $user->foto,
+                'universitas_id'   => $user->universitas_id,
+                'universitas_kode' => $user->universitas?->kode,
+                'universitas_nama' => $user->universitas?->nama,
+                'prodi_id'         => $user->prodi_id,
+                'prodi_nama'       => $user->prodi?->nama,
+                'fakultas_id'      => $user->prodi?->fakultas_id,
+                'fakultas_nama'    => $user->prodi?->fakultas?->nama,
+                'status'           => $user->status,
+                'created_at'       => $user->created_at,
+                'updated_at'       => $user->updated_at,
             ],
         ], 200);
     }
@@ -183,7 +185,7 @@ class AuthController extends Controller
         $roleLabel = $roleLabels[$user->role] ?? $user->role;
         $universitasKode = $user->universitas?->kode ?? null;
 
-        Mail::to($request->email)->send(new ResetPasswordMail($user->nama, $resetLink, $roleLabel, $universitasKode));
+        Mail::to($request->email)->queue(new ResetPasswordMail($user->nama, $resetLink, $roleLabel, $universitasKode));
 
         return response()->json([
             'message' => 'Link reset password telah dikirim ke email kamu!',

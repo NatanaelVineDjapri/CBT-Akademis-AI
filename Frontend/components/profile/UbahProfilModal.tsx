@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { X } from "lucide-react";
 import Cropper from "react-easy-crop";
 import { User } from "@/types";
-import { updateProfile } from "../../services/UserServices";
+import { updateProfile, uploadToCloudinary } from "../../services/UserServices";
 import { getCroppedImg, Area } from "../../utils/cropImage";
 import Avatar from "../Avatar";
 
@@ -27,8 +27,12 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [croppedPreview, setCroppedPreview] = useState<string | null>(null);
+
+  // Direct upload state
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState(false);
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -45,9 +49,21 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
   const handleCropConfirm = async () => {
     if (!rawImageSrc || !croppedAreaPixels) return;
     const file = await getCroppedImg(rawImageSrc, croppedAreaPixels);
-    setCroppedFile(file);
     setCroppedPreview(URL.createObjectURL(file));
     setRawImageSrc(null);
+    setUploadedUrl(null);
+    setUploadError(false);
+
+    // Upload ke Cloudinary langsung di background
+    setUploading(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      setUploadedUrl(url);
+    } catch {
+      setUploadError(true);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -55,13 +71,12 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
     setLoading(true);
     setError("");
     try {
-      const formData = new FormData();
-      formData.append("nama", nama);
-      formData.append("no_telp", noTelp);
-      formData.append("alamat", alamat);
-      if (croppedFile) formData.append("foto", croppedFile);
-      formData.append("_method", "PUT");
-      await updateProfile(formData);
+      await updateProfile({
+        nama,
+        no_telp: noTelp,
+        alamat,
+        ...(uploadedUrl ? { foto_url: uploadedUrl } : {}),
+      });
       onSaved();
       onClose();
     } catch (err: any) {
@@ -173,7 +188,8 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
               >
                 Telusuri Media
               </button>
-              {croppedFile && <span className="text-xs text-gray-400 truncate max-w-[120px]">{croppedFile.name}</span>}
+              {croppedPreview && uploading && <span className="text-xs text-gray-400">Mengunggah...</span>}
+              {croppedPreview && uploadError && <span className="text-xs text-red-400">Gagal upload</span>}
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFotoChange} />
             </div>
           </div>
@@ -186,11 +202,11 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading || uploadError}
               className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
-              {loading ? "Menyimpan..." : "Simpan"}
+              {loading ? "Menyimpan..." : uploading ? "Mengunggah..." : "Simpan"}
             </button>
           </div>
         </form>
