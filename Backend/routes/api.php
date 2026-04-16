@@ -108,6 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {
         Route::prefix('bank-soal')->group(function () {
+            Route::post('/', [BankSoalController::class, 'store']);
             Route::put('/{id}', [BankSoalController::class, 'update']);
             Route::delete('/{id}', [BankSoalController::class, 'destroy']);
             Route::post('/{id}/share-email', [BankSoalController::class, 'shareByEmail']);

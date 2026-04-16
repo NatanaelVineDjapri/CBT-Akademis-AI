@@ -14,49 +14,53 @@ import GrafikPelanggaranCard from "@/components/dashboard/dosen/GrafikPelanggara
 import TotalPelanggaranCard from "@/components/dashboard/dosen/TotalPelanggaranCard";
 import JadwalCard from "@/components/dashboard/dosen/JadwalCard";
 import PengumumanCard from "@/components/dashboard/PengumumanCard";
+import BerandaDosenSkeleton from "@/components/skeleton/BerandaDosenSkeleton";
 
 export default function DashboardDosenPage() {
   const { user } = useUser();
   const { data } = useSWR("/dashboard/dosen", getDosenDashboard, { revalidateOnFocus: false });
 
   return (
-    <div className="min-h-screen p-3">
-      {/* Greeting */}
-      <div className="mb-6">
-        <p className="text-2xl font-semibold" style={{color: "var(--color-primary)"}}>Hello</p>
-        <h1 className="text-2xl font-semibold" style={{ color: "var(--color-primary)" }}>Welcome Back {user?.nama ?? "Dosen"}</h1>
+    <div className="flex flex-col gap-4 pb-4">
+      <div className="shrink-0">
+        <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
+          Welcome Back, {user?.nama ?? "Dosen"}
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">Selamat datang kembali!</p>
       </div>
 
-      {/* Baris 1: Grid 2x2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <BankSoalCard data={data?.bank_soal ?? []} />
-        <UjianBerlangsungCard data={data?.ujian_berlangsung ?? []} />
-        <UjianTerbaruCard data={data?.ujian_terbaru ?? []} />
-        <UjianSelesaiCard data={data?.ujian_selesai ?? []} />
-      </div>
+      {!data ? <BerandaDosenSkeleton /> : (
+        <>
+          {/* Baris 1: Grid 2x2 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <BankSoalCard data={data.bank_soal} />
+            <UjianBerlangsungCard data={data.ujian_berlangsung} />
+            <UjianTerbaruCard data={data.ujian_terbaru} />
+            <UjianSelesaiCard data={data.ujian_selesai} />
+          </div>
 
-      {/* Baris 2: Performa Chart */}
-      <div className="mb-4">
-        <PerformaChart />
-      </div>
+          {/* Baris 2: Performa Chart */}
+          <PerformaChart />
 
-      {/* Baris 3: Persentase Kelulusan + Rata-rata Nilai */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <PersentaseKelulusanCard />
-        <RataRataNilaiCard />
-      </div>
+          {/* Baris 3: Persentase Kelulusan + Rata-rata Nilai */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <PersentaseKelulusanCard />
+            <RataRataNilaiCard />
+          </div>
 
-      {/* Baris 4: Grafik Pelanggaran + Total Pelanggaran */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <GrafikPelanggaranCard />
-        <TotalPelanggaranCard />
-      </div>
+          {/* Baris 4: Grafik Pelanggaran + Total Pelanggaran */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <GrafikPelanggaranCard />
+            <TotalPelanggaranCard />
+          </div>
 
-      {/* Baris 5: Jadwal + Pengumuman */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <JadwalCard />
-        <PengumumanCard />
-      </div>
+          {/* Baris 5: Jadwal + Pengumuman */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <JadwalCard />
+            <PengumumanCard />
+          </div>
+        </>
+      )}
     </div>
   );
 }
