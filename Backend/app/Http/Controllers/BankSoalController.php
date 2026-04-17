@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bab;
 use App\Models\BankSoal;
 use App\Models\BankSoalShared;
+use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -70,6 +72,38 @@ class BankSoalController extends Controller
                 'per_page'     => $bankSoal->perPage(),
                 'current_page' => $bankSoal->currentPage(),
                 'last_page'    => $bankSoal->lastPage(),
+            ],
+        ], 200);
+    }
+
+    public function showGlobal(Request $request, $id)
+    {
+        $bankSoal = BankSoal::with(['mataKuliah', 'creator.universitas'])
+            ->where('permission', 'public')
+            ->findOrFail($id);
+
+        $babs = [];
+        if ($bankSoal->mata_kuliah_id) {
+            $babs = Bab::where('mata_kuliah_id', $bankSoal->mata_kuliah_id)
+                ->orderBy('urutan', 'asc')
+                ->get()
+                ->map(function ($bab) use ($id) {
+                    return [
+                        'id'         => $bab->id,
+                        'nama_bab'   => $bab->nama_bab,
+                        'urutan'     => $bab->urutan,
+                        'soal_count' => Soal::where('bank_soal_id', $id)
+                                            ->where('bab_id', $bab->id)
+                                            ->count(),
+                    ];
+                });
+        }
+
+        return response()->json([
+            'message' => 'Detail bank soal global berhasil diambil!',
+            'data' => [
+                'bank_soal' => $bankSoal,
+                'babs'      => $babs,
             ],
         ], 200);
     }

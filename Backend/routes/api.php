@@ -13,13 +13,14 @@ use App\Http\Controllers\BabController;
 use App\Http\Controllers\UjianController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\TwoFactorController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login/2fa-verify', [AuthController::class, 'verifyLogin']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -27,6 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        Route::get('/2fa/setup', [TwoFactorController::class, 'setup']);
+        Route::post('/2fa/enable', [TwoFactorController::class, 'enable']);
+        Route::post('/2fa/disable', [TwoFactorController::class, 'disable']);
     });
 
     Route::prefix('profile')->group(function () {
@@ -48,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('bank-soal')->group(function () {
         Route::get('/', [BankSoalController::class, 'index']);
         Route::get('/global', [BankSoalController::class, 'global']);
+        Route::get('/global/{id}', [BankSoalController::class, 'showGlobal']);
         Route::post('/join', [BankSoalController::class, 'joinByLink']);
     });
 
