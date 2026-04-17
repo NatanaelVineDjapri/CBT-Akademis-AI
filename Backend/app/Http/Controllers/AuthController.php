@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cookie;
 use App\Mail\ResetPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use PragmaRX\Google2FA\Google2FA;
 
 class AuthController extends Controller
 {
@@ -92,7 +92,67 @@ class AuthController extends Controller
             ], 403);
         }
 
+        // Kalau 2FA aktif, jangan login dulu
+        if ($user->google2fa_enabled) {
+            // Simpan user id di session sementara
+            $request->session()->put('2fa_pending_user_id', $user->id);
+            $request->session()->put('2fa_remember', $request->boolean('remember'));
+
+            return response()->json([
+                'requires_2fa' => true,
+                'message' => 'Masukkan kode 2FA kamu!',
+            ], 200);
+        }
+
+        // Login biasa
         $remember = $request->boolean('remember');
+        Auth::login($user, $remember);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'message' => 'Login berhasil!',
+            'user' => [
+                'id' => $user->id,
+                'nama' => $user->nama,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ], 200);
+    }
+
+    public function verifyLogin(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|digits:6',
+        ], [
+            'code.required' => 'Kode 2FA wajib diisi!',
+            'code.digits' => 'Kode 2FA harus 6 digit!',
+        ]);
+
+        // Ambil user dari session sementara
+        $userId = $request->session()->get('2fa_pending_user_id');
+
+        if (!$userId) {
+            return response()->json(['message' => 'Sesi tidak valid, silakan login ulang!'], 401);
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan!'], 404);
+        }
+
+        // Verify kode TOTP
+        $google2fa = new Google2FA();
+        $valid = $google2fa->verifyKey($user->google2fa_secret, $request->code);
+
+        if (!$valid) {
+            return response()->json(['message' => 'Kode 2FA salah!'], 422);
+        }
+
+        $remember = $request->session()->pull('2fa_remember', false);
+        $request->session()->forget('2fa_pending_user_id');
+
         Auth::login($user, $remember);
         $request->session()->regenerate();
 
@@ -126,26 +186,27 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => [
-                'id'               => $user->id,
-                'nama'             => $user->nama,
-                'email'            => $user->email,
-                'role'             => $user->role,
-                'nim'              => $user->nim,
-                'nidn'             => $user->nidn,
-                'no_telp'          => $user->no_telp,
-                'alamat'           => $user->alamat,
-                'tahun_masuk'      => $user->tahun_masuk,
-                'foto'             => $user->foto,
-                'universitas_id'   => $user->universitas_id,
+                'id' => $user->id,
+                'nama' => $user->nama,
+                'email' => $user->email,
+                'role' => $user->role,
+                'nim' => $user->nim,
+                'nidn' => $user->nidn,
+                'no_telp' => $user->no_telp,
+                'alamat' => $user->alamat,
+                'tahun_masuk' => $user->tahun_masuk,
+                'foto' => $user->foto,
+                'universitas_id' => $user->universitas_id,
                 'universitas_kode' => $user->universitas?->kode,
                 'universitas_nama' => $user->universitas?->nama,
-                'prodi_id'         => $user->prodi_id,
-                'prodi_nama'       => $user->prodi?->nama,
-                'fakultas_id'      => $user->prodi?->fakultas_id,
-                'fakultas_nama'    => $user->prodi?->fakultas?->nama,
-                'status'           => $user->status,
-                'created_at'       => $user->created_at,
-                'updated_at'       => $user->updated_at,
+                'prodi_id' => $user->prodi_id,
+                'prodi_nama' => $user->prodi?->nama,
+                'fakultas_id' => $user->prodi?->fakultas_id,
+                'fakultas_nama' => $user->prodi?->fakultas?->nama,
+                'status' => $user->status,
+                'google2fa_enabled' => (bool) $user->google2fa_enabled,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
             ],
         ], 200);
     }

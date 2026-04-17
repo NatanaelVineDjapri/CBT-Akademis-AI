@@ -25,6 +25,13 @@ class User extends Authenticatable
         'is_temporary',
         'foto',
         'expired_at',
+        // 2FA 
+        'google2fa_secret',   
+        'google2fa_enabled',
+    ];
+     protected $hidden = [
+        'password',
+        'google2fa_secret',
     ];
 
     protected $casts = [
