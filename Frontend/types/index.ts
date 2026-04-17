@@ -43,10 +43,10 @@ export interface BankSoalItem {
   permission: 'public' | 'shared' | 'private';
   created_by: number;
   mata_kuliah_id?: number;
-  mata_kuliah?: { id: number; nama: string; kode: string };
+  mata_kuliah?: { id: number; nama: string; kode: string; bab?: { id: number; nama_bab: string; urutan: number }[] };
   bab_id?: number | null;
   bab?: { id: number; nama_bab: string } | null;
-  creator?: { id: number; nama: string };
+  creator?: { id: number; nama: string; universitas?: { id: number; nama: string } };
   soal_count?: number;
 }
 

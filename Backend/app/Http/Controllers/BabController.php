@@ -3,33 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bab;
-use App\Models\BankSoal;
 use Illuminate\Http\Request;
 
 class BabController extends Controller
 {
     public function index(Request $request)
     {
-        $authUser = $request->user();
-
         $request->validate([
             'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
         ]);
-
-        // Cari bank soal untuk mata kuliah ini
-        $bankSoal = BankSoal::where('mata_kuliah_id', $request->mata_kuliah_id)->firstOrFail();
-
-        // Cek akses berdasarkan permission
-        $punyaAkses = match ($bankSoal->permission) {
-            'public' => true,
-            'private' => $bankSoal->created_by === $authUser->id,
-            'shared' => $bankSoal->created_by === $authUser->id ||
-            $bankSoal->sharedUsers()->where('user_id', $authUser->id)->exists(),
-        };
-
-        if (!$punyaAkses) {
-            return response()->json(['message' => 'Tidak punya akses!'], 403);
-        }
 
         $bab = Bab::where('mata_kuliah_id', $request->mata_kuliah_id)
             ->orderBy('urutan', 'asc')

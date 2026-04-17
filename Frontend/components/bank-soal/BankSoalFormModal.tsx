@@ -8,7 +8,7 @@ import { getBabByMataKuliah, type BabOption } from "@/services/BankSoalServices"
 const PERMISSIONS = [
   { value: "public", label: "Publik" },
   { value: "shared", label: "Shared" },
-  { value: "private", label: "Draft" },
+  { value: "private", label: "Private" },
 ];
 
 interface MataKuliahOption {
@@ -49,7 +49,7 @@ export default function BankSoalFormModal({
   const [error, setError] = useState("");
 
   const inputClass =
-    "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2";
+    "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none";
 
   useEffect(() => {
     if (!mataKuliahId) { setBabOptions([]); setBabId(null); return; }
@@ -66,6 +66,10 @@ export default function BankSoalFormModal({
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    if (mataKuliahId && !babId) {
+      setError("Bab wajib dipilih.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -79,7 +83,7 @@ export default function BankSoalFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
         <div
           className="flex items-center justify-between px-6 py-4"
@@ -134,19 +138,24 @@ export default function BankSoalFormModal({
           {mataKuliahId && (
             <div>
               <label className="text-sm text-gray-600 mb-1 block">Bab</label>
-              <select
-                value={babId ?? ""}
-                onChange={(e) => setBabId(e.target.value ? Number(e.target.value) : null)}
-                className={inputClass}
-                disabled={loadingBab}
-              >
-                <option value="">— Semua Bab —</option>
-                {babOptions.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    Bab {b.urutan} — {b.nama_bab}
-                  </option>
-                ))}
-              </select>
+              {loadingBab ? (
+                <div className={inputClass + " text-gray-400 cursor-not-allowed bg-gray-50"}>Memuat bab...</div>
+              ) : babOptions.length === 0 ? (
+                <div className={inputClass + " text-gray-400 cursor-not-allowed bg-gray-50"}>Tidak ada bab untuk mata kuliah ini.</div>
+              ) : (
+                <select
+                  value={babId ?? ""}
+                  onChange={(e) => setBabId(e.target.value ? Number(e.target.value) : null)}
+                  className={inputClass}
+                >
+                  <option value="">— Semua Bab —</option>
+                  {babOptions.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      Bab {b.urutan} — {b.nama_bab}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
           )}
 

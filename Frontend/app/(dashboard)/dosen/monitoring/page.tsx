@@ -26,7 +26,7 @@ export default function DosenMonitoringPage() {
         <input
           type="text"
           placeholder="Search"
-          className="px-4 py-2 rounded-full border border-gray-300 text-sm outline-none focus:ring-2 focus:ring-teal-500"
+          className="px-4 py-2 rounded-full border border-gray-300 text-sm outline-none"
         />
       </div>
 

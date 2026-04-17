@@ -9,7 +9,7 @@ import Pagination from "@/components/filtering/Pagination";
 const permissionLabel: Record<string, string> = {
   public: "Publik",
   shared: "Shared",
-  private: "Draft",
+  private: "Private",
 };
 
 const permissionColor: Record<string, string> = {

@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('bank-soal')->group(function () {
         Route::get('/', [BankSoalController::class, 'index']);
+        Route::get('/global', [BankSoalController::class, 'global']);
         Route::post('/join', [BankSoalController::class, 'joinByLink']);
     });
 

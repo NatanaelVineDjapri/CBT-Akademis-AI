@@ -44,13 +44,43 @@ class BankSoalController extends Controller
         ], 200);
     }
 
+    public function global(Request $request)
+    {
+        $bankSoal = BankSoal::with(['mataKuliah.bab', 'creator.universitas'])->withCount('soal')
+            ->where('permission', 'public')
+            ->when($request->search, function ($q) use ($request) {
+                $s = '%' . strtolower($request->search) . '%';
+                $q->where(function ($q) use ($s) {
+                    $q->whereRaw('LOWER(bank_soal.nama) LIKE ?', [$s])
+                      ->orWhereHas('creator', fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', [$s]))
+                      ->orWhereHas('creator.universitas', fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', [$s])
+                            ->orWhereRaw('LOWER(kode) LIKE ?', [$s]));
+                });
+            })
+            ->when($request->mata_kuliah_id, fn($q) => $q->where('mata_kuliah_id', $request->mata_kuliah_id))
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate($request->per_page ?? 10);
+
+        return response()->json([
+            'message' => 'Data bank soal global berhasil diambil!',
+            'data' => $bankSoal->items(),
+            'meta' => [
+                'total'        => $bankSoal->total(),
+                'per_page'     => $bankSoal->perPage(),
+                'current_page' => $bankSoal->currentPage(),
+                'last_page'    => $bankSoal->lastPage(),
+            ],
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'nama'           => 'required|string|max:255',
             'deskripsi'      => 'nullable|string',
             'mata_kuliah_id' => 'nullable|exists:mata_kuliah,id',
-            'bab_id'         => 'nullable|exists:bab,id',
+            'bab_id'         => 'required_with:mata_kuliah_id|nullable|exists:bab,id',
             'permission'     => 'required|in:public,shared,private',
         ], [
             'nama.required'         => 'Nama bank soal wajib diisi!',

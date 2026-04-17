@@ -86,12 +86,12 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
     }
   };
 
-  const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500";
+  const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none";
 
   // Crop screen
   if (rawImageSrc) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
         <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
             <h3 className="text-base font-bold text-white">Crop Foto</h3>
@@ -149,7 +149,7 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
           <h3 className="text-base font-bold text-white">Ubah Profil</h3>
