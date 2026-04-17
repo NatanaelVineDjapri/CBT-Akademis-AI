@@ -15,6 +15,15 @@ export const getBankSoal = async (params?: {
   return { data: res.data.data, meta: res.data.meta };
 };
 
+export const getBankSoalGlobal = async (params?: {
+  search?: string;
+  page?: number;
+  per_page?: number;
+}): Promise<BankSoalResponse> => {
+  const res = await api.get("/bank-soal/global", { params });
+  return { data: res.data.data, meta: res.data.meta };
+};
+
 export const deleteBankSoal = async (id: number): Promise<void> => {
   await api.delete(`/bank-soal/${id}`);
 };

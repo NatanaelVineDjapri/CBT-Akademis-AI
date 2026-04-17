@@ -78,7 +78,7 @@ export default function DosenBankSoalPage() {
         />
       )}
 
-      <AksesBankSoalGlobalCard />
+      <AksesBankSoalGlobalCard href="/dosen/bank-soal/global" />
 
       {showCreate && (
         <BankSoalFormModal

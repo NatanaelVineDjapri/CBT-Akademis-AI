@@ -17,8 +17,7 @@ export default function SearchInput({ value, onChange, placeholder = "Cari..." }
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="pl-9 pr-4 py-2 text-sm text-gray-800 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-1 w-64"
-        style={{ "--tw-ring-color": "var(--color-primary)" } as React.CSSProperties}
+        className="pl-9 pr-4 py-2 text-sm text-gray-800 border border-gray-200 rounded-xl bg-white focus:outline-none w-64"
       />
     </div>
   );

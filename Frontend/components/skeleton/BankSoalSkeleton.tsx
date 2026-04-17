@@ -4,7 +4,7 @@ export default function BankSoalSkeleton() {
       {/* Card */}
       <div
         className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1"
-        style={{ border: "2px solid var(--color-primary)" }}
+        // style={{ border: "2px solid #e5e7eb" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
