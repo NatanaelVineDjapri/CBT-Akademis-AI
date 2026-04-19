@@ -1,6 +1,6 @@
 export default function BankSoalSkeleton() {
   return (
-    <div className="flex flex-col gap-4 animate-pulse min-h-screen">
+    <div className="flex flex-col gap-4 animate-pulse">
       {/* Card */}
       <div
         className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1"
@@ -38,7 +38,7 @@ export default function BankSoalSkeleton() {
             </thead>
 
             <tbody>
-              {Array.from({ length: 12 }).map((_, i) => (
+              {Array.from({ length: 10 }).map((_, i) => (
                 <tr key={i} className="border-b border-gray-50">
                   <td className="px-5 py-3.5">
                     <div className="h-3.5 w-6 rounded bg-gray-100" />

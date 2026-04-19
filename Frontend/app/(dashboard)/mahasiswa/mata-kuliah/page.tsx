@@ -39,8 +39,8 @@ export default function MataKuliahPage() {
   }, [isValidating, data]);
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+    <div className="flex flex-col h-full gap-4">
+      <div className="shrink-0 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
             Mata Kuliah
@@ -53,7 +53,7 @@ export default function MataKuliahPage() {
         </div>
       </div>
 
-      <div>
+      <div className="flex-1">
         {showSkeleton ? (
           <MataKuliahSkeleton count={perPage} />
         ) : isLoading ? null : mataKuliah.length === 0 ? (
@@ -68,15 +68,13 @@ export default function MataKuliahPage() {
       </div>
 
       {meta && (
-        <div>
-          <Pagination
-            currentPage={meta.current_page}
-            lastPage={meta.last_page}
-            total={meta.total}
-            perPage={meta.per_page}
-            onPageChange={setPage}
-          />
-        </div>
+        <Pagination
+          currentPage={meta.current_page}
+          lastPage={meta.last_page}
+          total={meta.total}
+          perPage={meta.per_page}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import api from "./api";
 import { MataKuliah, MataKuliahMeta, MataKuliahDetail } from "../types";
+import type { SoalItem } from "./BankSoalServices";
 
 export const getMataKuliah = async (params?: {
   page?: number;
@@ -49,5 +50,14 @@ export const getMyMataKuliahDetail = async (id: number | string): Promise<MataKu
 
 export const getDosenMataKuliah = async (): Promise<{ id: number; nama: string; kode: string }[]> => {
   const res = await api.get("/mata-kuliah/dosen");
+  return res.data.data;
+};
+
+export const getMataKuliahBabSoal = async (
+  matkulId: number | string,
+  babId: number | string,
+  params?: { search?: string }
+): Promise<SoalItem[]> => {
+  const res = await api.get(`/mata-kuliah/my/${matkulId}/bab/${babId}/soal`, { params });
   return res.data.data;
 };

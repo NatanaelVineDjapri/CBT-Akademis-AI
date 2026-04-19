@@ -43,7 +43,7 @@ export default function InfoAkunCard({ user }: Props) {
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div className="bg-white rounded-2xl p-6 shadow-sm min-h-[352px]">
       <h2
         className="text-lg font-bold mb-4"
         style={{ color: "var(--color-primary)" }}

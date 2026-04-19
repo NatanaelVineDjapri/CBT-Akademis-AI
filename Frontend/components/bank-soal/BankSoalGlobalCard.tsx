@@ -1,21 +1,34 @@
 "use client";
 
 import { BookOpen, UserCircle } from "lucide-react";
+import Link from "next/link";
+import { preload } from "swr";
+import { getBankSoalGlobalDetail } from "@/services/BankSoalServices";
 import type { BankSoalItem } from "@/types";
 
 interface Props {
   item: BankSoalItem;
 }
 
+function toSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
 export default function BankSoalGlobalCard({ item }: Props) {
   const babs = item.mata_kuliah?.bab ?? [];
-   // const primary = item.mata_kuliah?.nama ?? item.nama;
   const primary = item.nama;
   const secondary = item.creator?.universitas?.nama ?? "";
+  const slug = `${toSlug(item.nama)}-${item.id}`;
 
   return (
-    <div
-      className="rounded-2xl p-4 flex flex-col gap-3"
+    <Link
+      href={`/dosen/bank-soal/global/${slug}`}
+      onMouseEnter={() => preload(["/bank-soal/global", item.id], () => getBankSoalGlobalDetail(item.id))}
+      className="block rounded-2xl p-4 flex flex-col gap-3 hover:opacity-90 transition-opacity"
       style={{ backgroundColor: "var(--color-primary)" }}
     >
       {/* Header: icon + pill */}
@@ -69,6 +82,6 @@ export default function BankSoalGlobalCard({ item }: Props) {
           <span className="text-xs font-medium" style={{ color: "var(--color-primary)" }}>{item.soal_count ?? 0}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -8,11 +8,42 @@ const getCsrfCookie = async () => {
   });
 };
 
-export const login = async (credentials: LoginCredentials): Promise<User> => {
+export type LoginResult =
+  | { requires2fa: false; user: User }
+  | { requires2fa: true; user: null };
+
+
+export const login = async (credentials: LoginCredentials): Promise<LoginResult> => {
   await getCsrfCookie();
 
   const res = await api.post("/auth/login", credentials);
+
+  // Kalau butuh 2FA, jangan return user dulu
+  if (res.data.requires_2fa) {
+    return { requires2fa: true, user: null };
+  }
+
+  return { requires2fa: false, user: res.data.user };
+};
+
+export const verify2FA = async (code: string): Promise<User> => {
+  const res = await api.post("/auth/login/2fa-verify", { code });
   return res.data.user;
+};
+
+export const setup2FA = async (): Promise<{ secret: string; qr_code: string }> => {
+  const res = await api.get("/auth/2fa/setup");
+  return res.data;
+};
+
+export const enable2FA = async (code: string): Promise<string> => {
+  const res = await api.post("/auth/2fa/enable", { code });
+  return res.data.message;
+};
+
+export const disable2FA = async (code: string): Promise<string> => {
+  const res = await api.post("/auth/2fa/disable", { code });
+  return res.data.message;
 };
 
 export const logout = async (): Promise<void> => {

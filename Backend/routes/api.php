@@ -49,11 +49,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
     Route::get('/mata-kuliah/my', [MataKuliahController::class, 'myMataKuliah']);
     Route::get('/mata-kuliah/my/{id}', [MataKuliahController::class, 'myMataKuliahDetail']);
+    Route::get('/mata-kuliah/my/{matkulId}/bab/{babId}/soal', [MataKuliahController::class, 'myMataKuliahBabSoal']);
 
     Route::prefix('bank-soal')->group(function () {
         Route::get('/', [BankSoalController::class, 'index']);
         Route::get('/global', [BankSoalController::class, 'global']);
         Route::get('/global/{id}', [BankSoalController::class, 'showGlobal']);
+        Route::get('/{id}/soal', [BankSoalController::class, 'soal']);
         Route::post('/join', [BankSoalController::class, 'joinByLink']);
     });
 

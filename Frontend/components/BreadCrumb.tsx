@@ -5,7 +5,11 @@ import Link from "next/link";
 
 const SKIP_SEGMENTS = new Set(["dosen", "mahasiswa", "admin-universitas", "admin-akademis", "pmb"]);
 
-export default function Breadcrumb() {
+interface Props {
+  overrides?: Record<string, string>;
+}
+
+export default function Breadcrumb({ overrides }: Props = {}) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter((s) => Boolean(s) && !SKIP_SEGMENTS.has(s));
 
@@ -22,9 +26,9 @@ export default function Breadcrumb() {
           <span key={href} className="flex items-center gap-1">
             <span style={{ color: "var(--color-primary)" }}>»</span>
             {isLast ? (
-              <span style={{ color: "var(--color-primary)" }}>{labels[seg] ?? seg}</span>
+              <span style={{ color: "var(--color-primary)" }}>{overrides?.[seg] ?? labels[seg] ?? seg}</span>
             ) : (
-              <Link href={href} className="hover:underline" style={{ color: "var(--color-primary)" }}>{labels[seg] ?? seg}</Link>
+              <Link href={href} className="hover:underline" style={{ color: "var(--color-primary)" }}>{overrides?.[seg] ?? labels[seg] ?? seg}</Link>
             )}
           </span>
         );

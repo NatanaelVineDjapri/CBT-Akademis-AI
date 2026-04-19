@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MataKuliah;
 use App\Models\BankSoal;
+use App\Models\Soal;
 use Illuminate\Http\Request;
 
 class MataKuliahController extends Controller
@@ -99,6 +100,28 @@ class MataKuliahController extends Controller
                     'jumlah_soal' => $b->soal_count,
                 ])->values(),
             ],
+        ]);
+    }
+
+    public function myMataKuliahBabSoal(Request $request, $matkulId, $babId)
+    {
+        $authUser = $request->user();
+
+        // Pastikan mahasiswa terdaftar di matkul ini
+        MataKuliah::whereHas('userMataKuliah', fn($q) => $q->where('user_id', $authUser->id))
+            ->findOrFail($matkulId);
+
+        $soal = Soal::with(['jenisSoal.opsiJawaban', 'mediaSoal', 'bab'])
+            ->where('mata_kuliah_id', $matkulId)
+            ->where('bab_id', $babId)
+            ->whereHas('bankSoal', fn($q) => $q->where('permission', 'public'))
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(deskripsi) LIKE ?', ['%' . strtolower($request->search) . '%']))
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Data soal berhasil diambil!',
+            'data'    => $soal,
         ]);
     }
 

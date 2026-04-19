@@ -17,6 +17,7 @@ export interface User {
   fakultas_nama?: string;
   tahun_masuk?: number;
   status?: 'aktif' | 'cuti' | 'non aktif';
+  google2fa_enabled?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -196,6 +197,7 @@ export const labels: Record<string, string> = {
   nilai: "Nilai",
   "mata-kuliah": "Mata Kuliah",
   "bank-soal": "Bank Soal",
+  global: "Global",
   monitoring: "Monitoring",
   "hasil-ujian": "Hasil Ujian",
 };

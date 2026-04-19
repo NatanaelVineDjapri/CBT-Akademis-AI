@@ -7,6 +7,7 @@ import AkademikCard from "../../../../components/profile/AkademikCard";
 import KeamananCard from "../../../../components/profile/KeamananCard";
 import UbahProfilModal from "../../../../components/profile/UbahProfilModal";
 import UbahPasswordModal from "../../../../components/profile/UbahPasswordModal";
+import TwoFactorModal from "../../../../components/profile/TwoFactorModal";
 import InfoAkunCard from "../../../../components/profile/InfoAkunCard";
 import TipsKeamananCard from "../../../../components/profile/TipsKeamananCard";
 import Breadcrumb from "../../../../components/BreadCrumb";
@@ -15,6 +16,7 @@ export default function DosenProfilPage() {
   const { user, refreshUser } = useUser();
   const [showUbahProfil, setShowUbahProfil] = useState(false);
   const [showUbahPassword, setShowUbahPassword] = useState(false);
+  const [twoFactorMode, setTwoFactorMode] = useState<"enable" | "disable" | null>(null);
 
   if (!user) return null;
 
@@ -32,7 +34,11 @@ export default function DosenProfilPage() {
         </div>
         <div className="lg:col-span-2 flex flex-col gap-6">
           <AkademikCard user={user} />
-          <KeamananCard onUbahPassword={() => setShowUbahPassword(true)} />
+          <KeamananCard
+            user={user}
+            onUbahPassword={() => setShowUbahPassword(true)}
+            onToggle2FA={() => setTwoFactorMode(user.google2fa_enabled ? "disable" : "enable")}
+          />
           <div className="py-1">
             <TipsKeamananCard />
           </div>
@@ -49,6 +55,14 @@ export default function DosenProfilPage() {
 
       {showUbahPassword && (
         <UbahPasswordModal onClose={() => setShowUbahPassword(false)} />
+      )}
+
+      {twoFactorMode && (
+        <TwoFactorModal
+          mode={twoFactorMode}
+          onClose={() => setTwoFactorMode(null)}
+          onSuccess={refreshUser}
+        />
       )}
     </>
   );
