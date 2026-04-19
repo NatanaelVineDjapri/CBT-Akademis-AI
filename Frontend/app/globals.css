@@ -50,11 +50,104 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Landing page brand tokens — mapped to project palette */
+  --color-brand-teal: #097797;
+  --color-brand-yellow: #f59e0b;
+  --color-brand-ink: #0c2340;
+  --color-surface-sunny: #fffbef;
+  --color-surface-ocean: #eaf7f7;
+  --color-semantic-success: #22c55e;
+  --color-neutral-25: #fafafa;
 }
 
 @utility sidebar-width {
   width: 280px;
 }
+
+/* ── Landing page component styles ─────────────────────────── */
+
+.ak-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-brand-teal);
+}
+
+.ak-hl {
+  color: var(--color-brand-teal);
+  text-decoration: underline;
+  text-decoration-color: var(--color-brand-yellow);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+.ak-bullet {
+  display: inline-flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ak-bullet > span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 9999px;
+  background-color: currentColor;
+}
+
+.ak-bullet-red {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.625rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: 1.5px solid transparent;
+  transition: background-color 0.15s, color 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--color-brand-teal);
+  color: #fff;
+  border-color: var(--color-brand-teal);
+}
+
+.btn-primary:hover {
+  background-color: #076b87;
+  border-color: #076b87;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-brand-ink);
+  border-color: #d1d5db;
+}
+
+.btn-ghost:hover {
+  background-color: #f9fafb;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+  border-radius: 0.75rem;
+}
+
+/* ─────────────────────────────────────────────────────────── */
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
