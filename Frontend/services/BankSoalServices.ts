@@ -24,6 +24,44 @@ export const getBankSoalGlobal = async (params?: {
   return { data: res.data.data, meta: res.data.meta };
 };
 
+export interface BabWithCount {
+  id: number;
+  nama_bab: string;
+  urutan: number;
+  soal_count: number;
+}
+
+export interface BankSoalGlobalDetail {
+  bank_soal: BankSoalItem;
+  babs: BabWithCount[];
+}
+
+export const getBankSoalGlobalDetail = async (id: number): Promise<BankSoalGlobalDetail> => {
+  const res = await api.get(`/bank-soal/global/${id}`);
+  return res.data.data;
+};
+
+export interface SoalItem {
+  id: number;
+  deskripsi: string;
+  tingkat_kesulitan: string;
+  ai_generated: boolean;
+  bab?: { id: number; nama_bab: string };
+  jenis_soal: { id: number; jenis_soal: string; opsi_jawaban?: { id: number; opsi: string; teks: string; is_correct: boolean }[] }[];
+  media_soal: { id: number; tipe: string; url: string }[];
+}
+
+export interface BankSoalSoalResponse {
+  can_edit: boolean;
+  bank_soal: BankSoalItem;
+  data: SoalItem[];
+}
+
+export const getBankSoalSoal = async (id: number, params?: { search?: string }): Promise<BankSoalSoalResponse> => {
+  const res = await api.get(`/bank-soal/${id}/soal`, { params });
+  return res.data;
+};
+
 export const deleteBankSoal = async (id: number): Promise<void> => {
   await api.delete(`/bank-soal/${id}`);
 };

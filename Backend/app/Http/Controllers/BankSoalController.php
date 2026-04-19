@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bab;
 use App\Models\BankSoal;
 use App\Models\BankSoalShared;
+use App\Models\DosenMatkul;
 use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -105,6 +106,40 @@ class BankSoalController extends Controller
                 'bank_soal' => $bankSoal,
                 'babs'      => $babs,
             ],
+        ], 200);
+    }
+
+    public function soal(Request $request, $id)
+    {
+        $authUser = $request->user();
+        $bankSoal = BankSoal::with(['mataKuliah', 'bab', 'creator'])->withCount('soal')->findOrFail($id);
+
+        // Cek akses
+        $hasAccess = $bankSoal->created_by === $authUser->id
+            || $bankSoal->permission === 'public'
+            || $bankSoal->sharedUsers()->where('user_id', $authUser->id)->exists();
+
+        if (!$hasAccess) {
+            return response()->json(['message' => 'Tidak punya akses!'], 403);
+        }
+
+        // Cek bisa edit: creator atau dosen yang mengajar matkul ini
+        $canEdit = $bankSoal->created_by === $authUser->id
+            || ($bankSoal->mata_kuliah_id && DosenMatkul::where('mata_kuliah_id', $bankSoal->mata_kuliah_id)
+                ->where('user_id', $authUser->id)
+                ->exists());
+
+        $soal = Soal::with(['jenisSoal.opsiJawaban', 'mediaSoal', 'bab'])
+            ->where('bank_soal_id', $id)
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(deskripsi) LIKE ?', ['%' . strtolower($request->search) . '%']))
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'message'   => 'Data soal berhasil diambil!',
+            'can_edit'  => $canEdit,
+            'bank_soal' => $bankSoal,
+            'data'      => $soal,
         ], 200);
     }
 

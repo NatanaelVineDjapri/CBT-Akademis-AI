@@ -3,7 +3,8 @@
 import useSWR from "swr";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { BookOpen, ChevronLeft, GraduationCap, Layers } from "lucide-react";
+import { BookOpen, ChevronLeft, GraduationCap, Layers, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
 import SearchInput from "@/components/filtering/SearchInput";
 
@@ -104,7 +105,15 @@ export default function MataKuliahDetailPage() {
               filtered.map((bab, i) => (
                 <tr key={bab.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-4 text-gray-400">{String(i + 1).padStart(2, "0")}</td>
-                  <td className="px-4 py-4 text-gray-700 font-medium">{bab.nama_bab}</td>
+                  <td className="px-4 py-4">
+                    <Link
+                      href={`/mahasiswa/mata-kuliah/${id}/${bab.id}`}
+                      className="flex items-center justify-between group"
+                    >
+                      <span className="text-gray-700 font-medium group-hover:underline">{bab.nama_bab}</span>
+                      <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
+                    </Link>
+                  </td>
                   <td className="px-4 py-4 text-center text-gray-600">{bab.jumlah_soal}</td>
                 </tr>
               ))

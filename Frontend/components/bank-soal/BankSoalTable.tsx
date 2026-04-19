@@ -113,7 +113,11 @@ export default function BankSoalTable({
                   return (
                     <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3 text-xs text-gray-400">{rowNum}</td>
-                      <td className="px-4 py-3 font-medium text-gray-800">{item.nama}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800">
+                        <Link href={`/dosen/bank-soal/${item.id}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
+                          {item.nama}
+                        </Link>
+                      </td>
                       <td className="px-4 py-3 text-gray-500">
                         {item.mata_kuliah?.kode ?? item.mata_kuliah?.nama ?? "-"}
                       </td>
