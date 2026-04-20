@@ -53,7 +53,7 @@
 
   /* Landing page brand tokens — mapped to project palette */
   --color-brand-teal: #097797;
-  --color-brand-yellow: #f59e0b;
+  --color-brand-yellow: #F2CC0C;
   --color-brand-ink: #0c2340;
   --color-surface-sunny: #fffbef;
   --color-surface-ocean: #eaf7f7;
@@ -121,14 +121,14 @@
 }
 
 .btn-primary {
-  background-color: var(--color-brand-teal);
-  color: #fff;
-  border-color: var(--color-brand-teal);
+  background-color: var(--color-brand-yellow);
+  color: var(--color-brand-ink);
+  border-color: var(--color-brand-yellow);
 }
 
 .btn-primary:hover {
-  background-color: #076b87;
-  border-color: #076b87;
+  background-color: #d9b800;
+  border-color: #d9b800;
 }
 
 .btn-ghost {
