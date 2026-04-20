@@ -1,26 +1,53 @@
 const steps = [
-  { n: "01", t: "Upload bank soal", d: "Impor dari Excel, Word, atau ketik langsung. Semua ter-tag otomatis per mata kuliah." },
-  { n: "02", t: "Jadwalkan ujian", d: "Pilih kelas, atur durasi, tentukan aturan pengawasan — dalam 3 klik." },
-  { n: "03", t: "Mahasiswa kerjakan", d: "Akses via browser atau mobile. Autosave tiap 10 detik, anti-koneksi putus." },
-  { n: "04", t: "Nilai keluar sendiri", d: "Pilihan ganda dikoreksi instan. Esai dibantu AI grading, dosen tinggal validasi." },
+  { n: "01", t: "Lorem Ipsum Dolor",      d: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor." },
+  { n: "02", t: "Consectetur Adipiscing", d: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi." },
+  { n: "03", t: "Sed Do Eiusmod",         d: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore." },
 ];
+
 export default function HowItWorks() {
   return (
-    <section id="proses" className="py-20 bg-white">
+    <section id="proses" className="py-20">
       <div className="mx-auto max-w-[1200px] px-6">
-        <p className="ak-eyebrow">Cara kerja</p>
-        <h2 className="mt-3 text-[36px] md:text-[44px] font-extrabold text-brand-ink max-w-[700px] leading-[1.1]">
-          Dari <span className="ak-hl">soal</span> ke nilai, dalam empat langkah.
-        </h2>
-        <ol className="mt-12 grid md:grid-cols-4 gap-6">
-          {steps.map((s) => (
-            <li key={s.n} className="relative rounded-xl border border-neutral-100 bg-neutral-25 p-6">
-              <span className="font-mono text-sm font-bold text-brand-teal">{s.n}</span>
-              <h3 className="mt-3 text-lg font-extrabold text-brand-ink">{s.t}</h3>
-              <p className="mt-2 text-[14px] text-neutral-600">{s.d}</p>
-            </li>
+        <div className="text-center mb-16">
+          <p className="ak-eyebrow mb-4">Cara Kerja</p>
+          <h2 className="text-[32px] md:text-[44px] font-extrabold text-brand-ink leading-[1.1]">
+            Lorem ipsum dolor,{" "}
+            <span
+              className="underline decoration-brand-yellow decoration-[3px] underline-offset-[6px]"
+              style={{ color: "var(--color-brand-yellow)" }}
+            >
+              Tiga Langkah
+            </span>
+            .
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {steps.map((s, i) => (
+            <div key={s.n} className="relative flex items-stretch">
+              <div
+                className="rounded-2xl p-7 flex-1 bg-white border border-brand-yellow/30"
+              >
+                <span
+                  className="text-5xl font-extrabold block mb-5 leading-none"
+                  style={{ color: "var(--color-brand-yellow)" }}
+                >
+                  {s.n}
+                </span>
+                <h3 className="text-lg font-extrabold text-brand-ink mb-2">{s.t}</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed">{s.d}</p>
+              </div>
+
+              {i < steps.length - 1 && (
+                <div className="hidden md:flex items-center justify-center absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8">
+                  <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
+                    <path d="M1 7h22M17 1l6 6-6 6" stroke="#F2CC0C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="3 2"/>
+                  </svg>
+                </div>
+              )}
+            </div>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );

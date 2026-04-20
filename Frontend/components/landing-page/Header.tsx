@@ -1,25 +1,42 @@
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Menu } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-neutral-100">
-      <div className="mx-auto max-w-[1200px] px-6 h-[72px] flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-brand-ink font-extrabold text-lg">
-          <span className="w-9 h-9 rounded-lg bg-brand-yellow grid place-items-center text-brand-ink">
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h10l4 4v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M8 11h8M8 15h5"/></svg>
-          </span>
-          akademis<span className="text-brand-teal">.ai</span>
-        </Link>
-        <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-neutral-700">
-          <a href="#fitur">Fitur</a>
-          <a href="#proses">Cara kerja</a>
-          <a href="#testimoni">Testimoni</a>
-          <a href="#harga">Harga</a>
+    <header className="sticky top-0 z-40 bg-white backdrop-blur border-b border-neutral-300 ">
+      <div className="mx-auto max-w-[1200px] px-6 h-[68px] flex items-center justify-between gap-8">
+        <div className="flex items-center gap-4 shrink-0">
+          <Link href="/">
+            <Image
+              src="/images/akademis-logo-horizontal.webp"
+              alt="Akademis.ai"
+              width={140}
+              height={36}
+              className="h-9 w-auto"
+              priority
+            />
+          </Link>
+          <span className="hidden md:block text-sm font-bold text-brand-ink">CBT</span>
+        </div>
+
+        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-neutral-600">
+          <a href="#fitur" className="hover:text-brand-ink transition-colors">Fitur</a>
+          <a href="#solusi" className="hover:text-brand-ink transition-colors">Solusi</a>
+          <a href="#harga" className="hover:text-brand-ink transition-colors">Harga</a>
+          <a href="#faq" className="hover:text-brand-ink transition-colors">FAQ</a>
         </nav>
-        <div className="flex items-center gap-3">
-          <Link href="/app/login" className="hidden sm:inline text-sm font-semibold text-neutral-700 hover:text-brand-ink">Masuk</Link>
-          <Link href="/app" className="btn btn-primary text-sm">Coba gratis</Link>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            href="/login"
+            className="hidden sm:inline-flex items-center text-sm font-semibold text-neutral-700 hover:text-brand-ink px-4 py-2 rounded-lg border border-neutral-200 transition-colors"
+          >
+            Masuk
+          </Link>
+          <Link href="/app" className="btn btn-primary text-sm">
+            Ajukan Demo <ArrowRight className="w-4 h-4" />
+          </Link>
           <button className="md:hidden p-2"><Menu className="w-5 h-5" /></button>
         </div>
       </div>

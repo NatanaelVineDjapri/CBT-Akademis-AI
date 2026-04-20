@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <>
       <Header />
-      <main>
+      <main style={{ background: "linear-gradient(180deg, #fff9d6 0%, #fffbef 18%, #fffdf8 35%, #fff9e0 52%, #fffbef 68%, #fff9d6 84%, #fffdf8 100%)" }}>
         <Hero />
         <FeatureStrip />
         <Challenges />

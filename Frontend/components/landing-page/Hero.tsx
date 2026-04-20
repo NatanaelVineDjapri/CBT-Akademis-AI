@@ -1,35 +1,33 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-surface-sunny">
-      <div className="absolute -top-24 -right-24 w-[520px] h-[520px] rounded-full bg-brand-yellow/30 blur-3xl" />
-      <div className="absolute -bottom-32 -left-24 w-[420px] h-[420px] rounded-full bg-brand-teal/10 blur-3xl" />
-      <div className="relative mx-auto max-w-[1200px] px-6 py-20 md:py-28 grid md:grid-cols-[1.1fr_1fr] gap-16 items-center">
+    <section className="relative overflow-hidden pb-28">
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-brand-yellow/20 translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+
+      <div className="relative mx-auto max-w-[1200px] px-6 py-20 md:py-28 grid md:grid-cols-[1fr_1.1fr] gap-10 items-center">
         <div>
-          <p className="ak-eyebrow mb-5">Computer Based Testing</p>
-          <h1 className="text-[44px] md:text-[58px] leading-[1.05] font-extrabold text-brand-ink">
-            Ujian online kampus, <br />
-            <span className="ak-hl">tanpa drama</span> teknis.
+          <p className="ak-eyebrow mb-5">Computer-Based Testing</p>
+          <h1 className="text-[42px] md:text-[56px] leading-[1.08] font-extrabold text-brand-ink">
+            Ujian Online Kampus,{" "}
+            <span className="whitespace-nowrap">Tanpa Drama Koreksi</span>
           </h1>
-          <p className="mt-6 text-lg text-neutral-600 max-w-[560px]">
-            Satu platform untuk bank soal, penjadwalan, pengawasan, dan
-            penilaian — dipakai ratusan dosen tiap semester.
+          <p className="mt-5 text-[16px] text-neutral-600 max-w-[520px] leading-relaxed">
+           Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit architecto eveniet repellendus veniam, minus nulla quam dolore doloremque quibusdam, placeat voluptates culpa blanditiis atque aliquid dicta cum ut, dolorum dolores!
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/app" className="btn btn-primary btn-lg">Coba gratis 14 hari <ArrowRight className="w-4 h-4" /></Link>
-            <a href="#proses" className="btn btn-ghost btn-lg">Lihat cara kerja</a>
+            <Link href="/app" className="btn btn-primary btn-lg">
+              Ajukan Demo <ArrowRight className="w-4 h-4" />
+            </Link>
+            <a href="#proses" className="btn btn-ghost btn-lg">Lihat Cara Kerjanya</a>
           </div>
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-600">
-            {["Tanpa kartu kredit", "Setup &lt; 1 hari", "Support WhatsApp"].map((t) => (
-              <li key={t} className="inline-flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-semantic-success" />
-                <span dangerouslySetInnerHTML={{ __html: t }} />
-              </li>
-            ))}
-          </ul>
+          <div className="mt-6 flex items-center gap-2 text-sm text-neutral-600">
+            <span className="w-2 h-2 rounded-full bg-semantic-success shrink-0" />
+            Dipercaya 120+ kampus di Indonesia
+          </div>
         </div>
+
         <HeroMock />
       </div>
     </section>
@@ -37,41 +35,74 @@ export default function Hero() {
 }
 
 function HeroMock() {
+  const options = [
+    { l: "A", t: "Linear search",  sel: false },
+    { l: "B", t: "Binary search",  sel: true  },
+    { l: "C", t: "Bubble sort",    sel: false },
+    { l: "D", t: "Hashing",        sel: false },
+  ];
+
   return (
-    <div className="relative">
-      <div className="rounded-2xl bg-white shadow-lg border border-neutral-100 p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="w-3 h-3 rounded-full bg-neutral-200" />
-          <span className="w-3 h-3 rounded-full bg-neutral-200" />
-          <span className="w-3 h-3 rounded-full bg-neutral-200" />
-          <span className="ml-auto text-xs font-mono text-neutral-400">ujian.akademis.ai</span>
+    <div className="relative ml-auto">
+      {/* Yellow decorative tab on right edge */}
+      <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-32 bg-brand-yellow rounded-r-2xl -z-10" />
+
+      <div className="rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
+        {/* Browser bar */}
+        <div className="flex items-center gap-1.5 px-4 py-3 bg-neutral-50 border-b border-neutral-100">
+          <span className="w-3 h-3 rounded-full bg-red-400" />
+          <span className="w-3 h-3 rounded-full bg-brand-yellow" />
+          <span className="w-3 h-3 rounded-full bg-green-400" />
+          <span className="ml-3 flex-1 bg-white border border-neutral-200 rounded-md px-3 py-1 text-[11px] text-neutral-400 font-mono truncate">
+            cbt.akademis.ai/ujian/uts-basdat-2026
+          </span>
         </div>
-        <div className="rounded-xl bg-surface-ocean p-5">
-          <div className="text-xs font-bold tracking-widest text-brand-teal">UTS · BASIS DATA</div>
-          <div className="mt-2 text-xl font-extrabold text-brand-ink">Soal 12 dari 30</div>
-          <div className="mt-4 h-2 rounded-full bg-white overflow-hidden">
-            <div className="h-full w-[40%] bg-brand-yellow" />
+
+        {/* Exam UI */}
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-5">
+            <span className="bg-brand-ink text-white text-xs font-bold px-3 py-1.5 rounded-full">
+              Soal 7 · dari 40
+            </span>
+            <span className="flex items-center gap-1.5 text-sm font-semibold text-neutral-700">
+              <Clock className="w-4 h-4 text-neutral-400" />
+              58:22
+            </span>
           </div>
-          <p className="mt-5 text-sm text-neutral-700">
-            Manakah bentuk normalisasi yang menghilangkan <em>partial dependency</em> pada kunci komposit?
+
+          <p className="text-[13.5px] font-medium text-neutral-800 mb-4 leading-relaxed">
+            Algoritma yang paling efisien untuk mencari nilai pada array terurut adalah...
           </p>
-          <div className="mt-4 space-y-2">
-            {["1NF", "2NF", "3NF", "BCNF"].map((o, i) => (
-              <label key={o} className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-sm font-semibold cursor-pointer ${i===1?"border-brand-yellow bg-brand-yellow/10 text-brand-ink":"border-neutral-200 bg-white text-neutral-700"}`}>
-                <span className={`w-4 h-4 rounded-full border-2 ${i===1?"border-brand-yellow bg-brand-yellow":"border-neutral-300"}`} />
-                {o}
-              </label>
+
+          <div className="space-y-2">
+            {options.map((o) => (
+              <div
+                key={o.l}
+                className={`flex items-center gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold ${
+                  o.sel
+                    ? "border-brand-yellow bg-brand-yellow/15 text-brand-ink"
+                    : "border-neutral-100 bg-neutral-50 text-neutral-700"
+                }`}
+              >
+                <span
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                    o.sel ? "bg-brand-yellow text-brand-ink" : "bg-neutral-200 text-neutral-500"
+                  }`}
+                >
+                  {o.l}
+                </span>
+                {o.t}
+              </div>
             ))}
           </div>
+
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex-1 h-1.5 rounded-full bg-neutral-100 overflow-hidden">
+              <div className="h-full w-[17.5%] rounded-full bg-brand-yellow" />
+            </div>
+            <span className="text-xs text-neutral-500 shrink-0">7 / 40 dijawab</span>
+          </div>
         </div>
-      </div>
-      <div className="absolute -bottom-5 -left-5 rounded-xl bg-brand-ink text-white text-xs font-semibold px-4 py-3 shadow-lg flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-semantic-success animate-pulse" />
-        248 mahasiswa online
-      </div>
-      <div className="absolute -top-5 -right-3 rounded-xl bg-white shadow-md border border-neutral-100 px-4 py-3 text-xs">
-        <div className="font-bold text-brand-ink">Nilai otomatis</div>
-        <div className="text-neutral-500">dikirim ke PDDIKTI</div>
       </div>
     </div>
   );
