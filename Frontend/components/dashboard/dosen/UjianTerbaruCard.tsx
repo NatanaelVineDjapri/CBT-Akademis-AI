@@ -36,9 +36,9 @@ export default function UjianTerbaruCard({ data }: { data: DosenUjianItem[] }) {
               <div className="flex items-center gap-3">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: "var(--color-primary-light, #e0f7fa)" }}
+                  style={{ backgroundColor: "var(--color-primary)" }}
                 >
-                  <ClipboardList size={16} style={{ color: "var(--color-primary)" }} />
+                  <ClipboardList size={16} className="text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-800">{ujian.nama}</p>

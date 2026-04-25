@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ClipboardList } from "lucide-react";
 import type { DosenUjianItem } from "@/types";
 
 export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
@@ -21,13 +21,19 @@ export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
               key={ujian.id}
               className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0"
             >
-              <div>
-                <p className="text-sm font-medium text-gray-800">
-                  {ujian.nama}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {ujian.mata_kuliah} · {ujian.end_date}
-                </p>
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: "var(--color-primary)" }}
+                >
+                  <ClipboardList size={16} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800">{ujian.nama}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {ujian.mata_kuliah} · {ujian.end_date}
+                  </p>
+                </div>
               </div>
               <Link
                 href="/dosen/hasil-ujian"
