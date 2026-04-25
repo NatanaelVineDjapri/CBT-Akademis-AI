@@ -1,174 +1,189 @@
 "use client";
 
 import { useState } from "react";
+import useSWR from "swr";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
-import { ChevronLeft, ChevronRight, BarChart2, Percent, Users } from "lucide-react";
-
-const performaData = [
-  { ujian: "Ujian 1", nilai: 82, lowPass: false },
-  { ujian: "Ujian 2", nilai: 45, lowPass: true },
-  { ujian: "Ujian 3", nilai: 78, lowPass: false },
-  { ujian: "Ujian 4", nilai: 38, lowPass: true },
-  { ujian: "Ujian 5", nilai: 91, lowPass: false },
-  { ujian: "Ujian 6", nilai: 52, lowPass: true },
-  { ujian: "Ujian 7", nilai: 88, lowPass: false },
-  { ujian: "Ujian 8", nilai: 41, lowPass: true },
-  { ujian: "Ujian 9", nilai: 95, lowPass: false },
-  { ujian: "Ujian 10", nilai: 60, lowPass: false },
-];
-
-const matkul = ["Matematika", "Fisika", "Bahasa Indonesia"];
+import { TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { getDosenPerforma } from "@/services/DashboardServices";
+import { PERFORMA_STATS } from "@/types";
 
 function CustomDot(props: any) {
   const { cx, cy, payload } = props;
-  const color = payload.lowPass ? "#F59E0B" : "#0D9488";
   return (
-    <circle cx={cx} cy={cy} r={5} fill={color} stroke="#fff" strokeWidth={2} />
+    <circle
+      cx={cx} cy={cy} r={4} stroke="#fff" strokeWidth={2}
+      style={{ fill: payload.lowPass ? "var(--color-warning)" : "var(--color-primary)" }}
+    />
+  );
+}
+
+function CustomTooltip({ active, payload }: any) {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div className="bg-white border border-gray-100 rounded-xl px-3 py-2 shadow-sm text-xs">
+      <p className="font-medium text-gray-700 mb-0.5">{d.ujian}</p>
+      <p style={{ color: d.lowPass ? "var(--color-warning)" : "var(--color-primary)" }}>
+        Rata-rata: <span className="font-semibold">{d.nilai}</span>
+      </p>
+    </div>
   );
 }
 
 export default function PerformaChart() {
   const [index, setIndex] = useState(0);
+  const { data: matkulList, isLoading } = useSWR(
+    "/dashboard/dosen/performa",
+    getDosenPerforma,
+    { revalidateOnFocus: false }
+  );
+
+  if (isLoading || !matkulList || matkulList.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse">
+        <div className="flex items-center justify-between mb-4">
+          <div className="h-4 bg-gray-100 rounded w-32" />
+          <div className="h-7 bg-gray-100 rounded w-40" />
+        </div>
+        <div className="flex gap-2 mb-4">
+          {[1, 2, 3].map((i) => <div key={i} className="flex-1 h-14 bg-gray-100 rounded-xl" />)}
+        </div>
+        <div className="h-[180px] bg-gray-100 rounded-xl" />
+      </div>
+    );
+  }
+
+  const safeIndex = index % matkulList.length;
+  const current = matkulList[safeIndex];
+  const hasLowPass = current.ujian.some((u) => u.lowPass);
+  const allPass = current.ujian.length > 0 && !hasLowPass;
+
+  const values = current.ujian.map((u) => u.nilai);
+  const minVal = values.length ? Math.max(0, Math.floor(Math.min(...values) / 10) * 10 - 10) : 0;
+  const maxVal = values.length ? Math.min(100, Math.ceil(Math.max(...values) / 10) * 10 + 5) : 100;
+
+  const stats = PERFORMA_STATS.map((s) => ({
+    ...s,
+    value: s.suffix ? `${current[s.key]}${s.suffix}` : current[s.key],
+  }));
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       {/* Header */}
-      <div className="flex items-center justify-center gap-4 mb-5">
-        <button
-          onClick={() => setIndex((i) => (i - 1 + matkul.length) % matkul.length)}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-colors"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <span className="text-sm font-semibold text-gray-800">
-          Performa Mata Kuliah {matkul[index]}
-        </span>
-        <button
-          onClick={() => setIndex((i) => (i + 1) % matkul.length)}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-white hover:opacity-90 transition-colors"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
-          <ChevronRight size={16} />
-        </button>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <TrendingUp size={15} className="text-teal-600" />
+          <span className="text-sm font-medium text-gray-800">Performa Ujian</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setIndex((i) => (i - 1 + matkulList.length) % matkulList.length)}
+            className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            <ChevronLeft size={14} />
+          </button>
+          <div className="flex flex-col items-center min-w-[140px]">
+            <span className="text-xs font-semibold text-gray-800 truncate max-w-full text-center">
+              {current.matkul_nama}
+            </span>
+            <span className="text-[10px] text-gray-400">{safeIndex + 1} / {matkulList.length}</span>
+          </div>
+          <button
+            onClick={() => setIndex((i) => (i + 1) % matkulList.length)}
+            className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            <ChevronRight size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Body: stats kiri, chart kanan */}
-      <div className="flex gap-4">
-        {/* Stats kiri */}
-        <div className="flex flex-col gap-3 min-w-[160px]">
-          <div className="flex items-center gap-3 rounded-xl px-3 py-3" style={{ backgroundColor: "var(--color-primary-light, #e0f7fa)" }}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
-              <BarChart2 size={18} className="text-white" />
-            </div>
-            <div>
-              <p className="text-xs font-medium leading-tight" style={{ color: "var(--color-primary)" }}>Rata – rata Nilai</p>
-              <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>78.69</p>
-            </div>
+      {/* Stats row */}
+      <div className="flex gap-2 mb-4">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="flex-1 rounded-xl px-3 py-2.5"
+            style={{ backgroundColor: s.bg }}
+          >
+            <p className="text-[10px] font-medium mb-0.5" style={{ color: s.color }}>{s.label}</p>
+            <p className="text-sm font-bold" style={{ color: s.color }}>{s.value}</p>
           </div>
+        ))}
+      </div>
 
-          <div className="flex items-center gap-3 bg-green-50 rounded-xl px-3 py-3">
-            <div className="w-9 h-9 bg-green-400 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Percent size={18} className="text-white" />
-            </div>
-            <div>
-              <p className="text-xs text-green-700 font-medium leading-tight">Persentase Kelulusan</p>
-              <p className="text-sm font-semibold text-green-800">74%</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-purple-50 rounded-xl px-3 py-3">
-            <div className="w-9 h-9 bg-purple-400 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Users size={18} className="text-white" />
-            </div>
-            <div>
-              <p className="text-xs text-purple-700 font-medium leading-tight">Jumlah Mahasiswa</p>
-              <p className="text-sm font-semibold text-purple-800">
-                57{" "}
-                <span className="text-xs font-normal text-purple-600">mahasiswa</span>
-              </p>
-            </div>
-          </div>
+      {/* Chart */}
+      {current.ujian.length === 0 ? (
+        <div className="h-[180px] flex items-center justify-center rounded-xl bg-gray-50">
+          <p className="text-xs text-gray-400">Belum ada ujian untuk mata kuliah ini</p>
         </div>
-
-        {/* Chart kanan */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="h-[200px]">
+      ) : (
+        <>
+          <div className="h-[180px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={performaData}
-                margin={{ top: 5, right: 10, left: -10, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <AreaChart data={current.ujian} margin={{ top: 5, right: 4, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="performa-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" style={{ stopColor: "var(--color-primary)", stopOpacity: 0.15 }} />
+                    <stop offset="95%" style={{ stopColor: "var(--color-primary)", stopOpacity: 0 }} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                <ReferenceLine y={60} stroke="#e5e7eb" strokeDasharray="4 4" />
                 <XAxis
                   dataKey="ujian"
                   tick={{ fontSize: 9, fill: "#9CA3AF" }}
                   tickLine={false}
                   axisLine={false}
-                  label={{
-                    value: "Daftar 10 Ujian Terbaru",
-                    position: "insideBottom",
-                    offset: -12,
-                    fontSize: 10,
-                    fill: "#9CA3AF",
-                  }}
+                  interval="preserveStartEnd"
                 />
                 <YAxis
-                  domain={[20, 100]}
-                  ticks={[20, 40, 60, 80, 100]}
-                  tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                  domain={[minVal, maxVal]}
+                  tick={{ fontSize: 9, fill: "#9CA3AF" }}
                   tickLine={false}
                   axisLine={false}
-                  label={{
-                    value: "Rata-rata Nilai",
-                    angle: -90,
-                    position: "insideLeft",
-                    offset: 15,
-                    fontSize: 10,
-                    fill: "#9CA3AF",
-                  }}
+                  width={32}
                 />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "10px",
-                    border: "0.5px solid #e5e7eb",
-                    fontSize: "12px",
-                  }}
-                  formatter={(value) => [`${value}`, "Nilai rata-rata"]}
-                />
-                <Line
-                  type="linear"
+                <Tooltip content={<CustomTooltip />} />
+                <Area
+                  type="monotone"
                   dataKey="nilai"
-                  stroke="#0D9488"
+                  stroke="var(--color-primary)"
                   strokeWidth={2}
+                  fill="url(#performa-fill)"
                   dot={<CustomDot />}
-                  activeDot={{ r: 6, fill: "#0D9488" }}
+                  activeDot={{ r: 5, fill: "var(--color-primary)", stroke: "#fff", strokeWidth: 2 }}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
 
           {/* Legend */}
-          <div className="flex flex-col gap-1 mt-1">
+          <div className="flex items-center gap-4 mt-2">
             <span className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="text-xs">📈</span>
-              Performa Mahasiswa meningkat sejak 5 ujian terakhir
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-primary)" }} />
+              Di atas passing grade
             </span>
             <span className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="text-xs">⚠️</span>
-              Ujian memiliki tingkat kelulusan rendah
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-warning)" }} />
+              Di bawah passing grade
             </span>
+            {allPass && (
+              <span className="text-xs text-teal-600 font-medium ml-auto">Semua lulus ✓</span>
+            )}
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

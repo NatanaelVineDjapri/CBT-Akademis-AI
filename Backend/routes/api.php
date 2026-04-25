@@ -43,16 +43,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/dashboard/mahasiswa', [DashboardController::class, 'mahasiswa']);
     Route::get('/pengumuman', [PengumumanController::class, 'index']);
-    Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
     Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
-    Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
-    Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
     Route::get('/mata-kuliah/my', [MataKuliahController::class, 'myMataKuliah']);
     Route::get('/mata-kuliah/my/{id}', [MataKuliahController::class, 'myMataKuliahDetail']);
     Route::get('/mata-kuliah/my/{matkulId}/bab/{babId}/soal', [MataKuliahController::class, 'myMataKuliahBabSoal']);
-
+    // Tambah middleware role mahasiswa
+    Route::middleware('role:mahasiswa')->group(function () {
+        Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
+        Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
+        Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
+        Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']); // ✅
+    });
     Route::prefix('bank-soal')->group(function () {
-        Route::get('/', [BankSoalController::class, 'index']);
         Route::get('/global', [BankSoalController::class, 'global']);
         Route::get('/global/{id}', [BankSoalController::class, 'showGlobal']);
         Route::get('/{id}/soal', [BankSoalController::class, 'soal']);
@@ -111,12 +113,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:dosen')->group(function () {
         Route::get('/dashboard/dosen', [DashboardController::class, 'dosen']);
+        Route::get('/dashboard/dosen/performa', [DashboardController::class, 'dosenPerforma']);
         Route::get('/mata-kuliah/dosen', [MataKuliahController::class, 'dosenMataKuliah']);
         Route::get('/jadwal/dosen', [UjianController::class, 'jadwalDosen']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {
         Route::prefix('bank-soal')->group(function () {
+            Route::get('/', [BankSoalController::class, 'index']);
             Route::post('/', [BankSoalController::class, 'store']);
             Route::put('/{id}', [BankSoalController::class, 'update']);
             Route::delete('/{id}', [BankSoalController::class, 'destroy']);

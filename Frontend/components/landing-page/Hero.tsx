@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
+import { options } from "@/types/landing-page";
 
 export default function Hero() {
   return (
@@ -35,13 +36,6 @@ export default function Hero() {
 }
 
 function HeroMock() {
-  const options = [
-    { l: "A", t: "Linear search",  sel: false },
-    { l: "B", t: "Binary search",  sel: true  },
-    { l: "C", t: "Bubble sort",    sel: false },
-    { l: "D", t: "Hashing",        sel: false },
-  ];
-
   return (
     <div className="relative ml-auto">
       {/* Yellow decorative tab on right edge */}

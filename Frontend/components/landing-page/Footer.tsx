@@ -1,12 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Plus } from "lucide-react";
-
-const links = [
-  { heading: "Produk",     items: ["CBT", "SIAKAD", "PMB", "SPMI"] },
-  { heading: "Perusahaan", items: ["Tentang", "Karier", "Blog"] },
-  { heading: "Dukungan",   items: ["Bantuan", "Status", "API"] },
-];
+import { links } from "@/types/landing-page";
 
 export default function Footer() {
   return (

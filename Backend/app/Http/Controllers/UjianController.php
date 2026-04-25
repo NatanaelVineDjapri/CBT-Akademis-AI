@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\NilaiAkhir;
 use App\Models\PesertaUjian;
 use App\Models\Ujian;
+use App\Events\JawabanMasuk;
+use App\Models\JawabanPeserta;
+use App\Models\UjianSoal;
 use Illuminate\Http\Request;
 
 class UjianController extends Controller
@@ -14,10 +17,10 @@ class UjianController extends Controller
         PesertaUjian::autoExpire();
 
         $authUser = $request->user();
-        $search   = $request->query('search', '');
-        $status   = $request->query('status', '');
-        $sortDir  = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
-        $perPage  = (int) $request->query('per_page', 8);
+        $search = $request->query('search', '');
+        $status = $request->query('status', '');
+        $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
+        $perPage = (int) $request->query('per_page', 8);
 
         $query = PesertaUjian::with([
             'ujian.mataKuliah',
@@ -29,7 +32,9 @@ class UjianController extends Controller
             ->where('peserta_ujian.user_id', $authUser->id)
             ->select('peserta_ujian.*')
             ->when($status, fn($q) => $q->where('peserta_ujian.status', $status))
-            ->when($search, fn($q) =>
+            ->when(
+                $search,
+                fn($q) =>
                 $q->whereRaw('LOWER(ujian.nama_ujian) LIKE ?', ['%' . strtolower($search) . '%'])
             )
             ->orderBy('ujian.nama_ujian', $sortDir);
@@ -38,34 +43,88 @@ class UjianController extends Controller
 
         $data = collect($paginated->items())->map(fn($p) => [
             'peserta_ujian_id' => $p->id,
-            'ujian_id'         => $p->ujian->id,
-            'nama_ujian'       => $p->ujian->nama_ujian,
-            'mata_kuliah'      => $p->ujian->mataKuliah?->nama ?? '-',
-            'start_date'       => $p->ujian->start_date,
-            'end_date'         => $p->ujian->end_date,
-            'durasi_menit'     => $p->ujian->durasi_menit,
-            'passing_grade'    => $p->ujian->ujianSetting?->passing_grade,
-            'status'           => $p->status,
-            'attempt_ke'       => $p->attempt_ke,
-            'max_attempt'      => $p->ujian->ujianSetting?->max_attempt,
-            'jumlah_soal'      => $p->ujian->ujianSoal->count(),
-            'nilai'            => $p->nilaiAkhir?->nilai_total,
-            'grade'            => $p->nilaiAkhir?->grade,
-            'lulus'            => $p->nilaiAkhir?->lulus,
+            'ujian_id' => $p->ujian->id,
+            'nama_ujian' => $p->ujian->nama_ujian,
+            'mata_kuliah' => $p->ujian->mataKuliah?->nama ?? '-',
+            'start_date' => $p->ujian->start_date,
+            'end_date' => $p->ujian->end_date,
+            'durasi_menit' => $p->ujian->durasi_menit,
+            'passing_grade' => $p->ujian->ujianSetting?->passing_grade,
+            'status' => $p->status,
+            'attempt_ke' => $p->attempt_ke,
+            'max_attempt' => $p->ujian->ujianSetting?->max_attempt,
+            'jumlah_soal' => $p->ujian->ujianSoal->count(),
+            'nilai' => $p->nilaiAkhir?->nilai_total,
+            'grade' => $p->nilaiAkhir?->grade,
+            'lulus' => $p->nilaiAkhir?->lulus,
         ]);
 
         return response()->json([
             'message' => 'Daftar ujian berhasil diambil!',
-            'data'    => $data,
-            'meta'    => [
+            'data' => $data,
+            'meta' => [
                 'current_page' => $paginated->currentPage(),
-                'last_page'    => $paginated->lastPage(),
-                'per_page'     => $paginated->perPage(),
-                'total'        => $paginated->total(),
+                'last_page' => $paginated->lastPage(),
+                'per_page' => $paginated->perPage(),
+                'total' => $paginated->total(),
             ],
         ]);
     }
+    public function submitJawaban(Request $request)
+    {
+        $request->validate([
+            'peserta_ujian_id' => 'required|exists:peserta_ujian,id',
+            'ujian_soal_id' => 'required|exists:ujian_soal,id',
+            'jawaban' => 'required|string',
+        ]);
 
+        // Ambil data peserta + user + ujian
+        $peserta = PesertaUjian::with('user', 'ujian')->findOrFail($request->peserta_ujian_id);
+
+        // Pastikan yang submit adalah peserta yang login
+        if ($peserta->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Simpan / update jawaban
+        JawabanPeserta::updateOrCreate(
+            [
+                'peserta_ujian_id' => $request->peserta_ujian_id,
+                'ujian_soal_id' => $request->ujian_soal_id,
+            ],
+            [
+                'jawaban' => $request->jawaban,
+            ]
+        );
+
+        // Hitung progress
+        $totalSoal = UjianSoal::where('ujian_id', $peserta->ujian_id)->count();
+        $totalJawaban = JawabanPeserta::where('peserta_ujian_id', $peserta->id)->count();
+
+        // Broadcast ke Pusher
+        broadcast(new JawabanMasuk([
+            'peserta_ujian_id' => $peserta->id,
+            'user_id' => $peserta->user_id,
+            'nama' => $peserta->user->nama,
+            'ujian_id' => $peserta->ujian_id,
+            'nama_ujian' => $peserta->ujian->nama_ujian,
+            'ujian_soal_id' => $request->ujian_soal_id,
+            'jawaban' => $request->jawaban,
+            'total_jawaban' => $totalJawaban,
+            'total_soal' => $totalSoal,
+            'progress' => $totalSoal > 0 ? round(($totalJawaban / $totalSoal) * 100) : 0,
+            'waktu' => now()->format('H:i:s'),
+        ]));
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Jawaban tersimpan',
+            'data' => [
+                'total_jawaban' => $totalJawaban,
+                'total_soal' => $totalSoal,
+            ]
+        ]);
+    }
     public function jadwalMahasiswa(Request $request)
     {
         $authUser = $request->user();
@@ -74,17 +133,17 @@ class UjianController extends Controller
             ->where('user_id', $authUser->id)
             ->get()
             ->map(fn($peserta) => [
-                'id'          => $peserta->ujian->id,
-                'title'       => $peserta->ujian->nama_ujian,
+                'id' => $peserta->ujian->id,
+                'title' => $peserta->ujian->nama_ujian,
                 'mata_kuliah' => $peserta->ujian->mataKuliah?->nama,
-                'start'       => $peserta->ujian->start_date,
-                'end'         => $peserta->ujian->end_date,
-                'status'      => $peserta->status,
+                'start' => $peserta->ujian->start_date,
+                'end' => $peserta->ujian->end_date,
+                'status' => $peserta->status,
             ]);
 
         return response()->json([
             'message' => 'Jadwal ujian berhasil diambil!',
-            'data'    => $ujianList,
+            'data' => $ujianList,
         ], 200);
     }
 
@@ -96,17 +155,17 @@ class UjianController extends Controller
             ->where('created_by', $authUser->id)
             ->get()
             ->map(fn($ujian) => [
-                'id'          => $ujian->id,
-                'title'       => $ujian->nama_ujian,
+                'id' => $ujian->id,
+                'title' => $ujian->nama_ujian,
                 'mata_kuliah' => $ujian->mataKuliah?->nama,
-                'start'       => $ujian->start_date,
-                'end'         => $ujian->end_date,
-                'status'      => $ujian->status ?? null,
+                'start' => $ujian->start_date,
+                'end' => $ujian->end_date,
+                'status' => $ujian->status ?? null,
             ]);
 
         return response()->json([
             'message' => 'Jadwal ujian dosen berhasil diambil!',
-            'data'    => $ujianList,
+            'data' => $ujianList,
         ]);
     }
 
@@ -125,36 +184,36 @@ class UjianController extends Controller
         }
 
         $peserta = $nilai->pesertaUjian;
-        $ujian   = $peserta->ujian;
+        $ujian = $peserta->ujian;
 
         $gradeSetting = $ujian->gradeSetting
             ->sortBy('nilai_min')
             ->map(fn($g) => [
-                'grade'     => $g->grade,
+                'grade' => $g->grade,
                 'nilai_min' => $g->nilai_min,
                 'nilai_max' => $g->nilai_max,
             ])->values();
 
         $info = [
-            'nama_ujian'    => $ujian->nama_ujian,
-            'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
-            'tanggal'       => $nilai->graded_at?->format('d/m/Y'),
-            'waktu'         => $nilai->graded_at?->format('H:i'),
-            'nilai'         => $nilai->nilai_total,
-            'grade'         => $nilai->grade,
-            'lulus'         => $nilai->lulus,
+            'nama_ujian' => $ujian->nama_ujian,
+            'mata_kuliah' => $ujian->mataKuliah?->nama ?? '-',
+            'tanggal' => $nilai->graded_at?->format('d/m/Y'),
+            'waktu' => $nilai->graded_at?->format('H:i'),
+            'nilai' => $nilai->nilai_total,
+            'grade' => $nilai->grade,
+            'lulus' => $nilai->lulus,
             'grade_setting' => $gradeSetting,
         ];
 
         $pilihan_ganda = [];
-        $checklist     = [];
-        $essay         = [];
+        $checklist = [];
+        $essay = [];
 
         foreach ($peserta->jawabanPeserta->sortBy('ujianSoal.urutan') as $jwb) {
-            $soal      = $jwb->ujianSoal?->soal;
+            $soal = $jwb->ujianSoal?->soal;
             $jenisSoal = $soal?->jenisSoal->first();
-            $tipe      = $jenisSoal?->jenis_soal ?? 'essay';
-            $urutan    = $jwb->ujianSoal?->urutan ?? 0;
+            $tipe = $jenisSoal?->jenis_soal ?? 'essay';
+            $urutan = $jwb->ujianSoal?->urutan ?? 0;
 
             $kunci = $jenisSoal?->opsiJawaban
                 ->where('is_correct', true)
@@ -163,10 +222,10 @@ class UjianController extends Controller
                 ->implode(',') ?? '-';
 
             $row = [
-                'no'      => $urutan,
-                'soal'    => $soal?->deskripsi ?? '-',
+                'no' => $urutan,
+                'soal' => $soal?->deskripsi ?? '-',
                 'jawaban' => $jwb->jawaban ?? '-',
-                'poin'    => $jwb->final_nilai ?? $jwb->nilai ?? 0,
+                'poin' => $jwb->final_nilai ?? $jwb->nilai ?? 0,
             ];
 
             if ($tipe === 'pilihan_ganda') {
@@ -182,11 +241,11 @@ class UjianController extends Controller
 
         return response()->json([
             'message' => 'Detail nilai berhasil diambil!',
-            'info'    => $info,
+            'info' => $info,
             'jawaban' => [
                 'pilihan_ganda' => $pilihan_ganda,
-                'checklist'     => $checklist,
-                'essay'         => $essay,
+                'checklist' => $checklist,
+                'essay' => $essay,
             ],
         ]);
     }
@@ -194,17 +253,17 @@ class UjianController extends Controller
     public function nilaiMahasiswa(Request $request)
     {
         $authUser = $request->user();
-        $search   = $request->query('search', '');
-        $perPage  = (int) $request->query('per_page', 10);
+        $search = $request->query('search', '');
+        $perPage = (int) $request->query('per_page', 10);
 
         $colMap = [
             'nama_ujian' => 'ujian.nama_ujian',
-            'tanggal'    => 'nilai_akhir.graded_at',
-            'nilai'      => 'nilai_akhir.nilai_total',
-            'grade'      => 'nilai_akhir.grade',
+            'tanggal' => 'nilai_akhir.graded_at',
+            'nilai' => 'nilai_akhir.nilai_total',
+            'grade' => 'nilai_akhir.grade',
         ];
 
-        $sortBy  = $colMap[$request->query('sort_by', 'tanggal')] ?? 'nilai_akhir.graded_at';
+        $sortBy = $colMap[$request->query('sort_by', 'tanggal')] ?? 'nilai_akhir.graded_at';
         $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
 
         $query = NilaiAkhir::with(['pesertaUjian.ujian'])
@@ -220,23 +279,23 @@ class UjianController extends Controller
         $paginated = $query->paginate($perPage);
 
         $data = collect($paginated->items())->map(fn($nilai) => [
-            'id'         => $nilai->id,
+            'id' => $nilai->id,
             'nama_ujian' => $nilai->pesertaUjian->ujian->nama_ujian ?? '-',
-            'tanggal'    => $nilai->graded_at?->format('d/m/y'),
-            'pukul'      => $nilai->graded_at?->format('H.i'),
-            'nilai'      => $nilai->nilai_total,
-            'grade'      => $nilai->grade ?? '-',
-            'lulus'      => $nilai->lulus,
+            'tanggal' => $nilai->graded_at?->format('d/m/y'),
+            'pukul' => $nilai->graded_at?->format('H.i'),
+            'nilai' => $nilai->nilai_total,
+            'grade' => $nilai->grade ?? '-',
+            'lulus' => $nilai->lulus,
         ]);
 
         return response()->json([
             'message' => 'Riwayat nilai berhasil diambil!',
-            'data'    => $data,
-            'meta'    => [
+            'data' => $data,
+            'meta' => [
                 'current_page' => $paginated->currentPage(),
-                'last_page'    => $paginated->lastPage(),
-                'per_page'     => $paginated->perPage(),
-                'total'        => $paginated->total(),
+                'last_page' => $paginated->lastPage(),
+                'per_page' => $paginated->perPage(),
+                'total' => $paginated->total(),
             ],
         ]);
     }

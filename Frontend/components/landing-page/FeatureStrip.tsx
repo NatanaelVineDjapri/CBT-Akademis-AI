@@ -1,22 +1,4 @@
-import { LayoutGrid, ShieldCheck, Sparkles } from "lucide-react";
-
-const features = [
-  {
-    icon: LayoutGrid,
-    t: "Lorem Ipsum Dolor",
-    d: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod.",
-  },
-  {
-    icon: ShieldCheck,
-    t: "Consectetur Adipiscing",
-    d: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris.",
-  },
-  {
-    icon: Sparkles,
-    t: "Sed Do Eiusmod",
-    d: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
-  },
-];
+import { features } from "@/types/landing-page";
 
 export default function FeatureStrip() {
   return (

@@ -12,10 +12,10 @@ class DemoSeeder extends Seeder
     {
         //Ambil data existing 
         $prodiTI    = DB::table('prodi')->where('kode', 'TI')->first();
-        $dosenId    = DB::table('users')->where('email', 'budi.santoso@untar.ac.id')->value('id');
-        $natanaelId = DB::table('users')->where('email', 'natanaelvinedj@gmail.com')->value('id');
-        $mhs2Id     = DB::table('users')->where('email', 'andi.kurniawan@student.untar.ac.id')->value('id');
-        $mhs3Id     = DB::table('users')->where('email', 'siti.rahayu@student.untar.ac.id')->value('id');
+        $dosenId    = DB::table('users')->where('email', 'irvan.lewenusa@untar.ac.id')->value('id');
+        $natanaelId = DB::table('users')->where('nim', '535240042')->value('id');
+        $mhs2Id     = DB::table('users')->where('nim', '535240005')->value('id');
+        $mhs3Id     = DB::table('users')->where('nim', '535240003')->value('id');
 
         // Mata Kuliah (30 total)
         $allMatkul = [

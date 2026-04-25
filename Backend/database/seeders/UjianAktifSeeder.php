@@ -10,8 +10,8 @@ class UjianAktifSeeder extends Seeder
 {
     public function run(): void
     {
-        $natanaelId = DB::table('users')->where('email', 'natanaelvinedj@gmail.com')->value('id');
-        $dosenId    = DB::table('users')->where('email', 'budi.santoso@untar.ac.id')->value('id');
+        $natanaelId = DB::table('users')->where('nim', '535240042')->value('id');
+        $dosenId    = DB::table('users')->where('email', 'irvan.lewenusa@untar.ac.id')->value('id');
         $allMatkul  = DB::table('mata_kuliah')->orderBy('id')->get();
         DB::table('ujian')->whereIn('kode_akses', ['PWLX01','KBAX01','BDLX01','RPLX01'])->delete();
 

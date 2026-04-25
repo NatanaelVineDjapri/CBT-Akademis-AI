@@ -1,3 +1,5 @@
+import { tabs, items, students, bars } from "@/types/landing-page";
+
 function BrowserBar({ url }: { url: string }) {
   return (
     <div className="flex items-center gap-1.5 px-4 py-3 bg-neutral-50 border-b border-neutral-100">
@@ -11,13 +13,7 @@ function BrowserBar({ url }: { url: string }) {
   );
 }
 
-function BankSoalMock() {
-  const tabs = ["Semua", "Basis Data", "Algoritma", "Jaringan"];
-  const items = [
-    { t: "Normalisasi 3NF pada tabel transaksi", type: "Pilihan Ganda", diff: "Sedang", count: "128×" },
-    { t: "Perbedaan B-Tree dan B+Tree",          type: "Esai Singkat",  diff: "Sulit",  count: "47×"  },
-    { t: "Indeks komposit pada query WHERE",      type: "Pilihan Ganda", diff: "Mudah",  count: "302×" },
-  ];
+function BankSoalMock() {  
   return (
     <div className="rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
       <BrowserBar url="cbt.akademis.ai/bank-soal" />
@@ -46,12 +42,6 @@ function BankSoalMock() {
 }
 
 function PengawasanMock() {
-  const students = [
-    { name: "Ayu S.",   badge: "LIVE", color: "bg-green-500" },
-    { name: "Budi R.",  badge: "TAB",  color: "bg-orange-500" },
-    { name: "Citra L.", badge: "LIVE", color: "bg-green-500" },
-    { name: "Dewi P.",  badge: "LIVE", color: "bg-green-500" },
-  ];
   return (
     <div className="rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
       <BrowserBar url="cbt.akademis.ai/pengawasan" />
@@ -70,10 +60,7 @@ function PengawasanMock() {
 }
 
 function AnalitikMock() {
-  const bars = [
-    { label: "W1", h: 35 }, { label: "W2", h: 55 }, { label: "W3", h: 40 },
-    { label: "W4", h: 50 }, { label: "W5", h: 60 }, { label: "UTS", h: 85, active: true }, { label: "W7", h: 48 },
-  ];
+
   return (
     <div className="rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
       <BrowserBar url="cbt.akademis.ai/analitik" />
