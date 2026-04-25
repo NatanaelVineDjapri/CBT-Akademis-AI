@@ -44,21 +44,12 @@ export default function DashboardDosenPage() {
 
           {/* Baris 3: Persentase Kelulusan + Rata-rata Nilai */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <PersentaseKelulusanCard />
             <RataRataNilaiCard />
+            <GrafikPelanggaranCard />
           </div>
 
           {/* Baris 4: Grafik Pelanggaran + Total Pelanggaran */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <GrafikPelanggaranCard />
-            <TotalPelanggaranCard />
-          </div>
-
-          {/* Baris 5: Jadwal + Pengumuman */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <JadwalCard />
-            <PengumumanCard />
-          </div>
+         
         </>
       )}
     </div>
