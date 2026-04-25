@@ -62,6 +62,82 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function dosenPerforma(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        // Query 1: semua ujian dosen — top 10 per matkul diambil di PHP
+        $allUjian = Ujian::with(['mataKuliah', 'ujianSetting'])
+            ->where('created_by', $userId)
+            ->orderBy('mata_kuliah_id')
+            ->orderByDesc('start_date')
+            ->get();
+
+        if ($allUjian->isEmpty()) {
+            return response()->json(['message' => 'Data performa berhasil diambil!', 'data' => []]);
+        }
+
+        $ujianByMatkul = $allUjian->groupBy('mata_kuliah_id')
+            ->map(fn($ujians) => $ujians->take(10));
+
+        $allUjianIds = $ujianByMatkul->flatten()->pluck('id')->toArray();
+        $matkulIds   = $ujianByMatkul->keys()->toArray();
+
+        // Query 2: avg nilai per ujian (bulk)
+        $avgByUjian = NilaiAkhir::join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
+            ->whereIn('peserta_ujian.ujian_id', $allUjianIds)
+            ->groupBy('peserta_ujian.ujian_id')
+            ->selectRaw('peserta_ujian.ujian_id, AVG(nilai_akhir.nilai_total) AS avg_nilai')
+            ->pluck('avg_nilai', 'ujian_id');
+
+        // Query 3: stats per matkul (bulk)
+        $statsByMatkul = NilaiAkhir::join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
+            ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
+            ->where('ujian.created_by', $userId)
+            ->whereIn('ujian.mata_kuliah_id', $matkulIds)
+            ->groupBy('ujian.mata_kuliah_id')
+            ->selectRaw('
+                ujian.mata_kuliah_id,
+                AVG(nilai_akhir.nilai_total)                               AS rata_rata,
+                COUNT(*)                                                    AS total_peserta,
+                SUM(CASE WHEN nilai_akhir.lulus = true THEN 1 ELSE 0 END)  AS total_lulus,
+                COUNT(DISTINCT peserta_ujian.user_id)                      AS jumlah_mahasiswa
+            ')
+            ->get()
+            ->keyBy('mata_kuliah_id');
+
+        $result = $ujianByMatkul->map(function ($ujians, $matkulId) use ($avgByUjian, $statsByMatkul) {
+            $stats        = $statsByMatkul[$matkulId] ?? null;
+            $totalPeserta = (int) ($stats->total_peserta ?? 0);
+
+            $ujianData = $ujians->sortBy('start_date')->map(function ($ujian) use ($avgByUjian) {
+                $avg          = (float) ($avgByUjian[$ujian->id] ?? 0);
+                $passingGrade = $ujian->ujianSetting?->passing_grade ?? 60;
+                return [
+                    'ujian'   => $ujian->nama_ujian,
+                    'nilai'   => round($avg, 1),
+                    'lowPass' => $avg < $passingGrade,
+                ];
+            })->values();
+
+            return [
+                'matkul_id'            => $matkulId,
+                'matkul_nama'          => $ujians->first()->mataKuliah?->nama ?? '-',
+                'rata_rata_nilai'      => round((float) ($stats->rata_rata ?? 0), 2),
+                'persentase_kelulusan' => $totalPeserta > 0
+                    ? round(((int) ($stats->total_lulus ?? 0) / $totalPeserta) * 100)
+                    : 0,
+                'jumlah_mahasiswa'     => (int) ($stats->jumlah_mahasiswa ?? 0),
+                'ujian'                => $ujianData,
+            ];
+        })->sortBy('matkul_nama')->values();
+
+        return response()->json([
+            'message' => 'Data performa berhasil diambil!',
+            'data'    => $result,
+        ]);
+    }
+
     public function mahasiswa(Request $request)
     {
         PesertaUjian::autoExpire();

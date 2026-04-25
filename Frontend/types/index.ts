@@ -181,6 +181,114 @@ export interface JadwalEvent {
   end?: string;
   status?: string;
 }
+
+
+export interface DashboardStats {
+  ujian_selesai: number;
+  ujian_akan_datang: number;
+  rata_rata_nilai: number;
+  nilai_tertinggi: number;
+}
+
+export interface DashboardUjianItem {
+  peserta_ujian_id: number;
+  ujian_id: number;
+  nama: string;
+  mata_kuliah: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface DashboardNilaiItem {
+  nama: string;
+  mata_kuliah: string;
+  tanggal: string;
+  nilai: number;
+  grade: string;
+  lulus: boolean;
+}
+
+export interface DashboardBulananItem {
+  bulan: string;
+  selesai: number;
+  akan_datang: number;
+}
+
+export interface DashboardPerkembanganItem {
+  bulan: string;
+  rata: number;
+  tertinggi: number;
+  matkul_tinggi: string;
+  matkul_rendah: string;
+}
+
+export interface MahasiswaDashboard {
+  stats: DashboardStats;
+  ujian_segera: DashboardUjianItem | null;
+  ujian_akan_datang: DashboardUjianItem[];
+  nilai_terbaru: DashboardNilaiItem[];
+  ujian_per_bulan: DashboardBulananItem[];
+  perkembangan_nilai: DashboardPerkembanganItem[];
+}
+
+export interface DosenUjianItem {
+  id: number;
+  nama: string;
+  mata_kuliah: string;
+  start_date: string;
+  end_date: string;
+  jam: string;
+}
+
+export interface DosenBankSoalItem {
+  id: number;
+  nama: string;
+  jumlah_soal: number;
+  permission: string;
+}
+
+export interface DosenDashboard {
+  stats: {
+    total_bank_soal: number;
+    total_ujian: number;
+    ujian_berlangsung: number;
+    ujian_selesai: number;
+  };
+  bank_soal: DosenBankSoalItem[];
+  ujian_terbaru: DosenUjianItem[];
+  ujian_berlangsung: DosenUjianItem[];
+  ujian_selesai: DosenUjianItem[];
+}
+
+export interface DosenPerformaUjian {
+  ujian: string;
+  nilai: number;
+  lowPass: boolean;
+}
+
+export interface DosenPerformaMatkul {
+  matkul_id: number;
+  matkul_nama: string;
+  rata_rata_nilai: number;
+  persentase_kelulusan: number;
+  jumlah_mahasiswa: number;
+  ujian: DosenPerformaUjian[];
+}
+
+export interface PerformaStatConfig {
+  key: "rata_rata_nilai" | "persentase_kelulusan" | "jumlah_mahasiswa";
+  label: string;
+  bg: string;
+  color: string;
+  suffix?: string;
+}
+
+export const PERFORMA_STATS: PerformaStatConfig[] = [
+  { key: "rata_rata_nilai",      label: "Rata-rata Nilai", bg: "var(--color-primary-light)", color: "var(--color-primary)" },
+  { key: "persentase_kelulusan", label: "Kelulusan",       bg: "var(--akademik-prodi-bg)",   color: "var(--akademik-prodi-icon)", suffix: "%" },
+  { key: "jumlah_mahasiswa",     label: "Mahasiswa",       bg: "var(--akademik-tahun-bg)",   color: "var(--akademik-tahun-icon)" },
+];
+
 export const months = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",

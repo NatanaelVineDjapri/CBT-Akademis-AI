@@ -1,32 +1,4 @@
-const challenges = [
-  {
-    tag: "Lorem Ipsum",
-    t: "Lorem Ipsum Dolor Sit Amet Consectetur",
-    bullets: [
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Sed do eiusmod tempor incididunt ut labore",
-      "Ut enim ad minim veniam quis nostrud",
-    ],
-  },
-  {
-    tag: "Lorem Ipsum",
-    t: "Adipiscing Elit Sed Do Eiusmod Tempor",
-    bullets: [
-      "Duis aute irure dolor in reprehenderit",
-      "Excepteur sint occaecat cupidatat non proident",
-      "Sunt in culpa qui officia deserunt mollit",
-    ],
-  },
-  {
-    tag: "Lorem Ipsum",
-    t: "Incididunt Ut Labore Et Dolore Magna Aliqua",
-    bullets: [
-      "Quis nostrud exercitation ullamco laboris",
-      "Nisi ut aliquip ex ea commodo consequat",
-      "Duis aute irure dolor in reprehenderit voluptate",
-    ],
-  },
-];
+import { challenges } from "@/types/landing-page";
 
 export default function Challenges() {
   return (

@@ -1,8 +1,4 @@
-const steps = [
-  { n: "01", t: "Lorem Ipsum Dolor",      d: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor." },
-  { n: "02", t: "Consectetur Adipiscing", d: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi." },
-  { n: "03", t: "Sed Do Eiusmod",         d: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore." },
-];
+import { steps }from "@/types/landing-page";
 
 export default function HowItWorks() {
   return (

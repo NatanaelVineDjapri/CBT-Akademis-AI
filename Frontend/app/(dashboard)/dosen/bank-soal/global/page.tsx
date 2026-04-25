@@ -35,7 +35,7 @@ export default function BankSoalGlobalPage() {
       </div>
 
       {/* White container */}
-      <div className="bg-white rounded-2xl overflow-hidden flex-1">
+      <div className="bg-white rounded-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
@@ -64,6 +64,8 @@ export default function BankSoalGlobalPage() {
           )}
         </div>
       </div>
+
+      <div className="flex-1" />
 
       {data?.meta && (
         <Pagination

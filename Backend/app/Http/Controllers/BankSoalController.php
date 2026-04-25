@@ -19,17 +19,8 @@ class BankSoalController extends Controller
 
         $bankSoal = BankSoal::with('mataKuliah', 'bab', 'creator')->withCount('soal')
             ->where(function ($q) use ($authUser) {
-                $q
-                    // Punya sendiri
-                    ->where('created_by', $authUser->id)
-                    // Public → semua universitas bisa lihat
-                    ->orWhere('permission', 'public')
-                    // Shared → hanya yang diinvite by email atau via link
+                $q->where('created_by', $authUser->id)
                     ->orWhereHas('sharedUsers', fn($q) => $q->where('user_id', $authUser->id));
-
-                if (in_array($authUser->role, ['mahasiswa', 'peserta_mahasiswa_baru'])) { //ini tar hrs diubah pmb boleh atau ga akses public bank soal
-                    $q->where('permission', 'public');
-                }
             })
             ->when($request->mata_kuliah_id, fn($q) => $q->where('mata_kuliah_id', $request->mata_kuliah_id))
             ->when($request->search, fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($request->search) . '%']))
@@ -55,8 +46,8 @@ class BankSoalController extends Controller
                 $s = '%' . strtolower($request->search) . '%';
                 $q->where(function ($q) use ($s) {
                     $q->whereRaw('LOWER(bank_soal.nama) LIKE ?', [$s])
-                      ->orWhereHas('creator', fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', [$s]))
-                      ->orWhereHas('creator.universitas', fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', [$s])
+                        ->orWhereHas('creator', fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', [$s]))
+                        ->orWhereHas('creator.universitas', fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', [$s])
                             ->orWhereRaw('LOWER(kode) LIKE ?', [$s]));
                 });
             })
@@ -69,10 +60,10 @@ class BankSoalController extends Controller
             'message' => 'Data bank soal global berhasil diambil!',
             'data' => $bankSoal->items(),
             'meta' => [
-                'total'        => $bankSoal->total(),
-                'per_page'     => $bankSoal->perPage(),
+                'total' => $bankSoal->total(),
+                'per_page' => $bankSoal->perPage(),
                 'current_page' => $bankSoal->currentPage(),
-                'last_page'    => $bankSoal->lastPage(),
+                'last_page' => $bankSoal->lastPage(),
             ],
         ], 200);
     }
@@ -90,12 +81,12 @@ class BankSoalController extends Controller
                 ->get()
                 ->map(function ($bab) use ($id) {
                     return [
-                        'id'         => $bab->id,
-                        'nama_bab'   => $bab->nama_bab,
-                        'urutan'     => $bab->urutan,
+                        'id' => $bab->id,
+                        'nama_bab' => $bab->nama_bab,
+                        'urutan' => $bab->urutan,
                         'soal_count' => Soal::where('bank_soal_id', $id)
-                                            ->where('bab_id', $bab->id)
-                                            ->count(),
+                            ->where('bab_id', $bab->id)
+                            ->count(),
                     ];
                 });
         }
@@ -104,7 +95,7 @@ class BankSoalController extends Controller
             'message' => 'Detail bank soal global berhasil diambil!',
             'data' => [
                 'bank_soal' => $bankSoal,
-                'babs'      => $babs,
+                'babs' => $babs,
             ],
         ], 200);
     }
@@ -136,40 +127,40 @@ class BankSoalController extends Controller
             ->get();
 
         return response()->json([
-            'message'   => 'Data soal berhasil diambil!',
-            'can_edit'  => $canEdit,
+            'message' => 'Data soal berhasil diambil!',
+            'can_edit' => $canEdit,
             'bank_soal' => $bankSoal,
-            'data'      => $soal,
+            'data' => $soal,
         ], 200);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama'           => 'required|string|max:255',
-            'deskripsi'      => 'nullable|string',
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
             'mata_kuliah_id' => 'nullable|exists:mata_kuliah,id',
-            'bab_id'         => 'required_with:mata_kuliah_id|nullable|exists:bab,id',
-            'permission'     => 'required|in:public,shared,private',
+            'bab_id' => 'required_with:mata_kuliah_id|nullable|exists:bab,id',
+            'permission' => 'required|in:public,shared,private',
         ], [
-            'nama.required'         => 'Nama bank soal wajib diisi!',
-            'permission.in'         => 'Permission tidak valid!',
+            'nama.required' => 'Nama bank soal wajib diisi!',
+            'permission.in' => 'Permission tidak valid!',
             'mata_kuliah_id.exists' => 'Mata kuliah tidak ditemukan!',
-            'bab_id.exists'         => 'Bab tidak ditemukan!',
+            'bab_id.exists' => 'Bab tidak ditemukan!',
         ]);
 
         $bankSoal = BankSoal::create([
-            'created_by'     => $request->user()->id,
+            'created_by' => $request->user()->id,
             'mata_kuliah_id' => $request->mata_kuliah_id,
-            'bab_id'         => $request->bab_id,
-            'nama'           => $request->nama,
-            'deskripsi'      => $request->deskripsi,
-            'permission'     => $request->permission,
+            'bab_id' => $request->bab_id,
+            'nama' => $request->nama,
+            'deskripsi' => $request->deskripsi,
+            'permission' => $request->permission,
         ]);
 
         return response()->json([
             'message' => 'Bank soal berhasil dibuat!',
-            'data'    => $bankSoal->load('mataKuliah', 'bab'),
+            'data' => $bankSoal->load('mataKuliah', 'bab'),
         ], 201);
     }
 
@@ -183,11 +174,11 @@ class BankSoalController extends Controller
         }
 
         $request->validate([
-            'nama'           => 'sometimes|string|max:255',
-            'deskripsi'      => 'nullable|string',
+            'nama' => 'sometimes|string|max:255',
+            'deskripsi' => 'nullable|string',
             'mata_kuliah_id' => 'nullable|exists:mata_kuliah,id',
-            'bab_id'         => 'nullable|exists:bab,id',
-            'permission'     => 'sometimes|in:public,shared,private',
+            'bab_id' => 'nullable|exists:bab,id',
+            'permission' => 'sometimes|in:public,shared,private',
         ], [
             'permission.in' => 'Permission tidak valid!',
         ]);
@@ -197,11 +188,11 @@ class BankSoalController extends Controller
         }
 
         $bankSoal->update([
-            'nama'           => $request->nama ?? $bankSoal->nama,
-            'deskripsi'      => $request->deskripsi ?? $bankSoal->deskripsi,
+            'nama' => $request->nama ?? $bankSoal->nama,
+            'deskripsi' => $request->deskripsi ?? $bankSoal->deskripsi,
             'mata_kuliah_id' => $request->has('mata_kuliah_id') ? $request->mata_kuliah_id : $bankSoal->mata_kuliah_id,
-            'bab_id'         => $request->has('bab_id') ? $request->bab_id : $bankSoal->bab_id,
-            'permission'     => $request->permission ?? $bankSoal->permission,
+            'bab_id' => $request->has('bab_id') ? $request->bab_id : $bankSoal->bab_id,
+            'permission' => $request->permission ?? $bankSoal->permission,
         ]);
 
         return response()->json([

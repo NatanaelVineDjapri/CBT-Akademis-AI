@@ -9,7 +9,7 @@ class BankSoalBabSeeder extends Seeder
 {
     public function run(): void
     {
-        $dosenId = DB::table('users')->where('email', 'budi.santoso@untar.ac.id')->value('id');
+        $dosenId = DB::table('users')->where('email', 'irvan.lewenusa@untar.ac.id')->value('id');
 
         $matkulPW  = DB::table('mata_kuliah')->where('kode', 'TI301')->first();
         $matkulBD  = DB::table('mata_kuliah')->where('kode', 'TI302')->first();

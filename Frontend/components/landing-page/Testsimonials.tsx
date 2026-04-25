@@ -1,23 +1,4 @@
-const quotes = [
-  {
-    q: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    n: "Lorem Ipsum Dolor",
-    r: "Lorem Ipsum, Consectetur Adipiscing",
-    initials: "LI",
-  },
-  {
-    q: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute.",
-    n: "Consectetur Adipiscing",
-    r: "Lorem Ipsum, Sed Do Eiusmod Tempor",
-    initials: "CA",
-  },
-  {
-    q: "Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    n: "Sed Do Eiusmod",
-    r: "Lorem Ipsum, Incididunt Ut Labore",
-    initials: "SE",
-  },
-];
+import { quotes } from "@/types/landing-page";
 
 export default function Testimonials() {
   return (
