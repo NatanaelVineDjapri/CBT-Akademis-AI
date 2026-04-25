@@ -46,4 +46,9 @@ class BankSoal extends Model
     {
         return $this->hasMany(BankSoalShared::class);
     }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

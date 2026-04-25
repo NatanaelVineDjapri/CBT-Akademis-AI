@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Mail } from "lucide-react";
 import Link from "next/link";
 import type { BankSoalItem, BankSoalMeta } from "@/types";
 import SearchInput from "@/components/filtering/SearchInput";
@@ -26,6 +26,7 @@ interface Props {
   onPageChange: (p: number) => void;
   onEdit: (item: BankSoalItem) => void;
   onDelete: (item: BankSoalItem) => void;
+  onShare?: (item: BankSoalItem) => void;
   canEdit: boolean;
   createHref?: string;
   onTambah?: () => void;
@@ -39,6 +40,7 @@ export default function BankSoalTable({
   onPageChange,
   onEdit,
   onDelete,
+  onShare,
   canEdit,
   createHref,
   onTambah,
@@ -131,6 +133,15 @@ export default function BankSoalTable({
                       {canEdit && (
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
+                            {onShare && item.permission === "shared" && (
+                              <button
+                                onClick={() => onShare(item)}
+                                className="text-blue-400 hover:text-blue-500 transition-colors"
+                                title="Share via email"
+                              >
+                                <Mail size={15} />
+                              </button>
+                            )}
                             <button
                               onClick={() => onEdit(item)}
                               className="text-green-500 hover:text-green-600 transition-colors"
