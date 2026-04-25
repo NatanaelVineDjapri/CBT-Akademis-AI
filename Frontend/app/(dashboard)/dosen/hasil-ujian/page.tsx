@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
@@ -149,7 +150,11 @@ export default function DosenHasilUjianPage() {
                     return (
                       <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-4 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
-                        <td className="px-4 py-4 font-medium text-gray-800 truncate">{item.nama_ujian}</td>
+                        <td className="px-4 py-4 font-medium truncate">
+                          <Link href={`/dosen/hasil-ujian/${item.id}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
+                            {item.nama_ujian}
+                          </Link>
+                        </td>
                         <td className="px-4 py-4 text-gray-500 truncate">{item.mata_kuliah}</td>
                         <td className="px-4 py-4 text-gray-500">{item.jenis_ujian}</td>
                         <td className="px-4 py-4 text-gray-500">{item.tanggal}</td>

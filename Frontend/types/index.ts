@@ -289,6 +289,42 @@ export const PERFORMA_STATS: PerformaStatConfig[] = [
   { key: "jumlah_mahasiswa",     label: "Mahasiswa",       bg: "var(--akademik-tahun-bg)",   color: "var(--akademik-tahun-icon)" },
 ];
 
+export interface HasilUjianDosenDetailInfo {
+  nama_ujian: string;
+  mata_kuliah: string;
+  jenis_ujian: string;
+  tanggal: string;
+  pukul: string;
+  total_peserta: number;
+  total_soal: number;
+}
+
+export interface HasilUjianPeserta {
+  id: number;
+  nama: string;
+  nim?: string;
+  status: "Selesai" | "Perlu Pengecekan" | "Berlangsung" | "Belum Selesai";
+  nilai: number | null;
+  grade: string | null;
+  lulus: boolean | null;
+}
+
+export interface HasilUjianDistribusiItem {
+  no: number;
+  soal: string;
+  jenis: string;
+  kunci: string;
+  opsi: Record<string, number>;
+  total_jawaban: number;
+  tingkat_ketepatan: number;
+}
+
+export interface HasilUjianDosenDetail {
+  info: HasilUjianDosenDetailInfo;
+  peserta: HasilUjianPeserta[];
+  distribusi: HasilUjianDistribusiItem[];
+}
+
 export interface HasilUjianDosenItem {
   id: number;
   nama_ujian: string;
