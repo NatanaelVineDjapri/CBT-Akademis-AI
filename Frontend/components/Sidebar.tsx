@@ -24,9 +24,9 @@ import { preload } from "swr";
 import { User } from "@/types";
 import { logout } from "../services/AuthServices";
 import { getMyMataKuliah } from "../services/MataKuliahServices";
-import { getJadwal } from "../services/UserServices";
+import { getJadwal, getJadwalDosen } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
-import { getMyUjian } from "../services/UjianServices";
+import { getMyUjian, getHasilUjianDosen } from "../services/UjianServices";
 import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
@@ -259,6 +259,11 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                     ([, s, p, perPg, so]: [string, string, number, number, string]) =>
                       getMyMataKuliah({ search: s, page: p, per_page: perPg, sort: (so || undefined) as "asc" | "desc" | undefined })
                   );
+                } else if (item.href === "/dosen/hasil-ujian") {
+                  preload(["/ujian/dosen/hasil", "", 1], ([, s, p]: [string, string, number]) =>
+                    getHasilUjianDosen({ search: s, page: p, per_page: 10 }));
+                } else if (item.href === "/dosen/jadwal") {
+                  preload("/jadwal/dosen", getJadwalDosen);
                 } else if (item.href === "/mahasiswa/jadwal") {
                   preload("/jadwal", getJadwal);
                 } else if (item.href === "/mahasiswa/nilai") {

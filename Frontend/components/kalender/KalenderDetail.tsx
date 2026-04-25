@@ -20,16 +20,13 @@ export default function DetailJadwalModal({ event, onClose }: Props) {
     );
   };
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case "selesai":
-        return "bg-green-100 text-green-600";
-      case "berlangsung":
-        return "bg-yellow-100 text-yellow-600";
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
+  const STATUS_MAP: Record<string, { label: string; style: React.CSSProperties; bg: string }> = {
+    selesai:     { label: "Selesai",      bg: "var(--color-primary-light)",    style: { color: "var(--color-primary)" } },
+    berlangsung: { label: "Berlangsung",  bg: "var(--color-warning-light)",    style: { color: "var(--color-warning)" } },
+    belum_mulai: { label: "Belum Mulai",  bg: "var(--akademik-tahun-bg)",      style: { color: "var(--akademik-tahun-icon)" } },
   };
+
+  const statusInfo = STATUS_MAP[event.status ?? ""] ?? { label: "-", bg: "#f3f4f6", style: { color: "#6b7280" } };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
@@ -74,11 +71,10 @@ export default function DetailJadwalModal({ event, onClose }: Props) {
           <div>
             <p className="text-gray-500 mb-1">Status</p>
             <span
-              className={`inline-block px-5 py-3 text-xs rounded-lg ${getStatusColor(
-                event.status,
-              )}`}
+              className="inline-block px-4 py-1.5 text-xs font-medium rounded-lg"
+              style={{ backgroundColor: statusInfo.bg, ...statusInfo.style }}
             >
-              {event.status || "-"}
+              {statusInfo.label}
             </span>
           </div>
         </div>

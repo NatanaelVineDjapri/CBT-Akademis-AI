@@ -289,6 +289,19 @@ export const PERFORMA_STATS: PerformaStatConfig[] = [
   { key: "jumlah_mahasiswa",     label: "Mahasiswa",       bg: "var(--akademik-tahun-bg)",   color: "var(--akademik-tahun-icon)" },
 ];
 
+export interface HasilUjianDosenItem {
+  id: number;
+  nama_ujian: string;
+  mata_kuliah: string;
+  jenis_ujian: string;
+  tanggal: string;
+  pukul: string;
+  peserta_count: number;
+  avg_nilai: number | null;
+  total_lulus: number;
+  status: "Selesai" | "berlangsung" | "Belum_mulai";
+}
+
 export const months = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",

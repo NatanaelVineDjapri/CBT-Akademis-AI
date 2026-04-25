@@ -117,6 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard/dosen/performa', [DashboardController::class, 'dosenPerforma']);
         Route::get('/mata-kuliah/dosen', [MataKuliahController::class, 'dosenMataKuliah']);
         Route::get('/jadwal/dosen', [UjianController::class, 'jadwalDosen']);
+        Route::get('/ujian/dosen/hasil', [UjianController::class, 'hasilUjianDosen']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {
