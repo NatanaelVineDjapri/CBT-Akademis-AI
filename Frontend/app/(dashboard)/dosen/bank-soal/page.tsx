@@ -15,6 +15,7 @@ import {
   updateBankSoal,
   deleteBankSoal,
 } from "@/services/BankSoalServices";
+import ShareByEmailModal from "@/components/bank-soal/ShareByEmailModal";
 import { getDosenMataKuliah } from "@/services/MataKuliahServices";
 import type { BankSoalItem } from "@/types";
 
@@ -40,6 +41,7 @@ export default function DosenBankSoalPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [editItem, setEditItem] = useState<BankSoalItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<BankSoalItem | null>(null);
+  const [shareItem, setShareItem] = useState<BankSoalItem | null>(null);
 
   const handleCreate = async (formData: Parameters<typeof createBankSoal>[0]) => {
     await createBankSoal(formData);
@@ -73,6 +75,7 @@ export default function DosenBankSoalPage() {
           onPageChange={setPage}
           onEdit={(item) => setEditItem(item)}
           onDelete={(item) => setDeleteItem(item)}
+          onShare={(item) => setShareItem(item)}
           canEdit={true}
           onTambah={() => setShowCreate(true)}
         />
@@ -104,6 +107,13 @@ export default function DosenBankSoalPage() {
           item={deleteItem}
           onClose={() => setDeleteItem(null)}
           onConfirm={handleDelete}
+        />
+      )}
+
+      {shareItem && (
+        <ShareByEmailModal
+          item={shareItem}
+          onClose={() => setShareItem(null)}
         />
       )}
     </div>

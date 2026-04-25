@@ -10,6 +10,8 @@ use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Mail\BankSoalSharedMail;
+use Illuminate\Support\Facades\Mail;
 
 class BankSoalController extends Controller
 {
@@ -259,9 +261,34 @@ class BankSoalController extends Controller
             'expired_at' => null,
         ]);
 
+        Mail::to($targetUser->email)->queue(
+            new BankSoalSharedMail($targetUser, $authUser, $bankSoal)
+        );
+
+
         return response()->json([
             'message' => 'Bank soal berhasil di-share ke ' . $targetUser->nama . '!',
         ], 200);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $query = $request->get('q', '');
+
+        if (strlen($query) < 2) {
+            return response()->json(['data' => []]);
+        }
+
+        $users = User::where(function ($q) use ($query) {
+            $q->where('email', 'like', "%{$query}%")
+                ->orWhere('nama', 'like', "%{$query}%");
+        })
+            ->where('id', '!=', $request->user()->id)
+            ->select('id', 'nama', 'email')
+            ->limit(5)
+            ->get();
+
+        return response()->json(['data' => $users]);
     }
 
     // Generate link → buat token unik → kirim link ke frontend

@@ -52,7 +52,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
         Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
         Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
-        Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']); // ✅
+        Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
+        Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']); 
     });
     Route::prefix('bank-soal')->group(function () {
         Route::get('/global', [BankSoalController::class, 'global']);
@@ -121,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin_universitas,dosen')->group(function () {
         Route::prefix('bank-soal')->group(function () {
             Route::get('/', [BankSoalController::class, 'index']);
+            Route::get('/search-users', [BankSoalController::class, 'searchUsers']);
             Route::post('/', [BankSoalController::class, 'store']);
             Route::put('/{id}', [BankSoalController::class, 'update']);
             Route::delete('/{id}', [BankSoalController::class, 'destroy']);

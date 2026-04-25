@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Clock } from "lucide-react";
-import type { DosenUjianItem } from "@/services/DashboardServices";
+import type { DosenUjianItem } from "@/types";
 
 export default function UjianBerlangsungCard({ data }: { data: DosenUjianItem[] }) {
   return (

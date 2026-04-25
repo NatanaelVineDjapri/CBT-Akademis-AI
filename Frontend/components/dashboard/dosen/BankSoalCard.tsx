@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { FileText } from "lucide-react";
-import type { DosenBankSoalItem } from "@/services/DashboardServices";
+import { BookOpen } from "lucide-react";
+import type { DosenBankSoalItem } from "@/types";
 
 export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <FileText size={16} className="text-gray-500" />
+          <BookOpen size={16} className="text-gray-500" />
           <span className="text-sm font-medium text-gray-800">
             Bank Soal Terbaru
           </span>
@@ -40,14 +40,9 @@ export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
               <div className="flex items-center gap-3">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{
-                    backgroundColor: "var(--color-primary-light, #e0f7fa)",
-                  }}
+                  style={{ backgroundColor: "var(--color-primary)" }}
                 >
-                  <FileText
-                    size={16}
-                    style={{ color: "var(--color-primary)" }}
-                  />
+                  <BookOpen size={16} className="text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-800">

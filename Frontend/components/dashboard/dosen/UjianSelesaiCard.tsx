@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
-import type { DosenUjianItem } from "@/services/DashboardServices";
+import type { DosenUjianItem } from "@/types";
 
 export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
   return (

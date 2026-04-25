@@ -93,3 +93,7 @@ export const updateBankSoal = async (
 ): Promise<void> => {
   await api.put(`/bank-soal/${id}`, data);
 };
+
+export const shareByEmail = async (id: number, email: string): Promise<void> => {
+  await api.post(`/bank-soal/${id}/share-email`, { email });
+};
