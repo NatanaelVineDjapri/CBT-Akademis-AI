@@ -322,6 +322,85 @@ class UjianController extends Controller
         ]);
     }
 
+    public function detailUjianDosen(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::with([
+            'mataKuliah',
+            'pesertaUjian.user',
+            'pesertaUjian.nilaiAkhir',
+            'pesertaUjian.jawabanPeserta',
+            'ujianSoal.soal.jenisSoal.opsiJawaban',
+            'ujianSoal.jawabanPeserta',
+        ])->where('created_by', $authUser->id)->findOrFail($id);
+
+        $info = [
+            'nama_ujian'     => $ujian->nama_ujian,
+            'mata_kuliah'    => $ujian->mataKuliah?->nama ?? '-',
+            'jenis_ujian'    => $ujian->jenis_ujian ?? '-',
+            'tanggal'        => $ujian->start_date?->format('d/m/y'),
+            'pukul'          => $ujian->start_date?->format('H.i'),
+            'total_peserta'  => $ujian->pesertaUjian->count(),
+            'total_soal'     => $ujian->ujianSoal->count(),
+        ];
+
+        $peserta = $ujian->pesertaUjian->map(fn($p) => [
+            'id'     => $p->id,
+            'nama'   => $p->user->nama,
+            'nim'    => $p->user->nim,
+            'status' => $p->nilaiAkhir
+                ? ($p->jawabanPeserta->where('is_manual_graded', false)->isNotEmpty()
+                    ? 'Perlu Pengecekan'
+                    : 'Selesai')
+                : ($p->status === 'sedang_berlangsung' ? 'Berlangsung' : 'Belum Selesai'),
+            'nilai'  => $p->nilaiAkhir?->nilai_total,
+            'grade'  => $p->nilaiAkhir?->grade,
+            'lulus'  => $p->nilaiAkhir?->lulus,
+        ])->values();
+
+        $distribusi = $ujian->ujianSoal
+            ->sortBy('urutan')
+            ->filter(fn($us) => in_array($us->soal?->jenisSoal->first()?->jenis_soal, ['pilihan_ganda', 'checklist']))
+            ->map(function ($us) {
+                $jenisSoal = $us->soal?->jenisSoal->first();
+                $isPG      = $jenisSoal?->jenis_soal === 'pilihan_ganda';
+                $opsiList  = $jenisSoal?->opsiJawaban->pluck('opsi')->toArray() ?? [];
+                $kunci     = $jenisSoal?->opsiJawaban->where('is_correct', true)->pluck('opsi')->sort()->implode(',') ?? '-';
+                $jawabanList = $us->jawabanPeserta->pluck('jawaban')->filter()->values();
+
+                $opsiCount = [];
+                foreach ($opsiList as $opsi) {
+                    $opsiCount[$opsi] = $jawabanList->filter(fn($jwb) =>
+                        $isPG ? $jwb === $opsi : in_array($opsi, explode(',', $jwb))
+                    )->count();
+                }
+
+                $benar = $isPG
+                    ? $jawabanList->filter(fn($jwb) => $jwb === $kunci)->count()
+                    : 0;
+
+                $total = $jawabanList->count();
+
+                return [
+                    'no'                => $us->urutan,
+                    'soal'              => $us->soal?->deskripsi ?? '-',
+                    'jenis'             => $jenisSoal?->jenis_soal,
+                    'kunci'             => $kunci,
+                    'opsi'              => $opsiCount,
+                    'total_jawaban'     => $total,
+                    'tingkat_ketepatan' => $total > 0 ? round(($benar / $total) * 100) : 0,
+                ];
+            })->values();
+
+        return response()->json([
+            'message'   => 'Detail ujian berhasil diambil!',
+            'info'      => $info,
+            'peserta'   => $peserta,
+            'distribusi' => $distribusi,
+        ]);
+    }
+
     public function nilaiMahasiswa(Request $request)
     {
         $authUser = $request->user();

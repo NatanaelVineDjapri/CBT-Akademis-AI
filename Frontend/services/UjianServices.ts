@@ -1,5 +1,5 @@
 import api from "./api";
-import { UjianMahasiswa, UjianMeta, HasilUjianDosenItem } from "../types";
+import { UjianMahasiswa, UjianMeta, HasilUjianDosenItem, HasilUjianDosenDetail } from "../types";
 
 export const getMyUjian = async (params?: {
   search?: string;
@@ -10,6 +10,11 @@ export const getMyUjian = async (params?: {
 }): Promise<{ data: UjianMahasiswa[]; meta: UjianMeta }> => {
   const res = await api.get("/ujian/my", { params });
   return { data: res.data.data, meta: res.data.meta };
+};
+
+export const getDetailUjianDosen = async (id: number | string): Promise<HasilUjianDosenDetail> => {
+  const res = await api.get(`/ujian/dosen/hasil/${id}`);
+  return { info: res.data.info, peserta: res.data.peserta, distribusi: res.data.distribusi };
 };
 
 export const getHasilUjianDosen = async (params?: {
