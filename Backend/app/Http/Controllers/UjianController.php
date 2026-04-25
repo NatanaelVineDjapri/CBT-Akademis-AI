@@ -151,6 +151,8 @@ class UjianController extends Controller
     {
         $authUser = $request->user();
 
+        $now = now();
+
         $ujianList = Ujian::with('mataKuliah')
             ->where('created_by', $authUser->id)
             ->get()
@@ -160,7 +162,11 @@ class UjianController extends Controller
                 'mata_kuliah' => $ujian->mataKuliah?->nama,
                 'start' => $ujian->start_date,
                 'end' => $ujian->end_date,
-                'status' => $ujian->status ?? null,
+                'status' => match(true) {
+                    $ujian->end_date && $now->gt($ujian->end_date)   => 'selesai',
+                    $ujian->start_date && $now->gte($ujian->start_date) => 'berlangsung',
+                    default => 'belum_mulai',
+                },
             ]);
 
         return response()->json([
@@ -246,6 +252,72 @@ class UjianController extends Controller
                 'pilihan_ganda' => $pilihan_ganda,
                 'checklist' => $checklist,
                 'essay' => $essay,
+            ],
+        ]);
+    }
+
+    public function hasilUjianDosen(Request $request)
+    {
+        $authUser = $request->user();
+        $search   = $request->query('search', '');
+        $perPage  = (int) $request->query('per_page', 10);
+        $now      = now();
+
+        $sortBy  = $request->query('sort_by', 'tanggal');
+        $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
+
+        $query = Ujian::with(['mataKuliah', 'pesertaUjian.nilaiAkhir'])
+            ->withCount('pesertaUjian')
+            ->where('created_by', $authUser->id)
+            ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']));
+
+        if ($sortBy === 'avg_nilai') {
+            $sub = '(SELECT AVG(na.nilai_total) FROM nilai_akhir na
+                     INNER JOIN peserta_ujian pu ON na.peserta_ujian_id = pu.id
+                     WHERE pu.ujian_id = ujian.id)';
+            $query->orderByRaw("($sub IS NULL), $sub $sortDir");
+        } elseif ($sortBy === 'status') {
+            $query->orderByRaw(
+                "CASE
+                    WHEN end_date IS NOT NULL AND end_date < NOW() THEN 3
+                    WHEN start_date IS NOT NULL AND start_date <= NOW() THEN 1
+                    ELSE 2
+                END $sortDir"
+            );
+        } else {
+            $colMap = ['nama_ujian' => 'nama_ujian', 'tanggal' => 'start_date'];
+            $query->orderBy($colMap[$sortBy] ?? 'start_date', $sortDir);
+        }
+
+        $paginated = $query->paginate($perPage);
+
+        $data = collect($paginated->items())->map(fn($ujian) => [
+            'id'            => $ujian->id,
+            'nama_ujian'    => $ujian->nama_ujian,
+            'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
+            'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
+            'tanggal'       => $ujian->start_date?->format('d/m/y'),
+            'pukul'         => $ujian->start_date?->format('H.i'),
+            'peserta_count' => $ujian->peserta_ujian_count,
+            'avg_nilai'     => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->count()
+                               ? round($ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->avg('nilai_total'), 1)
+                               : null,
+            'total_lulus'   => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->where('lulus', true)->count(),
+            'status'        => match(true) {
+                $ujian->end_date && $now->gt($ujian->end_date)      => 'Selesai',
+                $ujian->start_date && $now->gte($ujian->start_date) => 'berlangsung',
+                default => 'Belum_mulai',
+            },
+        ]);
+
+        return response()->json([
+            'message' => 'Hasil ujian dosen berhasil diambil!',
+            'data' => $data,
+            'meta' => [
+                'current_page' => $paginated->currentPage(),
+                'last_page' => $paginated->lastPage(),
+                'per_page' => $paginated->perPage(),
+                'total' => $paginated->total(),
             ],
         ]);
     }
