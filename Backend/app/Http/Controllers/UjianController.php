@@ -406,6 +406,77 @@ class UjianController extends Controller
         ]);
     }
 
+    public function detailPesertaUjianDosen(Request $request, $ujianId, $pesertaId)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::with(['mataKuliah', 'gradeSetting'])
+            ->where('id', $ujianId)
+            ->where('created_by', $authUser->id)
+            ->firstOrFail();
+
+        $peserta = PesertaUjian::with([
+            'user',
+            'nilaiAkhir',
+            'jawabanPeserta.ujianSoal.soal.jenisSoal.opsiJawaban',
+        ])->where('id', $pesertaId)->where('ujian_id', $ujianId)->firstOrFail();
+
+        $nilai = $peserta->nilaiAkhir;
+
+        $gradeSetting = $ujian->gradeSetting->sortBy('nilai_min')->map(fn($g) => [
+            'grade'     => $g->grade,
+            'nilai_min' => $g->nilai_min,
+            'nilai_max' => $g->nilai_max,
+        ])->values();
+
+        $info = [
+            'nama_peserta' => $peserta->user->nama,
+            'nim'          => $peserta->user->nim ?? '-',
+            'nama_ujian'   => $ujian->nama_ujian,
+            'mata_kuliah'  => $ujian->mataKuliah?->nama ?? '-',
+            'tanggal'      => $nilai?->graded_at?->format('d/m/Y'),
+            'nilai'        => $nilai?->nilai_total,
+            'grade'        => $nilai?->grade,
+            'lulus'        => $nilai?->lulus,
+            'grade_setting' => $gradeSetting,
+        ];
+
+        $pilihan_ganda = [];
+        $checklist = [];
+        $essay = [];
+
+        foreach ($peserta->jawabanPeserta->sortBy('ujianSoal.urutan') as $jwb) {
+            $soal      = $jwb->ujianSoal?->soal;
+            $jenisSoal = $soal?->jenisSoal->first();
+            $tipe      = $jenisSoal?->jenis_soal ?? 'essay';
+            $urutan    = $jwb->ujianSoal?->urutan ?? 0;
+
+            $kunci = $jenisSoal?->opsiJawaban
+                ->where('is_correct', true)
+                ->pluck('opsi')->sort()->implode(',') ?? '-';
+
+            $row = [
+                'no'      => $urutan,
+                'soal'    => $soal?->deskripsi ?? '-',
+                'jawaban' => $jwb->jawaban ?? '-',
+                'poin'    => $jwb->final_nilai ?? $jwb->nilai ?? 0,
+            ];
+
+            if ($tipe === 'pilihan_ganda') {
+                $pilihan_ganda[] = array_merge($row, ['kunci' => $kunci]);
+            } elseif ($tipe === 'checklist') {
+                $checklist[] = array_merge($row, ['kunci' => $kunci]);
+            } else {
+                $essay[] = array_merge($row, ['ai_feedback' => $jwb->ai_feedback]);
+            }
+        }
+
+        return response()->json([
+            'info'    => $info,
+            'jawaban' => compact('pilihan_ganda', 'checklist', 'essay'),
+        ]);
+    }
+
     public function nilaiMahasiswa(Request $request)
     {
         $authUser = $request->user();

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { BankSoalItem, BankSoalMeta } from "@/types";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
+import EmptyState from "@/components/EmptyState";
 
 const permissionLabel: Record<string, string> = {
   public: "Publik",
@@ -119,17 +120,7 @@ export default function BankSoalTable({
               </tr>
             </thead>
             <tbody>
-              {data.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={canEdit ? 7 : 6}
-                    className="px-5 py-8 text-center text-sm text-gray-400"
-                  >
-                    Tidak ada bank soal.
-                  </td>
-                </tr>
-              ) : (
-                data.map((item, idx) => {
+              {data.map((item, idx) => {
                   const rowNum = String(
                     ((meta?.current_page ?? 1) - 1) * (meta?.per_page ?? 10) +
                       idx +
@@ -197,10 +188,13 @@ export default function BankSoalTable({
                       )}
                     </tr>
                   );
-                })
-              )}
+                })}
             </tbody>
           </table>
+
+          {data.length === 0 && (
+            <EmptyState message="Tidak ada bank soal." flat />
+          )}
         </div>
       </div>
 

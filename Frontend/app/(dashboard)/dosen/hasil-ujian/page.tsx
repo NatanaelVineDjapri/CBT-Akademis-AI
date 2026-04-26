@@ -309,7 +309,7 @@ export default function DosenHasilUjianPage() {
             </table>
 
             {!showSkeleton && data && items.length === 0 && (
-              <EmptyState message="Belum ada data ujian." />
+              <EmptyState message="Belum ada data ujian." flat />
             )}
         </div>
       </div>
