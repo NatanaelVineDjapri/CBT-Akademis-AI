@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import useSWR from "swr";
+import { preload } from "swr";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
@@ -10,15 +12,27 @@ import Pagination from "@/components/filtering/Pagination";
 import EmptyState from "@/components/EmptyState";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
-import { getHasilUjianDosen } from "@/services/UjianServices";
+import {
+  getHasilUjianDosen,
+  getDetailUjianDosen,
+} from "@/services/UjianServices";
 import HasilUjianTableSkeleton from "@/components/skeleton/HasilUjianTableSkeleton";
 import type { HasilUjianDosenItem, UjianMeta } from "@/types";
 
 type SortBy = "nama_ujian" | "tanggal" | "avg_nilai" | "status";
 type SortDir = "asc" | "desc";
 
-function ColHeader({ label, col, sortBy, sortDir, onSort }: {
-  label: string; col: SortBy; sortBy: SortBy; sortDir: SortDir;
+function ColHeader({
+  label,
+  col,
+  sortBy,
+  sortDir,
+  onSort,
+}: {
+  label: string;
+  col: SortBy;
+  sortBy: SortBy;
+  sortDir: SortDir;
   onSort: (col: SortBy) => void;
 }) {
   const active = sortBy === col;
@@ -30,20 +44,40 @@ function ColHeader({ label, col, sortBy, sortDir, onSort }: {
     >
       <span className="flex items-center gap-1">
         {label}
-        <Icon size={12} className={active ? "text-gray-600" : "text-gray-300"} />
+        <Icon
+          size={12}
+          className={active ? "text-gray-600" : "text-gray-300"}
+        />
       </span>
     </th>
   );
 }
 
-const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
-  Selesai:     { label: "Selesai",      bg: "var(--color-primary-light)",  color: "var(--color-primary)" },
-  berlangsung: { label: "Berlangsung",  bg: "var(--color-warning-light)",  color: "var(--color-warning)" },
-  Belum_mulai: { label: "Belum Mulai",  bg: "var(--akademik-tahun-bg)",    color: "var(--akademik-tahun-icon)" },
-};
+const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> =
+  {
+    Selesai: {
+      label: "Selesai",
+      bg: "var(--color-primary-light)",
+      color: "var(--color-primary)",
+    },
+    berlangsung: {
+      label: "Berlangsung",
+      bg: "var(--color-warning-light)",
+      color: "var(--color-warning)",
+    },
+    Belum_mulai: {
+      label: "Belum Mulai",
+      bg: "var(--akademik-tahun-bg)",
+      color: "var(--akademik-tahun-icon)",
+    },
+  };
 
 function StatusBadge({ status }: { status: string }) {
-  const s = STATUS_MAP[status] ?? { label: status, bg: "#f3f4f6", color: "#6b7280" };
+  const s = STATUS_MAP[status] ?? {
+    label: status,
+    bg: "#f3f4f6",
+    color: "#6b7280",
+  };
   return (
     <span
       className="inline-block text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap"
@@ -54,37 +88,60 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-
 export default function DosenHasilUjianPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const perPage = usePerPage(53, 1, 395);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<SortBy>("tanggal");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortBy, setSortBy] = useState<SortBy>(
+    (searchParams.get("sort_by") as SortBy) ?? "tanggal",
+  );
+  const [sortDir, setSortDir] = useState<SortDir>(
+    (searchParams.get("sort_dir") as SortDir) ?? "desc",
+  );
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
 
-  useEffect(() => { setPage(1); }, [debouncedSearch, sortBy, sortDir]);
-  useEffect(() => { setPage(1); }, [perPage]);
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, sortBy, sortDir]);
+  useEffect(() => {
+    setPage(1);
+  }, [perPage]);
 
   const handleSort = (col: SortBy) => {
-    if (col === sortBy) {
-      setSortDir(d => d === "desc" ? "asc" : "desc");
-    } else {
-      setSortBy(col);
-      setSortDir("desc");
-    }
+    const newDir: SortDir =
+      col === sortBy ? (sortDir === "desc" ? "asc" : "desc") : "desc";
+    setSortBy(col);
+    setSortDir(newDir);
+    router.replace(`/dosen/hasil-ujian?sort_by=${col}&sort_dir=${newDir}`, {
+      scroll: false,
+    });
   };
 
   const { data, isValidating } = useSWR(
     ["/ujian/dosen/hasil", debouncedSearch, page, perPage, sortBy, sortDir],
     ([, s, p, pp, sb, sd]: [string, string, number, number, SortBy, SortDir]) =>
-      getHasilUjianDosen({ search: s, page: p, per_page: pp, sort_by: sb, sort_dir: sd }),
-    { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
+      getHasilUjianDosen({
+        search: s,
+        page: p,
+        per_page: pp,
+        sort_by: sb,
+        sort_dir: sd,
+      }),
+    {
+      keepPreviousData: true,
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+    },
   );
 
   const [showSkeleton, setShowSkeleton] = useState(false);
   useEffect(() => {
-    if (!isValidating || !data) { setShowSkeleton(false); return; }
+    if (!isValidating || !data) {
+      setShowSkeleton(false);
+      return;
+    }
     const t = setTimeout(() => setShowSkeleton(true), 150);
     return () => clearTimeout(t);
   }, [isValidating, data]);
@@ -98,23 +155,26 @@ export default function DosenHasilUjianPage() {
         <Breadcrumb />
       </div>
 
-      <div className="flex-1 flex flex-col">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1">
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-            <h2 className="text-base font-bold shrink-0" style={{ color: "var(--color-primary)" }}>
+      <div className="flex-1">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden px-3 pb-2">
+          <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-4">
+            <h2
+              className="text-base font-bold shrink-0"
+              style={{ color: "var(--color-primary)" }}
+            >
               Hasil Ujian
             </h2>
             <SearchInput
               value={search}
-              onChange={(v) => { setSearch(v); setPage(1); }}
+              onChange={(v) => {
+                setSearch(v);
+                setPage(1);
+              }}
               placeholder="Cari ujian..."
             />
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto flex-1">
-            <table className="w-full text-sm table-fixed">
+          <table className="w-full text-sm table-fixed">
               <colgroup>
                 <col className="w-10" />
                 <col className="w-52" />
@@ -128,15 +188,49 @@ export default function DosenHasilUjianPage() {
               </colgroup>
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left text-xs text-gray-400 font-bold px-5 py-3">#</th>
-                  <ColHeader label="Nama Ujian" col="nama_ujian" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">Mata Kuliah</th>
-                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">Jenis</th>
-                  <ColHeader label="Tanggal" col="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">Pukul</th>
-                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">Peserta</th>
-                  <ColHeader label="Rata-rata" col="avg_nilai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                  <ColHeader label="Status" col="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">
+                    #
+                  </th>
+                  <ColHeader
+                    label="Nama Ujian"
+                    col="nama_ujian"
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
+                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">
+                    Mata Kuliah
+                  </th>
+                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">
+                    Jenis
+                  </th>
+                  <ColHeader
+                    label="Tanggal"
+                    col="tanggal"
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
+                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">
+                    Pukul
+                  </th>
+                  <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">
+                    Peserta
+                  </th>
+                  <ColHeader
+                    label="Rata-rata"
+                    col="avg_nilai"
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
+                  <ColHeader
+                    label="Status"
+                    col="status"
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
                 </tr>
               </thead>
               <tbody>
@@ -146,28 +240,58 @@ export default function DosenHasilUjianPage() {
                   <HasilUjianTableSkeleton count={6} />
                 ) : items.length === 0 ? null : (
                   items.map((item, idx) => {
-                    const no = ((meta?.current_page ?? 1) - 1) * perPage + idx + 1;
+                    const no =
+                      ((meta?.current_page ?? 1) - 1) * perPage + idx + 1;
                     return (
-                      <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-4 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
+                      <tr
+                        key={item.id}
+                        className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-5 py-4 text-xs text-gray-400">
+                          {String(no).padStart(2, "0")}
+                        </td>
                         <td className="px-4 py-4 font-medium truncate">
-                          <Link href={`/dosen/hasil-ujian/${item.id}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
+                          <Link
+                            href={`/dosen/hasil-ujian/${item.id}`}
+                            className="hover:underline"
+                            style={{ color: "var(--color-primary)" }}
+                            onMouseEnter={() =>
+                              preload(`/ujian/dosen/hasil/${item.id}`, () =>
+                                getDetailUjianDosen(item.id),
+                              )
+                            }
+                          >
                             {item.nama_ujian}
                           </Link>
                         </td>
-                        <td className="px-4 py-4 text-gray-500 truncate">{item.mata_kuliah}</td>
-                        <td className="px-4 py-4 text-gray-500">{item.jenis_ujian}</td>
-                        <td className="px-4 py-4 text-gray-500">{item.tanggal}</td>
-                        <td className="px-4 py-4 text-gray-500">{item.pukul}</td>
+                        <td className="px-4 py-4 text-gray-500 truncate">
+                          {item.mata_kuliah}
+                        </td>
+                        <td className="px-4 py-4 text-gray-500">
+                          {item.jenis_ujian}
+                        </td>
+                        <td className="px-4 py-4 text-gray-500">
+                          {item.tanggal}
+                        </td>
+                        <td className="px-4 py-4 text-gray-500">
+                          {item.pukul}
+                        </td>
                         <td className="px-4 py-4 text-gray-600">
-                          <span className="font-medium">{item.peserta_count}</span>
+                          <span className="font-medium">
+                            {item.peserta_count}
+                          </span>
                           {item.total_lulus > 0 && (
-                            <span className="text-xs text-gray-400 ml-1">({item.total_lulus} lulus)</span>
+                            <span className="text-xs text-gray-400 ml-1">
+                              ({item.total_lulus} lulus)
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-4">
                           {item.avg_nilai !== null ? (
-                            <span className="font-semibold" style={{ color: "var(--color-primary)" }}>
+                            <span
+                              className="font-semibold"
+                              style={{ color: "var(--color-primary)" }}
+                            >
                               {item.avg_nilai}
                             </span>
                           ) : (
@@ -187,7 +311,6 @@ export default function DosenHasilUjianPage() {
             {!showSkeleton && data && items.length === 0 && (
               <EmptyState message="Belum ada data ujian." />
             )}
-          </div>
         </div>
       </div>
 

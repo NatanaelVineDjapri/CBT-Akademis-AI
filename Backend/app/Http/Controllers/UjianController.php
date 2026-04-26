@@ -54,6 +54,7 @@ class UjianController extends Controller
             'attempt_ke' => $p->attempt_ke,
             'max_attempt' => $p->ujian->ujianSetting?->max_attempt,
             'jumlah_soal' => $p->ujian->ujianSoal->count(),
+            'nilai_akhir_id' => $p->nilaiAkhir?->id,
             'nilai' => $p->nilaiAkhir?->nilai_total,
             'grade' => $p->nilaiAkhir?->grade,
             'lulus' => $p->nilaiAkhir?->lulus,
@@ -353,7 +354,11 @@ class UjianController extends Controller
                 ? ($p->jawabanPeserta->where('is_manual_graded', false)->isNotEmpty()
                     ? 'Perlu Pengecekan'
                     : 'Selesai')
-                : ($p->status === 'sedang_berlangsung' ? 'Berlangsung' : 'Belum Selesai'),
+                : match(true) {
+                    $p->status === 'sedang_berlangsung' => 'Berlangsung',
+                    $p->mulai_at === null                => 'Belum Mulai',
+                    default                              => 'Belum Selesai',
+                },
             'nilai'  => $p->nilaiAkhir?->nilai_total,
             'grade'  => $p->nilaiAkhir?->grade,
             'lulus'  => $p->nilaiAkhir?->lulus,

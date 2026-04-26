@@ -10,6 +10,7 @@ import { getMyMataKuliah } from "../../../../services/MataKuliahServices";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import { usePerPage } from "../../../../hooks/usePerPage";
 import MataKuliahSkeleton from "../../../../components/skeleton/filtering/MataKuliahSkeleton";
+import EmptyState from "../../../../components/EmptyState";
 
 export default function MataKuliahPage() {
   const [search, setSearch] = useState("");
@@ -57,7 +58,7 @@ export default function MataKuliahPage() {
         {showSkeleton ? (
           <MataKuliahSkeleton count={perPage} />
         ) : isLoading ? null : mataKuliah.length === 0 ? (
-          <p className="text-sm text-gray-400">Tidak ada mata kuliah.</p>
+          <EmptyState message="Tidak ada mata kuliah." />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {mataKuliah.map((mk) => (

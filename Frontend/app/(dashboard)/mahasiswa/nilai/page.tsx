@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getNilai } from "../../../../services/NilaiServices";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import { usePerPage } from "../../../../hooks/usePerPage";
@@ -9,22 +10,22 @@ import Pagination from "../../../../components/filtering/Pagination";
 import NilaiTable, { type SortBy, type SortDir } from "../../../../components/dashboard/mahasiswa/NilaiTable";
 
 export default function NilaiPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const perPage = usePerPage(53, 1, 300);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<SortBy>("tanggal");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortBy, setSortBy] = useState<SortBy>((searchParams.get("sort_by") as SortBy) ?? "tanggal");
+  const [sortDir, setSortDir] = useState<SortDir>((searchParams.get("sort_dir") as SortDir) ?? "desc");
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
 
   useEffect(() => { setPage(1); }, [debouncedSearch, sortBy, sortDir]);
 
   const handleSort = (col: SortBy) => {
-    if (col === sortBy) {
-      setSortDir(d => d === "desc" ? "asc" : "desc");
-    } else {
-      setSortBy(col);
-      setSortDir("desc");
-    }
+    const newDir: SortDir = col === sortBy ? (sortDir === "desc" ? "asc" : "desc") : "desc";
+    setSortBy(col);
+    setSortDir(newDir);
+    router.replace(`/mahasiswa/nilai?sort_by=${col}&sort_dir=${newDir}`, { scroll: false });
   };
 
   const { data, isValidating } = useSWR(

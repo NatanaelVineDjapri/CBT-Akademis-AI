@@ -93,6 +93,7 @@ export interface UjianMahasiswa {
   status: "belum_mulai" | "sedang_berlangsung" | "selesai";
   attempt_ke: number;
   max_attempt: number | null;
+  nilai_akhir_id: number | null;
   jumlah_soal: number;
   nilai: number | null;
   grade: string | null;
@@ -303,7 +304,7 @@ export interface HasilUjianPeserta {
   id: number;
   nama: string;
   nim?: string;
-  status: "Selesai" | "Perlu Pengecekan" | "Berlangsung" | "Belum Selesai";
+  status: "Selesai" | "Perlu Pengecekan" | "Berlangsung" | "Belum Mulai" | "Belum Selesai";
   nilai: number | null;
   grade: string | null;
   lulus: boolean | null;

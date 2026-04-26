@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ClipboardList, Calendar, Clock } from "lucide-react";
-import type { DosenUjianItem } from "@/services/DashboardServices";
+import type { DosenUjianItem } from "@/types";
 
 export default function UjianTerbaruCard({ data }: { data: DosenUjianItem[] }) {
   return (
