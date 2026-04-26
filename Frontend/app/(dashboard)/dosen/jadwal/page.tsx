@@ -13,8 +13,8 @@ export default function DosenJadwalPage() {
   const { data: events = [] } = useSWR("/jadwal/dosen", getJadwalDosen, { revalidateOnFocus: false });
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      <div className="mb-6">
+    <div className="flex flex-col gap-2 pb-4">
+      <div className="shrink-0">
         <Breadcrumb />
       </div>
 

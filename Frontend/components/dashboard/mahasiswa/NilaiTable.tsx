@@ -188,9 +188,7 @@ export default function NilaiTable({
       </table>
 
       {!showSkeleton && nilaiList.length === 0 && (
-        <div className="px-3 pb-3">
-          <EmptyState message="Belum ada riwayat nilai." />
-        </div>
+        <EmptyState message="Belum ada riwayat nilai." flat />
       )}
     </div>
   );

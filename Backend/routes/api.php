@@ -119,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/jadwal/dosen', [UjianController::class, 'jadwalDosen']);
         Route::get('/ujian/dosen/hasil', [UjianController::class, 'hasilUjianDosen']);
         Route::get('/ujian/dosen/hasil/{id}', [UjianController::class, 'detailUjianDosen']);
+        Route::get('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}', [UjianController::class, 'detailPesertaUjianDosen']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {

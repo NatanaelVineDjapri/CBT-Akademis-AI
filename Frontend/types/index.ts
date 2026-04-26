@@ -326,6 +326,27 @@ export interface HasilUjianDosenDetail {
   distribusi: HasilUjianDistribusiItem[];
 }
 
+export interface DetailPesertaDosenInfo {
+  nama_peserta: string;
+  nim: string;
+  nama_ujian: string;
+  mata_kuliah: string;
+  tanggal: string | null;
+  nilai: number | null;
+  grade: string | null;
+  lulus: boolean | null;
+  grade_setting: GradeSettingItem[];
+}
+
+export interface DetailPesertaDosen {
+  info: DetailPesertaDosenInfo;
+  jawaban: {
+    pilihan_ganda: JawabanPG[];
+    checklist: JawabanCheckbox[];
+    essay: JawabanEssay[];
+  };
+}
+
 export interface HasilUjianDosenItem {
   id: number;
   nama_ujian: string;

@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { use } from "react";
 import useSWR from "swr";
+import Link from "next/link";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import EmptyState from "@/components/EmptyState";
-import { getDetailUjianDosen } from "@/services/UjianServices";
+import { preload } from "swr";
+import { getDetailUjianDosen, getDetailPesertaDosen } from "@/services/UjianServices";
 import DaftarSiswaTableSkeleton from "@/components/skeleton/DaftarSiswaTableSkeleton";
 import DistribusiJawabanTableSkeleton from "@/components/skeleton/DistribusiJawabanTableSkeleton";
 import type { HasilUjianPeserta, HasilUjianDistribusiItem } from "@/types";
@@ -97,7 +99,7 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ id:
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="shrink-0">
-        <Breadcrumb />
+        <Breadcrumb overrides={data ? { [id]: data.info.nama_ujian } : undefined} />
       </div>
 
       {/* Daftar Siswa */}
@@ -140,7 +142,18 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ id:
                 pesertaFiltered.map((p, idx) => (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-4 text-xs text-gray-400">{String(idx + 1).padStart(2, "0")}</td>
-                    <td className="px-4 py-4 font-medium text-gray-800 truncate">{p.nama}</td>
+                    <td className="px-4 py-4 font-medium text-gray-800 truncate">
+                      {p.nilai !== null ? (
+                        <Link
+                          href={`/dosen/hasil-ujian/${id}/${p.id}`}
+                          className="hover:underline"
+                          style={{ color: "var(--color-primary)" }}
+                          onMouseEnter={() => preload(`/ujian/dosen/hasil/${id}/peserta/${p.id}`, () => getDetailPesertaDosen(id, p.id))}
+                        >
+                          {p.nama}
+                        </Link>
+                      ) : p.nama}
+                    </td>
                     <td className="px-4 py-4"><StatusBadge status={p.status} /></td>
                     <td className="px-4 py-4">
                       {p.nilai !== null ? (

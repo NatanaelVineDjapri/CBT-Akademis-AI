@@ -14,7 +14,7 @@ export default function MahasiswaJadwalPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-4">
-      <div className="mb-6">
+      <div className="shrink-0">
         <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>Jadwal Ujian</h1>
         <p className="text-sm text-gray-500 mt-1">Lihat jadwal ujian yang akan datang</p>
       </div>
