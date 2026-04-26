@@ -1,6 +1,9 @@
 "use client";
 
-import { Calendar, Clock, ClipboardList, CheckCircle, XCircle, Timer } from "lucide-react";
+import Link from "next/link";
+import { preload } from "swr";
+import { getNilaiDetail } from "@/services/NilaiServices";
+import { Calendar, Clock, ClipboardList, Timer } from "lucide-react";
 import type { UjianMahasiswa } from "@/types";
 import { formatDate, formatTime } from "@/utils/format";
 
@@ -18,14 +21,15 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
           <ClipboardList className="w-5 h-5 text-white" />
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">
-          <p className="text-sm font-bold text-gray-800 leading-snug truncate">{ujian.nama_ujian}</p>
+          <p className="text-sm font-bold text-gray-800 leading-snug truncate">
+            {ujian.nama_ujian}
+          </p>
           <p className="text-xs text-gray-400 truncate">{ujian.mata_kuliah}</p>
         </div>
       </div>
 
       <div className="border-t border-gray-200" />
 
-      {/* Tanggal & Waktu — satu baris */}
       <div className="flex items-center gap-3 text-xs text-gray-500">
         <div className="flex items-center gap-1">
           <Calendar size={11} className="shrink-0" />
@@ -33,11 +37,12 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
         </div>
         <div className="flex items-center gap-1">
           <Clock size={11} className="shrink-0" />
-          <span>{formatTime(ujian.start_date)} – {formatTime(ujian.end_date)}</span>
+          <span>
+            {formatTime(ujian.start_date)} – {formatTime(ujian.end_date)}
+          </span>
         </div>
       </div>
 
-      {/* Durasi & Soal */}
       <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-200 pt-1">
         <div className="flex items-center gap-1">
           <Timer size={12} />
@@ -48,7 +53,6 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
 
       <div className="border-t border-gray-200" />
 
-      {/* Nilai atau Tombol */}
       {selesai && ujian.nilai !== null ? (
         <div className="flex flex-col gap-2">
           <div
@@ -57,21 +61,37 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
           >
             <p className="text-xs text-gray-500">Nilai Anda</p>
             <div className="flex items-end gap-3">
-              <p className="text-xl font-bold" style={{ color: ujian.lulus ? "var(--color-primary)" : "#ef4444" }}>
+              <p
+                className="text-xl font-bold"
+                style={{
+                  color: ujian.lulus ? "var(--color-primary)" : "#ef4444",
+                }}
+              >
                 {ujian.nilai}
               </p>
               <span className="text-gray-300 mb-1">|</span>
-              <p className="text-xl font-bold mb-0.5" style={{ color: ujian.lulus ? "var(--color-primary)" : "#ef4444" }}>
+              <p
+                className="text-xl font-bold mb-0.5"
+                style={{
+                  color: ujian.lulus ? "var(--color-primary)" : "#ef4444",
+                }}
+              >
                 {ujian.grade}
               </p>
             </div>
           </div>
-          <button
-            className="w-full py-2 rounded-lg text-white text-xs font-medium"
+          <Link
+            href={`/mahasiswa/nilai/${ujian.nilai_akhir_id}`}
+            className="block w-full py-2 rounded-lg text-white text-xs font-medium text-center"
             style={{ background: "var(--color-primary)" }}
+            onMouseEnter={() =>
+              preload(`/nilai/${ujian.nilai_akhir_id}`, () =>
+                getNilaiDetail(ujian.nilai_akhir_id!),
+              )
+            }
           >
             Lihat Detail
-          </button>
+          </Link>
         </div>
       ) : (
         <button
@@ -79,7 +99,9 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
           className="w-full py-2 rounded-lg text-white text-xs font-medium disabled:opacity-40"
           style={{ background: "var(--color-primary)" }}
         >
-          {ujian.status === "sedang_berlangsung" ? "Mulai Ujian" : "Belum Dimulai"}
+          {ujian.status === "sedang_berlangsung"
+            ? "Mulai Ujian"
+            : "Belum Dimulai"}
         </button>
       )}
     </div>

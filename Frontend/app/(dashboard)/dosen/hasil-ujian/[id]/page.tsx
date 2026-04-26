@@ -18,8 +18,9 @@ type SortDir = "asc" | "desc";
 const PESERTA_STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
   Selesai:          { label: "Selesai",          bg: "var(--color-primary-light)", color: "var(--color-primary)" },
   "Perlu Pengecekan": { label: "Perlu Pengecekan", bg: "var(--color-warning-light)", color: "var(--color-warning)" },
-  Berlangsung:      { label: "Berlangsung",      bg: "var(--akademik-prodi-bg)",   color: "var(--akademik-prodi-icon)" },
-  "Belum Selesai":  { label: "Belum Selesai",   bg: "var(--akademik-tahun-bg)",   color: "var(--akademik-tahun-icon)" },
+  Berlangsung:      { label: "Berlangsung",   bg: "var(--akademik-prodi-bg)",    color: "var(--akademik-prodi-icon)" },
+  "Belum Mulai":    { label: "Belum Mulai",   bg: "var(--akademik-tahun-bg)",    color: "var(--akademik-tahun-icon)" },
+  "Belum Selesai":  { label: "Belum Selesai", bg: "var(--akademik-alamat-bg)",   color: "var(--akademik-alamat-icon)" },
 };
 
 function StatusBadge({ status }: { status: string }) {
