@@ -1,9 +1,21 @@
 import api from "./api";
 import { JadwalEvent } from "../types";
 
-export const uploadToCloudinary = async (file: File): Promise<string> => {
-  const sigRes = await api.post("/upload/signature");
-  const { signature, timestamp, public_id, api_key, cloud_name } = sigRes.data;
+export interface UploadSignature {
+  signature: string;
+  timestamp: number;
+  public_id: string;
+  api_key: string;
+  cloud_name: string;
+}
+
+export const getUploadSignature = async (): Promise<UploadSignature> => {
+  const res = await api.post("/upload/signature");
+  return res.data;
+};
+
+export const uploadToCloudinary = async (file: File, sig?: UploadSignature): Promise<string> => {
+  const { signature, timestamp, public_id, api_key, cloud_name } = sig ?? await getUploadSignature();
 
   const body = new FormData();
   body.append("file", file);

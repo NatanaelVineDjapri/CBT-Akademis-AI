@@ -329,9 +329,11 @@ class UjianController extends Controller
 
         $ujian = Ujian::with([
             'mataKuliah',
-            'pesertaUjian.user',
-            'pesertaUjian.nilaiAkhir',
-            'pesertaUjian.jawabanPeserta',
+            'pesertaUjian' => fn($q) => $q
+                ->with(['user', 'nilaiAkhir'])
+                ->withExists([
+                    'jawabanPeserta as needs_review' => fn($q) => $q->where('is_manual_graded', false),
+                ]),
             'ujianSoal.soal.jenisSoal.opsiJawaban',
             'ujianSoal.jawabanPeserta',
         ])->where('created_by', $authUser->id)->findOrFail($id);
@@ -351,9 +353,7 @@ class UjianController extends Controller
             'nama'   => $p->user->nama,
             'nim'    => $p->user->nim,
             'status' => $p->nilaiAkhir
-                ? ($p->jawabanPeserta->where('is_manual_graded', false)->isNotEmpty()
-                    ? 'Perlu Pengecekan'
-                    : 'Selesai')
+                ? ($p->needs_review ? 'Perlu Pengecekan' : 'Selesai')
                 : match(true) {
                     $p->status === 'sedang_berlangsung' => 'Berlangsung',
                     $p->mulai_at === null                => 'Belum Mulai',

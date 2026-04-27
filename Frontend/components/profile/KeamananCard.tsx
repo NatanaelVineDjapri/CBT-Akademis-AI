@@ -1,6 +1,8 @@
 "use client";
 
 import { ShieldCheck, ShieldOff } from "lucide-react";
+import { preload } from "swr";
+import { setup2FA } from "@/services/AuthServices";
 import type { User } from "@/types";
 
 interface Props {
@@ -28,7 +30,7 @@ export default function KeamananCard({ user, onUbahPassword, onToggle2FA }: Prop
             </div>
             <button
               onClick={onUbahPassword}
-              className="text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap"
+              className="text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               Ubah Password
@@ -68,7 +70,8 @@ export default function KeamananCard({ user, onUbahPassword, onToggle2FA }: Prop
 
           <button
             onClick={onToggle2FA}
-            className="text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap shrink-0"
+            onMouseEnter={() => { if (!is2faEnabled) preload("2fa/setup", setup2FA); }}
+            className="text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap shrink-0 cursor-pointer"
             style={
               is2faEnabled
                 ? { border: "1px solid var(--color-primary)", color: "var(--color-primary)" }

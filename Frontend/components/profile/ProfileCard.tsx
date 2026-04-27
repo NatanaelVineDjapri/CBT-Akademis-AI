@@ -48,7 +48,7 @@ export default function ProfileCard({ user, onUbahProfil }: Props) {
 
       <button
         onClick={onUbahProfil}
-        className="mt-5 w-full text-white text-sm font-medium py-2.5 rounded-lg"
+        className="mt-5 w-full text-white text-sm font-medium py-2.5 rounded-lg cursor-pointer"
         style={{ backgroundColor: "var(--color-primary)"  }}
       >
         Ubah Profil

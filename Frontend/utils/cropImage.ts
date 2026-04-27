@@ -5,20 +5,22 @@ export interface Area {
   height: number;
 }
 
+const OUTPUT_SIZE = 400;
+
 export async function getCroppedImg(imageSrc: string, cropArea: Area): Promise<File> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
-  canvas.width = cropArea.width;
-  canvas.height = cropArea.height;
+  canvas.width = OUTPUT_SIZE;
+  canvas.height = OUTPUT_SIZE;
 
   const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(image, cropArea.x, cropArea.y, cropArea.width, cropArea.height, 0, 0, cropArea.width, cropArea.height);
+  ctx.drawImage(image, cropArea.x, cropArea.y, cropArea.width, cropArea.height, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) return reject(new Error("Canvas kosong"));
       resolve(new File([blob], "foto.jpg", { type: "image/jpeg" }));
-    }, "image/jpeg", 0.9);
+    }, "image/jpeg", 0.85);
   });
 }
 
