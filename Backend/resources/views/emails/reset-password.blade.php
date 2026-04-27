@@ -94,7 +94,6 @@
         <div class="header">
             <img src="{{ $message->embed($logoPath) }}" alt="akademis.ai">
         </div>
-
         <div class="body">
             <p class="greeting">Halo, {{ $nama }}!</p>
             <span class="role-badge">
