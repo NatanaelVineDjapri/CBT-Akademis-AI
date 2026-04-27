@@ -122,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}', [UjianController::class, 'detailPesertaUjianDosen']);
         Route::put('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}/periksa-essay', [UjianController::class, 'periksaEssay']);
         Route::put('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}/reset-essay', [UjianController::class, 'resetEssay']);
+        Route::get('/ujian/dosen/hasil/{id}/export-pdf', [UjianController::class, 'exportPDF']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {

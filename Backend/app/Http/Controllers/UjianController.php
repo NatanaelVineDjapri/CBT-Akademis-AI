@@ -606,6 +606,54 @@ class UjianController extends Controller
         return response()->json(['message' => 'Essay berhasil ditandai belum diperiksa.']);
     }
 
+    public function exportPDF(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::with(['gradeSetting', 'ujianSetting'])
+            ->where('id', $id)
+            ->where('created_by', $authUser->id)
+            ->firstOrFail();
+
+        $pesertaList = PesertaUjian::with(['user', 'nilaiAkhir'])
+            ->where('ujian_id', $id)
+            ->get();
+
+        $info = [
+            'nama_ujian'    => $ujian->nama_ujian,
+            'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
+            'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
+            'tanggal'       => $ujian->start_date ? \Carbon\Carbon::parse($ujian->start_date)->format('d M Y') : '-',
+            'total_peserta' => $pesertaList->count(),
+            'total_soal'    => $ujian->ujianSoal()->count(),
+        ];
+
+        $peserta = $pesertaList->map(fn($p) => [
+            'nim'   => $p->user?->nim ?? '-',
+            'nama'  => $p->user?->nama ?? '-',
+            'nilai' => $p->nilaiAkhir?->nilai_total !== null ? round($p->nilaiAkhir->nilai_total, 1) : null,
+            'grade' => $p->nilaiAkhir?->grade,
+            'lulus' => $p->nilaiAkhir?->lulus,
+        ])->sortBy('nama')->values();
+
+        $nilaiList = $peserta->whereNotNull('nilai')->pluck('nilai');
+        $totalLulus = $peserta->where('lulus', true)->count();
+        $totalDinilai = $nilaiList->count();
+
+        $stats = [
+            'rata_rata'    => $totalDinilai > 0 ? round($nilaiList->avg(), 1) : '-',
+            'total_lulus'  => $totalLulus,
+            'persen_lulus' => $totalDinilai > 0 ? round(($totalLulus / $totalDinilai) * 100, 1) : 0,
+        ];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.hasil-ujian', compact('info', 'peserta', 'stats'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'hasil-ujian-' . \Str::slug($ujian->nama_ujian) . '.pdf';
+
+        return $pdf->download($filename);
+    }
+
     public function nilaiMahasiswa(Request $request)
     {
         $authUser = $request->user();
