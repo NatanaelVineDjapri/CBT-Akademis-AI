@@ -4,12 +4,12 @@ import { useState } from "react";
 import { use } from "react";
 import useSWR from "swr";
 import Link from "next/link";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, FileDown, Sheet } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import EmptyState from "@/components/EmptyState";
 import { preload } from "swr";
-import { getDetailUjianDosen, getDetailPesertaDosen } from "@/services/UjianServices";
+import { getDetailUjianDosen, getDetailPesertaDosen, exportHasilUjianPDF, exportHasilUjianExcel } from "@/services/UjianServices";
 import DaftarSiswaTableSkeleton from "@/components/skeleton/DaftarSiswaTableSkeleton";
 import DistribusiJawabanTableSkeleton from "@/components/skeleton/DistribusiJawabanTableSkeleton";
 import type { HasilUjianPeserta, HasilUjianDistribusiItem } from "@/types";
@@ -66,6 +66,16 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ id:
   const [pesertaSortBy, setPesertaSortBy] = useState<PesertaSortBy>("nama");
   const [pesertaSortDir, setPesertaSortDir] = useState<SortDir>("asc");
   const [distribusiSearch, setDistribusiSearch] = useState("");
+  const [downloading, setDownloading] = useState(false);
+
+  const handleExportPDF = async () => {
+    setDownloading(true);
+    try {
+      await exportHasilUjianPDF(id);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handlePesertaSort = (col: PesertaSortBy) => {
     if (col === pesertaSortBy) {
@@ -116,7 +126,27 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ id:
               </span>
             )}
           </div>
-          <SearchInput value={pesertaSearch} onChange={setPesertaSearch} placeholder="Search" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => data && exportHasilUjianExcel(data, data.info.nama_ujian)}
+              disabled={!data}
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default"
+              style={{ borderColor: "var(--color-semantic-success)", color: "var(--color-semantic-success)" }}
+            >
+              <Sheet className="w-3.5 h-3.5" />
+              Export Excel
+            </button>
+            <button
+              onClick={handleExportPDF}
+              disabled={!data || downloading}
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default"
+              style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              {downloading ? "Mengunduh..." : "Export PDF"}
+            </button>
+            <SearchInput value={pesertaSearch} onChange={setPesertaSearch} placeholder="Search" />
+          </div>
         </div>
 
         <div className="overflow-x-auto">
