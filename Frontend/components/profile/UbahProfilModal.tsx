@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { X } from "lucide-react";
 import Cropper from "react-easy-crop";
 import { User } from "@/types";
-import { updateProfile, uploadToCloudinary } from "../../services/UserServices";
+import { updateProfile, uploadToCloudinary, getUploadSignature, UploadSignature } from "../../services/UserServices";
 import { getCroppedImg, Area } from "../../utils/cropImage";
 import Avatar from "../Avatar";
 
@@ -33,6 +33,14 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
   const [uploading, setUploading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState(false);
+  const prefetchedSig = useRef<UploadSignature | null>(null);
+
+  useEffect(() => {
+    if (rawImageSrc) {
+      prefetchedSig.current = null;
+      getUploadSignature().then(sig => { prefetchedSig.current = sig; }).catch(() => {});
+    }
+  }, [rawImageSrc]);
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -57,7 +65,7 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
     // Upload ke Cloudinary langsung di background
     setUploading(true);
     try {
-      const url = await uploadToCloudinary(file);
+      const url = await uploadToCloudinary(file, prefetchedSig.current ?? undefined);
       setUploadedUrl(url);
     } catch {
       setUploadError(true);
@@ -95,7 +103,7 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
         <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
             <h3 className="text-base font-bold text-white">Crop Foto</h3>
-            <button onClick={() => setRawImageSrc(null)} className="text-white/70 hover:text-white">
+            <button onClick={() => setRawImageSrc(null)} className="text-white/70 hover:text-white cursor-pointer">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -130,14 +138,14 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
             <button
               type="button"
               onClick={() => setRawImageSrc(null)}
-              className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg"
+              className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer"
             >
               Batal
             </button>
             <button
               type="button"
               onClick={handleCropConfirm}
-              className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg"
+              className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg cursor-pointer"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               Selesai
@@ -153,7 +161,7 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
           <h3 className="text-base font-bold text-white">Ubah Profil</h3>
-          <button onClick={onClose} className="text-white/70 hover:text-white">
+          <button onClick={onClose} className="text-white/70 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -183,7 +191,7 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="text-white text-sm px-4 py-2 rounded-lg"
+                className="text-white text-sm px-4 py-2 rounded-lg cursor-pointer"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Telusuri Media
@@ -197,13 +205,13 @@ export default function UbahProfilModal({ user, onClose, onSaved }: Props) {
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg">
+            <button type="button" onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || uploading || uploadError}
-              className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50"
+              className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 cursor-pointer disabled:cursor-default"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               {loading ? "Menyimpan..." : uploading ? "Mengunggah..." : "Simpan"}

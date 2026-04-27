@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { X, ShieldCheck, ShieldOff, Copy, Check } from "lucide-react";
 import { setup2FA, enable2FA, disable2FA } from "@/services/AuthServices";
 
@@ -14,21 +15,18 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
   const [step, setStep] = useState<"scan" | "verify" | "success">(
     mode === "enable" ? "scan" : "verify"
   );
-  const [qrCode, setQrCode] = useState("");
-  const [secret, setSecret] = useState("");
+  const { data: setupData } = useSWR(
+    mode === "enable" ? "2fa/setup" : null,
+    setup2FA,
+    { revalidateOnFocus: false }
+  );
+  const qrCode = setupData?.qr_code ?? "";
+  const secret = setupData?.secret ?? "";
+
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (mode === "enable") {
-      setup2FA().then((res) => {
-        setQrCode(res.qr_code);
-        setSecret(res.secret);
-      });
-    }
-  }, [mode]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(secret);
@@ -68,7 +66,7 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
           <h3 className="text-base font-bold text-white">
             {isEnable ? "Aktifkan 2FA" : "Nonaktifkan 2FA"}
           </h3>
-          <button onClick={onClose} className="text-white/70 hover:text-white">
+          <button onClick={onClose} className="text-white/70 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -116,7 +114,7 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
               <button
                 onClick={() => setStep("verify")}
                 disabled={!qrCode}
-                className="w-full text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50"
+                className="w-full text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 cursor-pointer disabled:cursor-default"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Lanjut
@@ -167,7 +165,7 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
                   <button
                     type="button"
                     onClick={() => setStep("scan")}
-                    className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg"
+                    className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer"
                   >
                     Kembali
                   </button>
@@ -175,14 +173,14 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className={`${isEnable ? "hidden" : "flex-1"} border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg`}
+                  className={`${isEnable ? "hidden" : "flex-1"} border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading || code.length !== 6}
-                  className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50"
+                  className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 cursor-pointer disabled:cursor-default"
                   style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   {loading
@@ -220,7 +218,7 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
               </div>
               <button
                 onClick={onClose}
-                className="w-full text-white text-sm font-medium py-2.5 rounded-lg"
+                className="w-full text-white text-sm font-medium py-2.5 rounded-lg cursor-pointer"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Selesai

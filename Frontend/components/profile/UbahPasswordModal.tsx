@@ -24,7 +24,7 @@ function PasswordField({
           className="flex-1 text-sm text-gray-700 outline-none bg-white"
           required
         />
-        <button type="button" onClick={onToggle} className="ml-2 text-gray-400">
+        <button type="button" onClick={onToggle} className="ml-2 text-gray-400 cursor-pointer">
           {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
       </div>
@@ -72,7 +72,7 @@ export default function UbahPasswordModal({ onClose }: Props) {
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
           <h3 className="text-base font-bold text-white">Ubah Password</h3>
-          <button type="button" onClick={onClose} className="text-white/70 hover:text-white">
+          <button type="button" onClick={onClose} className="text-white/70 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -86,13 +86,13 @@ export default function UbahPasswordModal({ onClose }: Props) {
           {success && <p className="text-sm text-green-600 text-center">{success}</p>}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg">
+            <button type="button" onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50"
+              className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 cursor-pointer disabled:cursor-default"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               {loading ? "Menyimpan..." : "Simpan"}
