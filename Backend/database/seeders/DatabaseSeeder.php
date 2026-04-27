@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             UjianDenganSoalSeeder::class,
             BankSoalBabSeeder::class,
             BankSoalExternalUnivSeeder::class,
+            SimulasiEssaySeeder::class,
         ]);
     }
 }

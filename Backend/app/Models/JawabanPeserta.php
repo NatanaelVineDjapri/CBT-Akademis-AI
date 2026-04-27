@@ -16,6 +16,7 @@ class JawabanPeserta extends Model
         'is_manual_graded',
         'ai_skor',
         'ai_feedback',
+        'dosen_feedback',
         'final_nilai',
     ];
 

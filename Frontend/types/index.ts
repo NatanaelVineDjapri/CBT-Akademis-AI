@@ -158,11 +158,15 @@ export interface JawabanCheckbox {
 }
 
 export interface JawabanEssay {
+  id: number;
   no: number;
   soal: string;
   jawaban: string;
   poin: number;
+  bobot: number;
+  is_manual_graded: boolean;
   ai_feedback: string | null;
+  dosen_feedback: string | null;
 }
 
 export interface NilaiDetail {
