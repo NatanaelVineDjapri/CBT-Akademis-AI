@@ -22,6 +22,21 @@ export const getDetailPesertaDosen = async (ujianId: string | number, pesertaId:
   return { info: res.data.info, jawaban: res.data.jawaban };
 };
 
+export const resetEssay = async (
+  ujianId: string | number,
+  pesertaId: string | number,
+): Promise<void> => {
+  await api.put(`/ujian/dosen/hasil/${ujianId}/peserta/${pesertaId}/reset-essay`);
+};
+
+export const periksaEssay = async (
+  ujianId: string | number,
+  pesertaId: string | number,
+  penilaian: { id: number; nilai: number; dosen_feedback?: string }[]
+): Promise<void> => {
+  await api.put(`/ujian/dosen/hasil/${ujianId}/peserta/${pesertaId}/periksa-essay`, { penilaian });
+};
+
 export const getHasilUjianDosen = async (params?: {
   search?: string;
   page?: number;

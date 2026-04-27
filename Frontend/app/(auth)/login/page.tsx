@@ -6,6 +6,7 @@ import Link from "next/link";
 import AuthLayout from "../../../components/AuthLayout";
 import { login, verify2FA } from "../../../services/AuthServices";
 import { Eye, EyeOff } from "lucide-react";
+import OtpInput from "@/components/OtpInput";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -68,21 +69,7 @@ export default function LoginPage() {
         subtitle="Masukkan kode 6 digit dari aplikasi Google Authenticator kamu."
       >
         <form onSubmit={handleVerify2FA} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">
-              Kode Autentikasi
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="123456"
-              value={twoFaCode}
-              onChange={(e) => setTwoFaCode(e.target.value.replace(/\D/g, ""))}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-500 placeholder-gray-300 focus:outline-none tracking-widest text-center"
-              required
-            />
-          </div>
+          <OtpInput value={twoFaCode} onChange={setTwoFaCode} />
 
           {error && (
             <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg text-center">

@@ -332,7 +332,11 @@ class UjianController extends Controller
             'pesertaUjian' => fn($q) => $q
                 ->with(['user', 'nilaiAkhir'])
                 ->withExists([
-                    'jawabanPeserta as needs_review' => fn($q) => $q->where('is_manual_graded', false),
+                    'jawabanPeserta as needs_review' => fn($q) => $q
+                        ->where('jawaban_peserta.is_manual_graded', false)
+                        ->join('ujian_soal', 'ujian_soal.id', '=', 'jawaban_peserta.ujian_soal_id')
+                        ->join('jenis_soal', 'jenis_soal.soal_id', '=', 'ujian_soal.soal_id')
+                        ->where('jenis_soal.jenis_soal', 'essay'),
                 ]),
             'ujianSoal.soal.jenisSoal.opsiJawaban',
             'ujianSoal.jawabanPeserta',
@@ -467,7 +471,13 @@ class UjianController extends Controller
             } elseif ($tipe === 'checklist') {
                 $checklist[] = array_merge($row, ['kunci' => $kunci]);
             } else {
-                $essay[] = array_merge($row, ['ai_feedback' => $jwb->ai_feedback]);
+                $essay[] = array_merge($row, [
+                    'id'               => $jwb->id,
+                    'bobot'            => $jwb->ujianSoal?->bobot ?? 0,
+                    'is_manual_graded' => (bool) $jwb->is_manual_graded,
+                    'ai_feedback'      => $jwb->ai_feedback,
+                    'dosen_feedback'   => $jwb->dosen_feedback,
+                ]);
             }
         }
 
@@ -475,6 +485,125 @@ class UjianController extends Controller
             'info'    => $info,
             'jawaban' => compact('pilihan_ganda', 'checklist', 'essay'),
         ]);
+    }
+
+    public function periksaEssay(Request $request, $ujianId, $pesertaId)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::with('gradeSetting')
+            ->where('id', $ujianId)
+            ->where('created_by', $authUser->id)
+            ->firstOrFail();
+
+        $peserta = PesertaUjian::with(['nilaiAkhir', 'jawabanPeserta.ujianSoal'])
+            ->where('id', $pesertaId)
+            ->where('ujian_id', $ujianId)
+            ->firstOrFail();
+
+        $request->validate([
+            'penilaian'                  => 'required|array',
+            'penilaian.*.id'             => 'required|integer',
+            'penilaian.*.nilai'          => 'required|numeric|min:0',
+            'penilaian.*.dosen_feedback' => 'nullable|string',
+        ]);
+
+        foreach ($request->penilaian as $item) {
+            $jwb = $peserta->jawabanPeserta->firstWhere('id', $item['id']);
+            if (!$jwb) continue;
+
+            $bobot = $jwb->ujianSoal?->bobot ?? 0;
+            $nilai = min((float) $item['nilai'], $bobot);
+
+            $jwb->update([
+                'nilai'            => $nilai,
+                'final_nilai'      => $nilai,
+                'is_manual_graded' => true,
+                'dosen_feedback'   => $item['dosen_feedback'] ?? null,
+            ]);
+        }
+
+        // Refresh jawaban setelah update
+        $peserta->load('jawabanPeserta');
+        $totalNilai = $peserta->jawabanPeserta->sum('final_nilai');
+
+        // Hitung grade & lulus
+        $grade = null;
+        $lulus = false;
+        foreach ($ujian->gradeSetting->sortByDesc('nilai_min') as $gs) {
+            if ($totalNilai >= $gs->nilai_min && $totalNilai <= $gs->nilai_max) {
+                $grade = $gs->grade;
+                break;
+            }
+        }
+
+        $passingGrade = \DB::table('ujian_setting')
+            ->where('ujian_id', $ujianId)
+            ->value('passing_grade');
+
+        if ($passingGrade !== null) {
+            $lulus = $totalNilai >= $passingGrade;
+        }
+
+        $peserta->nilaiAkhir->update([
+            'nilai_total' => round($totalNilai, 2),
+            'grade'       => $grade,
+            'lulus'       => $lulus,
+            'graded_at'   => now(),
+        ]);
+
+        return response()->json(['message' => 'Penilaian berhasil disimpan.']);
+    }
+
+    public function resetEssay(Request $request, $ujianId, $pesertaId)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::with(['gradeSetting', 'ujianSoal.soal.jenisSoal'])
+            ->where('id', $ujianId)
+            ->where('created_by', $authUser->id)
+            ->firstOrFail();
+
+        $peserta = PesertaUjian::with(['nilaiAkhir', 'jawabanPeserta.ujianSoal.soal.jenisSoal'])
+            ->where('id', $pesertaId)
+            ->where('ujian_id', $ujianId)
+            ->firstOrFail();
+
+        foreach ($peserta->jawabanPeserta as $jwb) {
+            $jenis = $jwb->ujianSoal?->soal?->jenisSoal->first()?->jenis_soal;
+            if ($jenis === 'essay') {
+                $jwb->update([
+                    'nilai'            => null,
+                    'final_nilai'      => null,
+                    'is_manual_graded' => false,
+                ]);
+            }
+        }
+
+        // Recalculate nilai_akhir dari non-essay saja
+        $peserta->load('jawabanPeserta.ujianSoal.soal.jenisSoal');
+        $totalNilai = $peserta->jawabanPeserta
+            ->filter(fn($jwb) => $jwb->ujianSoal?->soal?->jenisSoal->first()?->jenis_soal !== 'essay')
+            ->sum('final_nilai');
+
+        $grade = null;
+        foreach ($ujian->gradeSetting->sortByDesc('nilai_min') as $gs) {
+            if ($totalNilai >= $gs->nilai_min && $totalNilai <= $gs->nilai_max) {
+                $grade = $gs->grade;
+                break;
+            }
+        }
+
+        $passingGrade = \DB::table('ujian_setting')->where('ujian_id', $ujianId)->value('passing_grade');
+        $lulus = $passingGrade !== null ? $totalNilai >= $passingGrade : false;
+
+        $peserta->nilaiAkhir->update([
+            'nilai_total' => round($totalNilai, 2),
+            'grade'       => $grade,
+            'lulus'       => $lulus,
+        ]);
+
+        return response()->json(['message' => 'Essay berhasil ditandai belum diperiksa.']);
     }
 
     public function nilaiMahasiswa(Request $request)

@@ -4,12 +4,14 @@ import { useState } from "react";
 import useSWR from "swr";
 import { X, ShieldCheck, ShieldOff, Copy, Check } from "lucide-react";
 import { setup2FA, enable2FA, disable2FA } from "@/services/AuthServices";
+import OtpInput from "@/components/OtpInput";
 
 interface Props {
   mode: "enable" | "disable";
   onClose: () => void;
   onSuccess: () => void;
 }
+
 
 export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
   const [step, setStep] = useState<"scan" | "verify" | "success">(
@@ -143,16 +145,7 @@ export default function TwoFactorModal({ mode, onClose, onSuccess }: Props) {
                 </p>
               </div>
 
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                placeholder="123456"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 placeholder-gray-300 focus:outline-none tracking-widest text-center"
-                autoFocus
-              />
+              <OtpInput value={code} onChange={setCode} />
 
               {error && (
                 <p className="text-xs text-red-500 text-center bg-red-50 py-2 rounded-lg">
