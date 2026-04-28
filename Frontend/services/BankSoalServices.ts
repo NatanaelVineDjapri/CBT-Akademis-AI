@@ -77,6 +77,33 @@ export const getBabByMataKuliah = async (mataKuliahId: number): Promise<BabOptio
   return res.data.data ?? [];
 };
 
+export interface GeneratedSoal {
+  deskripsi: string;
+  bobot: number;
+  opsi?: Record<string, string>;
+  kunci?: string | string[];
+}
+
+export const generateSoalAI = async (data: {
+  jenis_soal: string;
+  jumlah: number;
+  topik?: string;
+  tingkat_kesulitan: string;
+  referensi_bab_ids: number[];
+}): Promise<GeneratedSoal[]> => {
+  const res = await api.post("/soal/generate-ai", data);
+  return res.data.soal;
+};
+
+export const saveBulkSoal = async (data: {
+  bank_soal_id: string | number;
+  jenis_soal: string;
+  tingkat_kesulitan: string;
+  soal: { deskripsi: string; opsi?: Record<string, string>; kunci?: string | string[] }[];
+}): Promise<void> => {
+  await api.post("/soal/bulk", data);
+};
+
 export const createBankSoal = async (data: {
   nama: string;
   deskripsi?: string;

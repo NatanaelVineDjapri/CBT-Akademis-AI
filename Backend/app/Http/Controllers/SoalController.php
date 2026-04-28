@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\BankSoal;
+use App\Models\JenisSoal;
+use App\Models\OpsiJawaban;
+use App\Models\Soal;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class SoalController extends Controller
+{
+    public function storeBulk(Request $request)
+    {
+        $request->validate([
+            'bank_soal_id'      => 'required|integer|exists:bank_soal,id',
+            'jenis_soal'        => 'required|in:pilihan_ganda,essay,checklist',
+            'tingkat_kesulitan' => 'required|in:mudah,sedang,sulit',
+            'soal'              => 'required|array|min:1',
+            'soal.*.deskripsi'  => 'required|string',
+            'soal.*.opsi'       => 'nullable|array',
+            'soal.*.kunci'      => 'nullable',
+        ]);
+
+        $bankSoal = BankSoal::findOrFail($request->bank_soal_id);
+
+        DB::transaction(function () use ($request, $bankSoal) {
+            foreach ($request->soal as $item) {
+                $soal = Soal::create([
+                    'bank_soal_id'     => $bankSoal->id,
+                    'mata_kuliah_id'   => $bankSoal->mata_kuliah_id,
+                    'deskripsi'        => $item['deskripsi'],
+                    'tingkat_kesulitan'=> $request->tingkat_kesulitan,
+                    'ai_generated'     => true,
+                ]);
+
+                $jenisSoal = JenisSoal::create([
+                    'soal_id'   => $soal->id,
+                    'jenis_soal'=> $request->jenis_soal,
+                ]);
+
+                if (!empty($item['opsi']) && !empty($item['kunci'])) {
+                    $kunci = $item['kunci'];
+                    foreach ($item['opsi'] as $huruf => $teks) {
+                        $isCorrect = is_array($kunci)
+                            ? in_array($huruf, $kunci)
+                            : $huruf === $kunci;
+
+                        OpsiJawaban::create([
+                            'jenis_soal_id' => $jenisSoal->id,
+                            'opsi'          => $huruf,
+                            'teks'          => $teks,
+                            'is_correct'    => $isCorrect,
+                        ]);
+                    }
+                }
+            }
+        });
+
+        return response()->json(['message' => 'Soal berhasil disimpan.']);
+    }
+}

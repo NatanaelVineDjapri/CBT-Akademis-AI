@@ -2,6 +2,9 @@
 
 import { Pencil, Trash2, Plus, Mail } from "lucide-react";
 import Link from "next/link";
+import { preload } from "swr";
+import api from "@/services/api";
+import { getBabByMataKuliah } from "@/services/BankSoalServices";
 import type { BankSoalItem, BankSoalMeta } from "@/types";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -164,6 +167,7 @@ export default function BankSoalTable({
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => onEdit(item)}
+                              onMouseEnter={() => item.mata_kuliah_id && preload(`/bab?mata_kuliah_id=${item.mata_kuliah_id}`, () => getBabByMataKuliah(item.mata_kuliah_id!))}
                               className="text-green-500 hover:text-green-600 transition-colors"
                             >
                               <Pencil size={15} />
@@ -177,6 +181,7 @@ export default function BankSoalTable({
                             {onShare && item.permission === "shared" && (
                               <button
                                 onClick={() => onShare(item)}
+                                onMouseEnter={() => preload(`/bank-soal/${item.id}/shared-users`, () => api.get(`/bank-soal/${item.id}/shared-users`).then(r => r.data.data))}
                                 className="text-blue-400 hover:text-blue-500 transition-colors"
                                 title="Share via email"
                               >

@@ -221,7 +221,27 @@ class BankSoalController extends Controller
         ], 200);
     }
 
-    // Share via email → cari user by email → tambah akses langsung
+    public function getSharedUsers(Request $request, $id)
+    {
+        $authUser = $request->user();
+        $bankSoal = BankSoal::findOrFail($id);
+
+        if ($bankSoal->created_by !== $authUser->id) {
+            return response()->json(['message' => 'Tidak punya akses!'], 403);
+        }
+
+        $shared = BankSoalShared::with('user:id,nama,email')
+            ->where('bank_soal_id', $id)
+            ->get()
+            ->map(fn($s) => [
+                'id'    => $s->user->id,
+                'nama'  => $s->user->nama,
+                'email' => $s->user->email,
+            ]);
+
+        return response()->json(['data' => $shared]);
+    }
+
     public function shareByEmail(Request $request, $id)
     {
         $authUser = $request->user();
