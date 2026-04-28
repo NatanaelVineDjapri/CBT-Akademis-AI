@@ -38,7 +38,7 @@ class GenerateSoalController extends Controller
             $referensi
         );
 
-        $response = Http::withHeaders([
+        $response = Http::timeout(120)->retry(3, 2000)->withHeaders([
             'Authorization' => 'Bearer ' . env('GROQ_API_KEY'),
         ])->post('https://api.groq.com/openai/v1/chat/completions', [
             'model'           => 'openai/gpt-oss-120b',
