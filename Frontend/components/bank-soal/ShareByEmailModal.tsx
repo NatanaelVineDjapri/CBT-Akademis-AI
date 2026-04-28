@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Users } from "lucide-react";
+import useSWR, { mutate } from "swr";
 import { shareByEmail } from "@/services/BankSoalServices";
 import api from "@/services/api";
 import type { BankSoalItem } from "@/types";
+
+interface SharedUser {
+  id: number;
+  nama: string;
+  email: string;
+}
 
 interface UserSuggestion {
   id: number;
@@ -26,6 +33,11 @@ export default function ShareByEmailModal({ item, onClose }: Props) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const sharedKey = `/bank-soal/${item.id}/shared-users`;
+  const { data: sharedData } = useSWR(sharedKey, () =>
+    api.get(sharedKey).then(r => r.data.data as SharedUser[])
+  );
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -73,6 +85,7 @@ export default function ShareByEmailModal({ item, onClose }: Props) {
       await shareByEmail(item.id, email);
       setSuccess(`Bank soal berhasil di-share ke ${email}`);
       setEmail("");
+      mutate(sharedKey);
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Gagal share bank soal.");
     } finally {
@@ -98,6 +111,29 @@ export default function ShareByEmailModal({ item, onClose }: Props) {
             <p className="text-xs text-gray-500">Bank Soal</p>
             <p className="text-sm font-medium mt-0.5" style={{ color: "var(--color-primary)" }}>{item.nama}</p>
           </div>
+
+          {(sharedData ?? []).length > 0 && (
+            <div className="rounded-xl border border-gray-100 overflow-hidden">
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 border-b border-gray-100">
+                <Users className="w-3.5 h-3.5 text-gray-400" />
+                <p className="text-xs font-semibold text-gray-500">Sudah dibagikan ke</p>
+              </div>
+              <div className="divide-y divide-gray-50 max-h-32 overflow-y-auto">
+                {(sharedData ?? []).map((u: SharedUser) => (
+                  <div key={u.id} className="flex items-center gap-2 px-3 py-2">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-bold"
+                      style={{ backgroundColor: "var(--color-primary)" }}>
+                      {u.nama[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700">{u.nama}</p>
+                      <p className="text-xs text-gray-400">{u.email}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

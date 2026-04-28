@@ -132,10 +132,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [BankSoalController::class, 'store']);
             Route::put('/{id}', [BankSoalController::class, 'update']);
             Route::delete('/{id}', [BankSoalController::class, 'destroy']);
+            Route::get('/{id}/shared-users', [BankSoalController::class, 'getSharedUsers']);
             Route::post('/{id}/share-email', [BankSoalController::class, 'shareByEmail']);
             Route::post('/{id}/generate-link', [BankSoalController::class, 'generateLink']);
             Route::delete('/{id}/remove-shared', [BankSoalController::class, 'removeShared']);
         });
+
+        Route::post('/soal/generate-ai', [\App\Http\Controllers\GenerateSoalController::class, 'generate']);
+        Route::post('/soal/bulk', [\App\Http\Controllers\SoalController::class, 'storeBulk']);
 
         Route::prefix('bab')->group(function () {
             Route::get('/', [BabController::class, 'index']);

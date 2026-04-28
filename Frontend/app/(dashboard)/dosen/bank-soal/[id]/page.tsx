@@ -1,13 +1,14 @@
 "use client";
 
 import { use, useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { useDebounce } from "@/hooks/useDebounce";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
 import { getBankSoalSoal } from "@/services/BankSoalServices";
 import { Plus, Sparkles } from "lucide-react";
+import GenerateAIModal from "@/components/soal/GenerateAIModal";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -16,6 +17,7 @@ interface Props {
 export default function DaftarSoalPage({ params }: Props) {
   const { id } = use(params);
   const [search, setSearch] = useState("");
+  const [showGenerateAI, setShowGenerateAI] = useState(false);
   const debouncedSearch = useDebounce(search);
 
   const { data, isLoading } = useSWR(
@@ -57,7 +59,8 @@ export default function DaftarSoalPage({ params }: Props) {
                   Tambah Soal
                 </button>
                 <button
-                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap"
+                  onClick={() => setShowGenerateAI(true)}
+                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer"
                   style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 80%, black)" }}
                 >
                   <Sparkles size={15} />
@@ -69,6 +72,14 @@ export default function DaftarSoalPage({ params }: Props) {
         </div>
 
         <SoalTable soalList={soalList} isLoading={isLoading} canEdit={canEdit} />
+
+      {showGenerateAI && (
+        <GenerateAIModal
+          bankSoalId={id}
+          onClose={() => setShowGenerateAI(false)}
+          onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
+        />
+      )}
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
+import useSWR from "swr";
 import type { BankSoalItem } from "@/types";
 import { getBabByMataKuliah, type BabOption } from "@/services/BankSoalServices";
 
@@ -43,21 +44,18 @@ export default function BankSoalFormModal({
   const [mataKuliahId, setMataKuliahId] = useState<number | null>(item?.mata_kuliah_id ?? null);
   const [babId, setBabId] = useState<number | null>(item?.bab_id ?? null);
   const [permission, setPermission] = useState<'public' | 'shared' | 'private'>(item?.permission ?? "private");
-  const [babOptions, setBabOptions] = useState<BabOption[]>([]);
-  const [loadingBab, setLoadingBab] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const babKey = mataKuliahId ? `/bab?mata_kuliah_id=${mataKuliahId}` : null;
+  const { data: babOptions = [], isLoading: loadingBab } = useSWR<BabOption[]>(
+    babKey,
+    () => getBabByMataKuliah(mataKuliahId!),
+    { revalidateOnFocus: false }
+  );
+
   const inputClass =
     "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none";
-
-  useEffect(() => {
-    if (!mataKuliahId) { setBabOptions([]); setBabId(null); return; }
-    setLoadingBab(true);
-    getBabByMataKuliah(mataKuliahId)
-      .then(setBabOptions)
-      .finally(() => setLoadingBab(false));
-  }, [mataKuliahId]);
 
   const handleMataKuliahChange = (val: string) => {
     setMataKuliahId(val ? Number(val) : null);
