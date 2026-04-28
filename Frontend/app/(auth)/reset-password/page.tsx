@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AuthLayout from "../../../components/AuthLayout";
-import { resetPassword } from "../../../services/AuthServices";
+import { resetPassword, verifyResetToken } from "../../../services/AuthServices";
 import { Eye, EyeOff } from "lucide-react";
 
 function ResetPasswordForm() {
@@ -20,6 +20,27 @@ function ResetPasswordForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tokenStatus, setTokenStatus] = useState<"checking" | "valid" | "invalid">("checking");
+  const [tokenError, setTokenError] = useState("");
+
+  useEffect(() => {
+    if (!token || !email) {
+      setTokenStatus("invalid");
+      setTokenError("Link reset password tidak valid.");
+      return;
+    }
+    verifyResetToken(email, token).then((res) => {
+      if (res.valid) {
+        setTokenStatus("valid");
+      } else {
+        setTokenStatus("invalid");
+        setTokenError(res.message ?? "Link reset password tidak valid atau sudah kedaluwarsa.");
+      }
+    }).catch(() => {
+      setTokenStatus("invalid");
+      setTokenError("Gagal memverifikasi link. Coba lagi.");
+    });
+  }, [email, token]);
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -42,6 +63,29 @@ function ResetPasswordForm() {
       setLoading(false);
     }
   };
+
+  if (tokenStatus === "checking") {
+    return <p className="text-sm text-gray-400 text-center">Memverifikasi link...</p>;
+  }
+
+  if (tokenStatus === "invalid") {
+    return (
+      <div className="space-y-4">
+        <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg text-center">
+          {tokenError}
+        </div>
+        <div className="text-center">
+          <Link
+            href="/forgot-password"
+            className="text-sm hover:underline"
+            style={{ color: "var(--color-primary)" }}
+          >
+            Kirim ulang link reset password
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

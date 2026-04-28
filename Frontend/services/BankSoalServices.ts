@@ -95,6 +95,33 @@ export const generateSoalAI = async (data: {
   return res.data.soal;
 };
 
+export const createSoal = async (data: {
+  bank_soal_id: string | number;
+  jenis_soal: string;
+  tingkat_kesulitan: string;
+  deskripsi: string;
+  bab_id?: number | null;
+  opsi?: Record<string, string>;
+  kunci?: string | string[];
+}): Promise<void> => {
+  await api.post("/soal", data);
+};
+
+export const updateSoal = async (id: number, data: {
+  jenis_soal: string;
+  tingkat_kesulitan: string;
+  deskripsi: string;
+  bab_id?: number | null;
+  opsi?: Record<string, string>;
+  kunci?: string | string[];
+}): Promise<void> => {
+  await api.put(`/soal/${id}`, data);
+};
+
+export const deleteSoal = async (id: number): Promise<void> => {
+  await api.delete(`/soal/${id}`);
+};
+
 export const saveBulkSoal = async (data: {
   bank_soal_id: string | number;
   jenis_soal: string;
