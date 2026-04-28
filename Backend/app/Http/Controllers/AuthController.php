@@ -297,4 +297,27 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function verifyResetToken(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+        ]);
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record || !Hash::check($request->token, $record->token)) {
+            return response()->json(['valid' => false, 'message' => 'Token tidak valid!'], 200);
+        }
+
+        if (now()->diffInMinutes($record->created_at) > 60) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return response()->json(['valid' => false, 'message' => 'Link reset password sudah kedaluwarsa!'], 200);
+        }
+
+        return response()->json(['valid' => true], 200);
+    }
+
 }

@@ -141,14 +141,16 @@ class BankSoalController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'mata_kuliah_id' => 'nullable|exists:mata_kuliah,id',
-            'bab_id' => 'required_with:mata_kuliah_id|nullable|exists:bab,id',
+            'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
+            'bab_id' => 'required|exists:bab,id',
             'permission' => 'required|in:public,shared,private',
         ], [
             'nama.required' => 'Nama bank soal wajib diisi!',
-            'permission.in' => 'Permission tidak valid!',
+            'mata_kuliah_id.required' => 'Mata kuliah wajib dipilih!',
             'mata_kuliah_id.exists' => 'Mata kuliah tidak ditemukan!',
+            'bab_id.required' => 'Bab wajib dipilih!',
             'bab_id.exists' => 'Bab tidak ditemukan!',
+            'permission.in' => 'Permission tidak valid!',
         ]);
 
         $bankSoal = BankSoal::create([

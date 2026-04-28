@@ -76,3 +76,8 @@ export const resetPassword = async (data: {
   const res = await api.post("/auth/reset-password", data);
   return res.data.message;
 };
+
+export const verifyResetToken = async (email: string, token: string): Promise<{ valid: boolean; message?: string }> => {
+  const res = await api.get("/auth/verify-reset-token", { params: { email, token } });
+  return res.data;
+};

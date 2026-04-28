@@ -64,7 +64,11 @@ export default function BankSoalFormModal({
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    if (mataKuliahId && !babId) {
+    if (!mataKuliahId) {
+      setError("Mata kuliah wajib dipilih.");
+      return;
+    }
+    if (!babId) {
       setError("Bab wajib dipilih.");
       return;
     }
@@ -118,13 +122,13 @@ export default function BankSoalFormModal({
           </div>
 
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Mata Kuliah</label>
+            <label className="text-sm text-gray-600 mb-1 block">Mata Kuliah <span className="text-red-400">*</span></label>
             <select
               value={mataKuliahId ?? ""}
               onChange={(e) => handleMataKuliahChange(e.target.value)}
               className={inputClass}
             >
-              <option value="">— Tidak dipilih —</option>
+              <option value="">— Pilih Mata Kuliah —</option>
               {mataKuliahOptions.map((mk) => (
                 <option key={mk.id} value={mk.id}>
                   {mk.kode} — {mk.nama}
@@ -133,29 +137,29 @@ export default function BankSoalFormModal({
             </select>
           </div>
 
-          {mataKuliahId && (
-            <div>
-              <label className="text-sm text-gray-600 mb-1 block">Bab</label>
-              {loadingBab ? (
-                <div className={inputClass + " text-gray-400 cursor-not-allowed bg-gray-50"}>Memuat bab...</div>
-              ) : babOptions.length === 0 ? (
-                <div className={inputClass + " text-gray-400 cursor-not-allowed bg-gray-50"}>Tidak ada bab untuk mata kuliah ini.</div>
-              ) : (
-                <select
-                  value={babId ?? ""}
-                  onChange={(e) => setBabId(e.target.value ? Number(e.target.value) : null)}
-                  className={inputClass}
-                >
-                  <option value="">— Semua Bab —</option>
-                  {babOptions.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      Bab {b.urutan} — {b.nama_bab}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          )}
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Bab <span className="text-red-400">*</span></label>
+            {!mataKuliahId ? (
+              <div className={inputClass + " text-gray-400 bg-gray-50"}>Pilih mata kuliah terlebih dahulu.</div>
+            ) : loadingBab ? (
+              <div className={inputClass + " text-gray-400 bg-gray-50"}>Memuat bab...</div>
+            ) : babOptions.length === 0 ? (
+              <div className={inputClass + " text-gray-400 bg-gray-50"}>Tidak ada bab untuk mata kuliah ini.</div>
+            ) : (
+              <select
+                value={babId ?? ""}
+                onChange={(e) => setBabId(e.target.value ? Number(e.target.value) : null)}
+                className={inputClass}
+              >
+                <option value="">— Pilih Bab —</option>
+                {babOptions.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    Bab {b.urutan} — {b.nama_bab}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
 
           <div>
             <label className="text-sm text-gray-600 mb-1 block">Permission</label>
