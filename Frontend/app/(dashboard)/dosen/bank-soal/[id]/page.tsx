@@ -61,7 +61,7 @@ export default function DaftarSoalPage({ params }: Props) {
                 <button
                   onClick={() => setShowGenerateAI(true)}
                   className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer"
-                  style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 80%, black)" }}
+                  style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   <Sparkles size={15} />
                   Generate Soal dengan AI
