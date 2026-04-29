@@ -54,6 +54,7 @@ class BankSoalController extends Controller
                 });
             })
             ->when($request->mata_kuliah_id, fn($q) => $q->where('mata_kuliah_id', $request->mata_kuliah_id))
+            ->when($request->bab_id, fn($q) => $q->whereHas('soal', fn($q2) => $q2->where('bab_id', $request->bab_id)))
             ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($request->per_page ?? 10);

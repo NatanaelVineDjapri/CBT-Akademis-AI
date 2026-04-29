@@ -19,6 +19,8 @@ export const getBankSoalGlobal = async (params?: {
   search?: string;
   page?: number;
   per_page?: number;
+  mata_kuliah_id?: number;
+  bab_id?: number;
 }): Promise<BankSoalResponse> => {
   const res = await api.get("/bank-soal/global", { params });
   return { data: res.data.data, meta: res.data.meta };
