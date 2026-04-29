@@ -19,6 +19,8 @@ export const getBankSoalGlobal = async (params?: {
   search?: string;
   page?: number;
   per_page?: number;
+  mata_kuliah_id?: number;
+  bab_id?: number;
 }): Promise<BankSoalResponse> => {
   const res = await api.get("/bank-soal/global", { params });
   return { data: res.data.data, meta: res.data.meta };
@@ -93,6 +95,33 @@ export const generateSoalAI = async (data: {
 }): Promise<GeneratedSoal[]> => {
   const res = await api.post("/soal/generate-ai", data);
   return res.data.soal;
+};
+
+export const createSoal = async (data: {
+  bank_soal_id: string | number;
+  jenis_soal: string;
+  tingkat_kesulitan: string;
+  deskripsi: string;
+  bab_id?: number | null;
+  opsi?: Record<string, string>;
+  kunci?: string | string[];
+}): Promise<void> => {
+  await api.post("/soal", data);
+};
+
+export const updateSoal = async (id: number, data: {
+  jenis_soal: string;
+  tingkat_kesulitan: string;
+  deskripsi: string;
+  bab_id?: number | null;
+  opsi?: Record<string, string>;
+  kunci?: string | string[];
+}): Promise<void> => {
+  await api.put(`/soal/${id}`, data);
+};
+
+export const deleteSoal = async (id: number): Promise<void> => {
+  await api.delete(`/soal/${id}`);
 };
 
 export const saveBulkSoal = async (data: {

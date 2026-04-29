@@ -21,6 +21,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::get('/verify-reset-token', [AuthController::class, 'verifyResetToken']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -140,6 +141,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/soal/generate-ai', [\App\Http\Controllers\GenerateSoalController::class, 'generate']);
         Route::post('/soal/bulk', [\App\Http\Controllers\SoalController::class, 'storeBulk']);
+        Route::put('/soal/{id}', [\App\Http\Controllers\SoalController::class, 'update']);
+        Route::delete('/soal/{id}', [\App\Http\Controllers\SoalController::class, 'destroy']);
 
         Route::prefix('bab')->group(function () {
             Route::get('/', [BabController::class, 'index']);

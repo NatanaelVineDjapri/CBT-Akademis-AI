@@ -80,10 +80,23 @@ class MataKuliahController extends Controller
 
         $mataKuliah = MataKuliah::with([
             'dosenMatkul.user',
-            'bab' => fn($q) => $q->withCount('soal')->orderBy('urutan'),
+            'bab' => fn($q) => $q->orderBy('urutan'),
         ])
         ->whereHas('userMataKuliah', fn($q) => $q->where('user_id', $authUser->id))
         ->findOrFail($id);
+
+        // Count distinct public bank soal per bab (via soal.bab_id)
+        $publicBankSoal = BankSoal::where('mata_kuliah_id', $mataKuliah->id)
+            ->where('permission', 'public')
+            ->with(['soal' => fn($q) => $q->whereNotNull('bab_id')->select('bank_soal_id', 'bab_id')])
+            ->get();
+
+        $bankSoalCounts = [];
+        foreach ($publicBankSoal as $bs) {
+            foreach ($bs->soal->pluck('bab_id')->unique() as $babId) {
+                $bankSoalCounts[$babId] = ($bankSoalCounts[$babId] ?? 0) + 1;
+            }
+        }
 
         return response()->json([
             'message' => 'Detail mata kuliah berhasil diambil!',
@@ -94,10 +107,10 @@ class MataKuliahController extends Controller
                 'dosen'     => $mataKuliah->dosenMatkul->first()?->user?->nama ?? '-',
                 'total_bab' => $mataKuliah->bab->count(),
                 'bab'       => $mataKuliah->bab->map(fn($b) => [
-                    'id'          => $b->id,
-                    'nama_bab'    => $b->nama_bab,
-                    'urutan'      => $b->urutan,
-                    'jumlah_soal' => $b->soal_count,
+                    'id'              => $b->id,
+                    'nama_bab'        => $b->nama_bab,
+                    'urutan'          => $b->urutan,
+                    'jumlah_soal'     => $bankSoalCounts[$b->id] ?? 0,
                 ])->values(),
             ],
         ]);
