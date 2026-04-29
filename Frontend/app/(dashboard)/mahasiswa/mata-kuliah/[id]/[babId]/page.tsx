@@ -1,20 +1,20 @@
 "use client";
 
 import { use, useState } from "react";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import Link from "next/link";
 import { useDebounce } from "@/hooks/useDebounce";
 import SearchInput from "@/components/filtering/SearchInput";
-import SoalTable from "@/components/soal/SoalTable";
-import { getMataKuliahBabSoal } from "@/services/MataKuliahServices";
 import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
+import { getBankSoalGlobal, getBankSoalSoal } from "@/services/BankSoalServices";
 
 interface Props {
   params: Promise<{ id: string; babId: string }>;
 }
 
-export default function MahasiswaBabSoalPage({ params }: Props) {
+export default function MahasiswaBabBankSoalPage({ params }: Props) {
   const { id, babId } = use(params);
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -26,13 +26,14 @@ export default function MahasiswaBabSoalPage({ params }: Props) {
     { revalidateOnFocus: false }
   );
 
-  const { data: soalList = [], isLoading } = useSWR(
-    ["/mata-kuliah/my", id, "bab", babId, "soal", debouncedSearch],
-    () => getMataKuliahBabSoal(id, babId, { search: debouncedSearch }),
+  const { data, isLoading } = useSWR(
+    ["/bank-soal/global", id, babId, debouncedSearch],
+    () => getBankSoalGlobal({ mata_kuliah_id: Number(id), bab_id: Number(babId), search: debouncedSearch }),
     { revalidateOnFocus: false }
   );
 
   const bab = matkul?.bab.find((b) => String(b.id) === babId);
+  const bankSoalList = data?.data ?? [];
 
   return (
     <div className="flex flex-col gap-4">
@@ -45,7 +46,7 @@ export default function MahasiswaBabSoalPage({ params }: Props) {
           <ChevronLeft size={16} /> Kembali
         </button>
         <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
-          {bab?.nama_bab ?? "Daftar Soal"}
+          {bab?.nama_bab ?? "Daftar Bank Soal"}
         </h1>
         {matkul && (
           <p className="text-sm text-gray-500 mt-1">{matkul.nama}</p>
@@ -55,12 +56,67 @@ export default function MahasiswaBabSoalPage({ params }: Props) {
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
-            Daftar Soal
+            Daftar Bank Soal
           </h2>
-          <SearchInput value={search} onChange={setSearch} placeholder="Search" />
+          <SearchInput value={search} onChange={setSearch} placeholder="Cari bank soal..." />
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading} canEdit={false} />
+        <table className="w-full text-sm table-fixed">
+          <colgroup>
+            <col />
+            <col className="w-32" />
+            <col className="w-12" />
+          </colgroup>
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="text-left px-5 py-3 text-xs text-gray-400 font-bold">Nama Bank Soal</th>
+              <th className="text-center px-4 py-3 text-xs text-gray-400 font-bold">Jumlah Soal</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <tr key={i} className="border-b border-gray-50 animate-pulse">
+                  <td className="px-5 py-4"><div className="h-3 w-48 bg-gray-100 rounded" /></td>
+                  <td className="px-4 py-4 text-center"><div className="h-3 w-8 bg-gray-100 rounded mx-auto" /></td>
+                  <td />
+                </tr>
+              ))
+            ) : bankSoalList.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-5 py-8 text-center text-sm text-gray-400">
+                  {search ? "Bank soal tidak ditemukan." : "Belum ada bank soal untuk bab ini."}
+                </td>
+              </tr>
+            ) : (
+              bankSoalList.map((bs) => (
+                <tr
+                  key={bs.id}
+                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                  onMouseEnter={() => preload(
+                    ["/bank-soal", String(bs.id), "soal", ""],
+                    () => getBankSoalSoal(bs.id, {})
+                  )}
+                >
+                  <td className="px-5 py-4">
+                    <Link
+                      href={`/mahasiswa/mata-kuliah/${id}/${babId}/${bs.id}`}
+                      className="flex items-center gap-2 group"
+                    >
+                      <BookOpen size={15} className="text-gray-300 shrink-0" />
+                      <span className="text-gray-700 font-medium group-hover:underline">{bs.nama}</span>
+                    </Link>
+                  </td>
+                  <td className="px-4 py-4 text-center text-gray-600">{bs.soal_count ?? 0}</td>
+                  <td className="px-4 py-4 text-right">
+                    <ChevronRight size={14} className="text-gray-300" />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
