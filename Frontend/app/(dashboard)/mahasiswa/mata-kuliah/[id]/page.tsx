@@ -1,11 +1,12 @@
 "use client";
 
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { BookOpen, ChevronLeft, GraduationCap, Layers, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, GraduationCap, Layers } from "lucide-react";
 import Link from "next/link";
 import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
+import { getBankSoalGlobal } from "@/services/BankSoalServices";
 import SearchInput from "@/components/filtering/SearchInput";
 
 export default function MataKuliahDetailPage() {
@@ -57,69 +58,101 @@ export default function MataKuliahDetailPage() {
             <span className="flex items-center gap-1.5 text-sm text-gray-500">
               <GraduationCap size={14} /> Dosen Pengurus : {data.dosen}
             </span>
-            <span className="flex items-center gap-1.5 text-sm text-gray-500">
-              <Layers size={14} /> Total Bab : {data.total_bab} Bab
-            </span>
           </div>
         </div>
       )}
 
-      {/* Tabel Bab */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden px-3 pb-2">
-        <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-4">
-          <h2 className="text-base font-bold shrink-0" style={{ color: "var(--color-primary)" }}>
+      {/* Bab List */}
+      <div className="bg-white rounded-2xl overflow-hidden flex flex-col">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-4 shrink-0">
+          <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
             Daftar Bab
           </h2>
           <SearchInput value={search} onChange={setSearch} placeholder="Cari bab..." />
         </div>
 
-        <table className="w-full text-sm table-fixed">
-          <colgroup>
-            <col className="w-14" />
-            <col />
-            <col className="w-32" />
-          </colgroup>
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">#</th>
-              <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">Nama Bab</th>
-              <th className="text-center px-4 py-3 text-xs text-gray-400 font-bold">Jumlah Soal</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i} className="border-b border-gray-50 animate-pulse">
-                  <td className="px-4 py-4"><div className="h-3 w-6 bg-gray-100 rounded" /></td>
-                  <td className="px-4 py-4"><div className="h-3 w-48 bg-gray-100 rounded" /></td>
-                  <td className="px-4 py-4 text-center"><div className="h-3 w-8 bg-gray-100 rounded mx-auto" /></td>
-                </tr>
-              ))
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-sm text-gray-400">
-                  {search ? "Bab tidak ditemukan." : "Belum ada bab."}
-                </td>
-              </tr>
-            ) : (
-              filtered.map((bab, i) => (
-                <tr key={bab.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-gray-400">{String(i + 1).padStart(2, "0")}</td>
-                  <td className="px-4 py-4">
-                    <Link
-                      href={`/mahasiswa/mata-kuliah/${id}/${bab.id}`}
-                      className="flex items-center justify-between group"
-                    >
-                      <span className="text-gray-700 font-medium group-hover:underline">{bab.nama_bab}</span>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
-                    </Link>
-                  </td>
-                  <td className="px-4 py-4 text-center text-gray-600">{bab.jumlah_soal}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="p-5">
+          {isLoading ? (
+            <div className="flex flex-col gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="animate-pulse rounded-xl px-4 py-3 flex items-center justify-between"
+                  style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, white)" }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gray-200" />
+                    <div className="h-4 rounded bg-gray-200 w-40" />
+                  </div>
+                  <div className="h-4 rounded bg-gray-200 w-16" />
+                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <p className="text-center text-sm text-gray-400 py-12">
+              {search ? "Bab tidak ditemukan." : "Belum ada bab."}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filtered.map((bab) => {
+                const hasSoal = bab.jumlah_soal > 0;
+                const inner = (
+                  <>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: hasSoal ? "var(--color-primary)" : "#d1d5db" }}
+                      >
+                        <Layers size={16} className="text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-400">Bab {bab.urutan}</p>
+                        <p
+                          className="text-sm font-semibold truncate"
+                          style={{ color: hasSoal ? "var(--color-primary)" : "#9ca3af" }}
+                        >
+                          {bab.nama_bab}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase tracking-wide text-gray-400">Bank Soal</p>
+                        <p
+                          className="text-sm font-bold"
+                          style={{ color: hasSoal ? "var(--color-primary)" : "#9ca3af" }}
+                        >
+                          {bab.jumlah_soal}
+                        </p>
+                      </div>
+                      <ChevronRight size={16} className={hasSoal ? "text-gray-300" : "text-gray-200"} />
+                    </div>
+                  </>
+                );
+
+                return hasSoal ? (
+                  <Link
+                    key={bab.id}
+                    href={`/mahasiswa/mata-kuliah/${id}/${bab.id}`}
+                    className="flex items-center justify-between px-4 py-3 rounded-xl hover:opacity-80 transition-opacity"
+                    style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, white)" }}
+                    onMouseEnter={() => preload(
+                      ["/bank-soal/global", id, String(bab.id), ""],
+                      () => getBankSoalGlobal({ mata_kuliah_id: Number(id), bab_id: bab.id })
+                    )}
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <div
+                    key={bab.id}
+                    className="flex items-center justify-between px-4 py-3 rounded-xl cursor-not-allowed opacity-60"
+                    style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 4%, white)" }}
+                  >
+                    {inner}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
