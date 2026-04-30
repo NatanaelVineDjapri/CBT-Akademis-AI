@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\BankSoal;
+use App\Models\MataKuliah;
 use App\Models\NilaiAkhir;
+use App\Models\Pengumuman;
 use App\Models\PesertaUjian;
 use App\Models\Ujian;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -134,6 +137,137 @@ class DashboardController extends Controller
         return response()->json([
             'message' => 'Data performa berhasil diambil!',
             'data'    => $result,
+        ]);
+    }
+
+    public function adminUniversitas(Request $request)
+    {
+        PesertaUjian::autoExpire();
+
+        $user          = $request->user();
+        $universitasId = $user->universitas_id;
+        $now           = now();
+
+        $dosenIds = User::where('universitas_id', $universitasId)
+            ->where('role', 'dosen')
+            ->pluck('id');
+
+        $totalMataKuliah = MataKuliah::whereHas('prodi.fakultas', fn($q) => $q->where('universitas_id', $universitasId))->count();
+
+        $allUjianQuery = Ujian::whereIn('created_by', $dosenIds);
+
+        $formatUjian = fn($u) => [
+            'id'          => $u->id,
+            'nama'        => $u->nama_ujian,
+            'mata_kuliah' => $u->mataKuliah?->nama ?? '-',
+            'start_date'  => $u->start_date?->format('d M Y'),
+            'end_date'    => $u->end_date?->format('d M Y'),
+            'jam'         => ($u->start_date?->format('H:i') ?? '') . ' – ' . ($u->end_date?->format('H:i') ?? ''),
+        ];
+
+        $ujianBerlangsung = Ujian::with('mataKuliah')
+            ->where('created_by', $user->id)
+            ->where('jenis_ujian', 'pmb')
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->orderByDesc('start_date')
+            ->limit(3)
+            ->get()
+            ->map(fn($u) => [...$formatUjian($u), 'jumlah_peserta' => $u->pesertaUjian()->count()]);
+
+        $bankSoal = BankSoal::withCount('soal')
+            ->where('created_by', $user->id)
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get()
+            ->map(fn($b) => [
+                'id'          => $b->id,
+                'nama'        => $b->nama,
+                'jumlah_soal' => $b->soal_count,
+                'permission'  => $b->permission,
+            ]);
+
+        $ujianTerbaru = Ujian::with('mataKuliah')
+            ->where('created_by', $user->id)
+            ->where('jenis_ujian', 'pmb')
+            ->orderByDesc('start_date')
+            ->limit(3)
+            ->get()
+            ->map($formatUjian);
+
+        $pengumuman = Pengumuman::where('created_by', $user->id)
+            ->where(fn($q) => $q->whereNull('expired_at')->orWhere('expired_at', '>', $now))
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get()
+            ->map(fn($p) => [
+                'id'         => $p->id,
+                'judul'      => $p->judul,
+                'isi'        => $p->isi,
+                'expired_at' => $p->expired_at?->format('d M Y'),
+            ]);
+
+        return response()->json([
+            'message' => 'Data dashboard admin universitas berhasil diambil!',
+            'stats'   => [
+                'total_dosen'      => $dosenIds->count(),
+                'total_mahasiswa'  => User::where('universitas_id', $universitasId)->where('role', 'mahasiswa')->count(),
+                'total_matakuliah' => $totalMataKuliah,
+                'total_ujian'      => $allUjianQuery->count(),
+            ],
+            'ujian_berlangsung' => $ujianBerlangsung,
+            'bank_soal'         => $bankSoal,
+            'ujian_terbaru'     => $ujianTerbaru,
+            'pengumuman'        => $pengumuman,
+        ]);
+    }
+
+    public function adminUniversitasPerforma(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        $ujianList = Ujian::where('created_by', $userId)
+            ->where('jenis_ujian', 'pmb')
+            ->where('end_date', '<', now())
+            ->orderBy('start_date')
+            ->get();
+
+        if ($ujianList->isEmpty()) {
+            return response()->json(['message' => 'Data performa PMB berhasil diambil!', 'stats' => null, 'ujian' => []]);
+        }
+
+        $ujianIds = $ujianList->pluck('id')->toArray();
+
+        $avgByUjian = NilaiAkhir::join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
+            ->whereIn('peserta_ujian.ujian_id', $ujianIds)
+            ->groupBy('peserta_ujian.ujian_id')
+            ->selectRaw('peserta_ujian.ujian_id, AVG(nilai_akhir.nilai_total) AS avg_nilai, COUNT(*) AS total_peserta, SUM(CASE WHEN nilai_akhir.lulus = true THEN 1 ELSE 0 END) AS total_lulus')
+            ->get()
+            ->keyBy('ujian_id');
+
+        $ujianData = $ujianList->map(function ($ujian) use ($avgByUjian) {
+            $row          = $avgByUjian[$ujian->id] ?? null;
+            $avg          = (float) ($row->avg_nilai ?? 0);
+            $passingGrade = 60;
+            return [
+                'ujian'   => $ujian->nama_ujian,
+                'nilai'   => round($avg, 1),
+                'lowPass' => $avg > 0 && $avg < $passingGrade,
+            ];
+        })->values();
+
+        $totalPeserta = $avgByUjian->sum('total_peserta');
+        $totalLulus   = $avgByUjian->sum('total_lulus');
+        $rataRata     = $avgByUjian->avg('avg_nilai');
+
+        return response()->json([
+            'message' => 'Data performa PMB berhasil diambil!',
+            'stats'   => [
+                'rata_rata'             => round((float) ($rataRata ?? 0), 1),
+                'persentase_kelulusan'  => $totalPeserta > 0 ? round(($totalLulus / $totalPeserta) * 100) : 0,
+                'total_peserta'         => (int) $totalPeserta,
+            ],
+            'ujian' => $ujianData,
         ]);
     }
 

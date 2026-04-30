@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             BankSoalBabSeeder::class,
             BankSoalExternalUnivSeeder::class,
             SimulasiEssaySeeder::class,
+            PmbSeeder::class,
         ]);
     }
 }

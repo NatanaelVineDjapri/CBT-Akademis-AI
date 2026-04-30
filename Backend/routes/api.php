@@ -90,6 +90,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:admin_universitas')->group(function () {
+        Route::get('/dashboard/admin-universitas', [DashboardController::class, 'adminUniversitas']);
+        Route::get('/dashboard/admin-universitas/performa', [DashboardController::class, 'adminUniversitasPerforma']);
+
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::post('/', [UserController::class, 'store']);
@@ -141,6 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/soal/generate-ai', [\App\Http\Controllers\GenerateSoalController::class, 'generate']);
         Route::post('/soal/bulk', [\App\Http\Controllers\SoalController::class, 'storeBulk']);
+        Route::post('/soal', [\App\Http\Controllers\SoalController::class, 'store']);
         Route::put('/soal/{id}', [\App\Http\Controllers\SoalController::class, 'update']);
         Route::delete('/soal/{id}', [\App\Http\Controllers\SoalController::class, 'destroy']);
 

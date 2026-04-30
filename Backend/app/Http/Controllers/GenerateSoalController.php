@@ -38,7 +38,7 @@ class GenerateSoalController extends Controller
             $referensi
         );
 
-        $response = Http::timeout(120)->retry(3, 2000)->withHeaders([
+        $response = Http::timeout(120)->retry(3, 2000, fn($e) => !($e instanceof \Illuminate\Http\Client\RequestException && $e->response?->status() === 413))->withHeaders([
             'Authorization' => 'Bearer ' . env('GROQ_API_KEY'),
         ])->post('https://api.groq.com/openai/v1/chat/completions', [
             'model'           => 'openai/gpt-oss-120b',
@@ -53,11 +53,12 @@ class GenerateSoalController extends Controller
                 ],
             ],
             'temperature'     => 0.7,
-            'max_tokens'      => 32768,
+            'max_tokens'      => 4096,
             'response_format' => ['type' => 'json_object'],
         ]);
 
         if (!$response->successful()) {
+            \Log::error('Groq error', ['status' => $response->status(), 'body' => $response->body()]);
             return response()->json(['message' => 'Gagal menghubungi AI. Coba lagi.'], 500);
         }
 
