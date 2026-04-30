@@ -92,6 +92,55 @@ export const exportHasilUjianExcel = (data: HasilUjianDosenDetail, namaUjian: st
   XLSX.writeFile(wb, `hasil-ujian-${slug}.xlsx`);
 };
 
+export const getHasilUjianAdminUniversitas = async (params?: {
+  search?: string;
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_dir?: "asc" | "desc";
+}): Promise<{ data: HasilUjianDosenItem[]; meta: UjianMeta }> => {
+  const res = await api.get("/ujian/admin-universitas/hasil", { params });
+  return { data: res.data.data, meta: res.data.meta };
+};
+
+export const getDetailUjianAdminUniversitas = async (id: number | string): Promise<HasilUjianDosenDetail> => {
+  const res = await api.get(`/ujian/admin-universitas/hasil/${id}`);
+  return { info: res.data.info, peserta: res.data.peserta, distribusi: res.data.distribusi };
+};
+
+export const getDetailPesertaAdminUniversitas = async (ujianId: string | number, pesertaId: string | number): Promise<DetailPesertaDosen> => {
+  const res = await api.get(`/ujian/admin-universitas/hasil/${ujianId}/peserta/${pesertaId}`);
+  return { info: res.data.info, jawaban: res.data.jawaban };
+};
+
+export const periksaEssayAdminUniversitas = async (
+  ujianId: string | number,
+  pesertaId: string | number,
+  penilaian: { id: number; nilai: number; dosen_feedback?: string }[]
+): Promise<void> => {
+  await api.put(`/ujian/admin-universitas/hasil/${ujianId}/peserta/${pesertaId}/periksa-essay`, { penilaian });
+};
+
+export const resetEssayAdminUniversitas = async (
+  ujianId: string | number,
+  pesertaId: string | number,
+): Promise<void> => {
+  await api.put(`/ujian/admin-universitas/hasil/${ujianId}/peserta/${pesertaId}/reset-essay`);
+};
+
+export const exportHasilUjianPMBPDF = async (id: string | number): Promise<void> => {
+  const res = await api.get(`/ujian/admin-universitas/hasil/${id}/export-pdf`, { responseType: "blob" });
+  const disposition = res.headers["content-disposition"] as string | undefined;
+  const match = disposition?.match(/filename="?([^";\n]+)"?/);
+  const filename = match?.[1] ?? `hasil-ujian-pmb-${id}.pdf`;
+  const url = URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 export const getHasilUjianDosen = async (params?: {
   search?: string;
   page?: number;
