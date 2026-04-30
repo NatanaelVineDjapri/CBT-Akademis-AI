@@ -22,9 +22,10 @@ interface Props {
   bankSoalId: string;
   onClose: () => void;
   onSaved: () => void;
+  hideBabReferensi?: boolean;
 }
 
-export default function GenerateAIModal({ bankSoalId, onClose, onSaved }: Props) {
+export default function GenerateAIModal({ bankSoalId, onClose, onSaved, hideBabReferensi = false }: Props) {
   const [step, setStep] = useState<1 | 2>(1);
   const [jenisSoal, setJenisSoal] = useState("pilihan_ganda");
   const [jumlah, setJumlah] = useState(5);
@@ -179,7 +180,7 @@ export default function GenerateAIModal({ bankSoalId, onClose, onSaved }: Props)
               </div>
 
               {/* Referensi Bab */}
-              <div>
+              {!hideBabReferensi && <div>
                 <label className="text-xs font-semibold text-gray-500 mb-1.5 block uppercase tracking-wide">
                   Referensi Bab <span className="text-gray-400 font-normal normal-case">(opsional)</span>
                 </label>
@@ -227,7 +228,7 @@ export default function GenerateAIModal({ bankSoalId, onClose, onSaved }: Props)
                 {selectedBabIds.length > 0 && (
                   <p className="text-xs text-gray-400 mt-1">{selectedBabIds.length} bab dipilih sebagai referensi</p>
                 )}
-              </div>
+              </div>}
             </>
           ) : (
             <>

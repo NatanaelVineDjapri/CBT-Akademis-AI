@@ -34,6 +34,7 @@ interface Props {
   canEdit: boolean;
   createHref?: string;
   onTambah?: () => void;
+  basePath?: string;
 }
 
 export default function BankSoalTable({
@@ -48,6 +49,7 @@ export default function BankSoalTable({
   canEdit,
   createHref,
   onTambah,
+  basePath = "/dosen/bank-soal",
 }: Props) {
   return (
     <div className="flex flex-col gap-3">
@@ -139,7 +141,7 @@ export default function BankSoalTable({
                       </td>
                       <td className="px-4 py-3 font-medium text-gray-800">
                         <Link
-                          href={`/dosen/bank-soal/${item.id}`}
+                          href={`${basePath}/${item.id}`}
                           className="hover:underline"
                           style={{ color: "var(--color-primary)" }}
                         >
