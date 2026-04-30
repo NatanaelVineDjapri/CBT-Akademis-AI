@@ -6,6 +6,7 @@ import { getAdminUniversitasDashboard } from "@/services/DashboardServices";
 import { BookOpen, Clock, GraduationCap, LayoutGrid, Users, FileText, Bell } from "lucide-react";
 import type { AdminUniversitasDashboard } from "@/types";
 import Link from "next/link";
+import StatistikPMBChart from "@/components/dashboard/admin-universitas/StatistikPMBChart";
 
 function StatCard({ label, value, icon: Icon, color }: { label: string; value: number | string; icon: React.ElementType; color: string }) {
   return (
@@ -211,6 +212,8 @@ export default function AdminUniversitasDashboardPage() {
             <UjianBerlangsungCard data={data.ujian_berlangsung} />
             <BankSoalCard data={data.bank_soal} />
           </div>
+
+          <StatistikPMBChart />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <UjianTerbaruCard data={data.ujian_terbaru} />

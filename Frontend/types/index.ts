@@ -289,6 +289,21 @@ export interface AdminUniversitasPengumumanItem {
   expired_at: string | null;
 }
 
+export interface AdminUniversitasPerformaUjian {
+  ujian: string;
+  nilai: number;
+  lowPass: boolean;
+}
+
+export interface AdminUniversitasPerforma {
+  stats: {
+    rata_rata: number;
+    persentase_kelulusan: number;
+    total_peserta: number;
+  } | null;
+  ujian: AdminUniversitasPerformaUjian[];
+}
+
 export interface AdminUniversitasDashboard {
   stats: {
     total_dosen: number;
