@@ -265,6 +265,43 @@ export interface DosenDashboard {
   ujian_selesai: DosenUjianItem[];
 }
 
+export interface AdminUniversitasUjianItem {
+  id: number;
+  nama: string;
+  mata_kuliah: string;
+  start_date: string;
+  end_date: string;
+  jam: string;
+  jumlah_peserta?: number;
+}
+
+export interface AdminUniversitasBankSoalItem {
+  id: number;
+  nama: string;
+  jumlah_soal: number;
+  permission: string;
+}
+
+export interface AdminUniversitasPengumumanItem {
+  id: number;
+  judul: string;
+  isi: string;
+  expired_at: string | null;
+}
+
+export interface AdminUniversitasDashboard {
+  stats: {
+    total_dosen: number;
+    total_mahasiswa: number;
+    total_matakuliah: number;
+    total_ujian: number;
+  };
+  ujian_berlangsung: AdminUniversitasUjianItem[];
+  bank_soal: AdminUniversitasBankSoalItem[];
+  ujian_terbaru: AdminUniversitasUjianItem[];
+  pengumuman: AdminUniversitasPengumumanItem[];
+}
+
 export interface DosenPerformaUjian {
   ujian: string;
   nilai: number;
