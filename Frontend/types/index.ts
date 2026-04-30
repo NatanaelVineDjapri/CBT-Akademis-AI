@@ -432,6 +432,7 @@ export const labels: Record<string, string> = {
   nilai: "Nilai",
   "mata-kuliah": "Mata Kuliah",
   "bank-soal": "Bank Soal",
+  "bank-soal-pmb": "Bank Soal PMB",
   global: "Global",
   monitoring: "Monitoring",
   "hasil-ujian": "Hasil Ujian",
