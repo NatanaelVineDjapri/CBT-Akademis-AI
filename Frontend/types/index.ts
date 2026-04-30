@@ -436,6 +436,7 @@ export const labels: Record<string, string> = {
   global: "Global",
   monitoring: "Monitoring",
   "hasil-ujian": "Hasil Ujian",
+  "hasil-ujian-pmb": "Hasil Ujian PMB",
 };
 
 export const roleLabels: Record<string, string> = {

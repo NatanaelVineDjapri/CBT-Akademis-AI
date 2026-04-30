@@ -114,6 +114,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/{id}', [MataKuliahController::class, 'update']);
             Route::delete('/{id}', [MataKuliahController::class, 'destroy']);
         });
+
+        Route::get('/ujian/admin-universitas/hasil', [UjianController::class, 'hasilUjianAdminUniversitas']);
+        Route::get('/ujian/admin-universitas/hasil/{id}', [UjianController::class, 'detailUjianDosen']);
+        Route::get('/ujian/admin-universitas/hasil/{ujianId}/peserta/{pesertaId}', [UjianController::class, 'detailPesertaUjianDosen']);
+        Route::put('/ujian/admin-universitas/hasil/{ujianId}/peserta/{pesertaId}/periksa-essay', [UjianController::class, 'periksaEssay']);
+        Route::put('/ujian/admin-universitas/hasil/{ujianId}/peserta/{pesertaId}/reset-essay', [UjianController::class, 'resetEssay']);
+        Route::get('/ujian/admin-universitas/hasil/{id}/export-pdf', [UjianController::class, 'exportPDF']);
     });
 
     Route::middleware('role:dosen')->group(function () {
