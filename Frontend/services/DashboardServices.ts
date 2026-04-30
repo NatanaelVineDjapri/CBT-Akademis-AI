@@ -1,5 +1,5 @@
 import api from "./api";
-import type { DosenDashboard, MahasiswaDashboard, DosenPerformaMatkul } from "@/types";
+import type { DosenDashboard, MahasiswaDashboard, DosenPerformaMatkul, AdminUniversitasDashboard } from "@/types";
 
 export const getMahasiswaDashboard = async (): Promise<MahasiswaDashboard> => {
   const res = await api.get("/dashboard/mahasiswa");
@@ -15,4 +15,9 @@ export const getDosenDashboard = async (): Promise<DosenDashboard> => {
 export const getDosenPerforma = async (): Promise<DosenPerformaMatkul[]> => {
   const res = await api.get("/dashboard/dosen/performa");
   return res.data.data;
+};
+
+export const getAdminUniversitasDashboard = async (): Promise<AdminUniversitasDashboard> => {
+  const res = await api.get("/dashboard/admin-universitas");
+  return res.data;
 };
