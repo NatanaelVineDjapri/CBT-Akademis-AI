@@ -301,7 +301,6 @@ class DashboardController extends Controller
             'end_date'         => $segera->ujian->end_date,
         ] : null;
 
-        // Ujian akan datang (3 terdekat) 
         $akanDatangList = PesertaUjian::with(['ujian.mataKuliah'])
             ->where('peserta_ujian.user_id', $userId)
             ->where('peserta_ujian.status', 'belum_mulai')
