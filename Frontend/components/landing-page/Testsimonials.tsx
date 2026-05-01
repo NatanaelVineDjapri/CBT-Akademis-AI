@@ -7,7 +7,7 @@ export default function Testimonials() {
         <div className="text-center mb-14">
           <p className="ak-eyebrow mb-4">Suara Kampus</p>
           <h2 className="text-[32px] md:text-[44px] font-extrabold text-brand-ink leading-[1.1]">
-            Lorem Ipsum Dolor Sit Amet Consectetur
+            Yang Kampus Rasakan Setelah Beralih
           </h2>
         </div>
 

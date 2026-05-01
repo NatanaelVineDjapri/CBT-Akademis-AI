@@ -7,7 +7,7 @@ export default function HowItWorks() {
         <div className="text-center mb-16">
           <p className="ak-eyebrow mb-4">Cara Kerja</p>
           <h2 className="text-[32px] md:text-[44px] font-extrabold text-brand-ink leading-[1.1]">
-            Lorem ipsum dolor,{" "}
+            Dari Silabus ke Nilai,{" "}
             <span
               className="underline decoration-brand-yellow decoration-[3px] underline-offset-[6px]"
               style={{ color: "var(--color-brand-yellow)" }}
