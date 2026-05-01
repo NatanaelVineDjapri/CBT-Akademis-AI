@@ -113,7 +113,7 @@ export default function DaftarPage() {
     : [];
 
   const handleFacultyClick = (facultyName) => {
-    router.push(`/daftar/${toSlug(facultyName)}`);
+    router.push(`/admin-akademis/daftar/${toSlug(facultyName)}`)
   };
 
   return (
