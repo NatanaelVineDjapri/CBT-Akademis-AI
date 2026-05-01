@@ -19,9 +19,9 @@ export default function Footer() {
             />
           </Link>
           <p className="text-white/50 text-sm leading-relaxed mb-4">
-            Lorem Ipsum Head Office<br />
-            Jl. Lorem Ipsum Dolor Sit Amet No. 1<br />
-            Lorem Ipsum 12345
+            Akademis.ai Head Office<br />
+            Jl. Pantai Indah Utara 2 Kav C1 PIK<br />
+            Jakarta Utara 14460
           </p>
           <p className="text-sm">
             <span className="font-semibold bg-gradient-to-r from-brand-yellow to-amber-300 bg-clip-text text-transparent">0811-2500-0060</span>
