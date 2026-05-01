@@ -26,7 +26,10 @@ import { logout } from "../services/AuthServices";
 import { getMyMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal, getJadwalDosen } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
-import { getMyUjian, getHasilUjianDosen } from "../services/UjianServices";
+import { getMyUjian, getHasilUjianDosen, getHasilUjianAdminUniversitas } from "../services/UjianServices";
+import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard } from "../services/DashboardServices";
+import { getBankSoal } from "../services/BankSoalServices";
+import { getFakultas } from "../services/AdminUserServices";
 import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
@@ -252,30 +255,55 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
               key={item.href}
               href={item.href}
               onMouseEnter={() => {
-                if (item.href === "/mahasiswa/mata-kuliah") {
-                  const pp = calcPerPage(128, 4, 200);
-                  preload(
-                    ["/mata-kuliah/my", "", 1, pp, ""],
-                    ([, s, p, perPg, so]: [string, string, number, number, string]) =>
-                      getMyMataKuliah({ search: s, page: p, per_page: perPg, sort: (so || undefined) as "asc" | "desc" | undefined })
-                  );
-                } else if (item.href === "/dosen/hasil-ujian") {
-                  preload(["/ujian/dosen/hasil", "", 1], ([, s, p]: [string, string, number]) =>
-                    getHasilUjianDosen({ search: s, page: p, per_page: 10 }));
-                } else if (item.href === "/dosen/jadwal") {
-                  preload("/jadwal/dosen", getJadwalDosen);
+                // — mahasiswa —
+                if (item.href === "/mahasiswa") {
+                  preload("/dashboard/mahasiswa", getMahasiswaDashboard);
+                } else if (item.href === "/mahasiswa/ujian") {
+                  const pp = calcPerPage(245, 4, 255);
+                  preload(["/ujian/my", "sedang_berlangsung", "", "", 1, pp], ([, st, s, sd, p, perPg]: [string, string, string, string, number, number]) =>
+                    getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: perPg }));
                 } else if (item.href === "/mahasiswa/jadwal") {
                   preload("/jadwal", getJadwal);
                 } else if (item.href === "/mahasiswa/nilai") {
                   const pp = calcPerPage(53, 1, 300);
                   preload(["/nilai", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg]: [string, string, number, number, string, string]) =>
-                    getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" }));
-                } else if (item.href === "/mahasiswa/ujian") {
-                  const pp = calcPerPage(245, 4, 255);
-                  preload(["/ujian/my", "sedang_berlangsung", "", "", 1, pp], ([, st, s, sd, p, perPg]: [string, string, string, string, number, number]) =>
-                    getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: perPg }));
+                    getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" as "asc" | "desc" }));
+                } else if (item.href === "/mahasiswa/mata-kuliah") {
+                  const pp = calcPerPage(128, 4, 200);
+                  preload(["/mata-kuliah/my", "", 1, pp, ""], ([, s, p, perPg, so]: [string, string, number, number, string]) =>
+                    getMyMataKuliah({ search: s, page: p, per_page: perPg, sort: (so || undefined) as "asc" | "desc" | undefined }));
+                // — dosen —
+                } else if (item.href === "/dosen") {
+                  preload("/dashboard/dosen", getDosenDashboard);
+                } else if (item.href === "/dosen/bank-soal") {
+                  preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
+                    getBankSoal({ search: s, page: p, per_page: 10 }));
+                } else if (item.href === "/dosen/hasil-ujian") {
+                  preload(["/ujian/dosen/hasil", "", 1], ([, s, p]: [string, string, number]) =>
+                    getHasilUjianDosen({ search: s, page: p, per_page: 10 }));
+                } else if (item.href === "/dosen/jadwal") {
+                  preload("/jadwal/dosen", getJadwalDosen);
+                // — admin universitas —
+                } else if (item.href === "/admin-universitas") {
+                  preload("/dashboard/admin-universitas", getAdminUniversitasDashboard);
+                } else if (item.href === "/admin-universitas/bank-soal-pmb") {
+                  preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
+                    getBankSoal({ search: s, page: p, per_page: 10 }));
+                } else if (item.href === "/admin-universitas/hasil-ujian-pmb") {
+                  const pp = calcPerPage(53, 1, 395);
+                  preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
+                    getHasilUjianAdminUniversitas({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
+                } else if (item.href === "/admin-universitas/user") {
+                  if (user.universitas_id) {
+                    preload(["/fakultas", user.universitas_id], ([, univId]: [string, number]) =>
+                      getFakultas({ universitas_id: univId, per_page: 100 }));
+                  }
+                // — pmb —
+                } else if (item.href === "/pmb") {
+                  preload("/dashboard/mahasiswa", getMahasiswaDashboard);
                 }
               }}
+              prefetch
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 isActive
                   ? "text-white font-medium"
