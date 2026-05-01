@@ -8,6 +8,7 @@ use App\Models\Ujian;
 use App\Events\JawabanMasuk;
 use App\Models\JawabanPeserta;
 use App\Models\UjianSoal;
+use App\Models\UjianSetting;
 use Illuminate\Http\Request;
 
 class UjianController extends Controller
@@ -537,9 +538,7 @@ class UjianController extends Controller
             }
         }
 
-        $passingGrade = \DB::table('ujian_setting')
-            ->where('ujian_id', $ujianId)
-            ->value('passing_grade');
+        $passingGrade = UjianSetting::where('ujian_id', $ujianId)->value('passing_grade');
 
         if ($passingGrade !== null) {
             $lulus = $totalNilai >= $passingGrade;
@@ -594,7 +593,7 @@ class UjianController extends Controller
             }
         }
 
-        $passingGrade = \DB::table('ujian_setting')->where('ujian_id', $ujianId)->value('passing_grade');
+        $passingGrade = UjianSetting::where('ujian_id', $ujianId)->value('passing_grade');
         $lulus = $passingGrade !== null ? $totalNilai >= $passingGrade : false;
 
         $peserta->nilaiAkhir->update([

@@ -437,6 +437,9 @@ export const labels: Record<string, string> = {
   monitoring: "Monitoring",
   "hasil-ujian": "Hasil Ujian",
   "hasil-ujian-pmb": "Hasil Ujian PMB",
+  user: "User",
+  fakultas: "Fakultas",
+  prodi: "Program Studi",
 };
 
 export const roleLabels: Record<string, string> = {
