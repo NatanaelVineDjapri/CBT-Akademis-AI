@@ -331,6 +331,61 @@ class DashboardController extends Controller
         return response()->json(['keys' => array_values(array_unique($allKeys)), 'data' => $data]);
     }
 
+    public function adminUniversitasKelulusan(Request $request)
+    {
+        $univId = $request->user()->universitas_id;
+
+        $fakultasList = Fakultas::where('universitas_id', $univId)
+            ->with('prodi:id,fakultas_id')
+            ->get(['id', 'nama']);
+
+        $nilaiByProdi = NilaiAkhir::whereHas('pesertaUjian.user', function ($q) use ($univId) {
+                $q->where('role', 'mahasiswa')
+                  ->whereHas('prodi.fakultas', fn ($qq) => $qq->where('universitas_id', $univId));
+            })
+            ->with('pesertaUjian:id,user_id', 'pesertaUjian.user:id,prodi_id')
+            ->get(['id', 'lulus', 'peserta_ujian_id'])
+            ->groupBy(fn ($n) => $n->pesertaUjian?->user?->prodi_id);
+
+        $data = $fakultasList->map(function ($f) use ($nilaiByProdi) {
+                $nilai = $f->prodi->flatMap(fn ($p) => $nilaiByProdi[$p->id] ?? collect());
+                $total = $nilai->count();
+                $lulus = $nilai->where('lulus', true)->count();
+                return [
+                    'nama'       => $f->nama,
+                    'persentase' => $total > 0 ? round(($lulus / $total) * 100, 1) : 0,
+                    'total'      => $total,
+                    'lulus'      => $lulus,
+                ];
+            })
+            ->sortByDesc('persentase')
+            ->values();
+
+        return response()->json($data);
+    }
+
+    public function adminUniversitasTrenNilai(Request $request)
+    {
+        $univId    = $request->user()->universitas_id;
+        $bulanNama = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+        $data = NilaiAkhir::whereHas('pesertaUjian.user', function ($q) use ($univId) {
+                $q->where('role', 'mahasiswa')
+                  ->whereHas('prodi.fakultas', fn ($qq) => $qq->where('universitas_id', $univId));
+            })
+            ->where('graded_at', '>=', now()->subMonths(5)->startOfMonth())
+            ->get(['nilai_total', 'graded_at'])
+            ->groupBy(fn ($n) => $n->graded_at->format('Y-m'))
+            ->map(fn ($group, $key) => [
+                'bulan'     => $bulanNama[(int) explode('-', $key)[1] - 1] . ' ' . explode('-', $key)[0],
+                'rata_rata' => round($group->avg('nilai_total'), 1),
+            ])
+            ->sortKeys()
+            ->values();
+
+        return response()->json($data);
+    }
+
     public function adminUniversitasDistribusi(Request $request)
     {
         $univId = $request->user()->universitas_id;
