@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
-    use HasApiTokens;
+    use HasApiTokens, \OwenIt\Auditing\Auditable;
+
+    protected $auditExclude = ['password', 'remember_token', 'two_factor_secret'];
     protected $table = 'users';
 
     protected $fillable = [

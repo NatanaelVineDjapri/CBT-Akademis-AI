@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\PmbPenerimaanController;
+use App\Http\Controllers\AuditController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -98,6 +99,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard/admin-universitas/aktivitas-ujian',  [DashboardController::class, 'adminUniversitasAktivitasUjian']);
         Route::get('/dashboard/admin-universitas/kelulusan',        [DashboardController::class, 'adminUniversitasKelulusan']);
         Route::get('/dashboard/admin-universitas/tren-nilai',       [DashboardController::class, 'adminUniversitasTrenNilai']);
+
+        Route::get('/audit',                    [AuditController::class, 'index']);
+        Route::get('/audit/{model}/{id}',       [AuditController::class, 'show']);
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
