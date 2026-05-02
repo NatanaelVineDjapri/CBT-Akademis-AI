@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BankSoal;
+use App\Models\Fakultas;
 use App\Models\MataKuliah;
 use App\Models\NilaiAkhir;
 use App\Models\Pengumuman;
@@ -10,7 +11,6 @@ use App\Models\PesertaUjian;
 use App\Models\Ujian;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -276,66 +276,72 @@ class DashboardController extends Controller
     {
         $univId = $request->user()->universitas_id;
 
-        $data = DB::table('nilai_akhir')
-            ->join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
-            ->join('users',         'peserta_ujian.user_id',        '=', 'users.id')
-            ->join('prodi',         'users.prodi_id',               '=', 'prodi.id')
-            ->join('fakultas',      'prodi.fakultas_id',            '=', 'fakultas.id')
-            ->where('fakultas.universitas_id', $univId)
-            ->where('users.role', 'mahasiswa')
-            ->groupBy('prodi.id', 'prodi.nama')
-            ->select(
-                'prodi.nama',
-                DB::raw('ROUND(AVG(nilai_akhir.nilai_total), 1) AS rata_rata'),
-                DB::raw('COUNT(DISTINCT users.id) AS jumlah_mahasiswa')
-            )
-            ->orderByDesc('rata_rata')
-            ->limit(10)
-            ->get();
+        $fakultasList = Fakultas::where('universitas_id', $univId)
+            ->with('prodi:id,nama,fakultas_id')
+            ->get(['id', 'nama']);
 
-        return response()->json($data);
+        $nilaiByProdi = NilaiAkhir::whereHas('pesertaUjian.user', function ($q) use ($univId) {
+                $q->where('role', 'mahasiswa')
+                  ->whereHas('prodi.fakultas', fn ($qq) => $qq->where('universitas_id', $univId));
+            })
+            ->with('pesertaUjian:id,user_id', 'pesertaUjian.user:id,prodi_id')
+            ->get()
+            ->groupBy(fn ($n) => $n->pesertaUjian->user->prodi_id);
+
+        $allKeys = [];
+        $data = $fakultasList->map(function ($f) use ($nilaiByProdi, &$allKeys) {
+            $row = ['nama' => $f->nama];
+            foreach ($f->prodi as $p) {
+                $allKeys[]    = $p->nama;
+                $row[$p->nama] = isset($nilaiByProdi[$p->id])
+                    ? round($nilaiByProdi[$p->id]->avg('nilai_total'), 1)
+                    : 0;
+            }
+            return $row;
+        })->values();
+
+        return response()->json(['keys' => array_values(array_unique($allKeys)), 'data' => $data]);
     }
 
     public function adminUniversitasAktivitasUjian(Request $request)
     {
         $univId = $request->user()->universitas_id;
 
-        $data = DB::table('ujian')
-            ->join('users', 'ujian.created_by', '=', 'users.id')
-            ->where('users.universitas_id', $univId)
-            ->where('ujian.start_date', '>=', now()->subMonths(11)->startOfMonth())
-            ->groupBy(DB::raw('DATE_FORMAT(ujian.start_date, "%Y-%m")'))
-            ->select(
-                DB::raw('DATE_FORMAT(ujian.start_date, "%Y-%m") AS bulan'),
-                DB::raw('COUNT(*) AS total')
-            )
-            ->orderBy('bulan')
-            ->get()
-            ->map(function ($row) {
-                [$y, $m] = explode('-', $row->bulan);
-                $bulanNama = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-                return [
-                    'bulan' => $bulanNama[(int)$m - 1] . ' ' . $y,
-                    'total' => (int) $row->total,
-                ];
-            });
+        $fakultasList = Fakultas::where('universitas_id', $univId)
+            ->with('prodi:id,nama,fakultas_id')
+            ->get(['id', 'nama']);
 
-        return response()->json($data);
+        $ujianByProdi = Ujian::whereHas('creator', fn ($q) =>
+                $q->whereHas('prodi.fakultas', fn ($qq) => $qq->where('universitas_id', $univId))
+            )
+            ->with('creator:id,prodi_id')
+            ->get(['id', 'created_by'])
+            ->groupBy(fn ($u) => $u->creator?->prodi_id);
+
+        $allKeys = [];
+        $data = $fakultasList->map(function ($f) use ($ujianByProdi, &$allKeys) {
+            $row = ['nama' => $f->nama];
+            foreach ($f->prodi as $p) {
+                $allKeys[]     = $p->nama;
+                $row[$p->nama] = isset($ujianByProdi[$p->id]) ? $ujianByProdi[$p->id]->count() : 0;
+            }
+            return $row;
+        })->values();
+
+        return response()->json(['keys' => array_values(array_unique($allKeys)), 'data' => $data]);
     }
 
     public function adminUniversitasDistribusi(Request $request)
     {
         $univId = $request->user()->universitas_id;
 
-        $distribusi = DB::table('users')
-            ->join('prodi',    'users.prodi_id',     '=', 'prodi.id')
-            ->join('fakultas', 'prodi.fakultas_id',  '=', 'fakultas.id')
-            ->where('fakultas.universitas_id', $univId)
-            ->where('users.role', 'mahasiswa')
-            ->groupBy('fakultas.id', 'fakultas.nama', 'fakultas.kode')
-            ->select('fakultas.nama', 'fakultas.kode', DB::raw('COUNT(users.id) as total'))
+        $distribusi = Fakultas::where('universitas_id', $univId)
+            ->withCount(['users as total' => fn ($q) => $q->where('role', 'mahasiswa')])
             ->orderByDesc('total')
-            ->get();
+            ->get()
+            ->filter(fn ($f) => $f->total > 0)
+            ->map(fn ($f) => ['nama' => $f->nama, 'kode' => $f->kode, 'total' => $f->total])
+            ->values();
 
         return response()->json($distribusi);
     }
