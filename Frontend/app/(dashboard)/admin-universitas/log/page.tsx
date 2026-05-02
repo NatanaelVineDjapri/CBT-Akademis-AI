@@ -1,233 +1,244 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
+import {
+  getAudits,
+  AuditItem,
+  AuditModel,
+  AuditEvent,
+} from "@/services/AuditService";
+import Breadcrumb from "@/components/BreadCrumb";
 
-const logs = [
-  {
-    id: 1,
-    raw: '[2026-03-26 07:15:22] [USER] [UPDATE_ROLE] - User "budi.santoso" role changed from "Student" to "Admin" by "superadmin"',
-  },
-  {
-    id: 2,
-    raw: '[2026-03-26 07:14:45] [USER] [KICK] - User "andi.pratama" removed from system by "admin01"',
-  },
-  {
-    id: 3,
-    raw: '[2026-03-26 07:13:10] [USER] [UPDATE_PROFILE] - User "siti.rahma" updated account information',
-  },
-  {
-    id: 4,
-    raw: '[2026-03-26 07:12:10] [EXAM] [SCHEDULED] - UAS "Algoritma dan Struktur Data" scheduled for 2026-04-10 09:00:00 (Class: IF-2023)',
-  },
-  {
-    id: 5,
-    raw: '[2026-03-26 07:11:34] [EXAM] [STARTED] - UAS "Algoritma dan Struktur Data" started (Class: IF-2023, Participants: 120)',
-  },
-  {
-    id: 6,
-    raw: '[2026-03-26 07:09:54] [EXAM] [ENDED] - UAS "Algoritma dan Struktur Data" ended (Class: IF-2023, Submitted: 115, Absent: 5)',
-  },
-  {
-    id: 7,
-    raw: "[2026-03-26 07:09:22] [SYSTEM] [MAINTENANCE_START] - Scheduled system maintenance started",
-  },
-  {
-    id: 8,
-    raw: "[2026-03-26 07:04:04] [SYSTEM] [MAINTENANCE_END] - System maintenance completed successfully",
-  },
-  {
-    id: 9,
-    raw: '[2026-03-26 07:01:20] [ANNOUNCEMENT] [CREATED] - Announcement "Jadwal UAS Telah Dirilis" published for Students and Lecturers',
-  },
-  {
-    id: 10,
-    raw: '[2026-03-26 07:01:14] [ANNOUNCEMENT] [UPDATED] - Announcement "Jadwal UAS Telah Dirilis" updated by "admin01"',
-  },
-];
 
 export default function SystemLog() {
+  const [data, setData] = useState<AuditItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [filterModel, setFilterModel] = useState<AuditModel | "">("");
+  const [filterEvent, setFilterEvent] = useState<AuditEvent | "">("");
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await getAudits({
+          ...(filterModel ? { model: filterModel } : {}),
+          ...(filterEvent ? { event: filterEvent } : {}),
+        });
+        setData(res);
+      } catch {
+        setError("Gagal memuat data audit.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [filterModel, filterEvent]);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return logs;
+    if (!search.trim()) return data;
     const q = search.toLowerCase();
-    return logs.filter((l) => l.raw.toLowerCase().includes(q));
-  }, [search]);
+    return data.filter(
+      (d) =>
+        d.keterangan.toLowerCase().includes(q) ||
+        d.model.toLowerCase().includes(q) ||
+        (d.user?.nama ?? "").toLowerCase().includes(q),
+    );
+  }, [search, data]);
+
+  const badgeClass = (event: string) => {
+    if (event === "created")
+      return "inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700";
+    if (event === "updated")
+      return "inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700";
+    if (event === "deleted")
+      return "inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700";
+    return "inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500";
+  };
 
   return (
-    <div
-      style={{
-        background: "transparent",
-        minHeight: "100vh",
-        fontFamily: "'Segoe UI', Arial, sans-serif",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 22,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 22,
-            fontWeight: 500,
-            color: "var(--color-primary)",
-            opacity: 0.6,
-            cursor: "pointer",
-          }}
-        >
-          Home
-        </span>
-        <span style={{ fontSize: 16, color: "var(--color-primary)", opacity: 0.5 }}>›</span>
-        <span
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            color: "var(--color-primary)",
-          }}
-        >
-          Log
-        </span>
-      </div>
-      <div
-        style={{
-          background: "#ffffff",
-          borderRadius: 14,
-          padding: "24px 28px 8px 28px",    
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 18,
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontSize: 18,
-              fontWeight: 700,
-              color: "var(--color-primary)",
-            }}
-          >
+    // Wrapper luar — fixed 100vh, no scroll
+    <div className="bg-transparent font-sans flex flex-col px-6 py-6">
+      {/* Breadcrumb */}
+      <div className="shrink-0">
+              <Breadcrumb />
+            </div>
+
+      {/* Card — ambil sisa tinggi */}
+      <div className="bg-white rounded-2xl px-7 pt-6 pb-2 flex flex-col min-h-0">
+        {/* Header — ga ikut scroll */}
+        <div className="flex items-center justify-between mb-5 flex-wrap gap-3 shrink-0">
+          <h2 className="text-lg font-bold text-[var(--color-primary)] m-0">
             System Log
           </h2>
 
-          <div style={{ position: "relative" }}>
-            <svg
-              style={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                pointerEvents: "none",
-              }}
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Filter Model */}
+            <select
+              value={filterModel}
+              onChange={(e) =>
+                setFilterModel(e.target.value as AuditModel | "")
+              }
+              className="px-3 py-2 border border-gray-200 rounded-full text-sm text-gray-500 outline-none bg-white cursor-pointer focus:border-[var(--color-primary)]"
             >
-              <circle cx="6" cy="6" r="4.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5" />
-              <line
-                x1="9.5"
-                y1="9.5"
-                x2="12.5"
-                y2="12.5"
-                stroke="var(--color-primary)"
-                strokeOpacity="0.4"
-                strokeWidth="1.5"
-                strokeLinecap="round"
+              <option value="">Semua Model</option>
+              <option value="user">Pengguna</option>
+              <option value="nilai_akhir">Nilai Akhir</option>
+              <option value="ujian">Ujian</option>
+              <option value="peserta_ujian">Peserta Ujian</option>
+              <option value="soal">Soal</option>
+              <option value="pmb_penerimaan">Penerimaan PMB</option>
+            </select>
+
+            {/* Filter Event */}
+            <select
+              value={filterEvent}
+              onChange={(e) =>
+                setFilterEvent(e.target.value as AuditEvent | "")
+              }
+              className="px-3 py-2 border border-gray-200 rounded-full text-sm text-gray-500 outline-none bg-white cursor-pointer focus:border-[var(--color-primary)]"
+            >
+              <option value="">Semua Event</option>
+              <option value="created">Created</option>
+              <option value="updated">Updated</option>
+              <option value="deleted">Deleted</option>
+            </select>
+
+            {/* Search */}
+            <div className="relative">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+              >
+                <circle
+                  cx="6"
+                  cy="6"
+                  r="4.5"
+                  stroke="var(--color-primary)"
+                  strokeOpacity="0.4"
+                  strokeWidth="1.5"
+                />
+                <line
+                  x1="9.5"
+                  y1="9.5"
+                  x2="12.5"
+                  y2="12.5"
+                  stroke="var(--color-primary)"
+                  strokeOpacity="0.4"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none bg-white w-52 focus:border-[var(--color-primary)] transition-colors"
               />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                paddingLeft: 34,
-                paddingRight: 14,
-                paddingTop: 8,
-                paddingBottom: 8,
-                border: "1px solid var(--calendar-border-color)",
-                borderRadius: 20,
-                fontSize: 13,
-                color: "black",
-                outline: "none",
-                background: "#ffffff",
-                width: 210,
-                transition: "border-color 0.15s",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
-              onBlur={(e) => (e.target.style.borderColor = "var(--calendar-border-color)")}
-            />
+            </div>
           </div>
         </div>
 
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th
-                style={{
-                  textAlign: "left",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "black",
-                  paddingBottom: 10,
-                  paddingLeft: 2,
-                  borderBottom: "1px solid var(--calendar-border-color)",
-                }}
-              >
-                #
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((log, i) => (
-              <tr
-                key={log.id}
-                style={{ transition: "background 0.1s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-primary-light)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-              >
-                <td
-                  style={{
-                    fontSize: 13.5,
-                    color: "black",
-                    padding: "14px 6px",
-                    borderBottom:
-                      i < filtered.length - 1
-                        ? "1px solid var(--calendar-border-color)"
-                        : "none",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {log.raw}
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
+        {/* Error */}
+        {error && (
+          <div className="px-4 py-3 bg-red-50 text-red-600 rounded-lg mb-3 text-sm shrink-0">
+            {error}
+          </div>
+        )}
+
+        {/* Table wrapper — hanya bagian ini yang scroll */}
+        <div className="overflow-y-auto max-h-[calc(100vh-220px)]">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-white">
               <tr>
-                <td
-                  style={{
-                    padding: "32px 2px",
-                    textAlign: "center",
-                    color: "var(--color-primary)",
-                    opacity: 0.4,
-                    fontSize: 13,
-                  }}
-                >
-                  No logs found.
-                </td>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 pl-0.5 border-b border-gray-200 w-[55%]">
+                  Keterangan
+                </th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[12%]">
+                  Model
+                </th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[10%]">
+                  Event
+                </th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[23%]">
+                  Waktu & Aktor
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="py-8 text-center text-sm text-gray-400"
+                  >
+                    Memuat data...
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="py-8 text-center text-sm text-gray-400"
+                  >
+                    Tidak ada log ditemukan.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((log, i) => (
+                  <tr
+                    key={log.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    {/* Keterangan */}
+                    <td
+                      className={`text-sm text-gray-800 py-3.5 px-1.5 leading-relaxed ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
+                    >
+                      {log.keterangan}
+                    </td>
+
+                    {/* Model */}
+                    <td
+                      className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
+                    >
+                      <span className="text-xs text-gray-500">{log.model}</span>
+                      <br />
+                      <span className="text-xs text-gray-300">
+                        ID: {log.model_id}
+                      </span>
+                    </td>
+
+                    {/* Event */}
+                    <td
+                      className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
+                    >
+                      <span className={badgeClass(log.event)}>{log.event}</span>
+                    </td>
+
+                    {/* Waktu & Aktor */}
+                    <td
+                      className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
+                    >
+                      <span className="text-xs text-gray-500">
+                        {log.created_at}
+                      </span>
+                      <br />
+                      <span className="text-xs text-gray-400">
+                        {log.user?.nama ?? "Sistem"}
+                        {log.ip_address ? ` · ${log.ip_address}` : ""}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
