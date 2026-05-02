@@ -416,6 +416,30 @@ export interface HasilUjianDosenItem {
   status: "Selesai" | "berlangsung" | "Belum_mulai";
 }
 
+export interface PmbStatistik {
+  tahun: number;
+  total_pendaftar: number;
+  total_diterima: number;
+}
+
+export interface PmbPesertaItem {
+  id: number;
+  nama: string;
+  email: string;
+  nim?: string;
+  no_telp?: string;
+  tahun_masuk?: number;
+  prodi_id?: number;
+  prodi?: { id: number; nama: string };
+}
+
+export interface PmbPesertaMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+}
+
 export const months = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
@@ -437,6 +461,7 @@ export const labels: Record<string, string> = {
   monitoring: "Monitoring",
   "hasil-ujian": "Hasil Ujian",
   "hasil-ujian-pmb": "Hasil Ujian PMB",
+  "penerimaan-pmb": "Penerimaan PMB",
   user: "User",
   fakultas: "Fakultas",
   prodi: "Program Studi",
