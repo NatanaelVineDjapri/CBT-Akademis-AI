@@ -10,6 +10,7 @@ use App\Models\PesertaUjian;
 use App\Models\Ujian;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -269,6 +270,23 @@ class DashboardController extends Controller
             ],
             'ujian' => $ujianData,
         ]);
+    }
+
+    public function adminUniversitasDistribusi(Request $request)
+    {
+        $univId = $request->user()->universitas_id;
+
+        $distribusi = DB::table('users')
+            ->join('prodi',    'users.prodi_id',     '=', 'prodi.id')
+            ->join('fakultas', 'prodi.fakultas_id',  '=', 'fakultas.id')
+            ->where('fakultas.universitas_id', $univId)
+            ->where('users.role', 'mahasiswa')
+            ->groupBy('fakultas.id', 'fakultas.nama', 'fakultas.kode')
+            ->select('fakultas.nama', 'fakultas.kode', DB::raw('COUNT(users.id) as total'))
+            ->orderByDesc('total')
+            ->get();
+
+        return response()->json($distribusi);
     }
 
     public function mahasiswa(Request $request)
