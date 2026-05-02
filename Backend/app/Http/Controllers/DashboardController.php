@@ -272,6 +272,57 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function adminUniversitasPerformaProdi(Request $request)
+    {
+        $univId = $request->user()->universitas_id;
+
+        $data = DB::table('nilai_akhir')
+            ->join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
+            ->join('users',         'peserta_ujian.user_id',        '=', 'users.id')
+            ->join('prodi',         'users.prodi_id',               '=', 'prodi.id')
+            ->join('fakultas',      'prodi.fakultas_id',            '=', 'fakultas.id')
+            ->where('fakultas.universitas_id', $univId)
+            ->where('users.role', 'mahasiswa')
+            ->groupBy('prodi.id', 'prodi.nama')
+            ->select(
+                'prodi.nama',
+                DB::raw('ROUND(AVG(nilai_akhir.nilai_total), 1) AS rata_rata'),
+                DB::raw('COUNT(DISTINCT users.id) AS jumlah_mahasiswa')
+            )
+            ->orderByDesc('rata_rata')
+            ->limit(10)
+            ->get();
+
+        return response()->json($data);
+    }
+
+    public function adminUniversitasAktivitasUjian(Request $request)
+    {
+        $univId = $request->user()->universitas_id;
+
+        $data = DB::table('ujian')
+            ->join('users', 'ujian.created_by', '=', 'users.id')
+            ->where('users.universitas_id', $univId)
+            ->where('ujian.start_date', '>=', now()->subMonths(11)->startOfMonth())
+            ->groupBy(DB::raw('DATE_FORMAT(ujian.start_date, "%Y-%m")'))
+            ->select(
+                DB::raw('DATE_FORMAT(ujian.start_date, "%Y-%m") AS bulan'),
+                DB::raw('COUNT(*) AS total')
+            )
+            ->orderBy('bulan')
+            ->get()
+            ->map(function ($row) {
+                [$y, $m] = explode('-', $row->bulan);
+                $bulanNama = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+                return [
+                    'bulan' => $bulanNama[(int)$m - 1] . ' ' . $y,
+                    'total' => (int) $row->total,
+                ];
+            });
+
+        return response()->json($data);
+    }
+
     public function adminUniversitasDistribusi(Request $request)
     {
         $univId = $request->user()->universitas_id;
