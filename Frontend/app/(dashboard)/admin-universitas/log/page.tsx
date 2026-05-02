@@ -8,7 +8,6 @@ import {
 } from "@/services/AuditService";
 import Breadcrumb from "@/components/BreadCrumb";
 
-
 export default function SystemLog() {
   const [data, setData] = useState<AuditItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +42,7 @@ export default function SystemLog() {
       (d) =>
         d.keterangan.toLowerCase().includes(q) ||
         d.model.toLowerCase().includes(q) ||
-        (d.user?.nama ?? "").toLowerCase().includes(q),
+        (d.user?.nama ?? "").toLowerCase().includes(q)
     );
   }, [search, data]);
 
@@ -58,17 +57,16 @@ export default function SystemLog() {
   };
 
   return (
-    // Wrapper luar — fixed 100vh, no scroll
-    <div className="bg-transparent font-sans flex flex-col px-6 py-6">
+    <div className="flex flex-col gap-4 pb-4">
       {/* Breadcrumb */}
       <div className="shrink-0">
-              <Breadcrumb />
-            </div>
+        <Breadcrumb />
+      </div>
 
-      {/* Card — ambil sisa tinggi */}
-      <div className="bg-white rounded-2xl px-7 pt-6 pb-2 flex flex-col min-h-0">
-        {/* Header — ga ikut scroll */}
-        <div className="flex items-center justify-between mb-5 flex-wrap gap-3 shrink-0">
+      {/* Card */}
+      <div className="bg-white rounded-2xl px-7 pt-6 pb-2">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
           <h2 className="text-lg font-bold text-[var(--color-primary)] m-0">
             System Log
           </h2>
@@ -77,9 +75,7 @@ export default function SystemLog() {
             {/* Filter Model */}
             <select
               value={filterModel}
-              onChange={(e) =>
-                setFilterModel(e.target.value as AuditModel | "")
-              }
+              onChange={(e) => setFilterModel(e.target.value as AuditModel | "")}
               className="px-3 py-2 border border-gray-200 rounded-full text-sm text-gray-500 outline-none bg-white cursor-pointer focus:border-[var(--color-primary)]"
             >
               <option value="">Semua Model</option>
@@ -94,9 +90,7 @@ export default function SystemLog() {
             {/* Filter Event */}
             <select
               value={filterEvent}
-              onChange={(e) =>
-                setFilterEvent(e.target.value as AuditEvent | "")
-              }
+              onChange={(e) => setFilterEvent(e.target.value as AuditEvent | "")}
               className="px-3 py-2 border border-gray-200 rounded-full text-sm text-gray-500 outline-none bg-white cursor-pointer focus:border-[var(--color-primary)]"
             >
               <option value="">Semua Event</option>
@@ -109,29 +103,10 @@ export default function SystemLog() {
             <div className="relative">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
+                width="14" height="14" viewBox="0 0 14 14" fill="none"
               >
-                <circle
-                  cx="6"
-                  cy="6"
-                  r="4.5"
-                  stroke="var(--color-primary)"
-                  strokeOpacity="0.4"
-                  strokeWidth="1.5"
-                />
-                <line
-                  x1="9.5"
-                  y1="9.5"
-                  x2="12.5"
-                  y2="12.5"
-                  stroke="var(--color-primary)"
-                  strokeOpacity="0.4"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
+                <circle cx="6" cy="6" r="4.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5" />
+                <line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
               <input
                 type="text"
@@ -146,99 +121,69 @@ export default function SystemLog() {
 
         {/* Error */}
         {error && (
-          <div className="px-4 py-3 bg-red-50 text-red-600 rounded-lg mb-3 text-sm shrink-0">
+          <div className="px-4 py-3 bg-red-50 text-red-600 rounded-lg mb-3 text-sm">
             {error}
           </div>
         )}
 
-        {/* Table wrapper — hanya bagian ini yang scroll */}
-        <div className="overflow-y-auto max-h-[calc(100vh-220px)]">
-          <table className="w-full border-collapse">
-            <thead className="sticky top-0 bg-white">
+        {/* Table */}
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 pl-0.5 border-b border-gray-200 w-[55%]">
+                Keterangan
+              </th>
+              <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[12%]">
+                Model
+              </th>
+              <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[10%]">
+                Event
+              </th>
+              <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[23%]">
+                Waktu & Aktor
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
               <tr>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 pl-0.5 border-b border-gray-200 w-[55%]">
-                  Keterangan
-                </th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[12%]">
-                  Model
-                </th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[10%]">
-                  Event
-                </th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 border-b border-gray-200 w-[23%]">
-                  Waktu & Aktor
-                </th>
+                <td colSpan={4} className="py-8 text-center text-sm text-gray-400">
+                  Memuat data...
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="py-8 text-center text-sm text-gray-400"
-                  >
-                    Memuat data...
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-8 text-center text-sm text-gray-400">
+                  Tidak ada log ditemukan.
+                </td>
+              </tr>
+            ) : (
+              filtered.map((log, i) => (
+                <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                  <td className={`text-sm text-gray-800 py-3.5 px-1.5 leading-relaxed ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    {log.keterangan}
+                  </td>
+                  <td className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    <span className="text-xs text-gray-500">{log.model}</span>
+                    <br />
+                    <span className="text-xs text-gray-300">ID: {log.model_id}</span>
+                  </td>
+                  <td className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    <span className={badgeClass(log.event)}>{log.event}</span>
+                  </td>
+                  <td className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    <span className="text-xs text-gray-500">{log.created_at}</span>
+                    <br />
+                    <span className="text-xs text-gray-400">
+                      {log.user?.nama ?? "Sistem"}
+                      {log.ip_address ? ` · ${log.ip_address}` : ""}
+                    </span>
                   </td>
                 </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="py-8 text-center text-sm text-gray-400"
-                  >
-                    Tidak ada log ditemukan.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((log, i) => (
-                  <tr
-                    key={log.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    {/* Keterangan */}
-                    <td
-                      className={`text-sm text-gray-800 py-3.5 px-1.5 leading-relaxed ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
-                    >
-                      {log.keterangan}
-                    </td>
-
-                    {/* Model */}
-                    <td
-                      className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
-                    >
-                      <span className="text-xs text-gray-500">{log.model}</span>
-                      <br />
-                      <span className="text-xs text-gray-300">
-                        ID: {log.model_id}
-                      </span>
-                    </td>
-
-                    {/* Event */}
-                    <td
-                      className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
-                    >
-                      <span className={badgeClass(log.event)}>{log.event}</span>
-                    </td>
-
-                    {/* Waktu & Aktor */}
-                    <td
-                      className={`py-3.5 px-1.5 ${i < filtered.length - 1 ? "border-b border-gray-100" : ""}`}
-                    >
-                      <span className="text-xs text-gray-500">
-                        {log.created_at}
-                      </span>
-                      <br />
-                      <span className="text-xs text-gray-400">
-                        {log.user?.nama ?? "Sistem"}
-                        {log.ip_address ? ` · ${log.ip_address}` : ""}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
