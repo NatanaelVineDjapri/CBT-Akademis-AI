@@ -30,6 +30,7 @@ import { getMyUjian, getHasilUjianDosen, getHasilUjianAdminUniversitas } from ".
 import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard } from "../services/DashboardServices";
 import { getBankSoal } from "../services/BankSoalServices";
 import { getFakultas } from "../services/AdminUserServices";
+import { getPmbPeserta } from "../services/PmbPenerimaanServices";
 import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
@@ -86,6 +87,11 @@ const menuByRole: Record<string, MenuItem[]> = {
       label: "Hasil Ujian PMB",
       href: "/admin-universitas/hasil-ujian-pmb",
       icon: <BarChart2 size={18} />,
+    },
+    {
+      label: "Penerimaan PMB",
+      href: "/admin-universitas/penerimaan-pmb",
+      icon: <GraduationCap size={18} />,
     },
     {
       label: "User",
@@ -289,6 +295,9 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                 } else if (item.href === "/admin-universitas/bank-soal-pmb") {
                   preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
                     getBankSoal({ search: s, page: p, per_page: 10 }));
+                } else if (item.href === "/admin-universitas/penerimaan-pmb") {
+                  preload(["/pmb/penerimaan/peserta", "", new Date().getFullYear()], ([, s, t]: [string, string, number]) =>
+                    getPmbPeserta({ search: s, tahun: t, per_page: 200 }));
                 } else if (item.href === "/admin-universitas/hasil-ujian-pmb") {
                   const pp = calcPerPage(53, 1, 395);
                   preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>

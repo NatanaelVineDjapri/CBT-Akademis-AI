@@ -11,6 +11,12 @@ import UjianTerbaruCard from "@/components/dashboard/admin-universitas/UjianTerb
 import PengumumanCard from "@/components/dashboard/admin-universitas/PengumumanCard";
 import DashboardSkeleton from "@/components/dashboard/admin-universitas/DashboardSkeleton";
 import StatistikPMBChart from "@/components/dashboard/admin-universitas/StatistikPMBChart";
+import GrafikPenerimaan from "@/components/dashboard/admin-universitas/GrafikPenerimaan";
+import DistribusiMahasiswa from "@/components/dashboard/admin-universitas/DistribusiMahasiswa";
+import PerformaProdi from "@/components/dashboard/admin-universitas/PerformaProdi";
+import AktivitasUjian from "@/components/dashboard/admin-universitas/AktivitasUjian";
+import TingkatKelulusan from "@/components/dashboard/admin-universitas/TingkatKelulusan";
+import TrenNilai from "@/components/dashboard/admin-universitas/TrenNilai";
 
 export default function AdminUniversitasDashboardPage() {
   const { user } = useUser();
@@ -42,6 +48,21 @@ export default function AdminUniversitasDashboardPage() {
           </div>
 
           <StatistikPMBChart />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <GrafikPenerimaan />
+            <DistribusiMahasiswa />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <PerformaProdi />
+            <AktivitasUjian />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <TingkatKelulusan />
+            <TrenNilai />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <UjianTerbaruCard data={data.ujian_terbaru} />
