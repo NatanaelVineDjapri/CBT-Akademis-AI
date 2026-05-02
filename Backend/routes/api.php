@@ -93,9 +93,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin_universitas')->group(function () {
         Route::get('/dashboard/admin-universitas', [DashboardController::class, 'adminUniversitas']);
         Route::get('/dashboard/admin-universitas/performa',   [DashboardController::class, 'adminUniversitasPerforma']);
-        Route::get('/dashboard/admin-universitas/distribusi',      [DashboardController::class, 'adminUniversitasDistribusi']);
-        Route::get('/dashboard/admin-universitas/performa-prodi',  [DashboardController::class, 'adminUniversitasPerformaProdi']);
-        Route::get('/dashboard/admin-universitas/aktivitas-ujian', [DashboardController::class, 'adminUniversitasAktivitasUjian']);
+        Route::get('/dashboard/admin-universitas/distribusi',        [DashboardController::class, 'adminUniversitasDistribusi']);
+        Route::get('/dashboard/admin-universitas/performa-prodi',   [DashboardController::class, 'adminUniversitasPerformaProdi']);
+        Route::get('/dashboard/admin-universitas/aktivitas-ujian',  [DashboardController::class, 'adminUniversitasAktivitasUjian']);
+        Route::get('/dashboard/admin-universitas/kelulusan',        [DashboardController::class, 'adminUniversitasKelulusan']);
+        Route::get('/dashboard/admin-universitas/tren-nilai',       [DashboardController::class, 'adminUniversitasTrenNilai']);
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
