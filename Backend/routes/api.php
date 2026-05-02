@@ -14,6 +14,7 @@ use App\Http\Controllers\UjianController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\PmbPenerimaanController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -91,7 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin_universitas')->group(function () {
         Route::get('/dashboard/admin-universitas', [DashboardController::class, 'adminUniversitas']);
-        Route::get('/dashboard/admin-universitas/performa', [DashboardController::class, 'adminUniversitasPerforma']);
+        Route::get('/dashboard/admin-universitas/performa',   [DashboardController::class, 'adminUniversitasPerforma']);
+        Route::get('/dashboard/admin-universitas/distribusi', [DashboardController::class, 'adminUniversitasDistribusi']);
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
@@ -113,6 +115,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [MataKuliahController::class, 'store']);
             Route::put('/{id}', [MataKuliahController::class, 'update']);
             Route::delete('/{id}', [MataKuliahController::class, 'destroy']);
+        });
+
+        Route::prefix('pmb/penerimaan')->group(function () {
+            Route::get('/statistik', [PmbPenerimaanController::class, 'statistik']);
+            Route::get('/peserta',   [PmbPenerimaanController::class, 'index']);
+            Route::post('/proses',   [PmbPenerimaanController::class, 'proses']);
         });
 
         Route::get('/ujian/admin-universitas/hasil', [UjianController::class, 'hasilUjianAdminUniversitas']);
