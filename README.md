@@ -75,7 +75,7 @@
 ### 🔧 Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/username/cbt-akademis.git
+git clone https://github.com/NatanaelVineDjapri/cbt-akademis.git
 cd cbt-akademis
 ```
 
