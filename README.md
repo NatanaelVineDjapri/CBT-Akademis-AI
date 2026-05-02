@@ -45,7 +45,7 @@
 **6. 🤖 AI Proctoring**
 <blockquote>Real-time detection of tab switching, multiple faces, copy-paste, and fullscreen violations. Each infraction is logged and assigned a risk score.</blockquote>
 
-**7. 📈 Dashboard**
+**7. 📈 Monitoring Dashboard**
 <blockquote>Real-time overview of active exams, participant status, and proctoring activity for administrators.</blockquote>
 
 ---
