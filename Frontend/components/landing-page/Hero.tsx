@@ -15,7 +15,7 @@ export default function Hero() {
             <span className="whitespace-nowrap">Tanpa Drama Koreksi</span>
           </h1>
           <p className="mt-5 text-[16px] text-neutral-600 max-w-[520px] leading-relaxed">
-           Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit architecto eveniet repellendus veniam, minus nulla quam dolore doloremque quibusdam, placeat voluptates culpa blanditiis atque aliquid dicta cum ut, dolorum dolores!
+           CBT Akademis.ai menyatukan bank soal, penjadwalan, pengawasan, dan penilaian dalam satu alur yang sederhana — didukung asisten cerdas untuk membantu dosen dan admin bekerja lebih cepat.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/app" className="btn btn-primary btn-lg">
