@@ -15,11 +15,10 @@ export default function Challenges() {
       <div className="relative mx-auto max-w-[1200px] px-6">
         <div className="text-center mb-12">
           <h2 className="text-[32px] md:text-[42px] font-extrabold text-brand-ink leading-[1.1]">
-            Lorem Ipsum Dolor Sit Amet Consectetur
+            Tantangan CBT yang Masih Sering Dialami
           </h2>
           <p className="mt-3 text-neutral-500 text-[15px] max-w-[520px] mx-auto leading-relaxed">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua.
+            Banyak kampus sudah online, tapi alur ujiannya masih tercecer di Word, WhatsApp, dan spreadsheet.
           </p>
         </div>
 
