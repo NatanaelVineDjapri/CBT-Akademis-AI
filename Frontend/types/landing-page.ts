@@ -2,30 +2,30 @@ import { LayoutGrid, ShieldCheck, Sparkles } from "lucide-react";
 
 export const challenges = [
   {
-    tag: "Lorem Ipsum",
-    t: "Lorem Ipsum Dolor Sit Amet Consectetur",
+    tag: "KOREKSI",
+    t: "Koreksi Manual Memakan Waktu Berhari-hari",
     bullets: [
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Sed do eiusmod tempor incididunt ut labore",
-      "Ut enim ad minim veniam quis nostrud",
+      "Dosen mengoreksi ratusan berkas ujian satu persatu",
+      "Rekap nilai rawan salah ketik dan hilang",
+      "Hasil baru keluar setelah minggu-minggu menunggu",
     ],
   },
   {
-    tag: "Lorem Ipsum",
-    t: "Adipiscing Elit Sed Do Eiusmod Tempor",
+    tag: "KEAMANAN",
+    t: "Kecurangan Sulit Dipantau saat Ujian Online",
     bullets: [
-      "Duis aute irure dolor in reprehenderit",
-      "Excepteur sint occaecat cupidatat non proident",
-      "Sunt in culpa qui officia deserunt mollit",
+      "Mahasiswa bisa pindah tab tanpa terdeteksi",
+      "Sulit memastikan identitas pesertat",
+      "Bukti pelanggaran sulit dikumpulkan",
     ],
   },
   {
-    tag: "Lorem Ipsum",
-    t: "Incididunt Ut Labore Et Dolore Magna Aliqua",
+    tag: "BANK SOAL",
+    t: "Soal Tersebar di Berbagai File dan Folder",
     bullets: [
-      "Quis nostrud exercitation ullamco laboris",
-      "Nisi ut aliquip ex ea commodo consequat",
-      "Duis aute irure dolor in reprehenderit voluptate",
+      "Setiap dosen menyimpan soal sendiri-sendiri",
+      "Sulit menyusun ujian lintas kelas",
+      "Soal lama sulit digunakan ulang",
     ],
   },
 ];
@@ -33,18 +33,18 @@ export const challenges = [
 export const features = [
   {
     icon: LayoutGrid,
-    t: "Lorem Ipsum Dolor",
-    d: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod.",
+    t: "Bank Soal Terpusat",
+    d: "Ribuan soal terorganisir per mata kuliah, level kesulitan, dan kompetensi",
   },
   {
     icon: ShieldCheck,
     t: "Consectetur Adipiscing",
-    d: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris.",
+    d: "Deteksi pindah tab, kamera, dan kecurangan tanpa aplikasi tambahan.",
   },
   {
     icon: Sparkles,
     t: "Sed Do Eiusmod",
-    d: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
+    d: "Bantu menyusun soal, mengoreksi esai, dan menarik insight hasil ujian.",
   },
 ];
 
@@ -64,18 +64,18 @@ export const options = [
 export const steps = [
   {
     n: "01",
-    t: "Lorem Ipsum Dolor",
-    d: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor.",
+    t: "Susun Soal",
+    d: "Tarik soal dari bank atau minta asisten AI menyusunkan berdasarkan silabus.",
   },
   {
     n: "02",
-    t: "Consectetur Adipiscing",
-    d: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi.",
+    t: "Jadwalkan Ujian",
+    d: "Tentukan durasi, mahasiswa peserta, dan mode pengawasan.",
   },
   {
     n: "03",
-    t: "Sed Do Eiusmod",
-    d: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.",
+    t: "Nilai Otomatis",
+    d: "Pilihan ganda dinilai otomatis; esai dibantu AI dengan rubrik dosen.",
   },
 ];
 
@@ -119,21 +119,21 @@ export const bars = [
 
 export const quotes = [
   {
-    q: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    n: "Lorem Ipsum Dolor",
-    r: "Lorem Ipsum, Consectetur Adipiscing",
-    initials: "LI",
+    q: "Waktu koreksi UTS turun dari 2 minggu ke 2 hari. Dosen bisa fokus ke pembelajaran, bukan ke kertas.",
+    n: "Dr. Rina Kusuma",
+    r: "Kaprodi Informatika, Universitas Dipo Nusantara",
+    initials: "RK",
   },
   {
-    q: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute.",
-    n: "Consectetur Adipiscing",
-    r: "Lorem Ipsum, Sed Do Eiusmod Tempor",
-    initials: "CA",
+    q: "Bank soal yang terpusat bikin kami konsisten lintas kelas paralel. Mahasiswa dapat kualitas ujian yang setara.",
+    n: "Prof. Hendra Sukmawan",
+    r: "Dekan FEB, Institut Teknologi Merdeka",
+    initials: "HS",
   },
   {
-    q: "Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    n: "Sed Do Eiusmod",
-    r: "Lorem Ipsum, Incididunt Ut Labore",
-    initials: "SE",
+    q: "Asisten AI-nya bantu susun soal dari silabus — saya tinggal review. Hemat 3–4 jam tiap minggu.",
+    n: "Ibu Siti Nuraini",
+    r: "Ibu Siti Nuraini",
+    initials: "SN",
   },
 ];

@@ -87,31 +87,31 @@ function AnalitikMock() {
 
 const rows = [
   {
-    tag: "Lorem Ipsum",
-    t: "Lorem Ipsum Dolor Sit Amet Consectetur",
+    tag: "BANK SOAL",
+    t: "Semua Soal dalam Satu Rak yang Rapi",
     bullets: [
-      { color: "bg-orange-400", text: "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt." },
-      { color: "bg-blue-400",   text: "Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip commodo." },
+      { color: "bg-orange-400", text: "Soal tersebar di file, drive, dan folder pribadi dosen — sulit digunakan ulang." },
+      { color: "bg-blue-400",   text: "CBT Akademis.ai menyatukan bank soal lintas mata kuliah, lengkap dengan tag kompetensi dan tingkat kesulitan." },
     ],
     mock: <BankSoalMock />,
     reverse: false,
   },
   {
-    tag: "Lorem Ipsum",
-    t: "Consectetur Adipiscing Elit Sed Do Eiusmod",
+    tag: "PENGAWASAN",
+    t: "Pengawasan yang Berjalan di Latar Belakang",
     bullets: [
-      { color: "bg-orange-400", text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat." },
-      { color: "bg-blue-400",   text: "Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit." },
+      { color: "bg-orange-400", text: "Sulit memastikan mahasiswa tidak membuka tab lain, berbagi jawaban, atau meminta bantuan di luar." },
+      { color: "bg-blue-400",   text: "Deteksi perpindahan tab, kamera, dan pola jawab mencurigakan — semua tercatat tanpa aplikasi tambahan." },
     ],
     mock: <PengawasanMock />,
     reverse: true,
   },
   {
-    tag: "Lorem Ipsum",
-    t: "Sed Do Eiusmod Tempor Incididunt Ut Labore",
+    tag: "ANALITIK",
+    t: "Insight Kelas dalam Hitungan Detik",
     bullets: [
-      { color: "bg-orange-400", text: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia." },
-      { color: "bg-blue-400",   text: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet consectetur adipisci." },
+      { color: "bg-orange-400", text: "Rekap nilai masih dikerjakan manual di spreadsheet; trend kesulitan sulit terlihat." },
+      { color: "bg-blue-400",   text: "Lihat rata-rata, sebaran, dan soal paling sulit per kelas — diringkas oleh asisten cerdas." },
     ],
     mock: <AnalitikMock />,
     reverse: false,
