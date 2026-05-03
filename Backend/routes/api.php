@@ -90,6 +90,8 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::delete('/{id}', [FakultasController::class, 'destroy']);
         });
 
+        Route::get('/fakultas/{id}', [FakultasController::class, 'show']);
+
         Route::prefix('prodi')->group(function () {
             Route::post('/', [ProdiController::class, 'store']);
             Route::put('/{id}', [ProdiController::class, 'update']);

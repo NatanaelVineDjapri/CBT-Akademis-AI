@@ -474,6 +474,7 @@ export const labels: Record<string, string> = {
   user: "User",
   fakultas: "Fakultas",
   prodi: "Program Studi",
+  institusi: "Institusi",
 };
 
 export const roleLabels: Record<string, string> = {
