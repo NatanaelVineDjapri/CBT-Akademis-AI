@@ -13,11 +13,18 @@ const api = axios.create({
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401 && typeof window !== 'undefined') {
-            const authPages = ['/login', '/forgot-password', '/reset-password']
-            const isAuthPage = authPages.some(p => window.location.pathname.startsWith(p))
-            if (!isAuthPage) {
-                window.location.href = '/login'
+        if (typeof window !== 'undefined') {
+            const status = error.response?.status
+            if (status === 401) {
+                const authPages = ['/login', '/forgot-password', '/reset-password']
+                const isAuthPage = authPages.some(p => window.location.pathname.startsWith(p))
+                if (!isAuthPage) {
+                    window.location.href = '/login'
+                }
+            } else if (status === 503) {
+                if (!window.location.pathname.startsWith('/maintenance')) {
+                    window.location.href = '/maintenance'
+                }
             }
         }
         return Promise.reject(error)

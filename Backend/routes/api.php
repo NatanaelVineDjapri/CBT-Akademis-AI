@@ -16,6 +16,7 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\PmbPenerimaanController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\SettingsController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -26,7 +27,7 @@ Route::prefix('auth')->group(function () {
     Route::get('/verify-reset-token', [AuthController::class, 'verifyResetToken']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
 
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
@@ -66,6 +67,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:admin_akademis_ai')->group(function () {
+        Route::get('/settings/maintenance',  [SettingsController::class, 'getMaintenanceStatus']);
+        Route::post('/settings/maintenance', [SettingsController::class, 'toggleMaintenance']);
+
         Route::get('/dashboard/admin-akademis',                        [DashboardController::class, 'adminAkademis']);
         Route::get('/dashboard/admin-akademis/distribusi-pengguna',   [DashboardController::class, 'adminAkademisDistribusiPengguna']);
         Route::get('/dashboard/admin-akademis/aktivitas-ujian',       [DashboardController::class, 'adminAkademisAktivitasUjian']);
