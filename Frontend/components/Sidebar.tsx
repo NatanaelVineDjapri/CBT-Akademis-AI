@@ -27,7 +27,7 @@ import { getMyMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal, getJadwalDosen } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
 import { getMyUjian, getHasilUjianDosen, getHasilUjianAdminUniversitas } from "../services/UjianServices";
-import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard, getAdminUniversitasPerforma, getAdminUniversitasDistribusi, getAdminUniversitasPerformaProdi, getAdminUniversitasAktivitasUjian, getAdminUniversitasKelulusan, getAdminUniversitasTrenNilai } from "../services/DashboardServices";
+import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard, getAdminUniversitasPerforma, getAdminUniversitasDistribusi, getAdminUniversitasPerformaProdi, getAdminUniversitasAktivitasUjian, getAdminUniversitasKelulusan, getAdminUniversitasTrenNilai, getAdminAkademisDashboard, getAdminAkademisDistribusiPengguna, getAdminAkademisAktivitasUjian, getAdminAkademisKelulusan, getAdminAkademisTrenNilai } from "../services/DashboardServices";
 import { getBankSoal } from "../services/BankSoalServices";
 import { getFakultas } from "../services/AdminUserServices";
 import { getPmbPeserta, getPmbStatistik } from "../services/PmbPenerimaanServices";
@@ -262,8 +262,15 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
               key={item.href}
               href={item.href}
               onMouseEnter={() => {
+                // — admin akademis —
+                if (item.href === "/admin-akademis") {
+                  preload("/dashboard/admin-akademis", getAdminAkademisDashboard);
+                  preload("/dashboard/admin-akademis/distribusi-pengguna", getAdminAkademisDistribusiPengguna);
+                  preload("/dashboard/admin-akademis/aktivitas-ujian", getAdminAkademisAktivitasUjian);
+                  preload("/dashboard/admin-akademis/kelulusan", getAdminAkademisKelulusan);
+                  preload("/dashboard/admin-akademis/tren-nilai", getAdminAkademisTrenNilai);
                 // — mahasiswa —
-                if (item.href === "/mahasiswa") {
+                } else if (item.href === "/mahasiswa") {
                   preload("/dashboard/mahasiswa", getMahasiswaDashboard);
                 } else if (item.href === "/mahasiswa/ujian") {
                   const pp = calcPerPage(245, 4, 255);

@@ -66,6 +66,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:admin_akademis_ai')->group(function () {
+        Route::get('/dashboard/admin-akademis',                        [DashboardController::class, 'adminAkademis']);
+        Route::get('/dashboard/admin-akademis/distribusi-pengguna',   [DashboardController::class, 'adminAkademisDistribusiPengguna']);
+        Route::get('/dashboard/admin-akademis/aktivitas-ujian',       [DashboardController::class, 'adminAkademisAktivitasUjian']);
+        Route::get('/dashboard/admin-akademis/kelulusan',             [DashboardController::class, 'adminAkademisKelulusan']);
+        Route::get('/dashboard/admin-akademis/tren-nilai',            [DashboardController::class, 'adminAkademisTrenNilai']);
+
         Route::prefix('universitas')->group(function () {
             Route::post('/', [UniversitasController::class, 'store']);
             Route::put('/{id}', [UniversitasController::class, 'update']);
