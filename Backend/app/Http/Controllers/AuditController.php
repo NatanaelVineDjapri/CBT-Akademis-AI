@@ -108,9 +108,7 @@ class AuditController extends Controller
 
     public function index(Request $request)
     {
-        $query = Audit::with('user:id,nama,email,role')
-            ->latest()
-            ->limit(100);
+        $query = Audit::with('user:id,nama,email,role')->latest();
 
         if ($request->filled('model')) {
             $modelClass = self::MODEL_MAP[$request->input('model')] ?? null;
@@ -127,9 +125,24 @@ class AuditController extends Controller
             $query->where('user_id', $request->input('user_id'));
         }
 
-        $audits = $query->get()->map(fn ($a) => $this->formatAudit($a));
+        if ($request->filled('search')) {
+            $q = $request->input('search');
+            $query->where(function ($sub) use ($q) {
+                $sub->whereHas('user', fn ($u) => $u->where('nama', 'like', "%{$q}%"))
+                    ->orWhere('auditable_type', 'like', "%{$q}%");
+            });
+        }
 
-        return response()->json($audits);
+        $perPage = max(1, (int) $request->input('per_page', 15));
+        $paginated = $query->paginate($perPage);
+
+        return response()->json([
+            'data'      => collect($paginated->items())->map(fn ($a) => $this->formatAudit($a)),
+            'total'     => $paginated->total(),
+            'per_page'  => $paginated->perPage(),
+            'last_page' => $paginated->lastPage(),
+            'page'      => $paginated->currentPage(),
+        ]);
     }
 
     public function show(string $model, int $id)
