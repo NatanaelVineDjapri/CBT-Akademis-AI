@@ -16,7 +16,6 @@ import {
   Trophy,
   GraduationCap,
   UserCircle,
-  List,
   Building2,
   LogOut,
 } from "lucide-react";
@@ -46,11 +45,6 @@ const menuByRole: Record<string, MenuItem[]> = {
       label: "Beranda",
       href: "/admin-akademis",
       icon: <LayoutDashboard size={18} />,
-    },
-    {
-      label: "Daftar",
-      href: "/admin-akademis/daftar",
-      icon: <List size={18} />,
     },
     {
       label: "Institusi",

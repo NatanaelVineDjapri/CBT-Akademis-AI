@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { getFakultas, deleteFakultas, FakultasItem } from "@/services/FakultasService";
 import { useDebounce } from "@/hooks/useDebounce";
 import Pagination from "@/components/filtering/Pagination";
@@ -10,16 +11,19 @@ import Pagination from "@/components/filtering/Pagination";
 interface Props {
   universitasId: number;
   onEdit: (item: FakultasItem) => void;
+  onAdd: () => void;
   refreshKey: number;
+  univId?: number;
 }
 
 const PER_PAGE = 10;
 
-export default function DaftarFakultasTable({ universitasId, onEdit, refreshKey }: Props) {
+export default function DaftarFakultasTable({ universitasId, onEdit, onAdd, refreshKey, univId }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<FakultasItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const router = useRouter();
 
   const debouncedSearch = useDebounce(search);
 
@@ -49,6 +53,15 @@ export default function DaftarFakultasTable({ universitasId, onEdit, refreshKey 
         {/* Header */}
         <div className="px-6 pt-5 pb-3 flex items-center justify-between gap-3 flex-wrap shrink-0">
           <span className="text-sm font-bold" style={{ color: "var(--color-primary)" }}>Daftar Fakultas</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onAdd}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              <Plus size={13} />
+              Tambah
+            </button>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 14 14" fill="none">
               <circle cx="6" cy="6" r="4.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5"/>
@@ -61,6 +74,7 @@ export default function DaftarFakultasTable({ universitasId, onEdit, refreshKey 
               onChange={e => handleSearch(e.target.value)}
               className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none w-52 focus:border-[var(--color-primary)] transition-colors"
             />
+          </div>
           </div>
         </div>
 
@@ -95,7 +109,11 @@ export default function DaftarFakultasTable({ universitasId, onEdit, refreshKey 
               ) : data.data.map((item, i) => {
                 const isLast = i === data.data.length - 1;
                 return (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={item.id}
+                    onClick={() => univId && router.push(`/admin-akademis/institusi/${univId}/${item.id}`)}
+                    className={`hover:bg-gray-50 transition-colors ${univId ? "cursor-pointer" : ""}`}
+                  >
                     <td className={`text-xs text-gray-400 font-semibold py-3.5 ${!isLast ? "border-b border-gray-100" : ""}`}>
                       {String((page - 1) * PER_PAGE + i + 1).padStart(2, "0")}
                     </td>
@@ -116,14 +134,14 @@ export default function DaftarFakultasTable({ universitasId, onEdit, refreshKey 
                     <td className={`py-3.5 ${!isLast ? "border-b border-gray-100" : ""}`}>
                       <div className="flex items-center justify-center gap-1.5">
                         <button
-                          onClick={() => onEdit(item)}
+                          onClick={e => { e.stopPropagation(); onEdit(item); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer hover:bg-blue-50"
                           title="Edit"
                         >
                           <Pencil size={14} style={{ color: "var(--color-primary)" }} />
                         </button>
                         <button
-                          onClick={() => setDeleteTarget(item)}
+                          onClick={e => { e.stopPropagation(); setDeleteTarget(item); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer hover:bg-red-50"
                           title="Hapus"
                         >

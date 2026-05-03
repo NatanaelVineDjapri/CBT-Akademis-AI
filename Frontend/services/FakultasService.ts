@@ -20,6 +20,11 @@ export interface FakultasPaginated {
   };
 }
 
+export const getFakultasById = async (id: number): Promise<FakultasItem> => {
+  const res = await api.get(`/fakultas/${id}`);
+  return res.data.data;
+};
+
 export const getFakultas = async (params?: {
   universitas_id?: number;
   search?: string;
