@@ -26,9 +26,10 @@ import { getMyMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal, getJadwalDosen } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
 import { getMyUjian, getHasilUjianDosen, getHasilUjianAdminUniversitas } from "../services/UjianServices";
-import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard, getAdminUniversitasPerforma, getAdminUniversitasDistribusi, getAdminUniversitasPerformaProdi, getAdminUniversitasAktivitasUjian, getAdminUniversitasKelulusan, getAdminUniversitasTrenNilai, getAdminAkademisDashboard, getAdminAkademisDistribusiPengguna, getAdminAkademisAktivitasUjian, getAdminAkademisKelulusan, getAdminAkademisTrenNilai } from "../services/DashboardServices";
+import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard, getAdminUniversitasPerforma, getAdminUniversitasDistribusi, getAdminUniversitasPerformaProdi, getAdminUniversitasAktivitasUjian, getAdminUniversitasKelulusan, getAdminUniversitasTrenNilai, getAdminAkademisDashboard, getAdminAkademisDistribusiPengguna, getAdminAkademisAktivitasUjian, getAdminAkademisKelulusan, getAdminAkademisTrenNilai, getAdminAkademisPertumbuhanPengguna } from "../services/DashboardServices";
 import { getBankSoal } from "../services/BankSoalServices";
 import { getFakultas } from "../services/AdminUserServices";
+import { getUniversitas } from "../services/UniversitasService";
 import { getPmbPeserta, getPmbStatistik } from "../services/PmbPenerimaanServices";
 import { getAudits } from "../services/AuditService";
 import { calcPerPage } from "../hooks/usePerPage";
@@ -257,12 +258,15 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
               href={item.href}
               onMouseEnter={() => {
                 // — admin akademis —
-                if (item.href === "/admin-akademis") {
+                if (item.href === "/admin-akademis/institusi") {
+                  preload(["/universitas", "", 1, 0], () => getUniversitas({ page: 1, per_page: 10 }));
+                } else if (item.href === "/admin-akademis") {
                   preload("/dashboard/admin-akademis", getAdminAkademisDashboard);
                   preload("/dashboard/admin-akademis/distribusi-pengguna", getAdminAkademisDistribusiPengguna);
                   preload("/dashboard/admin-akademis/aktivitas-ujian", getAdminAkademisAktivitasUjian);
                   preload("/dashboard/admin-akademis/kelulusan", getAdminAkademisKelulusan);
                   preload("/dashboard/admin-akademis/tren-nilai", getAdminAkademisTrenNilai);
+                  preload("/dashboard/admin-akademis/pertumbuhan-pengguna", getAdminAkademisPertumbuhanPengguna);
                 // — mahasiswa —
                 } else if (item.href === "/mahasiswa") {
                   preload("/dashboard/mahasiswa", getMahasiswaDashboard);
