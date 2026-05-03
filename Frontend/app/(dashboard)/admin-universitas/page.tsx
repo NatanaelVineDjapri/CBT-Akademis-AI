@@ -46,29 +46,31 @@ export default function AdminUniversitasDashboardPage() {
             <UjianBerlangsungCard data={data.ujian_berlangsung} />
             <BankSoalCard data={data.bank_soal} />
           </div>
-
-          <StatistikPMBChart />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <GrafikPenerimaan />
-            <DistribusiMahasiswa />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <PerformaProdi />
-            <AktivitasUjian />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <TingkatKelulusan />
-            <TrenNilai />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <UjianTerbaruCard data={data.ujian_terbaru} />
-            <PengumumanCard data={data.pengumuman} />
-          </div>
         </>
+      )}
+
+      <StatistikPMBChart />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <GrafikPenerimaan />
+        <DistribusiMahasiswa />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <PerformaProdi />
+        <AktivitasUjian />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TingkatKelulusan />
+        <TrenNilai />
+      </div>
+
+      {data && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <UjianTerbaruCard data={data.ujian_terbaru} />
+          <PengumumanCard data={data.pengumuman} />
+        </div>
       )}
     </div>
   );
