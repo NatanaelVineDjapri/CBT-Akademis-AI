@@ -12,6 +12,7 @@ import DistribusiPengguna from "@/components/dashboard/admin-akademis/Distribusi
 import AktivitasUjian from "@/components/dashboard/admin-akademis/AktivitasUjian";
 import TingkatKelulusan from "@/components/dashboard/admin-akademis/TingkatKelulusan";
 import TrenNilai from "@/components/dashboard/admin-akademis/TrenNilai";
+import PertumbuhanPengguna from "@/components/dashboard/admin-akademis/PertumbuhanPengguna";
 
 export default function AdminAkademisPage() {
   const { user } = useUser();
@@ -44,6 +45,8 @@ export default function AdminAkademisPage() {
         <TingkatKelulusan />
         <TrenNilai />
       </div>
+
+      <PertumbuhanPengguna />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <MaintenanceCard />

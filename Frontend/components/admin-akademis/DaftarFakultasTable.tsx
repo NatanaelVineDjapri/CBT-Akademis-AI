@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
-import { getFakultas, deleteFakultas, FakultasItem } from "@/services/FakultasService";
+import { getFakultas, getFakultasById, deleteFakultas, FakultasItem } from "@/services/FakultasService";
+import { getProdi } from "@/services/ProdiService";
 import { useDebounce } from "@/hooks/useDebounce";
 import Pagination from "@/components/filtering/Pagination";
 
@@ -112,6 +113,11 @@ export default function DaftarFakultasTable({ universitasId, onEdit, onAdd, refr
                   <tr
                     key={item.id}
                     onClick={() => univId && router.push(`/admin-akademis/institusi/${univId}/${item.id}`)}
+                    onMouseEnter={() => {
+                      if (univId) router.prefetch(`/admin-akademis/institusi/${univId}/${item.id}`);
+                      preload(`/fakultas/${item.id}`, () => getFakultasById(item.id));
+                      preload(["/prodi", item.id, "", 1, 0], () => getProdi({ fakultas_id: item.id, page: 1, per_page: 10 }));
+                    }}
                     className={`hover:bg-gray-50 transition-colors ${univId ? "cursor-pointer" : ""}`}
                   >
                     <td className={`text-xs text-gray-400 font-semibold py-3.5 ${!isLast ? "border-b border-gray-100" : ""}`}>

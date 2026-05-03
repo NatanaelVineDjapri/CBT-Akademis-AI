@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/dashboard/admin-akademis/aktivitas-ujian',       [DashboardController::class, 'adminAkademisAktivitasUjian']);
         Route::get('/dashboard/admin-akademis/kelulusan',             [DashboardController::class, 'adminAkademisKelulusan']);
         Route::get('/dashboard/admin-akademis/tren-nilai',            [DashboardController::class, 'adminAkademisTrenNilai']);
+        Route::get('/dashboard/admin-akademis/pertumbuhan-pengguna', [DashboardController::class, 'adminAkademisPertumbuhanPengguna']);
 
         Route::prefix('universitas')->group(function () {
             Route::post('/', [UniversitasController::class, 'store']);

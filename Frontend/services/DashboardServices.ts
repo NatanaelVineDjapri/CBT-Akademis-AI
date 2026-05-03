@@ -76,3 +76,8 @@ export const getAdminAkademisTrenNilai = async (): Promise<{ bulan: string; rata
   const res = await api.get("/dashboard/admin-akademis/tren-nilai");
   return res.data;
 };
+
+export const getAdminAkademisPertumbuhanPengguna = async (): Promise<{ bulan: string; mahasiswa: number; dosen: number }[]> => {
+  const res = await api.get("/dashboard/admin-akademis/pertumbuhan-pengguna");
+  return res.data;
+};

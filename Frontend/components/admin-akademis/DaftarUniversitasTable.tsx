@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
-import { getUniversitas, deleteUniversitas, UniversitasItem } from "@/services/UniversitasService";
+import { getUniversitas, getUniversitasById, deleteUniversitas, UniversitasItem } from "@/services/UniversitasService";
+import { getFakultas } from "@/services/FakultasService";
 import { useDebounce } from "@/hooks/useDebounce";
 import Pagination from "@/components/filtering/Pagination";
 
@@ -82,7 +83,7 @@ export default function DaftarUniversitasTable({ onEdit, onAdd, refreshKey }: Pr
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-10">#</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5">Universitas</th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-56">Universitas</th>
                 <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-[18%]">Alamat</th>
                 <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-20 text-center">Fakultas</th>
                 <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-20 text-center">Mahasiswa</th>
@@ -111,6 +112,11 @@ export default function DaftarUniversitasTable({ onEdit, onAdd, refreshKey }: Pr
                   <tr
                     key={item.id}
                     onClick={() => router.push(`/admin-akademis/institusi/${item.id}`)}
+                    onMouseEnter={() => {
+                      router.prefetch(`/admin-akademis/institusi/${item.id}`);
+                      preload(`/universitas/${item.id}`, () => getUniversitasById(item.id));
+                      preload(["/fakultas", item.id, "", 1, 0], () => getFakultas({ universitas_id: item.id, page: 1, per_page: 10 }));
+                    }}
                     className="hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     <td className={`text-xs text-gray-400 font-semibold py-3.5 ${!isLast ? "border-b border-gray-100" : ""}`}>
@@ -129,8 +135,8 @@ export default function DaftarUniversitasTable({ onEdit, onAdd, refreshKey }: Pr
                             {item.kode.slice(0, 1)}
                           </div>
                         )}
-                        <div>
-                          <p className="text-sm text-gray-800 font-medium leading-tight">{item.nama}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm text-gray-800 font-medium leading-tight truncate">{item.nama}</p>
                           <p className="text-xs text-gray-400">{item.kode}</p>
                         </div>
                       </div>

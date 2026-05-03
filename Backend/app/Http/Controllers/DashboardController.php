@@ -503,6 +503,23 @@ class DashboardController extends Controller
         return response()->json($data);
     }
 
+    public function adminAkademisPertumbuhanPengguna()
+    {
+        $bulanNama = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+        $data = collect(range(5, 0))->map(function ($i) use ($bulanNama) {
+            $date       = now()->subMonths($i);
+            $endOfMonth = $date->copy()->endOfMonth();
+            return [
+                'bulan'     => $bulanNama[(int)$date->format('n') - 1] . ' ' . $date->format('Y'),
+                'mahasiswa' => User::where('role', 'mahasiswa')->where('created_at', '<=', $endOfMonth)->count(),
+                'dosen'     => User::where('role', 'dosen')->where('created_at', '<=', $endOfMonth)->count(),
+            ];
+        })->values();
+
+        return response()->json($data);
+    }
+
     public function mahasiswa(Request $request)
     {
         PesertaUjian::autoExpire();
