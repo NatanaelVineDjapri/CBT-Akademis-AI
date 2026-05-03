@@ -31,11 +31,22 @@ export type AuditModel =
 export type AuditEvent = "created" | "updated" | "deleted";
 
 
+export interface AuditPaginated {
+  data: AuditItem[];
+  total: number;
+  per_page: number;
+  last_page: number;
+  page: number;
+}
+
 export const getAudits = async (params?: {
   model?: AuditModel;
   event?: AuditEvent;
   user_id?: number;
-}): Promise<AuditItem[]> => {
+  search?: string;
+  page?: number;
+  per_page?: number;
+}): Promise<AuditPaginated> => {
   const res = await api.get("/audit", { params });
   return res.data;
 };

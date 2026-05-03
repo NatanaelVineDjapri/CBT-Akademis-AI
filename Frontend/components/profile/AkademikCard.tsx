@@ -82,7 +82,7 @@ export default function AkademikCard({ user }: Props) {
         Informasi Akademik
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {baseItems.map(({ icon: Icon, label, value, bg, color }) => (
+        {baseItems.filter(item => item.value !== "-").map(({ icon: Icon, label, value, bg, color }) => (
           <div
             key={label}
             className="flex items-start gap-3 border border-gray-100 rounded-xl p-3"
