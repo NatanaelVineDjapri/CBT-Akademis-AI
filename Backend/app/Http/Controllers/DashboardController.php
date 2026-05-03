@@ -9,6 +9,7 @@ use App\Models\NilaiAkhir;
 use App\Models\Pengumuman;
 use App\Models\PesertaUjian;
 use App\Models\Ujian;
+use App\Models\Universitas;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -399,6 +400,107 @@ class DashboardController extends Controller
             ->values();
 
         return response()->json($distribusi);
+    }
+
+    public function adminAkademis()
+    {
+        return response()->json([
+            'stats' => [
+                'total_universitas' => Universitas::count(),
+                'total_pengguna'    => User::whereIn('role', ['dosen', 'mahasiswa'])->count(),
+                'total_ujian'       => Ujian::count(),
+                'total_bank_soal'   => BankSoal::count(),
+            ],
+        ]);
+    }
+
+    public function adminAkademisDistribusiPengguna()
+    {
+        $univList = Universitas::orderBy('nama')->get(['id', 'nama', 'kode']);
+
+        $counts = User::whereIn('role', ['dosen', 'mahasiswa'])
+            ->whereNotNull('universitas_id')
+            ->selectRaw('universitas_id, role, COUNT(*) as total')
+            ->groupBy('universitas_id', 'role')
+            ->get()
+            ->groupBy('universitas_id');
+
+        $data = $univList->map(function ($u) use ($counts) {
+            $rows      = $counts[$u->getAttribute('id')] ?? collect();
+            $dosen     = (int) ($rows->firstWhere('role', 'dosen')?->total ?? 0);
+            $mahasiswa = (int) ($rows->firstWhere('role', 'mahasiswa')?->total ?? 0);
+            return [
+                'nama'      => $u->getAttribute('kode') ?: $u->getAttribute('nama'),
+                'dosen'     => $dosen,
+                'mahasiswa' => $mahasiswa,
+            ];
+        })->values();
+
+        return response()->json($data);
+    }
+
+    public function adminAkademisAktivitasUjian()
+    {
+        $univList = Universitas::orderBy('nama')->get(['id', 'nama', 'kode']);
+
+        $ujianByUniv = Ujian::join('users', 'ujian.created_by', '=', 'users.id')
+            ->whereNotNull('users.universitas_id')
+            ->groupBy('users.universitas_id')
+            ->selectRaw('users.universitas_id, COUNT(*) as total')
+            ->pluck('total', 'universitas_id');
+
+        $data = $univList->map(fn($u) => [
+            'nama'  => $u->getAttribute('kode') ?: $u->getAttribute('nama'),
+            'total' => (int) ($ujianByUniv[$u->getAttribute('id')] ?? 0),
+        ])->values();
+
+        return response()->json($data);
+    }
+
+    public function adminAkademisKelulusan()
+    {
+        $univList = Universitas::orderBy('nama')->get(['id', 'nama', 'kode']);
+
+        $nilaiByUniv = NilaiAkhir::join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
+            ->join('users', 'peserta_ujian.user_id', '=', 'users.id')
+            ->where('users.role', 'mahasiswa')
+            ->whereNotNull('users.universitas_id')
+            ->selectRaw('users.universitas_id, COUNT(*) as total, SUM(CASE WHEN nilai_akhir.lulus = true THEN 1 ELSE 0 END) as lulus')
+            ->groupBy('users.universitas_id')
+            ->get()
+            ->keyBy('universitas_id');
+
+        $data = $univList->map(function ($u) use ($nilaiByUniv) {
+            $row   = $nilaiByUniv[$u->getAttribute('id')] ?? null;
+            $total = (int) ($row?->total ?? 0);
+            $lulus = (int) ($row?->lulus ?? 0);
+            return [
+                'nama'       => $u->getAttribute('kode') ?: $u->getAttribute('nama'),
+                'persentase' => $total > 0 ? round(($lulus / $total) * 100, 1) : 0,
+                'total'      => $total,
+                'lulus'      => $lulus,
+            ];
+        })->sortByDesc('persentase')->values();
+
+        return response()->json($data);
+    }
+
+    public function adminAkademisTrenNilai()
+    {
+        $bulanNama = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+        $data = NilaiAkhir::whereHas('pesertaUjian.user', fn($q) => $q->where('role', 'mahasiswa'))
+            ->where('graded_at', '>=', now()->subMonths(5)->startOfMonth())
+            ->get(['nilai_total', 'graded_at'])
+            ->groupBy(fn($n) => $n->graded_at->format('Y-m'))
+            ->map(fn($group, $key) => [
+                'bulan'     => $bulanNama[(int) explode('-', $key)[1] - 1] . ' ' . explode('-', $key)[0],
+                'rata_rata' => round($group->avg('nilai_total'), 1),
+            ])
+            ->sortKeys()
+            ->values();
+
+        return response()->json($data);
     }
 
     public function mahasiswa(Request $request)

@@ -317,6 +317,15 @@ export interface AdminUniversitasDashboard {
   pengumuman: AdminUniversitasPengumumanItem[];
 }
 
+export interface AdminAkademisDashboard {
+  stats: {
+    total_universitas: number;
+    total_pengguna: number;
+    total_ujian: number;
+    total_bank_soal: number;
+  };
+}
+
 export interface DosenPerformaUjian {
   ujian: string;
   nilai: number;

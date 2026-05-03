@@ -1,5 +1,5 @@
 import api from "./api";
-import type { DosenDashboard, MahasiswaDashboard, DosenPerformaMatkul, AdminUniversitasDashboard, AdminUniversitasPerforma } from "@/types";
+import type { DosenDashboard, MahasiswaDashboard, DosenPerformaMatkul, AdminUniversitasDashboard, AdminUniversitasPerforma, AdminAkademisDashboard } from "@/types";
 
 export const getMahasiswaDashboard = async (): Promise<MahasiswaDashboard> => {
   const res = await api.get("/dashboard/mahasiswa");
@@ -49,5 +49,30 @@ export const getAdminUniversitasKelulusan = async (): Promise<{ nama: string; pe
 
 export const getAdminUniversitasTrenNilai = async (): Promise<{ bulan: string; rata_rata: number }[]> => {
   const res = await api.get("/dashboard/admin-universitas/tren-nilai");
+  return res.data;
+};
+
+export const getAdminAkademisDashboard = async (): Promise<AdminAkademisDashboard> => {
+  const res = await api.get("/dashboard/admin-akademis");
+  return res.data;
+};
+
+export const getAdminAkademisDistribusiPengguna = async (): Promise<{ nama: string; dosen: number; mahasiswa: number }[]> => {
+  const res = await api.get("/dashboard/admin-akademis/distribusi-pengguna");
+  return res.data;
+};
+
+export const getAdminAkademisAktivitasUjian = async (): Promise<{ nama: string; total: number }[]> => {
+  const res = await api.get("/dashboard/admin-akademis/aktivitas-ujian");
+  return res.data;
+};
+
+export const getAdminAkademisKelulusan = async (): Promise<{ nama: string; persentase: number; total: number; lulus: number }[]> => {
+  const res = await api.get("/dashboard/admin-akademis/kelulusan");
+  return res.data;
+};
+
+export const getAdminAkademisTrenNilai = async (): Promise<{ bulan: string; rata_rata: number }[]> => {
+  const res = await api.get("/dashboard/admin-akademis/tren-nilai");
   return res.data;
 };
