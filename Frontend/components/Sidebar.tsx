@@ -27,10 +27,11 @@ import { getMyMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal, getJadwalDosen } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
 import { getMyUjian, getHasilUjianDosen, getHasilUjianAdminUniversitas } from "../services/UjianServices";
-import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard } from "../services/DashboardServices";
+import { getMahasiswaDashboard, getDosenDashboard, getAdminUniversitasDashboard, getAdminUniversitasPerforma, getAdminUniversitasDistribusi, getAdminUniversitasPerformaProdi, getAdminUniversitasAktivitasUjian, getAdminUniversitasKelulusan, getAdminUniversitasTrenNilai } from "../services/DashboardServices";
 import { getBankSoal } from "../services/BankSoalServices";
 import { getFakultas } from "../services/AdminUserServices";
-import { getPmbPeserta } from "../services/PmbPenerimaanServices";
+import { getPmbPeserta, getPmbStatistik } from "../services/PmbPenerimaanServices";
+import { getAudits } from "../services/AuditService";
 import { calcPerPage } from "../hooks/usePerPage";
 
 interface MenuItem {
@@ -292,6 +293,13 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                 // — admin universitas —
                 } else if (item.href === "/admin-universitas") {
                   preload("/dashboard/admin-universitas", getAdminUniversitasDashboard);
+                  preload("/dashboard/admin-universitas/performa", getAdminUniversitasPerforma);
+                  preload("/dashboard/admin-universitas/distribusi", getAdminUniversitasDistribusi);
+                  preload("/dashboard/admin-universitas/performa-prodi", getAdminUniversitasPerformaProdi);
+                  preload("/dashboard/admin-universitas/aktivitas-ujian", getAdminUniversitasAktivitasUjian);
+                  preload("/dashboard/admin-universitas/kelulusan", getAdminUniversitasKelulusan);
+                  preload("/dashboard/admin-universitas/tren-nilai", getAdminUniversitasTrenNilai);
+                  preload("/pmb/penerimaan/statistik", getPmbStatistik);
                 } else if (item.href === "/admin-universitas/bank-soal-pmb") {
                   preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
                     getBankSoal({ search: s, page: p, per_page: 10 }));
@@ -307,6 +315,10 @@ export default function Sidebar({ user, isOpen, onClose }: { user: User; isOpen?
                     preload(["/fakultas", user.universitas_id], ([, univId]: [string, number]) =>
                       getFakultas({ universitas_id: univId, per_page: 100 }));
                   }
+                } else if (item.href === "/admin-universitas/log") {
+                  const pp = calcPerPage(52, 1, 310);
+                  preload(["/audit", "", "", "", 1, pp], () =>
+                    getAudits({ page: 1, per_page: pp }));
                 // — pmb —
                 } else if (item.href === "/pmb") {
                   preload("/dashboard/mahasiswa", getMahasiswaDashboard);
