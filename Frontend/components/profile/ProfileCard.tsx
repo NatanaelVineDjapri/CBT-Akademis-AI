@@ -46,6 +46,12 @@ export default function ProfileCard({ user, onUbahProfil }: Props) {
             {user.no_telp || "-"}
           </div>
         </div>
+        <div>
+          <label className="text-xs text-gray-500">Alamat</label>
+          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 min-h-[60px]">
+            {user.alamat || "-"}
+          </div>
+        </div>
       </div>
 
       <button

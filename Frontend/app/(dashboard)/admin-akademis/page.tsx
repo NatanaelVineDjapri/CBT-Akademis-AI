@@ -1,8 +1,10 @@
 "use client";
 
 import useSWR from "swr";
+import { useState } from "react";
 import { useUser } from "../../../context/UserContext";
 import { getAdminAkademisDashboard } from "@/services/DashboardServices";
+import { getMaintenanceStatus, toggleMaintenance } from "@/services/SettingsService";
 import { Building2, Users, ClipboardList, BookOpen } from "lucide-react";
 import StatCard from "@/components/dashboard/admin-universitas/StatCard";
 import DashboardSkeleton from "@/components/dashboard/admin-akademis/DashboardSkeleton";
@@ -52,22 +54,59 @@ export default function AdminAkademisPage() {
 }
 
 function MaintenanceCard() {
+  const { data, mutate } = useSWR("/settings/maintenance", getMaintenanceStatus, { revalidateOnFocus: false });
+  const [loading, setLoading] = useState(false);
+
+  const isOn = data?.maintenance ?? false;
+
+  const handleToggle = async () => {
+    setLoading(true);
+    try {
+      const res = await toggleMaintenance();
+      mutate({ maintenance: res.maintenance }, false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <div className="flex items-center gap-2 pb-3 border-b border-gray-100 mb-4">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-        </svg>
-        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Maintenance Break</span>
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 12%, white)" }}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+        </div>
+        <span className="text-sm font-semibold text-gray-800">Maintenance Break</span>
       </div>
-      <p className="text-xs text-gray-400 mb-4">
-        Mengaktifkan mode Maintenance Break akan menonaktifkan sementara seluruh akses dan fitur sistem bagi pengguna.
+
+      {/* Status indicator */}
+      <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, white)" }}>
+        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: "var(--color-primary)" }} />
+        <div>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
+            {isOn ? "Maintenance Aktif" : "Sistem Berjalan Normal"}
+          </p>
+          <p className="text-xs mt-0.5" style={{ color: "color-mix(in srgb, var(--color-primary) 60%, white)" }}>
+            {isOn ? "Semua pengguna tidak dapat mengakses sistem" : "Semua pengguna dapat mengakses sistem"}
+          </p>
+        </div>
+      </div>
+
+      {/* Description */}
+      <p className="text-xs text-gray-400 leading-relaxed">
+        Mengaktifkan mode Maintenance Break akan menonaktifkan sementara seluruh akses dan fitur sistem bagi semua pengguna, kecuali Admin Akademis AI.
       </p>
+
+      {/* Action */}
       <button
-        className="px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer"
+        onClick={handleToggle}
+        disabled={loading || data === undefined}
+        className="w-full py-2.5 rounded-lg text-sm font-semibold text-white cursor-pointer disabled:opacity-50 transition-colors mt-auto"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
-        Maintenance: OFF
+        {loading ? "Memproses..." : isOn ? "Nonaktifkan Maintenance" : "Aktifkan Maintenance"}
       </button>
     </div>
   );
@@ -87,7 +126,7 @@ function PengumumanCard() {
       <textarea
         placeholder="Tulis pengumuman platform..."
         className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 mb-3 resize-none outline-none focus:border-[var(--color-primary)] transition-colors"
-        rows={3}
+        rows={6}
       />
       <button
         className="px-4 py-2 rounded-lg text-sm font-semibold text-white cursor-pointer"
