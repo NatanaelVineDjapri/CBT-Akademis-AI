@@ -82,6 +82,8 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::delete('/{id}', [UniversitasController::class, 'destroy']);
         });
 
+        Route::get('/universitas/{id}', [UniversitasController::class, 'show']);
+
         Route::prefix('fakultas')->group(function () {
             Route::post('/', [FakultasController::class, 'store']);
             Route::put('/{id}', [FakultasController::class, 'update']);

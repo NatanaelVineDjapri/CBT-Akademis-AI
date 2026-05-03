@@ -21,6 +21,11 @@ export interface UniversitasPaginated {
   };
 }
 
+export const getUniversitasById = async (id: number): Promise<UniversitasItem> => {
+  const res = await api.get(`/universitas/${id}`);
+  return res.data.data;
+};
+
 export const getUniversitas = async (params?: {
   search?: string;
   page?: number;
