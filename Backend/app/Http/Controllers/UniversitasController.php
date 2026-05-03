@@ -31,6 +31,20 @@ class UniversitasController extends Controller
         ], 200);
     }
 
+    public function show($id)
+    {
+        $universitas = Universitas::withCount([
+            'fakultas',
+            'users as total_mahasiswa' => fn($q) => $q->where('role', 'mahasiswa'),
+            'users as total_dosen' => fn($q) => $q->where('role', 'dosen'),
+        ])->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Data universitas berhasil diambil!',
+            'data' => $universitas,
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

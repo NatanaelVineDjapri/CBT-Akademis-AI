@@ -54,7 +54,7 @@ const menuByRole: Record<string, MenuItem[]> = {
     },
     {
       label: "Institusi",
-      href: "/admin-akademis/tambah-institusi",
+      href: "/admin-akademis/institusi",
       icon: <Building2 size={18} />,
     },
     {
