@@ -53,7 +53,7 @@ const menuByRole: Record<string, MenuItem[]> = {
       icon: <List size={18} />,
     },
     {
-      label: "Tambah Institusi",
+      label: "Institusi",
       href: "/admin-akademis/tambah-institusi",
       icon: <Building2 size={18} />,
     },
