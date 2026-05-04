@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { UserProvider, useUser } from "../../context/UserContext";
 import Sidebar from "../../components/Sidebar";
@@ -23,13 +23,26 @@ function getRoleLabel(user: { role: string; universitas_kode?: string }) {
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("sidebar-collapsed") === "true") setCollapsed(true);
+  }, []);
+
+  const toggleCollapsed = () => {
+    setCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem("sidebar-collapsed", String(next));
+      return next;
+    });
+  };
 
   if (!user) return null;
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="sidebar-width shrink-0 hidden lg:block" />
+      <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={collapsed} onToggle={toggleCollapsed} />
+      <div className={`${collapsed ? "w-16" : "w-[280px]"} shrink-0 hidden lg:block transition-all duration-300`} />
       <div className="flex-1 min-w-0 flex flex-col">
         {user.role !== "mahasiswa" && (
           <div
