@@ -12,7 +12,7 @@ class UjianSeeder extends Seeder
 
     public function run(): void
     {
-        // ── Get dosen & mahasiswa IDs ─────────────────────────────────
+        // ── Inisialisasi Data User & Prodi ─────────────────────────
         $irvanId  = DB::table('users')->where('email', 'irvan.lewenusa@untar.ac.id')->value('id');
         $desiId   = DB::table('users')->where('email', 'desi.arisandi@untar.ac.id')->value('id');
         $bagusId  = DB::table('users')->where('email', 'bagus.mulyawan@untar.ac.id')->value('id');
@@ -24,190 +24,545 @@ class UjianSeeder extends Seeder
         $ti = DB::table('prodi')->where('kode', 'TI')->value('id');
         $si = DB::table('prodi')->where('kode', 'SI')->value('id');
 
-        // ── Mata Kuliah ───────────────────────────────────────────────
-        $mkTI501 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Software Development',        'kode' => 'TI501', 'prodi_id' => $ti, 'created_at' => now(), 'updated_at' => now()]);
-        $mkTI502 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Frontend Development',        'kode' => 'TI502', 'prodi_id' => $ti, 'created_at' => now(), 'updated_at' => now()]);
-        $mkTI503 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Backend Development',         'kode' => 'TI503', 'prodi_id' => $ti, 'created_at' => now(), 'updated_at' => now()]);
-        $mkSI501 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Software Development SI',     'kode' => 'SI501', 'prodi_id' => $si, 'created_at' => now(), 'updated_at' => now()]);
-        $mkSI502 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Database Systems',            'kode' => 'SI502', 'prodi_id' => $si, 'created_at' => now(), 'updated_at' => now()]);
-        $mkSI503 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Rekayasa Sistem Informasi',   'kode' => 'SI503', 'prodi_id' => $si, 'created_at' => now(), 'updated_at' => now()]);
-        $mkTI504 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Mobile Development',          'kode' => 'TI504', 'prodi_id' => $ti, 'created_at' => now(), 'updated_at' => now()]);
-        $mkTI505 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Cloud Computing',             'kode' => 'TI505', 'prodi_id' => $ti, 'created_at' => now(), 'updated_at' => now()]);
-        $mkTI506 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Keamanan Jaringan',           'kode' => 'TI506', 'prodi_id' => $ti, 'created_at' => now(), 'updated_at' => now()]);
-        $mkSI504 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Analisis Sistem Informasi',   'kode' => 'SI504', 'prodi_id' => $si, 'created_at' => now(), 'updated_at' => now()]);
-        $mkSI505 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Manajemen Proyek TI',         'kode' => 'SI505', 'prodi_id' => $si, 'created_at' => now(), 'updated_at' => now()]);
-        $mkSI506 = DB::table('mata_kuliah')->insertGetId(['nama' => 'Business Intelligence',       'kode' => 'SI506', 'prodi_id' => $si, 'created_at' => now(), 'updated_at' => now()]);
+        // ── Contoh Pengambilan Data dari getSoal5 ──────────────────
+        $dataLogika = $this->getSoal5('Logika Matematika');
+        $sdPG    = $dataLogika['pg'] ?? [];
+        $sdCB    = $dataLogika['cb'] ?? [];
+        $sdEssay = $dataLogika['essay'] ?? [];
 
-        // ── Dosen Matkul ──────────────────────────────────────────────
-        $ta = '2025/2026';
-        DB::table('dosen_matkul')->insert([
-            ['user_id' => $irvanId,  'mata_kuliah_id' => $mkTI501, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $irvanId,  'mata_kuliah_id' => $mkTI502, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $irvanId,  'mata_kuliah_id' => $mkTI503, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $desiId,   'mata_kuliah_id' => $mkSI501, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $desiId,   'mata_kuliah_id' => $mkSI502, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $desiId,   'mata_kuliah_id' => $mkSI503, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $bagusId,  'mata_kuliah_id' => $mkTI504, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $bagusId,  'mata_kuliah_id' => $mkTI505, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $bagusId,  'mata_kuliah_id' => $mkTI506, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $jansonId, 'mata_kuliah_id' => $mkSI504, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $jansonId, 'mata_kuliah_id' => $mkSI505, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $jansonId, 'mata_kuliah_id' => $mkSI506, 'tahun_ajaran' => $ta, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // ── Buat Bank Soal ─────────────────────────────────────────
+        $bankSD = $this->insertBank($irvanId, $mkTI501, 'Bank Soal Logika Matematika', 'Soal UTS Logika Matematika');
 
-        // ── User Matkul — Natanael & Andi enrolled in Irvan & Desi's matkul ──
-        $umRows = [];
-        foreach ([$natanaelId, $andiId] as $uid) {
-            foreach ([$mkTI501, $mkTI502, $mkTI503, $mkSI501, $mkSI502, $mkSI503] as $mkId) {
-                $umRows[] = ['user_id' => $uid, 'mata_kuliah_id' => $mkId, 'tahun_ajaran' => $ta, 'is_aktif' => true, 'created_at' => now(), 'updated_at' => now()];
-            }
-        }
-        DB::table('user_mata_kuliah')->insert($umRows);
-
-        // ── Bank Soal ─────────────────────────────────────────────────
-        $bankSD = $this->insertBank($irvanId, $mkTI501, 'Bank Soal Software Development', 'Soal UTS Software Development');
-        $bankFE = $this->insertBank($irvanId, $mkTI502, 'Bank Soal Frontend Development', 'Soal UTS Frontend Development');
-        $bankBE = $this->insertBank($irvanId, $mkTI503, 'Bank Soal Backend Development',  'Soal UTS Backend Development');
-        $bankDB = $this->insertBank($desiId,  $mkSI502, 'Bank Soal Database Systems',     'Soal UTS Database Systems');
-
-        // ── Soal Definitions ──────────────────────────────────────────
-
-        // Software Development
-        $sdPG = [
-            ['q' => 'Metodologi Agile menekankan pada?', 'a' => ['Dokumentasi lengkap di awal', 'Kolaborasi tim dan respons terhadap perubahan', 'Perencanaan kaku tanpa iterasi', 'Pengembangan individual tanpa review'], 'correct' => 1],
-            ['q' => 'Dalam Git, perintah untuk menggabungkan branch adalah?', 'a' => ['git commit', 'git push', 'git merge', 'git clone'], 'correct' => 2],
-            ['q' => 'Design Pattern Singleton memastikan?', 'a' => ['Banyak instance dari sebuah class', 'Hanya satu instance dari sebuah class', 'Penghapusan otomatis objek', 'Pewarisan multiple inheritance'], 'correct' => 1],
-            ['q' => 'Unit testing menguji pada tingkat?', 'a' => ['Sistem keseluruhan end-to-end', 'Integrasi antar modul', 'Fungsi atau method individual', 'Antarmuka pengguna (UI)'], 'correct' => 2],
-            ['q' => 'CI/CD dalam pengembangan software singkatan dari?', 'a' => ['Code Integration / Code Deployment', 'Continuous Integration / Continuous Deployment', 'Complete Integration / Complete Delivery', 'Central Integration / Central Delivery'], 'correct' => 1],
-        ];
-        $sdCB = [
-            ['q' => 'Manakah yang merupakan Agile ceremonies?', 'options' => ['Sprint Planning', 'Waterfall Review', 'Daily Standup', 'Gantt Chart Update'], 'correct' => [0, 2]],
-            ['q' => 'Manakah yang termasuk prinsip SOLID?', 'options' => ['Single Responsibility Principle', 'Sequential Logic Principle', 'Open/Closed Principle', 'Overloading Data Principle'], 'correct' => [0, 2]],
-        ];
-        $sdEssay = [
-            ['q' => 'Jelaskan perbedaan antara metodologi Scrum dan Kanban beserta kelebihan dan kekurangan masing-masing!'],
-            ['q' => 'Bagaimana cara menerapkan Test-Driven Development (TDD) dalam sebuah proyek? Jelaskan tahapan Red-Green-Refactor dengan contoh!'],
-        ];
-
-        // Frontend Development
-        $fePG = [
-            ['q' => 'Tag HTML semantic yang digunakan untuk navigasi utama adalah?', 'a' => ['<div>', '<section>', '<nav>', '<span>'], 'correct' => 2],
-            ['q' => 'CSS Flexbox dirancang untuk layout?', 'a' => ['Dua dimensi (baris dan kolom sekaligus)', 'Satu dimensi (baris atau kolom)', 'Animasi elemen saja', 'Responsivitas gambar saja'], 'correct' => 1],
-            ['q' => 'Virtual DOM dalam React berfungsi untuk?', 'a' => ['Menyimpan data ke server', 'Mengoptimalkan render dengan diff algorithm', 'Mengelola state global aplikasi', 'Membuat komponen baru secara otomatis'], 'correct' => 1],
-            ['q' => 'React Hook useState digunakan untuk?', 'a' => ['Mengambil data dari API', 'Mengelola state lokal dalam functional component', 'Membuat routing halaman', 'Menghubungkan ke Redux store'], 'correct' => 1],
-            ['q' => 'Media query dalam CSS digunakan untuk?', 'a' => ['Mengambil data dari REST API', 'Membuat responsive design berdasarkan ukuran layar', 'Membuat animasi kompleks', 'Manipulasi DOM secara langsung'], 'correct' => 1],
-        ];
-        $feCB = [
-            ['q' => 'Manakah yang merupakan semantic HTML5 tag?', 'options' => ['<header>', '<div>', '<article>', '<span>'], 'correct' => [0, 2]],
-            ['q' => 'Manakah yang termasuk React Hooks bawaan?', 'options' => ['useState', 'componentDidMount', 'useEffect', 'render'], 'correct' => [0, 2]],
-        ];
-        $feEssay = [
-            ['q' => 'Jelaskan perbedaan antara Server-Side Rendering (SSR) dan Client-Side Rendering (CSR) beserta use case yang tepat untuk masing-masing!'],
-            ['q' => 'Apa yang dimaksud dengan state management dalam aplikasi React? Kapan sebaiknya menggunakan Context API dibandingkan dengan Redux?'],
-        ];
-
-        // Backend Development
-        $bePG = [
-            ['q' => 'HTTP method yang digunakan untuk membuat resource baru dalam REST API adalah?', 'a' => ['GET', 'PUT', 'POST', 'DELETE'], 'correct' => 2],
-            ['q' => 'JWT (JSON Web Token) terdiri dari berapa bagian yang dipisahkan oleh titik?', 'a' => ['1', '2', '3', '4'], 'correct' => 2],
-            ['q' => 'ORM (Object Relational Mapping) dalam backend development digunakan untuk?', 'a' => ['Mengoptimalkan performa server', 'Memetakan object ke tabel database secara abstrak', 'Mengelola file sistem', 'Mengatur konfigurasi server'], 'correct' => 1],
-            ['q' => 'Middleware dalam framework backend berfungsi sebagai?', 'a' => ['Database connection manager', 'Perantara yang memproses request sebelum sampai ke controller', 'Template engine untuk view', 'Cache manager untuk response'], 'correct' => 1],
-            ['q' => 'Arsitektur Microservices membagi aplikasi menjadi?', 'a' => ['Satu service besar monolitik', 'Layanan-layanan kecil yang independen dan dapat di-deploy terpisah', 'Dua tier: frontend dan backend saja', 'Tiga layer MVC yang terpisah'], 'correct' => 1],
-        ];
-        $beCB = [
-            ['q' => 'Manakah yang merupakan prinsip utama REST API?', 'options' => ['Stateless', 'Stateful session wajib', 'Uniform Interface', 'Single endpoint saja'], 'correct' => [0, 2]],
-            ['q' => 'Manakah yang merupakan best practice keamanan pada API?', 'options' => ['Input validation dan sanitasi', 'Menyimpan password plain text', 'Rate limiting pada endpoint', 'Menonaktifkan HTTPS'], 'correct' => [0, 2]],
-        ];
-        $beEssay = [
-            ['q' => 'Jelaskan arsitektur MVC (Model-View-Controller) dan bagaimana penerapannya dalam framework Laravel! Berikan contoh konkret untuk masing-masing komponen!'],
-            ['q' => 'Apa itu rate limiting pada API? Mengapa rate limiting penting untuk keamanan dan performa? Bagaimana cara mengimplementasikannya di Laravel?'],
-        ];
-
-        // Database Systems
-        $dbPG = [
-            ['q' => 'Bentuk Normal Ketiga (3NF) mensyaratkan tidak adanya?', 'a' => ['Atribut multivalued', 'Dependensi transitif terhadap non-primary key', 'Foreign key di setiap tabel', 'Kolom dengan nilai NULL'], 'correct' => 1],
-            ['q' => 'INNER JOIN mengembalikan?', 'a' => ['Semua baris dari tabel kiri meski tidak cocok', 'Semua baris dari tabel kanan meski tidak cocok', 'Hanya baris yang memiliki kecocokan di kedua tabel', 'Semua baris dari kedua tabel termasuk yang tidak cocok'], 'correct' => 2],
-            ['q' => 'Dalam sifat ACID database, huruf C singkatan dari?', 'a' => ['Concurrency', 'Consistency', 'Compression', 'Cascade'], 'correct' => 1],
-            ['q' => 'Index pada kolom database berfungsi utama untuk?', 'a' => ['Mempercepat operasi INSERT', 'Mempercepat operasi SELECT dan pencarian data', 'Mengurangi ukuran storage tabel', 'Meningkatkan keamanan akses data'], 'correct' => 1],
-            ['q' => 'Perbedaan utama antara NoSQL dan SQL database adalah?', 'a' => ['NoSQL selalu lebih lambat dari SQL', 'NoSQL bersifat schema-less dan lebih mudah di-scale horizontal', 'SQL tidak mendukung operasi JOIN sama sekali', 'NoSQL tidak dapat menyimpan data dalam format JSON'], 'correct' => 1],
-        ];
-        $dbCB = [
-            ['q' => 'Manakah yang merupakan jenis SQL constraint yang valid?', 'options' => ['PRIMARY KEY', 'SORT KEY', 'FOREIGN KEY', 'SEARCH KEY'], 'correct' => [0, 2]],
-            ['q' => 'Manakah yang merupakan langkah dalam proses normalisasi database?', 'options' => ['Identifikasi functional dependency', 'Penambahan data dummy untuk testing', 'Eliminasi partial dependency menuju 2NF', 'Menghapus semua index untuk efisiensi'], 'correct' => [0, 2]],
-        ];
-        $dbEssay = [
-            ['q' => 'Jelaskan perbedaan antara INNER JOIN, LEFT JOIN, dan RIGHT JOIN beserta contoh query SQL untuk masing-masing jenis JOIN!'],
-            ['q' => 'Bagaimana merancang skema database untuk sistem e-commerce sederhana? Sebutkan tabel-tabel utama yang diperlukan, atributnya, dan hubungan antar tabel!'],
-        ];
-
-        // ── Insert Soal ───────────────────────────────────────────────
-        [$sdPGIds, $sdCBIds, $sdEssayIds] = $this->insertAllSoal($sdPG, $sdCB, $sdEssay, $bankSD, $mkTI501);
-        [$fePGIds, $feCBIds, $feEssayIds] = $this->insertAllSoal($fePG, $feCB, $feEssay, $bankFE, $mkTI502);
-        [$bePGIds, $beCBIds, $beEssayIds] = $this->insertAllSoal($bePG, $beCB, $beEssay, $bankBE, $mkTI503);
-        [$dbPGIds, $dbCBIds, $dbEssayIds] = $this->insertAllSoal($dbPG, $dbCB, $dbEssay, $bankDB, $mkSI502);
-
-        // ── Ujian ─────────────────────────────────────────────────────
-        $base = Carbon::create(2026, 3, 10, 8, 0, 0);
-        $ujianSD = $this->insertUjian($irvanId, $mkTI501, 'UTS Software Development 2025/2026', $base,                   'UTISD01');
-        $ujianFE = $this->insertUjian($irvanId, $mkTI502, 'UTS Frontend Development 2025/2026',  $base->copy()->addDays(3), 'UTIFE01');
-        $ujianBE = $this->insertUjian($irvanId, $mkTI503, 'UTS Backend Development 2025/2026',   $base->copy()->addDays(5), 'UTIBE01');
-        $ujianDB = $this->insertUjian($desiId,  $mkSI502, 'UTS Database Systems 2025/2026',      $base->copy()->addDays(7), 'USIDB01');
-
-        DB::table('ujian_setting')->insert([
-            ['ujian_id' => $ujianSD, 'randomize_soal' => false, 'max_attempt' => 1, 'passing_grade' => 65, 'proctoring_aktif' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['ujian_id' => $ujianFE, 'randomize_soal' => false, 'max_attempt' => 1, 'passing_grade' => 65, 'proctoring_aktif' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['ujian_id' => $ujianBE, 'randomize_soal' => false, 'max_attempt' => 1, 'passing_grade' => 65, 'proctoring_aktif' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['ujian_id' => $ujianDB, 'randomize_soal' => false, 'max_attempt' => 1, 'passing_grade' => 65, 'proctoring_aktif' => false, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        $gradeRanges = [['A', 85, 100], ['B', 75, 84], ['C', 65, 74], ['D', 55, 64], ['E', 0, 54]];
-        foreach ([$ujianSD, $ujianFE, $ujianBE, $ujianDB] as $uid) {
-            $this->insertGradeSetting($uid, $gradeRanges);
-        }
-
-        // ── Link Ujian → Soal (bobot: PG=8, CB=10, Essay=20) ─────────
-        $ujianSoalSD = $this->linkUjianSoal($ujianSD, $sdPGIds, $sdCBIds, $sdEssayIds);
-        $ujianSoalFE = $this->linkUjianSoal($ujianFE, $fePGIds, $feCBIds, $feEssayIds);
-        $ujianSoalBE = $this->linkUjianSoal($ujianBE, $bePGIds, $beCBIds, $beEssayIds);
-        $ujianSoalDB = $this->linkUjianSoal($ujianDB, $dbPGIds, $dbCBIds, $dbEssayIds);
-
-        // ── Peserta: 30 TI-2024 (index 4=Andi, index 29=Natanael) ────
-        $tiStudents = DB::table('users')
-            ->where('prodi_id', $ti)->where('tahun_masuk', 2024)
-            ->where('role', 'mahasiswa')->where('nim', '!=', '535240042')
-            ->orderBy('nim')->limit(29)->pluck('id')->toArray();
-        $tiStudents   = array_values($tiStudents);
-        $tiStudents[] = $natanaelId; // index 29
-
-        // ── Peserta DB ujian: 28 SI-2024 + Andi(28) + Natanael(29) ───
-        $siStudents = DB::table('users')
-            ->where('prodi_id', $si)->where('tahun_masuk', 2024)
-            ->where('role', 'mahasiswa')->orderBy('nim')->limit(28)->pluck('id')->toArray();
-        $dbStudents   = array_values($siStudents);
-        $dbStudents[] = $andiId;     // index 28
-        $dbStudents[] = $natanaelId; // index 29
-
-        // Scores: index 4=Andi(72), index 29=Natanael(88)
-        $scoresTI = [78, 82, 65, 70, 72, 88, 55, 60, 75, 90, 68, 73, 84, 62, 57, 79, 86, 64, 71, 83, 59, 77, 91, 67, 74, 80, 63, 69, 76, 88];
-        // Scores: index 28=Andi(72), index 29=Natanael(88)
-        $scoresDB = [74, 80, 63, 69, 76, 85, 55, 60, 75, 88, 68, 73, 84, 62, 57, 79, 86, 64, 71, 83, 59, 77, 91, 67, 74, 80, 63, 70, 72, 88];
-
-        $soalSets = [
-            [$ujianSD, $ujianSoalSD, $tiStudents, $scoresTI, $base],
-            [$ujianFE, $ujianSoalFE, $tiStudents, $scoresTI, $base->copy()->addDays(3)],
-            [$ujianBE, $ujianSoalBE, $tiStudents, $scoresTI, $base->copy()->addDays(5)],
-            [$ujianDB, $ujianSoalDB, $dbStudents, $scoresDB, $base->copy()->addDays(7)],
-        ];
-
-        foreach ($soalSets as [$ujianId, $ujianSoal, $students, $skor, $tanggal]) {
-            foreach ($students as $idx => $studentId) {
-                $this->buatPeserta($studentId, $ujianId, $ujianSoal, (float) ($skor[$idx] ?? 70), $tanggal);
-            }
-        }
+        // ── Insert Soal ────────────────────────────────────────────
+        $sdPGIds    = $this->insertSoalPG($sdPG, $bankSD, $mkTI501);
+        $sdCBIds    = $this->insertSoalCB($sdCB, $bankSD, $mkTI501);
+        $sdEssayIds = $this->insertSoalEssay($sdEssay, $bankSD, $mkTI501);
+        
+        // ... Lanjutkan sisa logika ujian dan peserta di sini ...
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════════
+    // Posisikan method getSoal5 di luar method run() seperti ini:
+    // ══════════════════════════════════════════════════════════════
+    private function getSoal5(string $nama): array
+    {
+  
+    
+        $data = [
+             'Logika Matematika' => [
+                'pg' => [
+                    ['q' => 'Negasi dari "Semua mahasiswa lulus" adalah?', 'a' => ['Semua tidak lulus', 'Ada yang tidak lulus', 'Tidak ada yang lulus', 'Semua lulus ujian'], 'correct' => 1],
+                    ['q' => '"p → q" bernilai FALSE hanya ketika?', 'a' => ['p=T q=T', 'p=F q=F', 'p=T q=F', 'p=F q=T'], 'correct' => 2],
+                    ['q' => 'Formula yang selalu bernilai TRUE disebut?', 'a' => ['Kontradiksi', 'Kontingensi', 'Tautologi', 'Proposisi'], 'correct' => 2],
+                    ['q' => '¬(p ∧ q) ekuivalen dengan (De Morgan)?', 'a' => ['¬p ∧ ¬q', '¬p ∨ ¬q', 'p ∨ ¬q', '¬p ∧ q'], 'correct' => 1],
+                    ['q' => 'Jika "p→q" benar dan "p" benar, maka (Modus Ponens)?', 'a' => ['p salah', 'q benar', 'q salah', 'p→q salah'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah konektor logika yang valid?', 'options' => ['AND (∧)', 'PLUS (+)', 'OR (∨)', 'DIVIDE (÷)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aturan inferensi logika yang valid?', 'options' => ['Modus Ponens', 'Spekulasi', 'Modus Tollens', 'Asumsi bebas'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang merupakan hukum ekuivalensi logika?', 'options' => ['De Morgan Law', 'Hukum Newton', 'Distributive Law', 'Hukum Ohm'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah quantifier logika predikat yang valid?', 'options' => ['Universal (∀)', 'Biner (∑)', 'Eksistensial (∃)', 'Linear (∫)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang merupakan contoh tautologi?', 'options' => ['p ∨ ¬p', 'p ∧ q', 'p → p', '¬p ∧ p'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep proposisi dan buat tabel kebenaran untuk operator AND, OR, dan IMPLICATION!'],
+                    ['q' => 'Apa yang dimaksud dengan tautologi? Buktikan bahwa (p → q) ↔ (¬q → ¬p) adalah tautologi!'],
+                    ['q' => 'Jelaskan hukum De Morgan dan tunjukkan bagaimana hukum ini digunakan dalam penyederhanaan ekspresi!'],
+                    ['q' => 'Apa perbedaan antara logika proposisional dan logika predikat? Berikan contoh pernyataan yang membutuhkan logika predikat!'],
+                    ['q' => 'Bagaimana aljabar Boolean berkaitan dengan logika matematika? Berikan contoh penerapan dalam desain rangkaian digital!'],
+                ],
+            ],
 
+            'Basis Data Lanjut' => [
+                'pg' => [
+                    ['q' => 'Teorema CAP: huruf C singkatan dari?', 'a' => ['Caching', 'Consistency', 'Concurrency', 'Connectivity'], 'correct' => 1],
+                    ['q' => 'Membagi tabel ke beberapa node secara horizontal disebut?', 'a' => ['Replication', 'Indexing', 'Sharding', 'Caching'], 'correct' => 2],
+                    ['q' => 'Materialized view berbeda dari view biasa karena?', 'a' => ['Tidak bisa di-query', 'Menyimpan hasil query secara fisik', 'Hanya satu tabel', 'Tidak bisa refresh'], 'correct' => 1],
+                    ['q' => 'OLAP dioptimalkan untuk?', 'a' => ['Transaksi real-time', 'Analisis data multidimensi', 'CRUD cepat', 'Login pengguna'], 'correct' => 1],
+                    ['q' => 'Column-store database optimal untuk?', 'a' => ['Banyak INSERT', 'Analytical query banyak kolom', 'Transaksi perbankan', 'Full-text search'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah teknik optimasi database yang valid?', 'options' => ['Indexing', 'Mengabaikan constraint', 'Query Optimization', 'Full table scan selalu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang merupakan jenis NoSQL database?', 'options' => ['Document store (MongoDB)', 'Relational (MySQL)', 'Key-Value (Redis)', 'Tabular (Excel)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah pola replikasi database yang umum?', 'options' => ['Master-Slave', 'ACID mode', 'Master-Master', 'CAP mode'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis partitioning yang valid?', 'options' => ['Horizontal partitioning', 'Diagonal partitioning', 'Vertical partitioning', 'Circular partitioning'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis index database yang umum?', 'options' => ['B-Tree Index', 'Linked Index', 'Hash Index', 'Random Index'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan teorema CAP dalam distributed database dan mengapa ketiga properti tidak bisa dipenuhi bersamaan!'],
+                    ['q' => 'Apa perbedaan OLTP dan OLAP? Jelaskan karakteristik dan use case masing-masing!'],
+                    ['q' => 'Jelaskan sharding dalam database, beserta kelebihan dan tantangan implementasinya!'],
+                    ['q' => 'Kapan denormalisasi lebih baik dari normalisasi? Berikan contoh kasus yang tepat!'],
+                    ['q' => 'Bagaimana cara mengoptimalkan query SQL yang lambat? Jelaskan strategi query optimization!'],
+                ],
+            ],
+
+            'Pemrograman Fungsional' => [
+                'pg' => [
+                    ['q' => 'Fungsi tanpa efek samping dalam FP disebut?', 'a' => ['Impure function', 'Pure function', 'Static function', 'Global function'], 'correct' => 1],
+                    ['q' => 'map() pada list berfungsi untuk?', 'a' => ['Menyaring elemen', 'Menerapkan fungsi ke tiap elemen', 'Menggabungkan elemen', 'Mengurutkan'], 'correct' => 1],
+                    ['q' => 'Bahasa pemrograman fungsional murni?', 'a' => ['Python', 'Java', 'Haskell', 'C++'], 'correct' => 2],
+                    ['q' => 'Teknik ubah fungsi n-argumen menjadi rangkaian fungsi 1-argumen?', 'a' => ['Memoization', 'Composition', 'Currying', 'Recursion'], 'correct' => 2],
+                    ['q' => 'Data yang tidak bisa diubah setelah dibuat dalam FP disebut?', 'a' => ['Mutable', 'Variable', 'Immutable', 'Dynamic'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah prinsip pemrograman fungsional yang benar?', 'options' => ['Immutability', 'Shared state', 'Pure functions', 'Side effects'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah higher-order function yang umum?', 'options' => ['map()', 'print()', 'filter()', 'input()'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah bahasa dengan fitur fungsional?', 'options' => ['Haskell', 'Assembly', 'Scala', 'COBOL'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah konsep FP yang valid?', 'options' => ['Currying', 'Inheritance', 'Function Composition', 'Class hierarchy'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik optimasi FP?', 'options' => ['Memoization', 'Global variables', 'Tail-call optimization', 'Mutation'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan paradigma fungsional vs imperatif beserta kelebihan masing-masing!'],
+                    ['q' => 'Mengapa pure function lebih mudah di-test dan di-debug? Berikan contoh!'],
+                    ['q' => 'Jelaskan higher-order function dengan contoh map, filter, reduce dalam Python atau JS!'],
+                    ['q' => 'Apa itu closure? Berikan contoh closure dan jelaskan cara kerjanya!'],
+                    ['q' => 'Jelaskan immutability dan manfaatnya dalam concurrent programming!'],
+                ],
+            ],
+
+            'Arsitektur Komputer' => [
+                'pg' => [
+                    ['q' => 'Komponen CPU yang melakukan operasi aritmatika dan logika?', 'a' => ['Control Unit', 'ALU', 'Register', 'Cache'], 'correct' => 1],
+                    ['q' => 'Siklus eksekusi instruksi CPU disebut?', 'a' => ['Boot Cycle', 'Fetch-Decode-Execute', 'Read-Write Cycle', 'IO Cycle'], 'correct' => 1],
+                    ['q' => 'Cache L1 memiliki karakteristik?', 'a' => ['Paling besar paling lambat', 'Paling kecil paling cepat', 'Sama dengan RAM', 'Sama dengan HDD'], 'correct' => 1],
+                    ['q' => 'Teknik eksekusi beberapa instruksi secara bersamaan?', 'a' => ['Caching', 'Pipelining', 'Buffering', 'Multiplexing'], 'correct' => 1],
+                    ['q' => 'DMA memungkinkan?', 'a' => ['CPU akses memori lebih cepat', 'Device I/O transfer data ke memori tanpa CPU', 'Multi-CPU bekerja bersamaan', 'Cache otomatis'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen utama CPU?', 'options' => ['ALU', 'Hard Disk', 'Control Unit', 'Monitor'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis arsitektur ISA yang valid?', 'options' => ['RISC', 'CISC', 'x86', 'ARM'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik peningkatan performa CPU?', 'options' => ['Pipelining', 'Slower clock', 'Branch Prediction', 'Less Cache'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis memori sekunder?', 'options' => ['HDD', 'Register', 'SSD', 'Cache L1'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis bus dalam komputer?', 'options' => ['Data bus', 'Network bus', 'Address bus', 'Power bus'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan arsitektur von Neumann beserta kelebihan dan keterbatasannya!'],
+                    ['q' => 'Jelaskan siklus Fetch-Decode-Execute dalam CPU secara rinci!'],
+                    ['q' => 'Apa perbedaan RISC dan CISC? Berikan contoh prosesor masing-masing!'],
+                    ['q' => 'Jelaskan hierarki memori dari register hingga storage beserta karakteristiknya!'],
+                    ['q' => 'Bagaimana cache memory bekerja? Jelaskan cache hit, miss, dan strategi replacement-nya!'],
+                ],
+            ],
+
+            'Kompilator' => [
+                'pg' => [
+                    ['q' => 'Fase pertama dalam proses kompilasi adalah?', 'a' => ['Parsing', 'Lexical Analysis', 'Code Generation', 'Optimization'], 'correct' => 1],
+                    ['q' => 'Parse tree dibangun oleh fase?', 'a' => ['Lexer', 'Parser', 'Semantic Analyzer', 'Code Generator'], 'correct' => 1],
+                    ['q' => 'Intermediate Representation (IR) berguna karena?', 'a' => ['Output final', 'Abstraksi antara source dan machine code', 'Error reporting saja', 'Symbol table'], 'correct' => 1],
+                    ['q' => 'Interpreter berbeda dari compiler karena?', 'a' => ['Output lebih cepat', 'Terjemahkan dan eksekusi baris per baris', 'Hasilkan object file', 'Lebih banyak optimasi'], 'correct' => 1],
+                    ['q' => 'JIT compilation berarti?', 'a' => ['Dikompilasi sebelum runtime', 'Dikompilasi saat runtime ketika dibutuhkan', 'Hanya diinterpretasikan', 'Tidak perlu dikompilasi'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah fase front-end kompiler?', 'options' => ['Lexical Analysis', 'Code Generation', 'Parsing', 'Optimization'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis error yang dideteksi kompiler?', 'options' => ['Syntax Error', 'Logic Error', 'Semantic Error', 'Network Error'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik optimasi kode?', 'options' => ['Constant Folding', 'Tokenization', 'Dead Code Elimination', 'Parsing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis parser?', 'options' => ['Recursive Descent', 'Lexer', 'LR Parser', 'Tokenizer'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang disimpan dalam symbol table?', 'options' => ['Nama identifier', 'Machine code', 'Tipe variabel', 'Grammar rules'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan fase-fase kompilasi dari source code hingga machine code!'],
+                    ['q' => 'Apa yang dimaksud lexical analysis? Jelaskan cara tokenizer bekerja dengan contoh!'],
+                    ['q' => 'Jelaskan parsing dan parse tree! Apa perbedaan top-down dan bottom-up parsing?'],
+                    ['q' => 'Apa perbedaan compiler, interpreter, dan JIT? Berikan contoh bahasa untuk masing-masing!'],
+                    ['q' => 'Jelaskan minimal 3 teknik optimasi kode yang dilakukan kompiler beserta contohnya!'],
+                ],
+            ],
+
+            'Grafika Komputer' => [
+                'pg' => [
+                    ['q' => 'Algoritma menggambar garis pada grid piksel?', 'a' => ["Bresenham's Line Algorithm", 'Flood Fill', 'Ray Casting', 'Scanline'], 'correct' => 0],
+                    ['q' => 'Teknik rendering yang mensimulasikan jalur cahaya dari mata ke sumber?', 'a' => ['Rasterization', 'Ray Tracing', 'Scanline', 'Z-Buffering'], 'correct' => 1],
+                    ['q' => 'Z-buffer algorithm digunakan untuk?', 'a' => ['Anti-aliasing', 'Hidden surface removal', 'Texture mapping', 'Lighting'], 'correct' => 1],
+                    ['q' => 'Model warna untuk pencetakan adalah?', 'a' => ['RGB', 'HSV', 'CMYK', 'YCbCr'], 'correct' => 2],
+                    ['q' => 'Shading model yang menghasilkan permukaan tampak halus disebut?', 'a' => ['Flat shading', 'Gouraud shading', 'Phong shading', 'Ray shading'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah transformasi geometri 2D yang valid?', 'options' => ['Translation', 'Erosion', 'Rotation', 'Dilation'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik rendering 3D?', 'options' => ['Ray Tracing', 'Sorting', 'Rasterization', 'Hashing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik pencahayaan dalam grafika 3D?', 'options' => ['Phong lighting', 'Z-buffering', 'Blinn-Phong', 'Scanline'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah Graphics API yang umum digunakan?', 'options' => ['OpenGL', 'MySQL', 'Vulkan', 'HTTP'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik anti-aliasing?', 'options' => ['MSAA', 'Z-buffer', 'FXAA', 'Rasterization'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan pipeline rendering GPU modern dari vertex input hingga pixel output!'],
+                    ['q' => 'Apa yang dimaksud ray tracing? Jelaskan cara kerjanya dan mengapa lebih realistis dari rasterization!'],
+                    ['q' => 'Jelaskan transformasi geometri 3D (translation, rotation, scaling) dalam representasi matriks!'],
+                    ['q' => 'Jelaskan model pencahayaan Phong beserta komponen ambient, diffuse, dan specular!'],
+                    ['q' => 'Apa yang dimaksud Z-buffer? Bagaimana Z-buffer menyelesaikan hidden surface removal?'],
+                ],
+            ],
+
+            'Internet of Things' => [
+                'pg' => [
+                    ['q' => 'Protokol komunikasi ringan paling umum di IoT adalah?', 'a' => ['HTTP', 'MQTT', 'FTP', 'SMTP'], 'correct' => 1],
+                    ['q' => 'Mikrokontroler paling populer untuk edukasi IoT?', 'a' => ['Raspberry Pi', 'Arduino', 'Intel NUC', 'NVIDIA Jetson'], 'correct' => 1],
+                    ['q' => 'Edge computing dalam IoT berarti?', 'a' => ['Semua data di cloud', 'Proses data di dekat sumber', 'Tanpa internet', 'Server terpusat'], 'correct' => 1],
+                    ['q' => 'LPWAN untuk IoT cakupan luas?', 'a' => ['Bluetooth', 'Zigbee', 'LoRaWAN', 'WiFi'], 'correct' => 2],
+                    ['q' => 'OTA update pada IoT memungkinkan?', 'a' => ['Tanpa baterai', 'Update firmware nirkabel jarak jauh', 'Koneksi lebih cepat', 'Sensor lebih akurat'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah protokol komunikasi IoT yang valid?', 'options' => ['MQTT', 'HTTP', 'CoAP', 'FTP'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah platform IoT yang populer?', 'options' => ['Arduino', 'Windows Desktop', 'Raspberry Pi', 'Oracle DB'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknologi wireless untuk IoT?', 'options' => ['Zigbee', 'Ethernet', 'LoRa', 'Fiber optic'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tantangan utama dalam IoT?', 'options' => ['Security', 'Terlalu banyak daya', 'Scalability', 'Terlalu cepat'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi IoT nyata?', 'options' => ['Smart home', 'TV tabung', 'Smart agriculture', 'Koran cetak'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep IoT dan komponen utama dalam ekosistemnya!'],
+                    ['q' => 'Apa perbedaan Arduino dan Raspberry Pi? Kapan menggunakan masing-masing?'],
+                    ['q' => 'Jelaskan protokol MQTT dan model publish-subscribe dalam komunikasi IoT!'],
+                    ['q' => 'Apa yang dimaksud edge computing dalam IoT dan bagaimana mengurangi latensi?'],
+                    ['q' => 'Jelaskan tantangan keamanan IoT dan teknik mitigasi yang umum digunakan!'],
+                ],
+            ],
+
+            'Big Data Analytics' => [
+                'pg' => [
+                    ['q' => 'Karakteristik Big Data "5V" dimulai dari Volume, Velocity, Variety, Veracity, dan?', 'a' => ['Visibility', 'Value', 'Version', 'Validation'], 'correct' => 1],
+                    ['q' => 'Framework paling populer untuk Big Data terdistribusi?', 'a' => ['MySQL', 'MongoDB', 'Apache Hadoop', 'Redis'], 'correct' => 2],
+                    ['q' => 'Apache Spark lebih cepat dari Hadoop MapReduce karena?', 'a' => ['Lebih banyak node', 'In-memory processing', 'Pakai SSD', 'Kode lebih efisien'], 'correct' => 1],
+                    ['q' => 'Apache Kafka digunakan untuk?', 'a' => ['Batch processing', 'Real-time data streaming', 'Machine learning saja', 'Database management'], 'correct' => 1],
+                    ['q' => 'Data lake berbeda dari data warehouse karena?', 'a' => ['Hanya structured data', 'Simpan data dalam format raw/asli', 'Lebih mahal', 'Tidak bisa dianalisis'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah karakteristik Big Data (V) yang valid?', 'options' => ['Volume', 'Velocity', 'Variety', 'Veracity'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah framework Big Data populer?', 'options' => ['Apache Hadoop', 'MySQL', 'Apache Spark', 'PostgreSQL'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools stream processing?', 'options' => ['Apache Kafka', 'Hadoop HDFS', 'Apache Flink', 'MySQL'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah format penyimpanan kolumnar untuk big data?', 'options' => ['Parquet', 'CSV', 'ORC', 'JSON'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools visualisasi data?', 'options' => ['Tableau', 'Hadoop', 'Power BI', 'Spark'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep Big Data dan karakteristik 5V-nya!'],
+                    ['q' => 'Jelaskan arsitektur Hadoop (HDFS, MapReduce, YARN) dan cara kerjanya!'],
+                    ['q' => 'Apa perbedaan Apache Spark vs Hadoop MapReduce? Mengapa Spark sering dipilih?'],
+                    ['q' => 'Jelaskan Lambda Architecture dalam big data beserta peran setiap layer-nya!'],
+                    ['q' => 'Apa itu ETL? Jelaskan setiap tahap Extract, Transform, Load dalam pipeline data!'],
+                ],
+            ],
+
+            'DevOps' => [
+                'pg' => [
+                    ['q' => 'DevOps menggabungkan antara?', 'a' => ['Design dan Operations', 'Development dan Operations', 'Data dan Operations', 'Deploy dan Optimization'], 'correct' => 1],
+                    ['q' => 'Container orchestration paling populer?', 'a' => ['Docker', 'Ansible', 'Kubernetes', 'Terraform'], 'correct' => 2],
+                    ['q' => 'Continuous Integration (CI) berarti?', 'a' => ['Deploy otomatis ke production', 'Merge dan otomatis build/test', 'Monitor terus-menerus', 'Backup database otomatis'], 'correct' => 1],
+                    ['q' => 'Deployment yang bertahap pindahkan traffic ke versi baru disebut?', 'a' => ['Big Bang', 'Blue-Green', 'Canary', 'Rollback'], 'correct' => 2],
+                    ['q' => 'Tiga pilar observability dalam DevOps?', 'a' => ['Code, Test, Deploy', 'Logs, Metrics, Traces', 'Plan, Build, Monitor', 'Dev, Int, Deliver'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah tools CI/CD populer?', 'options' => ['Jenkins', 'Docker', 'GitHub Actions', 'Kubernetes'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools Infrastructure as Code?', 'options' => ['Terraform', 'Jenkins', 'Ansible', 'Git'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip DevOps yang valid?', 'options' => ['Continuous Integration', 'Waterfall dev', 'Automation', 'Manual testing only'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools monitoring dan observability?', 'options' => ['Prometheus', 'Docker', 'Grafana', 'Kubernetes'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi deployment?', 'options' => ['Blue-Green', 'Waterfall', 'Canary', 'Agile'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep DevOps dan bagaimana menjembatani gap antara Development dan Operations!'],
+                    ['q' => 'Apa yang dimaksud CI/CD pipeline? Jelaskan tahapan dalam pipeline yang ideal!'],
+                    ['q' => 'Jelaskan containerization dengan Docker! Apa perbedaan Container dan Virtual Machine?'],
+                    ['q' => 'Apa itu Kubernetes? Jelaskan komponen utamanya dan cara kerjanya!'],
+                    ['q' => 'Jelaskan Infrastructure as Code (IaC) dan keuntungan menggunakan Terraform!'],
+                ],
+            ],
+
+            'Etika Profesi TI' => [
+                'pg' => [
+                    ['q' => 'Kode etik profesi TI bertujuan untuk?', 'a' => ['Meningkatkan gaji', 'Mengatur perilaku profesional dan tanggung jawab', 'Mempercepat proyek', 'Mengurangi biaya'], 'correct' => 1],
+                    ['q' => 'Hak cipta perangkat lunak melindungi?', 'a' => ['Ide algoritma', 'Ekspresi kode sumber yang tertulis', 'Konsep umum', 'Hasil output program'], 'correct' => 1],
+                    ['q' => 'GDPR adalah regulasi yang mengatur?', 'a' => ['Hak cipta software', 'Perlindungan data pribadi warga EU', 'Standar coding', 'Keamanan jaringan'], 'correct' => 1],
+                    ['q' => 'Whistleblowing dalam konteks etika TI adalah?', 'a' => ['Membocorkan data klien', 'Melaporkan pelanggaran etika/hukum oleh organisasi', 'Mencuri kode sumber', 'Mengundurkan diri'], 'correct' => 1],
+                    ['q' => 'Prinsip privasi "data minimization" berarti?', 'a' => ['Simpan data sebanyak mungkin', 'Hanya kumpulkan data yang benar-benar diperlukan', 'Enkripsi semua data', 'Hapus semua data'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk jenis kekayaan intelektual di TI?', 'options' => ['Hak Cipta (Copyright)', 'Hak minum', 'Paten', 'Hak bernafas'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip etika dalam pengembangan AI yang diakui?', 'options' => ['Fairness', 'Profitability first', 'Transparency', 'Speed only'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah regulasi terkait privasi data yang valid?', 'options' => ['GDPR', 'ISO 9001', 'UU ITE', 'ISO 14001'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tanggung jawab profesional TI?', 'options' => ['Menjaga kerahasiaan data klien', 'Menjual data klien', 'Mengutamakan keselamatan publik', 'Mengabaikan bug minor'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk isu etika dalam cybersecurity?', 'options' => ['Ethical hacking', 'Mencuri kredensial', 'Responsible disclosure', 'Menyebarkan malware'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan pentingnya kode etik profesi dalam bidang teknologi informasi!'],
+                    ['q' => 'Apa yang dimaksud dengan hak cipta software? Jelaskan perbedaan proprietary dan open source license!'],
+                    ['q' => 'Jelaskan isu privasi data dalam era digital dan regulasi yang mengaturnya (GDPR, UU ITE)!'],
+                    ['q' => 'Apa yang dimaksud dengan ethical hacking? Jelaskan perbedaan black hat, white hat, dan grey hat hacker!'],
+                    ['q' => 'Bagaimana seorang profesional TI seharusnya menangani konflik kepentingan antara klien dan kepentingan publik?'],
+                ],
+            ],
+
+            // ─────────────────────────────────────────────────────
+            // SISTEM INFORMASI (SI)
+            // ─────────────────────────────────────────────────────
+
+            'Analisis Sistem' => [
+                'pg' => [
+                    ['q' => 'Tahap pertama dalam analisis sistem adalah?', 'a' => ['Desain', 'Identifikasi masalah', 'Implementasi', 'Testing'], 'correct' => 1],
+                    ['q' => 'DFD (Data Flow Diagram) digunakan untuk?', 'a' => ['Menggambar struktur database', 'Menggambarkan aliran data dalam sistem', 'Membuat wireframe UI', 'Mendokumentasikan kode'], 'correct' => 1],
+                    ['q' => 'Studi kelayakan (feasibility study) mencakup aspek?', 'a' => ['Teknis saja', 'Ekonomis saja', 'Teknis, ekonomis, operasional, dan jadwal', 'Jadwal saja'], 'correct' => 2],
+                    ['q' => 'Wawancara, kuesioner, dan observasi adalah teknik?', 'a' => ['Desain sistem', 'Pengumpulan kebutuhan (requirement gathering)', 'Testing', 'Deployment'], 'correct' => 1],
+                    ['q' => 'Simbol proses dalam DFD berbentuk?', 'a' => ['Kotak persegi', 'Lingkaran/gelembung', 'Panah', 'Silinder'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah teknik pengumpulan kebutuhan yang valid?', 'options' => ['Wawancara', 'Coding', 'Kuesioner', 'Testing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk tipe feasibility study?', 'options' => ['Technical feasibility', 'Logical feasibility', 'Economic feasibility', 'Binary feasibility'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah elemen dalam DFD?', 'options' => ['Proses', 'Class', 'Data store', 'Method'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk tipe sistem informasi?', 'options' => ['TPS (Transaction Processing)', 'MIS (Management Info)', 'DSS (Decision Support)', 'UML (Unified Modeling)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah output dari analisis sistem?', 'options' => ['Requirements document', 'Source code', 'System design', 'Test plan'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tahapan dalam proses analisis sistem informasi secara lengkap!'],
+                    ['q' => 'Apa yang dimaksud DFD? Jelaskan komponen-komponen DFD dan cara membacanya!'],
+                    ['q' => 'Jelaskan perbedaan antara kebutuhan fungsional dan non-fungsional beserta contoh masing-masing!'],
+                    ['q' => 'Apa yang dimaksud studi kelayakan? Jelaskan aspek-aspek yang dievaluasi!'],
+                    ['q' => 'Bagaimana cara melakukan fact-finding dalam analisis sistem? Jelaskan teknik-teknik yang digunakan!'],
+                ],
+            ],
+
+            'Perancangan Sistem' => [
+                'pg' => [
+                    ['q' => 'Diagram yang menggambarkan struktur fisik komponen sistem?', 'a' => ['Use Case Diagram', 'Class Diagram', 'Deployment Diagram', 'Sequence Diagram'], 'correct' => 2],
+                    ['q' => 'Normalisasi database bertujuan untuk?', 'a' => ['Mempercepat query saja', 'Mengurangi redundansi dan anomali data', 'Memperbesar database', 'Menambah tabel'], 'correct' => 1],
+                    ['q' => 'Perancangan antarmuka pengguna mempertimbangkan prinsip?', 'a' => ['Kecepatan server', 'Usability dan user experience', 'Ukuran database', 'Jumlah kode'], 'correct' => 1],
+                    ['q' => 'Prototyping dalam perancangan sistem berguna untuk?', 'a' => ['Final deployment', 'Validasi kebutuhan dengan pengguna lebih awal', 'Pengganti dokumentasi', 'Optimasi performa'], 'correct' => 1],
+                    ['q' => 'Arsitektur three-tier terdiri dari?', 'a' => ['Input, Proses, Output', 'Presentation, Business Logic, Data', 'Frontend, API, Server', 'Client, Network, Cloud'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk jenis diagram UML untuk perancangan?', 'options' => ['Class Diagram', 'Gantt Chart', 'Sequence Diagram', 'Pert Chart'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip desain sistem yang baik?', 'options' => ['Modularity', 'Coupling tinggi', 'Cohesion tinggi', 'Redundansi tinggi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk tipe arsitektur sistem?', 'options' => ['Client-Server', 'Peer-to-Peer', 'Monolithic', 'Binary'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah output dari perancangan sistem?', 'options' => ['Design document', 'Test result', 'ERD', 'Source code'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang merupakan pertimbangan dalam desain database?', 'options' => ['Normalisasi', 'Warna UI', 'Indexing strategy', 'Font size'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara analisis sistem dan perancangan sistem!'],
+                    ['q' => 'Jelaskan konsep normalisasi database dan tahapannya (1NF, 2NF, 3NF)!'],
+                    ['q' => 'Apa yang dimaksud dengan arsitektur three-tier? Jelaskan keuntungannya dibanding two-tier!'],
+                    ['q' => 'Jelaskan prinsip high cohesion dan low coupling dalam perancangan sistem!'],
+                    ['q' => 'Bagaimana prototyping membantu dalam proses perancangan sistem? Jelaskan jenisnya!'],
+                ],
+            ],
+
+            'Enterprise Resource Planning' => [
+                'pg' => [
+                    ['q' => 'ERP adalah sistem yang mengintegrasikan?', 'a' => ['Hanya keuangan', 'Seluruh proses bisnis dalam satu platform', 'Hanya HR', 'Hanya produksi'], 'correct' => 1],
+                    ['q' => 'Vendor ERP terbesar di dunia adalah?', 'a' => ['Microsoft Office', 'SAP', 'Adobe', 'Salesforce'], 'correct' => 1],
+                    ['q' => 'Modul utama dalam sistem ERP biasanya mencakup?', 'a' => ['Gaming saja', 'Finance, HR, SCM, CRM', 'Email saja', 'Media sosial'], 'correct' => 1],
+                    ['q' => 'Implementasi ERP yang mengganti sistem lama sekaligus disebut?', 'a' => ['Phased rollout', 'Big Bang approach', 'Parallel running', 'Pilot approach'], 'correct' => 1],
+                    ['q' => 'Penyebab utama kegagalan implementasi ERP?', 'a' => ['Software terlalu bagus', 'Resistensi pengguna dan manajemen perubahan buruk', 'Hardware terlalu mahal', 'Internet terlalu cepat'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah modul yang umum ada dalam ERP?', 'options' => ['Financial Management', 'Game Engine', 'Human Resources', 'Photo Editor'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi implementasi ERP?', 'options' => ['Big Bang', 'No planning', 'Phased rollout', 'Random deployment'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah vendor ERP terkenal?', 'options' => ['SAP', 'Instagram', 'Oracle', 'YouTube'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah keuntungan ERP?', 'options' => ['Data terintegrasi', 'Sistem terfragmentasi', 'Proses lebih efisien', 'Biaya selalu lebih murah'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tantangan implementasi ERP?', 'options' => ['Change management', 'Terlalu mudah digunakan', 'Data migration', 'Tidak perlu training'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep ERP dan bagaimana sistem ini mengintegrasikan proses bisnis!'],
+                    ['q' => 'Apa kelebihan dan kekurangan implementasi ERP pada perusahaan?'],
+                    ['q' => 'Jelaskan strategi Big Bang vs Phased Rollout dalam implementasi ERP!'],
+                    ['q' => 'Mengapa banyak proyek implementasi ERP gagal? Jelaskan faktor-faktor penyebabnya!'],
+                    ['q' => 'Apa perbedaan ERP cloud vs on-premise? Kapan memilih masing-masing?'],
+                ],
+            ],
+
+            'Audit Sistem Informasi' => [
+                'pg' => [
+                    ['q' => 'Tujuan utama audit sistem informasi adalah?', 'a' => ['Menambah fitur sistem', 'Menilai efektivitas kontrol dan keamanan SI', 'Mempercepat sistem', 'Mengganti sistem lama'], 'correct' => 1],
+                    ['q' => 'Framework audit IT yang paling dikenal adalah?', 'a' => ['SCRUM', 'COBIT', 'Kanban', 'Agile'], 'correct' => 1],
+                    ['q' => 'Audit trail dalam sistem informasi adalah?', 'a' => ['Jalur jaringan', 'Catatan log semua aktivitas sistem', 'Diagram alur', 'Kode program'], 'correct' => 1],
+                    ['q' => 'Kontrol preventif bertujuan untuk?', 'a' => ['Mendeteksi kesalahan setelah terjadi', 'Mencegah kesalahan sebelum terjadi', 'Memperbaiki kesalahan', 'Mendokumentasikan kesalahan'], 'correct' => 1],
+                    ['q' => 'Sertifikasi auditor IT yang paling dikenal adalah?', 'a' => ['PMP', 'CISA', 'CCNA', 'AWS'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis kontrol dalam audit SI?', 'options' => ['Preventive control', 'Decorative control', 'Detective control', 'Physical control'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah framework yang digunakan dalam audit IT?', 'options' => ['COBIT', 'Scrum', 'ITIL', 'Kanban'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk area audit dalam SI?', 'options' => ['Audit keamanan', 'Audit desain UI', 'Audit operasional', 'Audit warna'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang merupakan bukti audit?', 'options' => ['Log files', 'Desain grafis', 'Interview notes', 'Foto produk'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah standar yang relevan dalam audit SI?', 'options' => ['ISO 27001', 'ISO 9001 Mutu', 'SOX (Sarbanes-Oxley)', 'ISO 14001'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tujuan dan ruang lingkup audit sistem informasi!'],
+                    ['q' => 'Apa yang dimaksud COBIT? Jelaskan bagaimana COBIT digunakan sebagai framework audit IT!'],
+                    ['q' => 'Jelaskan perbedaan antara kontrol preventif, detektif, dan korektif dalam audit SI!'],
+                    ['q' => 'Bagaimana proses audit trail bekerja? Mengapa audit trail penting dalam keamanan sistem?'],
+                    ['q' => 'Apa saja risiko yang diidentifikasi dalam audit keamanan sistem informasi? Jelaskan pendekatannya!'],
+                ],
+            ],
+
+            'Manajemen Proyek TI' => [
+                'pg' => [
+                    ['q' => 'Triple constraint dalam manajemen proyek terdiri dari?', 'a' => ['Waktu, biaya, kualitas', 'Waktu, biaya, scope', 'Biaya, scope, tim', 'Scope, kualitas, tim'], 'correct' => 1],
+                    ['q' => 'Diagram Gantt digunakan untuk?', 'a' => ['Alokasi anggaran', 'Jadwal dan progress aktivitas proyek', 'Struktur organisasi', 'Alur data'], 'correct' => 1],
+                    ['q' => 'Sertifikasi manajemen proyek paling diakui secara global?', 'a' => ['CISA', 'PMP (Project Management Professional)', 'CCNA', 'AWS Certified'], 'correct' => 1],
+                    ['q' => 'Work Breakdown Structure (WBS) digunakan untuk?', 'a' => ['Mengelola keuangan', 'Memecah proyek menjadi deliverable lebih kecil', 'Mengatur tim', 'Membuat jadwal'], 'correct' => 1],
+                    ['q' => 'Critical Path Method (CPM) digunakan untuk?', 'a' => ['Menganalisis biaya', 'Menentukan rangkaian aktivitas terpanjang yang kritis', 'Merekrut tim', 'Testing aplikasi'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah tools manajemen proyek yang populer?', 'options' => ['JIRA', 'Photoshop', 'Trello', 'Illustrator'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah fase dalam siklus hidup proyek (PMBOK)?', 'options' => ['Initiating', 'Painting', 'Planning', 'Decorating'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk dalam project risk management?', 'options' => ['Risk identification', 'Risk decoration', 'Risk mitigation', 'Risk creation'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik estimasi proyek yang valid?', 'options' => ['Function Point Analysis', 'Random guessing', 'Story Points', 'No estimation'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk dokumen manajemen proyek?', 'options' => ['Project Charter', 'Source code', 'WBS', 'Database schema'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan triple constraint dalam manajemen proyek dan bagaimana ketiga elemen saling mempengaruhi!'],
+                    ['q' => 'Apa yang dimaksud WBS? Jelaskan cara membuat WBS yang efektif untuk proyek TI!'],
+                    ['q' => 'Jelaskan proses manajemen risiko proyek dari identifikasi hingga mitigasi!'],
+                    ['q' => 'Apa perbedaan pendekatan Waterfall dan Agile dalam manajemen proyek TI?'],
+                    ['q' => 'Bagaimana cara mengelola stakeholder dalam proyek TI? Jelaskan teknik komunikasi yang efektif!'],
+                ],
+            ],
+
+            'Sistem Pendukung Keputusan' => [
+                'pg' => [
+                    ['q' => 'DSS (Decision Support System) dirancang untuk membantu?', 'a' => ['Karyawan operasional', 'Manajer dalam pengambilan keputusan semi-terstruktur', 'Programmer', 'Akuntan saja'], 'correct' => 1],
+                    ['q' => 'Model dalam DSS yang mensimulasikan berbagai skenario disebut?', 'a' => ['Dialog model', 'What-if analysis model', 'Database model', 'Report model'], 'correct' => 1],
+                    ['q' => 'Komponen utama DSS terdiri dari?', 'a' => ['UI saja', 'Model base, database, dan user interface', 'Jaringan saja', 'Kode program saja'], 'correct' => 1],
+                    ['q' => 'Data warehouse mendukung DSS karena?', 'a' => ['Menyimpan data transaksional', 'Menyediakan data historis terintegrasi untuk analisis', 'Mempercepat input data', 'Mengamankan data'], 'correct' => 1],
+                    ['q' => 'Analytic Hierarchy Process (AHP) digunakan dalam DSS untuk?', 'a' => ['Sorting data', 'Pengambilan keputusan multi-kriteria', 'Kompresi data', 'Backup database'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen dalam DSS?', 'options' => ['Model base', 'Printer', 'Database', 'Scanner'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis DSS berdasarkan teknologi?', 'options' => ['Data-driven DSS', 'Manual DSS', 'Model-driven DSS', 'Paper-based DSS'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik analisis dalam DSS?', 'options' => ['What-if analysis', 'Sorting only', 'Sensitivity analysis', 'Data entry only'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang mendukung DSS?', 'options' => ['OLAP', 'CRUD only', 'Data mining', 'File storage only'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah perbedaan DSS dari MIS?', 'options' => ['Mendukung keputusan tidak terstruktur', 'Hanya laporan rutin', 'Fleksibel dan ad-hoc', 'Output tetap'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep DSS dan perbedaannya dengan MIS (Management Information System)!'],
+                    ['q' => 'Jelaskan tiga komponen utama DSS (model base, database, user interface) beserta fungsinya!'],
+                    ['q' => 'Apa yang dimaksud dengan what-if analysis dalam DSS? Berikan contoh penggunaannya!'],
+                    ['q' => 'Bagaimana data warehouse mendukung fungsi DSS? Jelaskan hubungannya!'],
+                    ['q' => 'Jelaskan metode AHP (Analytic Hierarchy Process) dan bagaimana digunakan dalam pengambilan keputusan!'],
+                ],
+            ],
+
+            'Manajemen Basis Data' => [
+                'pg' => [
+                    ['q' => 'DBA (Database Administrator) bertanggung jawab atas?', 'a' => ['Menulis aplikasi', 'Performa, keamanan, dan integritas database', 'Desain UI', 'Manajemen jaringan'], 'correct' => 1],
+                    ['q' => 'Backup database jenis full backup dilakukan dengan cara?', 'a' => ['Hanya menyimpan perubahan sejak backup terakhir', 'Menyimpan seluruh data database', 'Hanya menyimpan log', 'Tidak menyimpan apapun'], 'correct' => 1],
+                    ['q' => 'Database tuning bertujuan untuk?', 'a' => ['Menambah tabel', 'Meningkatkan performa query dan manajemen resource', 'Menghapus data', 'Mengubah skema'], 'correct' => 1],
+                    ['q' => 'Recovery database menggunakan redo log untuk?', 'a' => ['Menghapus data', 'Memulihkan committed transaction yang hilang', 'Membuat backup', 'Membuat index'], 'correct' => 1],
+                    ['q' => 'Connection pooling dalam database management berguna untuk?', 'a' => ['Menambah koneksi fisik', 'Menggunakan kembali koneksi yang sudah ada', 'Mengurangi keamanan', 'Memperbesar database'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis backup database?', 'options' => ['Full backup', 'Color backup', 'Incremental backup', 'Shape backup'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tugas DBA?', 'options' => ['Performance tuning', 'UI design', 'Security management', 'Content writing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik database monitoring?', 'options' => ['Query execution plan', 'Code review', 'Slow query log', 'Unit testing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik high availability database?', 'options' => ['Replication', 'Manual backup only', 'Failover clustering', 'No redundancy'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk database security?', 'options' => ['Role-based access control', 'Public access all', 'Data encryption', 'No authentication'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan peran DBA dalam organisasi dan tanggung jawab utamanya!'],
+                    ['q' => 'Jelaskan strategi backup dan recovery database! Apa perbedaan full, incremental, dan differential backup?'],
+                    ['q' => 'Bagaimana cara melakukan database performance tuning? Jelaskan langkah-langkahnya!'],
+                    ['q' => 'Jelaskan konsep database security! Apa saja lapisan keamanan yang perlu diterapkan?'],
+                    ['q' => 'Apa yang dimaksud high availability database? Jelaskan teknik clustering dan replication!'],
+                ],
+            ],
+
+            'E-Business' => [
+                'pg' => [
+                    ['q' => 'Model bisnis B2C dalam e-business berarti?', 'a' => ['Business to Company', 'Business to Consumer', 'Bank to Consumer', 'Brand to Customer'], 'correct' => 1],
+                    ['q' => 'Payment gateway dalam e-commerce berfungsi untuk?', 'a' => ['Menyimpan produk', 'Memproses transaksi pembayaran online secara aman', 'Mengelola inventori', 'Mengirim email'], 'correct' => 1],
+                    ['q' => 'SEO (Search Engine Optimization) bertujuan untuk?', 'a' => ['Membayar iklan', 'Meningkatkan visibilitas organik di mesin pencari', 'Membuat aplikasi mobile', 'Meningkatkan keamanan'], 'correct' => 1],
+                    ['q' => 'Marketplace digital seperti Tokopedia adalah contoh model?', 'a' => ['B2B', 'C2C/B2C (platform)', 'B2G', 'G2C'], 'correct' => 1],
+                    ['q' => 'Digital marketing channel yang paling hemat biaya untuk startup?', 'a' => ['TV advertising', 'Content marketing dan social media', 'Billboard', 'Print media'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah model bisnis e-commerce yang valid?', 'options' => ['B2C', 'B2Z', 'B2B', 'C2C'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen utama dalam e-commerce?', 'options' => ['Payment gateway', 'Physical store', 'Shopping cart', 'Manual invoicing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik digital marketing?', 'options' => ['SEO', 'Billboard', 'Email marketing', 'TV ads'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah keamanan dalam transaksi e-commerce?', 'options' => ['SSL/TLS', 'Plain HTTP', 'Two-factor auth', 'No encryption'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk e-business strategy?', 'options' => ['Omnichannel', 'Single channel', 'Digital transformation', 'Manual process'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara e-commerce dan e-business! Mana yang lebih luas cakupannya?'],
+                    ['q' => 'Jelaskan model bisnis B2B, B2C, dan C2C beserta contoh platform masing-masing!'],
+                    ['q' => 'Apa yang dimaksud digital transformation? Bagaimana perusahaan konvensional bertransisi ke e-business?'],
+                    ['q' => 'Jelaskan strategi omnichannel dalam e-business! Apa keuntungannya bagi pelanggan dan bisnis?'],
+                    ['q' => 'Bagaimana cara mengamankan transaksi dalam e-commerce? Jelaskan teknik keamanan yang digunakan!'],
+                ],
+            ],
+
+            'Business Intelligence' => [
+                'pg' => [
+                    ['q' => 'BI (Business Intelligence) bertujuan untuk?', 'a' => ['Mengganti sistem ERP', 'Mengubah data menjadi insight yang mendukung keputusan bisnis', 'Mengelola keuangan saja', 'Membuat aplikasi web'], 'correct' => 1],
+                    ['q' => 'KPI (Key Performance Indicator) dalam BI digunakan untuk?', 'a' => ['Menyimpan data', 'Mengukur performa bisnis terhadap target', 'Mengamankan data', 'Memformat laporan'], 'correct' => 1],
+                    ['q' => 'Dashboard dalam BI berfungsi sebagai?', 'a' => ['Database', 'Visualisasi ringkasan metrik bisnis secara real-time', 'Kode program', 'Jaringan'], 'correct' => 1],
+                    ['q' => 'OLAP cube dalam BI digunakan untuk?', 'a' => ['Menyimpan foto', 'Analisis data multidimensi dari berbagai sudut pandang', 'Membuat laporan teks', 'Testing software'], 'correct' => 1],
+                    ['q' => 'Tools BI yang paling populer di perusahaan besar?', 'a' => ['Notepad', 'Power BI dan Tableau', 'Paint', 'Calculator'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen dalam ekosistem BI?', 'options' => ['Data warehouse', 'Source code repo', 'ETL pipeline', 'Game engine'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools BI yang populer?', 'options' => ['Tableau', 'Notepad', 'Power BI', 'Paint'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tipe laporan dalam BI?', 'options' => ['Ad-hoc report', 'Random report', 'Scheduled report', 'Imaginary report'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik visualisasi data dalam BI?', 'options' => ['Dashboard', 'Plain text file', 'Scorecard', 'Raw CSV'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sumber data untuk BI?', 'options' => ['Data warehouse', 'Social media APIs', 'CRM systems', 'Sticky notes'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep Business Intelligence dan bagaimana mengubah data menjadi business insight!'],
+                    ['q' => 'Apa yang dimaksud dengan KPI? Berikan contoh KPI untuk perusahaan e-commerce!'],
+                    ['q' => 'Jelaskan arsitektur BI dari data source hingga dashboard! Sebutkan komponen-komponen utamanya!'],
+                    ['q' => 'Apa perbedaan antara laporan operasional dan laporan analitik dalam BI?'],
+                    ['q' => 'Bagaimana BI mendukung pengambilan keputusan strategis perusahaan? Berikan contoh kasus nyata!'],
+                ],
+            ],
+
+            'IT Governance' => [
+                'pg' => [
+                    ['q' => 'IT Governance bertujuan untuk?', 'a' => ['Mempercepat coding', 'Memastikan IT mendukung tujuan bisnis dan dikelola dengan baik', 'Mengurangi karyawan IT', 'Membeli hardware terbaru'], 'correct' => 1],
+                    ['q' => 'Framework IT Governance yang paling banyak digunakan?', 'a' => ['Scrum', 'COBIT', 'Kanban', 'XP'], 'correct' => 1],
+                    ['q' => 'ITIL adalah framework untuk mengelola?', 'a' => ['Proyek software', 'Layanan IT (IT service management)', 'Database', 'Jaringan'], 'correct' => 1],
+                    ['q' => 'IT Steering Committee bertanggung jawab untuk?', 'a' => ['Menulis kode program', 'Mengarahkan investasi dan prioritas IT sejalan dengan bisnis', 'Mengelola server', 'Testing software'], 'correct' => 1],
+                    ['q' => 'ISO/IEC 38500 adalah standar untuk?', 'a' => ['Keamanan informasi', 'Corporate governance of IT', 'Kualitas software', 'Manajemen layanan IT'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah framework IT Governance yang valid?', 'options' => ['COBIT', 'Scrum', 'ITIL', 'Kanban'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah domain utama dalam COBIT?', 'options' => ['Evaluate, Direct and Monitor', 'Code and Test', 'Align, Plan and Organize', 'Deploy and Forget'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tujuan IT Governance?', 'options' => ['Value delivery', 'Cost maximization', 'Risk management', 'Ignore compliance'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk IT risk management?', 'options' => ['Risk identification', 'Risk creation', 'Risk mitigation', 'Risk ignoring'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah peran dalam IT Governance?', 'options' => ['IT Steering Committee', 'Game developers', 'Board of Directors', 'Social media managers'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep IT Governance dan mengapa penting bagi organisasi!'],
+                    ['q' => 'Apa yang dimaksud dengan COBIT? Jelaskan domain-domain utama dalam COBIT!'],
+                    ['q' => 'Bagaimana IT Governance memastikan alignment antara strategi IT dan strategi bisnis?'],
+                    ['q' => 'Jelaskan konsep IT risk management dalam konteks IT Governance!'],
+                    ['q' => 'Apa perbedaan antara IT Governance dan IT Management? Jelaskan dengan contoh!'],
+                ],
+            ],
+
+            'Manajemen Layanan TI' => [
+                'pg' => [
+                    ['q' => 'ITSM (IT Service Management) bertujuan untuk?', 'a' => ['Mengelola kode sumber', 'Mengelola layanan IT agar memenuhi kebutuhan bisnis', 'Mengelola database saja', 'Mengelola jaringan saja'], 'correct' => 1],
+                    ['q' => 'SLA dalam konteks ITSM berarti?', 'a' => ['Software License Agreement', 'Service Level Agreement', 'System Login Access', 'Security Layer Agreement'], 'correct' => 1],
+                    ['q' => 'ITIL versi terbaru yang berfokus pada value co-creation adalah?', 'a' => ['ITIL v2', 'ITIL v3', 'ITIL 4', 'ITIL 5'], 'correct' => 2],
+                    ['q' => 'Incident management bertujuan untuk?', 'a' => ['Mencegah insiden', 'Memulihkan layanan secepat mungkin setelah gangguan', 'Menghapus insiden', 'Membuat laporan saja'], 'correct' => 1],
+                    ['q' => 'Change management dalam ITSM bertujuan untuk?', 'a' => ['Mencegah semua perubahan', 'Mengelola perubahan IT dengan risiko minimal', 'Mempercepat semua perubahan tanpa review', 'Mendokumentasikan saja'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah proses utama dalam ITIL?', 'options' => ['Incident Management', 'Game Management', 'Change Management', 'Photo Management'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen dalam SLA?', 'options' => ['Uptime guarantee', 'Employee salary', 'Response time', 'Office location'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools ITSM yang populer?', 'options' => ['ServiceNow', 'Photoshop', 'Jira Service Desk', 'Instagram'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tipe change dalam ITSM?', 'options' => ['Standard change', 'Random change', 'Emergency change', 'Hidden change'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah ITIL service management practice?', 'options' => ['Problem management', 'Cooking management', 'Knowledge management', 'Sports management'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep ITSM dan bagaimana ITIL menjadi framework panduan implementasinya!'],
+                    ['q' => 'Apa yang dimaksud SLA? Jelaskan komponen-komponen penting dalam SLA layanan IT!'],
+                    ['q' => 'Jelaskan perbedaan antara Incident Management dan Problem Management dalam ITIL!'],
+                    ['q' => 'Bagaimana change management dalam ITSM membantu mengurangi risiko gangguan layanan?'],
+                    ['q' => 'Jelaskan konsep service catalog dalam ITSM! Bagaimana service catalog membantu pengguna IT?'],
+                ],
+            ],
+
+        ];
+ 
+        return $data[$nama] ?? [];
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────
     private function insertBank(int $dosenId, int $mkId, string $nama, string $deskripsi): int
     {
         return DB::table('bank_soal')->insertGetId([
@@ -220,257 +575,5 @@ class UjianSeeder extends Seeder
         ]);
     }
 
-    private function insertAllSoal(array $pg, array $cb, array $essay, int $bankId, int $mkId): array
-    {
-        return [
-            $this->insertSoalPG($pg, $bankId, $mkId),
-            $this->insertSoalCB($cb, $bankId, $mkId),
-            $this->insertSoalEssay($essay, $bankId, $mkId),
-        ];
-    }
-
-    private function insertSoalPG(array $soalList, int $bankId, int $mkId): array
-    {
-        $result = [];
-        foreach ($soalList as $s) {
-            $soalId = DB::table('soal')->insertGetId([
-                'bank_soal_id'      => $bankId,
-                'mata_kuliah_id'    => $mkId,
-                'deskripsi'         => $s['q'],
-                'tingkat_kesulitan' => 'sedang',
-                'ai_generated'      => false,
-                'created_at'        => now(), 'updated_at' => now(),
-            ]);
-            $jsId = DB::table('jenis_soal')->insertGetId([
-                'soal_id'    => $soalId,
-                'jenis_soal' => 'pilihan_ganda',
-                'created_at' => now(), 'updated_at' => now(),
-            ]);
-            foreach ($s['a'] as $i => $teks) {
-                DB::table('opsi_jawaban')->insert([
-                    'jenis_soal_id' => $jsId,
-                    'opsi'          => $this->opsiLabels[$i],
-                    'teks'          => $teks,
-                    'is_correct'    => ($i === $s['correct']),
-                    'created_at'    => now(), 'updated_at' => now(),
-                ]);
-            }
-            $result[] = ['soal_id' => $soalId, 'correct' => $s['correct'], 'tipe' => 'pilihan_ganda'];
-        }
-        return $result;
-    }
-
-    private function insertSoalCB(array $soalList, int $bankId, int $mkId): array
-    {
-        $result = [];
-        foreach ($soalList as $s) {
-            $soalId = DB::table('soal')->insertGetId([
-                'bank_soal_id'      => $bankId,
-                'mata_kuliah_id'    => $mkId,
-                'deskripsi'         => $s['q'],
-                'tingkat_kesulitan' => 'sedang',
-                'ai_generated'      => false,
-                'created_at'        => now(), 'updated_at' => now(),
-            ]);
-            $jsId = DB::table('jenis_soal')->insertGetId([
-                'soal_id'    => $soalId,
-                'jenis_soal' => 'checklist',
-                'created_at' => now(), 'updated_at' => now(),
-            ]);
-            foreach ($s['options'] as $i => $teks) {
-                DB::table('opsi_jawaban')->insert([
-                    'jenis_soal_id' => $jsId,
-                    'opsi'          => $this->opsiLabels[$i],
-                    'teks'          => $teks,
-                    'is_correct'    => in_array($i, $s['correct']),
-                    'created_at'    => now(), 'updated_at' => now(),
-                ]);
-            }
-            $kunci = implode(',', array_map(fn($idx) => $this->opsiLabels[$idx], $s['correct']));
-            $result[] = ['soal_id' => $soalId, 'kunci' => $kunci, 'tipe' => 'checklist'];
-        }
-        return $result;
-    }
-
-    private function insertSoalEssay(array $soalList, int $bankId, int $mkId): array
-    {
-        $result = [];
-        foreach ($soalList as $s) {
-            $soalId = DB::table('soal')->insertGetId([
-                'bank_soal_id'      => $bankId,
-                'mata_kuliah_id'    => $mkId,
-                'deskripsi'         => $s['q'],
-                'tingkat_kesulitan' => 'sulit',
-                'ai_generated'      => false,
-                'created_at'        => now(), 'updated_at' => now(),
-            ]);
-            DB::table('jenis_soal')->insert([
-                'soal_id'    => $soalId,
-                'jenis_soal' => 'essay',
-                'created_at' => now(), 'updated_at' => now(),
-            ]);
-            $result[] = ['soal_id' => $soalId, 'tipe' => 'essay'];
-        }
-        return $result;
-    }
-
-    private function insertUjian(int $dosenId, int $mkId, string $nama, Carbon $start, string $kode): int
-    {
-        return DB::table('ujian')->insertGetId([
-            'created_by'     => $dosenId,
-            'mata_kuliah_id' => $mkId,
-            'nama_ujian'     => $nama,
-            'jenis_ujian'    => 'perkuliahan',
-            'start_date'     => $start,
-            'end_date'       => $start->copy()->addHours(2),
-            'durasi_menit'   => 90,
-            'kode_akses'     => $kode,
-            'is_kode_aktif'  => false,
-            'created_at'     => now(), 'updated_at' => now(),
-        ]);
-    }
-
-    private function insertGradeSetting(int $ujianId, array $grades): void
-    {
-        foreach ($grades as [$grade, $min, $max]) {
-            DB::table('grade_setting')->insert([
-                'ujian_id'   => $ujianId,
-                'grade'      => $grade,
-                'nilai_min'  => $min,
-                'nilai_max'  => $max,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-    }
-
-    private function linkUjianSoal(int $ujianId, array $pgIds, array $cbIds, array $essayIds): array
-    {
-        $result = [];
-        $urutan = 1;
-        foreach ($pgIds as $s) {
-            $result[] = [
-                'id'      => DB::table('ujian_soal')->insertGetId(['ujian_id' => $ujianId, 'soal_id' => $s['soal_id'], 'bobot' => 8,  'urutan' => $urutan++, 'created_at' => now(), 'updated_at' => now()]),
-                'tipe'    => 'pilihan_ganda',
-                'correct' => $s['correct'],
-            ];
-        }
-        foreach ($cbIds as $s) {
-            $result[] = [
-                'id'    => DB::table('ujian_soal')->insertGetId(['ujian_id' => $ujianId, 'soal_id' => $s['soal_id'], 'bobot' => 10, 'urutan' => $urutan++, 'created_at' => now(), 'updated_at' => now()]),
-                'tipe'  => 'checklist',
-                'kunci' => $s['kunci'],
-            ];
-        }
-        foreach ($essayIds as $s) {
-            $result[] = [
-                'id'   => DB::table('ujian_soal')->insertGetId(['ujian_id' => $ujianId, 'soal_id' => $s['soal_id'], 'bobot' => 20, 'urutan' => $urutan++, 'created_at' => now(), 'updated_at' => now()]),
-                'tipe' => 'essay',
-            ];
-        }
-        return $result;
-    }
-
-    private function getComponentScores(float $total): array
-    {
-        // [pg_correct(0-5), cb_correct(0-2), essay_total(0-40)]
-        [$pgC, $cbC] = match (true) {
-            $total >= 90 => [5, 2],
-            $total >= 80 => [4, 2],
-            $total >= 70 => [4, 1],
-            $total >= 60 => [3, 1],
-            $total >= 50 => [2, 1],
-            default      => [2, 0],
-        };
-        $essay = max(0, min(40, (int) round($total - ($pgC * 8) - ($cbC * 10))));
-        return [$pgC, $cbC, $essay];
-    }
-
-    private function buatPeserta(int $userId, int $ujianId, array $ujianSoal, float $score, Carbon $tanggal): void
-    {
-        [$pgCorrect, $cbCorrect, $essayTotal] = $this->getComponentScores($score);
-
-        $mulai    = $tanggal->copy()->addMinutes(rand(0, 10));
-        $selesai  = $mulai->copy()->addMinutes(rand(60, 88));
-
-        $pesertaId = DB::table('peserta_ujian')->insertGetId([
-            'ujian_id'   => $ujianId,
-            'user_id'    => $userId,
-            'attempt_ke' => 1,
-            'status'     => 'selesai',
-            'mulai_at'   => $mulai,
-            'selesai_at' => $selesai,
-            'created_at' => now(), 'updated_at' => now(),
-        ]);
-
-        $pgIdx  = 0;
-        $cbIdx  = 0;
-        $essIdx = 0;
-        $essayTexts = [
-            'Berdasarkan pemahaman saya, konsep ini berkaitan dengan penerapan prinsip-prinsip yang telah dipelajari. Terdapat beberapa aspek penting yang perlu diperhatikan dalam implementasinya di dunia nyata.',
-            'Analisis mendalam terhadap topik ini menunjukkan bahwa ada beberapa faktor kritis yang mempengaruhi hasil akhir. Diperlukan pemahaman yang komprehensif untuk dapat menerapkannya secara efektif.',
-        ];
-
-        foreach ($ujianSoal as $entry) {
-            if ($entry['tipe'] === 'pilihan_ganda') {
-                $benar   = $pgIdx < $pgCorrect;
-                $correct = $entry['correct'];
-                $jawaban = $benar ? $this->opsiLabels[$correct] : $this->opsiLabels[($correct + 1) % 4];
-                $nilai   = $benar ? 8.0 : 0.0;
-                DB::table('jawaban_peserta')->insert([
-                    'peserta_ujian_id' => $pesertaId,
-                    'ujian_soal_id'    => $entry['id'],
-                    'jawaban'          => $jawaban,
-                    'nilai'            => $nilai,
-                    'is_manual_graded' => false,
-                    'final_nilai'      => $nilai,
-                    'created_at'       => now(), 'updated_at' => now(),
-                ]);
-                $pgIdx++;
-            } elseif ($entry['tipe'] === 'checklist') {
-                $benar   = $cbIdx < $cbCorrect;
-                $jawaban = $benar ? $entry['kunci'] : 'A,B';
-                $nilai   = $benar ? 10.0 : 0.0;
-                DB::table('jawaban_peserta')->insert([
-                    'peserta_ujian_id' => $pesertaId,
-                    'ujian_soal_id'    => $entry['id'],
-                    'jawaban'          => $jawaban,
-                    'nilai'            => $nilai,
-                    'is_manual_graded' => false,
-                    'final_nilai'      => $nilai,
-                    'created_at'       => now(), 'updated_at' => now(),
-                ]);
-                $cbIdx++;
-            } else { // essay
-                $essayScore = $essIdx === 0 ? (int) ceil($essayTotal / 2) : (int) floor($essayTotal / 2);
-                DB::table('jawaban_peserta')->insert([
-                    'peserta_ujian_id' => $pesertaId,
-                    'ujian_soal_id'    => $entry['id'],
-                    'jawaban'          => $essayTexts[$essIdx % 2],
-                    'nilai'            => 0,
-                    'is_manual_graded' => true,
-                    'final_nilai'      => (float) $essayScore,
-                    'created_at'       => now(), 'updated_at' => now(),
-                ]);
-                $essIdx++;
-            }
-        }
-
-        $grade = match (true) {
-            $score >= 85 => 'A',
-            $score >= 75 => 'B',
-            $score >= 65 => 'C',
-            $score >= 55 => 'D',
-            default      => 'E',
-        };
-
-        DB::table('nilai_akhir')->insert([
-            'peserta_ujian_id' => $pesertaId,
-            'nilai_total'      => $score,
-            'lulus'            => $score >= 65,
-            'grade'            => $grade,
-            'graded_at'        => $selesai->copy()->addDays(3),
-            'created_at'       => now(), 'updated_at' => now(),
-        ]);
-    }
+    // ... (Fungsi helper lainnya tidak berubah dan taruh di sini) ...
 }
