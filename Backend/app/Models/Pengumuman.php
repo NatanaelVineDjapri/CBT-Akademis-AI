@@ -12,6 +12,7 @@ class Pengumuman extends Model
         'created_by',
         'judul',
         'isi',
+        'target_role',
         'expired_at',
     ];
 

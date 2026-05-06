@@ -14,9 +14,21 @@ class PengumumanController extends Controller
 
         $pengumuman = Pengumuman::with('creator')
             ->where(function ($q) use ($authUser) {
-                $q->whereHas('creator', fn($q) => $q->where('universitas_id', $authUser->universitas_id));
+                if ($authUser->role === 'admin_akademis_ai') {
+                    $q->where('created_by', $authUser->id);
+                } else {
+                    // Tampilkan pengumuman dari universitas sendiri ATAU pengumuman platform dari admin-akademis
+                    $q->whereHas('creator', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
+                      ->orWhereHas('creator', fn($q) => $q->where('role', 'admin_akademis_ai'));
+                }
             })
             ->when($request->ujian_id, fn($q) => $q->where('ujian_id', $request->ujian_id))
+            ->when(
+                !in_array($authUser->role, ['admin_akademis_ai', 'admin_universitas']),
+                fn($q) => $q->where(function ($q) use ($authUser) {
+                    $q->whereNull('target_role')->orWhere('target_role', $authUser->role);
+                })
+            )
             ->when(
                 in_array($authUser->role, ['dosen', 'mahasiswa', 'peserta_mahasiswa_baru']),
                 fn($q) => $q->where(function ($q) {
@@ -46,6 +58,7 @@ class PengumumanController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'isi' => 'required|string',
+            'target_role' => 'nullable|in:mahasiswa,dosen,peserta_mahasiswa_baru',
             'ujian_id' => 'nullable|exists:ujian,id',
             'expired_at' => 'nullable|date|after:now',
         ], [
@@ -73,6 +86,7 @@ class PengumumanController extends Controller
             'ujian_id' => $request->ujian_id,
             'judul' => $request->judul,
             'isi' => $request->isi,
+            'target_role' => $request->target_role,
             'expired_at' => $request->expired_at,
         ]);
 
@@ -94,16 +108,17 @@ class PengumumanController extends Controller
         $request->validate([
             'judul' => 'sometimes|string|max:255',
             'isi' => 'sometimes|string',
+            'target_role' => 'nullable|in:mahasiswa,dosen,peserta_mahasiswa_baru',
             'ujian_id' => 'nullable|exists:ujian,id',
-            'expired_at' => 'nullable|date|after:now',
+            'expired_at' => 'nullable|date',
         ], [
             'ujian_id.exists' => 'Ujian tidak ditemukan!',
-            'expired_at.after' => 'Tanggal expired harus setelah sekarang!',
         ]);
 
         $pengumuman->update([
             'judul' => $request->judul ?? $pengumuman->judul,
             'isi' => $request->isi ?? $pengumuman->isi,
+            'target_role' => array_key_exists('target_role', $request->all()) ? $request->target_role : $pengumuman->target_role,
             'ujian_id' => $request->ujian_id ?? $pengumuman->ujian_id,
             'expired_at' => $request->expired_at ?? $pengumuman->expired_at,
         ]);
