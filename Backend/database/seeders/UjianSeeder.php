@@ -386,8 +386,6 @@ class UjianSeeder extends Seeder
             ],
 
             // SISTEM INFORMASI (SI)
-
-
             'Analisis Sistem' => [
                 'pg' => [
                     ['q' => 'Tahap pertama dalam analisis sistem adalah?', 'a' => ['Desain', 'Identifikasi masalah', 'Implementasi', 'Testing'], 'correct' => 1],
@@ -652,12 +650,1048 @@ class UjianSeeder extends Seeder
                 ],
             ],
 
+            // TEKNIK SIPIL (TS)
+            'Mekanika Tanah' => [
+                'pg' => [
+                    ['q' => 'Batas cair (Liquid Limit) tanah ditentukan dengan alat?', 'a' => ['Proctor', 'Casagrande', 'Triaxial', 'Oedometer'], 'correct' => 1],
+                    ['q' => 'Consolidasi primer tanah berkaitan dengan?', 'a' => ['Deformasi plastis tanah pasir', 'Keluarnya air pori dari tanah lempung', 'Pemadatan mekanis', 'Erosi tanah'], 'correct' => 1],
+                    ['q' => 'Nilai N-SPT digunakan untuk menentukan?', 'a' => ['Kadar air tanah', 'Kepadatan/konsistensi lapisan tanah', 'Batas plastis', 'Berat jenis tanah'], 'correct' => 1],
+                    ['q' => 'Tanah yang memiliki permeabilitas tinggi adalah?', 'a' => ['Lempung', 'Lanau', 'Pasir kasar', 'Gambut'], 'correct' => 2],
+                    ['q' => 'Tegangan efektif tanah dihitung dengan rumus?', 'a' => ['σ = γ × z', "σ' = σ - u", 'σ = cu × Nc', 'σ = q × Nq'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk klasifikasi tanah berdasarkan USCS?', 'options' => ['GW (Well-graded Gravel)', 'RB (Red Brick)', 'CL (Clay Low plasticity)', 'WS (Wet Sand)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter kuat geser tanah?', 'options' => ['Kohesi (c)', 'Berat jenis (Gs)', 'Sudut geser dalam (φ)', 'Kadar air (w)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah uji laboratorium mekanika tanah?', 'options' => ['Triaxial test', 'Tensile test baja', 'Direct shear test', 'Bending test beton'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk masalah stabilitas lereng?', 'options' => ['Slip circle failure', 'Bending failure', 'Translational failure', 'Tensile failure'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter konsolidasi tanah?', 'options' => ['Cc (Compression index)', 'Modulus elastis baja', 'Cv (Coefficient of consolidation)', 'Kuat tekan beton'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep Atterberg Limits dan signifikansinya dalam klasifikasi tanah berbutir halus!'],
+                    ['q' => 'Apa yang dimaksud dengan konsolidasi tanah? Jelaskan perbedaan konsolidasi primer dan sekunder!'],
+                    ['q' => 'Jelaskan prinsip tegangan efektif Terzaghi dan aplikasinya dalam perencanaan fondasi!'],
+                    ['q' => 'Bagaimana cara menganalisis stabilitas lereng? Jelaskan metode irisan Bishop yang disederhanakan!'],
+                    ['q' => 'Jelaskan prosedur uji SPT (Standard Penetration Test) dan interpretasi hasilnya!'],
+                ],
+            ],
+
+            'Struktur Beton' => [
+                'pg' => [
+                    ['q' => 'Kuat tekan beton fc\' diuji pada umur berapa hari?', 'a' => ['7 hari', '14 hari', '28 hari', '56 hari'], 'correct' => 2],
+                    ['q' => 'Tulangan baja dalam beton bertulang berfungsi utama menahan?', 'a' => ['Tegangan tekan', 'Tegangan tarik', 'Tegangan geser saja', 'Beban angin'], 'correct' => 1],
+                    ['q' => 'Selimut beton (concrete cover) berfungsi untuk?', 'a' => ['Estetika', 'Melindungi tulangan dari korosi dan kebakaran', 'Menambah kekuatan', 'Mengurangi berat'], 'correct' => 1],
+                    ['q' => 'Water-cement ratio (w/c) yang rendah menghasilkan beton?', 'a' => ['Lebih lemah', 'Lebih kuat dan kedap', 'Lebih mudah dikerjakan', 'Lebih ringan'], 'correct' => 1],
+                    ['q' => 'Balok T dalam struktur beton digunakan karena?', 'a' => ['Lebih hemat tulangan', 'Pelat lantai ikut bekerja sebagai flens tekan', 'Lebih mudah dibuat', 'Lebih ringan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk material penyusun beton?', 'options' => ['Semen Portland', 'Baja profil', 'Agregat kasar', 'Kayu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis beton berdasarkan berat jenisnya?', 'options' => ['Beton normal', 'Beton elastis', 'Beton ringan', 'Beton kaku'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk uji beton segar?', 'options' => ['Slump test', 'Compression test', 'Flow table test', 'Bending test'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah keunggulan beton prategang?', 'options' => ['Retak lebih awal', 'Bentang lebih panjang', 'Penampang lebih ramping', 'Biaya lebih murah selalu'], 'correct' => [1, 2]],
+                    ['q' => 'Manakah yang mempengaruhi kuat tekan beton?', 'options' => ['w/c ratio', 'Warna agregat', 'Kualitas agregat', 'Nama proyek'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perilaku lentur balok beton bertulang! Bagaimana distribusi tegangan pada penampang?'],
+                    ['q' => 'Apa yang dimaksud dengan rasio tulangan seimbang (balanced reinforcement ratio)? Mengapa penting dalam desain?'],
+                    ['q' => 'Jelaskan cara mendesain kolom beton bertulang yang menerima beban aksial dan momen!'],
+                    ['q' => 'Apa perbedaan beton bertulang biasa dan beton prategang? Jelaskan prinsip kerja beton prategang!'],
+                    ['q' => 'Jelaskan faktor-faktor yang mempengaruhi durabilitas beton dan cara meningkatkannya!'],
+                ],
+            ],
+
+            'Hidrolika' => [
+                'pg' => [
+                    ['q' => 'Persamaan kontinuitas aliran fluida menyatakan?', 'a' => ['Tekanan konstan', 'Massa fluida yang masuk = massa yang keluar', 'Kecepatan konstan', 'Volume tetap'], 'correct' => 1],
+                    ['q' => 'Bilangan Reynolds menentukan jenis aliran. Aliran turbulen terjadi ketika Re?', 'a' => ['Re < 2000', 'Re antara 2000-4000', 'Re > 4000', 'Re = 0'], 'correct' => 2],
+                    ['q' => 'Persamaan Bernoulli menghubungkan?', 'a' => ['Massa dan percepatan', 'Tekanan, kecepatan, dan elevasi', 'Debit dan luas penampang', 'Viskositas dan densitas'], 'correct' => 1],
+                    ['q' => 'Koefisien Manning (n) digunakan dalam?', 'a' => ['Aliran bertekanan dalam pipa', 'Aliran permukaan bebas di saluran', 'Aliran tanah', 'Aliran udara'], 'correct' => 1],
+                    ['q' => 'Head losses dalam pipa disebabkan oleh?', 'a' => ['Gravitasi saja', 'Gesekan dan minor losses', 'Tekanan atmosfer', 'Kecepatan angin'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah sifat fluida yang penting dalam hidrolika?', 'options' => ['Viskositas', 'Warna', 'Densitas', 'Bau'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis aliran dalam saluran terbuka?', 'options' => ['Aliran kritis', 'Aliran sirkular', 'Aliran subkritis', 'Aliran spiral'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen head dalam persamaan Bernoulli?', 'options' => ['Pressure head', 'Temperature head', 'Velocity head', 'Color head'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah struktur hidraulik yang umum digunakan?', 'options' => ['Bendung (weir)', 'Jembatan gantung', 'Pintu air (gate)', 'Fondasi tiang'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang mempengaruhi debit aliran sungai?', 'options' => ['Luas penampang', 'Warna air', 'Kecepatan aliran', 'Kekeruhan air'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan persamaan Bernoulli dan asumsi-asumsinya! Berikan contoh aplikasi persamaan Bernoulli!'],
+                    ['q' => 'Apa yang dimaksud bilangan Reynolds? Jelaskan perbedaan aliran laminar dan turbulen!'],
+                    ['q' => 'Jelaskan cara menghitung debit aliran dalam saluran terbuka menggunakan persamaan Manning!'],
+                    ['q' => 'Apa yang dimaksud dengan loncatan hidrolik? Jelaskan kapan dan mengapa terjadi!'],
+                    ['q' => 'Jelaskan prinsip kerja pompa sentrifugal dan kurva karakteristiknya!'],
+                ],
+            ],
+
+            'Manajemen Konstruksi' => [
+                'pg' => [
+                    ['q' => 'Metode penjadwalan yang menggambarkan urutan dan durasi aktivitas secara visual?', 'a' => ['WBS', 'Gantt Chart', 'Flowchart', 'Mindmap'], 'correct' => 1],
+                    ['q' => 'Nilai Earned Value (EV) dalam proyek konstruksi merepresentasikan?', 'a' => ['Biaya aktual', 'Nilai pekerjaan yang telah diselesaikan', 'Anggaran rencana', 'Laba proyek'], 'correct' => 1],
+                    ['q' => 'K3 (Keselamatan dan Kesehatan Kerja) di proyek konstruksi diatur oleh?', 'a' => ['Menteri Keuangan', 'Permenaker dan SNI terkait K3', 'Departemen Perdagangan', 'Bank Indonesia'], 'correct' => 1],
+                    ['q' => 'RAB (Rencana Anggaran Biaya) disusun berdasarkan?', 'a' => ['Perkiraan kasar', 'Volume pekerjaan × harga satuan', 'Harga pasar bebas', 'Negosiasi saja'], 'correct' => 1],
+                    ['q' => 'Metode CPM (Critical Path Method) mengidentifikasi?', 'a' => ['Aktivitas termudah', 'Jalur terpanjang yang menentukan durasi proyek', 'Aktivitas paling mahal', 'Tim terbaik'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah dokumen tender proyek konstruksi?', 'options' => ['Bill of Quantities (BQ)', 'Buku harian', 'Spesifikasi teknis', 'Daftar nama pekerja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah indikator kinerja proyek dalam Earned Value Analysis?', 'options' => ['CPI (Cost Performance Index)', 'IQ (Intelligence Quotient)', 'SPI (Schedule Performance Index)', 'BMI (Body Mass Index)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah pihak dalam kontrak konstruksi?', 'options' => ['Pemilik (Owner)', 'Pengamat', 'Kontraktor', 'Penonton'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis kontrak konstruksi?', 'options' => ['Lump sum', 'Kontrak verbal', 'Unit price', 'Kontrak musiman'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk sumber daya proyek konstruksi (5M)?', 'options' => ['Man (tenaga kerja)', 'Mind map', 'Material', 'Meeting'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tahapan manajemen proyek konstruksi dari perencanaan hingga serah terima!'],
+                    ['q' => 'Apa yang dimaksud Earned Value Analysis? Jelaskan CPI dan SPI beserta cara interpretasinya!'],
+                    ['q' => 'Jelaskan perbedaan antara kontrak Lump Sum dan Unit Price dalam konstruksi!'],
+                    ['q' => 'Bagaimana cara mengelola risiko dalam proyek konstruksi? Jelaskan tahapannya!'],
+                    ['q' => 'Jelaskan pentingnya K3 dalam proyek konstruksi dan peraturan yang mengaturnya di Indonesia!'],
+                ],
+            ],
+
+            'Rekayasa Transportasi' => [
+                'pg' => [
+                    ['q' => 'LHR (Lalu Lintas Harian Rata-rata) digunakan untuk?', 'a' => ['Menghitung biaya', 'Merencanakan kapasitas dan lebar jalan', 'Mengatur rambu', 'Menghitung kecelakaan'], 'correct' => 1],
+                    ['q' => 'V/C ratio dalam analisis kapasitas jalan menggambarkan?', 'a' => ['Kecepatan/kapasitas', 'Volume lalu lintas/kapasitas jalan', 'Nilai/biaya', 'Viskositas/kepadatan'], 'correct' => 1],
+                    ['q' => 'Tingkat pelayanan jalan (Level of Service) F menunjukkan kondisi?', 'a' => ['Arus bebas', 'Arus stabil', 'Mendekati jenuh', 'Macet total/terhenti'], 'correct' => 3],
+                    ['q' => 'Perkerasan lentur (flexible pavement) menggunakan material utama?', 'a' => ['Beton semen', 'Aspal sebagai pengikat', 'Batu bata', 'Baja'], 'correct' => 1],
+                    ['q' => 'Simpang bersinyal didesain untuk?', 'a' => ['Mengurangi kapasitas', 'Mengatur konflik arus lalu lintas', 'Memperindah kota', 'Meningkatkan kemacetan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah moda transportasi dalam sistem transportasi perkotaan?', 'options' => ['Bus Rapid Transit', 'Sepeda', 'Light Rail Transit', 'Skuter listrik'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter arus lalu lintas?', 'options' => ['Volume', 'Warna kendaraan', 'Kecepatan', 'Nomor plat'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis perkerasan jalan?', 'options' => ['Perkerasan lentur', 'Perkerasan elastis', 'Perkerasan kaku', 'Perkerasan cair'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk geometrik jalan?', 'options' => ['Alinyemen horizontal', 'Warna marka', 'Alinyemen vertikal', 'Nama jalan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah faktor yang mempengaruhi kecelakaan lalu lintas (3E)?', 'options' => ['Engineering', 'Economics', 'Enforcement', 'Entertainment'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep Level of Service (LOS) jalan! Jelaskan masing-masing level A hingga F!'],
+                    ['q' => 'Apa yang dimaksud dengan kapasitas jalan? Jelaskan faktor-faktor yang mempengaruhi kapasitas!'],
+                    ['q' => 'Jelaskan perbedaan perkerasan lentur dan perkerasan kaku! Kapan masing-masing digunakan?'],
+                    ['q' => 'Bagaimana cara merencanakan sistem transportasi perkotaan yang berkelanjutan?'],
+                    ['q' => 'Jelaskan metode 3E dalam penanganan kecelakaan lalu lintas (Engineering, Enforcement, Education)!'],
+                ],
+            ],
+
+            'Geoteknik' => [
+                'pg' => [
+                    ['q' => 'Tipe fondasi yang digunakan ketika lapisan tanah keras berada sangat dalam?', 'a' => ['Fondasi telapak', 'Fondasi rakit', 'Fondasi tiang', 'Fondasi sumuran'], 'correct' => 2],
+                    ['q' => 'Kelongsoran tanah (slope failure) paling sering terjadi pada?', 'a' => ['Tanah pasir kering', 'Tanah lempung jenuh setelah hujan lebat', 'Tanah berbatu padat', 'Tanah gambut kering'], 'correct' => 1],
+                    ['q' => 'Liquefaction (likuifaksi) tanah terjadi pada?', 'a' => ['Tanah lempung saat kering', 'Tanah pasir jenuh saat gempa', 'Batuan keras', 'Tanah gambut'], 'correct' => 1],
+                    ['q' => 'Perkuatan tanah dengan geotextile berfungsi sebagai?', 'a' => ['Drainase saja', 'Perkuatan, separasi, dan filtrasi', 'Estetika saja', 'Penanda batas'], 'correct' => 1],
+                    ['q' => 'Tekanan tanah aktif (Ka) bekerja pada?', 'a' => ['Dinding yang tidak bergerak', 'Dinding yang bergerak menjauhi tanah', 'Dinding yang bergerak ke tanah', 'Fondasi dalam'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis fondasi berdasarkan kedalaman?', 'options' => ['Fondasi dangkal', 'Fondasi melayang', 'Fondasi dalam', 'Fondasi apung'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode perkuatan lereng?', 'options' => ['Soil nailing', 'Penambahan beban', 'Ground anchor', 'Penggalian lereng'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang mempengaruhi daya dukung fondasi?', 'options' => ['Kohesi tanah', 'Warna tanah', 'Sudut geser dalam', 'Bau tanah'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode penyelidikan tanah di lapangan?', 'options' => ['SPT (Standard Penetration Test)', 'Uji tekan beton', 'CPT (Cone Penetration Test)', 'Uji tarik baja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah material geosintetik?', 'options' => ['Geotextile', 'Baja tulangan', 'Geomembrane', 'Beton'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan fondasi dangkal dan fondasi dalam! Kapan masing-masing digunakan?'],
+                    ['q' => 'Apa yang dimaksud dengan daya dukung tanah? Jelaskan persamaan Terzaghi untuk fondasi telapak!'],
+                    ['q' => 'Jelaskan fenomena likuifaksi tanah! Apa kondisi yang menyebabkannya dan bagaimana mitigasinya?'],
+                    ['q' => 'Jelaskan tekanan tanah lateral aktif dan pasif! Bagaimana menghitung tekanan tanah pada dinding penahan?'],
+                    ['q' => 'Apa peran geosintetik dalam rekayasa geoteknik? Jelaskan jenis dan fungsinya!'],
+                ],
+            ],
+
+            'Struktur Baja' => [
+                'pg' => [
+                    ['q' => 'Keunggulan utama baja sebagai material struktur?', 'a' => ['Tidak berkarat', 'Kuat tarik dan tekan tinggi dengan berat ringan', 'Lebih murah dari beton', 'Tahan api'], 'correct' => 1],
+                    ['q' => 'Sambungan baut mutu tinggi dalam struktur baja bekerja dengan?', 'a' => ['Geser bolt saja', 'Gesek (friction-type) dan/atau tumpuan (bearing-type)', 'Tarik saja', 'Tekuk saja'], 'correct' => 1],
+                    ['q' => 'Tekuk lokal (local buckling) pada profil baja dapat dicegah dengan?', 'a' => ['Mengurangi beban', 'Membatasi rasio lebar/tebal (b/t ratio)', 'Cat anti karat', 'Memperlebar fondasi'], 'correct' => 1],
+                    ['q' => 'Profil WF (Wide Flange) efisien untuk balok karena?', 'a' => ['Memiliki luas penampang kecil', 'Momen inersia tinggi terhadap sumbu kuat', 'Mudah disambung', 'Lebih ringan dari pipa'], 'correct' => 1],
+                    ['q' => 'Korosi baja dapat dicegah dengan?', 'a' => ['Memperbesar penampang saja', 'Galvanisasi dan pengecatan', 'Menambah tulangan', 'Dibakar'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis sambungan struktur baja?', 'options' => ['Sambungan las', 'Sambungan semen', 'Sambungan baut', 'Sambungan kayu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis profil baja struktural?', 'options' => ['WF (Wide Flange)', 'Baja tulangan polos', 'HSS (Hollow Structural Section)', 'Kawat besi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis tekuk (buckling) pada struktur baja?', 'options' => ['Tekuk kolom (global)', 'Tekuk tanah', 'Tekuk lokal sayap', 'Tekuk fondasi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah perlindungan korosi pada baja?', 'options' => ['Galvanisasi', 'Penambahan beban', 'Pengecatan epoksi', 'Penggalian tanah'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah standar desain struktur baja di Indonesia?', 'options' => ['SNI 1729', 'ISO 14001', 'AISC 360', 'ASTM A36'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan keunggulan dan kelemahan baja sebagai material struktur dibandingkan beton!'],
+                    ['q' => 'Apa yang dimaksud tekuk (buckling) pada kolom baja? Jelaskan faktor kelangsingan dan pengaruhnya!'],
+                    ['q' => 'Jelaskan jenis-jenis sambungan baut pada struktur baja dan cara kerjanya!'],
+                    ['q' => 'Bagaimana cara mencegah dan melindungi struktur baja dari korosi? Jelaskan metode-metodenya!'],
+                    ['q' => 'Jelaskan perencanaan balok baja terhadap lentur! Apa yang dimaksud dengan momen plastis?'],
+                ],
+            ],
+
+            // TEKNIK MESIN (TM)
+            'Termodinamika' => [
+                'pg' => [
+                    ['q' => 'Hukum Pertama Termodinamika menyatakan?', 'a' => ['Panas tidak bisa diciptakan', 'Energi tidak dapat diciptakan atau dimusnahkan', 'Entropi selalu meningkat', 'Panas mengalir dari dingin ke panas'], 'correct' => 1],
+                    ['q' => 'Siklus Carnot merupakan siklus yang?', 'a' => ['Paling nyata di industri', 'Efisiensi termal tertinggi yang teoritis mungkin', 'Menggunakan uap air saja', 'Menggunakan gas ideal saja'], 'correct' => 1],
+                    ['q' => 'Efisiensi termal mesin kalor Carnot bergantung pada?', 'a' => ['Jenis bahan bakar', 'Suhu sumber panas dan sumber dingin (T_H dan T_L)', 'Ukuran mesin', 'Jenis gas'], 'correct' => 1],
+                    ['q' => 'Entalpi (H) didefinisikan sebagai?', 'a' => ['H = U - pV', 'H = U + pV', 'H = Q/T', 'H = W + Q'], 'correct' => 1],
+                    ['q' => 'Proses adiabatik adalah proses tanpa perpindahan?', 'a' => ['Kerja', 'Massa', 'Kalor', 'Tekanan'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah hukum termodinamika yang valid?', 'options' => ['Hukum Pertama (kekekalan energi)', 'Hukum Nol (kesetimbangan termal)', 'Hukum Kedua (entropi)', 'Hukum Keempat (tidak ada)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis proses termodinamika?', 'options' => ['Isotermal', 'Isopolygonal', 'Isobarik', 'Isodecorative'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah siklus termodinamika dalam teknik?', 'options' => ['Siklus Otto', 'Siklus Fibonacci', 'Siklus Diesel', 'Siklus Newton'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah properti termodinamika intensif?', 'options' => ['Suhu (T)', 'Massa (m)', 'Tekanan (P)', 'Volume (V)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi termodinamika dalam teknik mesin?', 'options' => ['Mesin pembakaran dalam', 'Pemrograman komputer', 'Sistem refrigerasi', 'Desain jembatan'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan Hukum Pertama dan Kedua Termodinamika beserta implikasinya!'],
+                    ['q' => 'Apa itu siklus Carnot? Mengapa efisiensinya menjadi batas atas efisiensi mesin kalor nyata?'],
+                    ['q' => 'Jelaskan perbedaan antara siklus Otto dan siklus Diesel! Mana yang lebih efisien dan mengapa?'],
+                    ['q' => 'Apa yang dimaksud dengan entropi? Jelaskan hubungannya dengan Hukum Kedua Termodinamika!'],
+                    ['q' => 'Jelaskan cara kerja sistem refrigerasi/AC berdasarkan prinsip termodinamika!'],
+                ],
+            ],
+
+            'Mekanika Fluida' => [
+                'pg' => [
+                    ['q' => 'Fluida ideal (inviscid) memiliki karakteristik?', 'a' => ['Viskositas berhingga', 'Viskositas nol', 'Tak dapat dimampatkan dan berkompresibilitas tinggi', 'Densitas berubah'], 'correct' => 1],
+                    ['q' => 'Hukum Pascal menyatakan tekanan dalam fluida tertutup?', 'a' => ['Berkurang sesuai kedalaman', 'Diteruskan sama besar ke segala arah', 'Hanya menuju ke bawah', 'Bergantung pada luas permukaan'], 'correct' => 1],
+                    ['q' => 'Gaya angkat (lift) pada sayap pesawat terjadi akibat?', 'a' => ['Perbedaan gravitasi', 'Perbedaan tekanan akibat perbedaan kecepatan aliran (Bernoulli)', 'Berat mesin', 'Gaya magnet'], 'correct' => 1],
+                    ['q' => 'Viskositas fluida mengukur?', 'a' => ['Kerapatan fluida', 'Ketahanan fluida terhadap deformasi/aliran', 'Tekanan fluida', 'Suhu fluida'], 'correct' => 1],
+                    ['q' => 'Boundary layer dalam aliran viskos terbentuk di?', 'a' => ['Tengah aliran', 'Dekat permukaan benda padat', 'Di atas aliran', 'Di daerah bebas'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah sifat fluida yang penting?', 'options' => ['Densitas', 'Warna', 'Viskositas', 'Bau'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis aliran fluida?', 'options' => ['Laminar', 'Circular', 'Turbulent', 'Diagonal'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah persamaan dasar mekanika fluida?', 'options' => ['Persamaan Bernoulli', 'Hukum Faraday', 'Persamaan Navier-Stokes', 'Hukum Mendel'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah bilangan tak berdimensi dalam mekanika fluida?', 'options' => ['Bilangan Reynolds', 'Bilangan Fibonacci', 'Bilangan Mach', 'Bilangan Avogadro'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi mekanika fluida dalam teknik?', 'options' => ['Desain turbin', 'Desain rangkaian listrik', 'Desain pompa', 'Desain processor'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan persamaan kontinuitas dan persamaan Bernoulli! Bagaimana hubungan keduanya?'],
+                    ['q' => 'Apa yang dimaksud bilangan Reynolds? Jelaskan transisi dari aliran laminar ke turbulen!'],
+                    ['q' => 'Jelaskan konsep lapisan batas (boundary layer) pada aliran di atas pelat datar!'],
+                    ['q' => 'Apa yang dimaksud dengan kavitasi? Jelaskan penyebab dan dampaknya pada pompa!'],
+                    ['q' => 'Jelaskan prinsip kerja turbin air (Pelton, Francis, Kaplan) dan perbedaannya!'],
+                ],
+            ],
+
+            'Perpindahan Panas' => [
+                'pg' => [
+                    ['q' => 'Konduksi panas terjadi melalui?', 'a' => ['Perpindahan massa', 'Kontak langsung antar molekul/partikel', 'Gelombang elektromagnetik', 'Aliran fluida'], 'correct' => 1],
+                    ['q' => 'Hukum Fourier untuk konduksi menyatakan laju perpindahan panas sebanding dengan?', 'a' => ['Perbedaan tekanan', 'Gradien suhu dan luas penampang', 'Kecepatan fluida', 'Konsentrasi partikel'], 'correct' => 1],
+                    ['q' => 'Konveksi paksa (forced convection) terjadi ketika?', 'a' => ['Tidak ada aliran fluida', 'Fluida digerakkan oleh gaya eksternal (pompa/kipas)', 'Hanya ada perbedaan densitas', 'Radiasi dominan'], 'correct' => 1],
+                    ['q' => 'Koefisien perpindahan panas keseluruhan (U) digunakan dalam?', 'a' => ['Konduksi murni', 'Heat exchanger (penukar panas)', 'Radiasi saja', 'Konduksi dan konveksi terpisah'], 'correct' => 1],
+                    ['q' => 'Bilangan Nusselt (Nu) dalam konveksi menggambarkan?', 'a' => ['Rasio inersia terhadap viskositas', 'Perbandingan perpindahan panas konveksi terhadap konduksi', 'Rasio difusivitas termal', 'Laju perpindahan massa'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah mekanisme perpindahan panas?', 'options' => ['Konduksi', 'Gravitasi', 'Konveksi', 'Rotasi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah bilangan tak berdimensi dalam perpindahan panas?', 'options' => ['Bilangan Nusselt', 'Bilangan Fibonacci', 'Bilangan Prandtl', 'Bilangan Avogadro'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis heat exchanger?', 'options' => ['Shell and tube', 'Drum and pipe', 'Plate heat exchanger', 'Box heat exchanger'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang mempengaruhi laju konduksi panas?', 'options' => ['Konduktivitas termal material', 'Warna material', 'Gradien suhu', 'Berat material'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi perpindahan panas dalam teknik?', 'options' => ['Radiator mobil', 'Desain program', 'Heat sink prosesor', 'Desain jalan'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tiga mekanisme perpindahan panas (konduksi, konveksi, radiasi) beserta contoh aplikasi!'],
+                    ['q' => 'Jelaskan Hukum Fourier untuk konduksi! Bagaimana resistansi termal digunakan dalam analisis konduksi?'],
+                    ['q' => 'Apa perbedaan konveksi bebas dan konveksi paksa? Jelaskan korelasi bilangan Nusselt untuk masing-masing!'],
+                    ['q' => 'Jelaskan cara kerja heat exchanger tipe shell-and-tube! Apa yang dimaksud LMTD?'],
+                    ['q' => 'Jelaskan hukum Stefan-Boltzmann untuk radiasi termal dan faktor emisivitas!'],
+                ],
+            ],
+
+            'Elemen Mesin' => [
+                'pg' => [
+                    ['q' => 'Pasak (key) pada poros berfungsi untuk?', 'a' => ['Menahan beban aksial', 'Mentransmisikan torsi antara poros dan komponen', 'Mengurangi gesekan', 'Menahan beban bending'], 'correct' => 1],
+                    ['q' => 'Bantalan (bearing) digunakan untuk?', 'a' => ['Memperkuat poros', 'Mendukung poros berputar dan mengurangi gesekan', 'Menghubungkan dua poros', 'Mengubah kecepatan'], 'correct' => 1],
+                    ['q' => 'Roda gigi (gear) berfungsi untuk?', 'a' => ['Hanya memindahkan daya', 'Mentransmisikan daya sambil mengubah kecepatan dan torsi', 'Menghentikan gerakan', 'Menyimpan energi'], 'correct' => 1],
+                    ['q' => 'Faktor keamanan (safety factor) dalam desain elemen mesin digunakan untuk?', 'a' => ['Mengurangi berat', 'Memberikan cadangan terhadap ketidakpastian pembebanan dan material', 'Mempercepat produksi', 'Menghemat material'], 'correct' => 1],
+                    ['q' => 'Kegagalan fatigue (kelelahan) pada elemen mesin terjadi karena?', 'a' => ['Beban statis yang besar', 'Beban berulang-ulang di bawah kekuatan ultimat material', 'Suhu terlalu tinggi', 'Korosi saja'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah elemen transmisi daya yang umum?', 'options' => ['Roda gigi', 'Sekrup', 'Sabuk-puli', 'Palu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis bantalan (bearing)?', 'options' => ['Bantalan gelinding (ball bearing)', 'Bantalan tali', 'Bantalan luncur (journal bearing)', 'Bantalan kayu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis sambungan elemen mesin?', 'options' => ['Sambungan keling (rivet)', 'Sambungan semen', 'Sambungan ulir (bolt)', 'Sambungan lem kertas'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk analisis kegagalan elemen mesin?', 'options' => ['Analisis tegangan', 'Analisis warna', 'Analisis fatigue', 'Analisis desain grafis'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah faktor yang mempengaruhi kekuatan fatigue?', 'options' => ['Kekasaran permukaan', 'Warna benda', 'Konsentrasi tegangan', 'Bau material'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep faktor keamanan dalam desain elemen mesin! Bagaimana menentukan nilainya?'],
+                    ['q' => 'Apa yang dimaksud kegagalan fatigue? Jelaskan diagram Wöhler (S-N curve)!'],
+                    ['q' => 'Jelaskan cara mendesain poros terhadap beban puntir dan lentur kombinasi!'],
+                    ['q' => 'Apa perbedaan roda gigi spur, helical, dan bevel? Jelaskan kelebihan masing-masing!'],
+                    ['q' => 'Jelaskan prinsip pemilihan bantalan (bearing selection) berdasarkan beban dan kecepatan!'],
+                ],
+            ],
+
+            'Proses Manufaktur' => [
+                'pg' => [
+                    ['q' => 'Proses pemotongan logam (machining) yang paling umum adalah?', 'a' => ['Casting', 'Turning (pembubutan)', 'Forging', 'Welding'], 'correct' => 1],
+                    ['q' => 'Toleransi dimensi dalam manufaktur bertujuan untuk?', 'a' => ['Estetika produk', 'Memastikan interchagebility dan fungsi produk', 'Mengurangi material', 'Mempercepat produksi'], 'correct' => 1],
+                    ['q' => 'CNC (Computer Numerical Control) digunakan untuk?', 'a' => ['Desain grafis', 'Mengotomasi dan mengontrol mesin perkakas secara presisi', 'Manajemen keuangan', 'Quality control saja'], 'correct' => 1],
+                    ['q' => 'Proses pengelasan (welding) menggabungkan material dengan cara?', 'a' => ['Mekanis saja', 'Panas dan/atau tekanan hingga menyatu', 'Lem kimia', 'Baut saja'], 'correct' => 1],
+                    ['q' => 'Surface roughness (Ra) dalam manufaktur mengukur?', 'a' => ['Kekerasan permukaan', 'Kekasaran rata-rata permukaan hasil proses', 'Warna permukaan', 'Kilap permukaan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah proses pembentukan logam (metal forming)?', 'options' => ['Forging (tempa)', 'Melting saja', 'Rolling (rol)', 'Painting'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah proses casting (pengecoran)?', 'options' => ['Sand casting', 'Machining', 'Die casting', 'Turning'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter proses machining?', 'options' => ['Cutting speed', 'Material color', 'Feed rate', 'Product name'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis proses welding?', 'options' => ['MIG welding', 'Cold welding (temperature)', 'TIG welding', 'Hot glue only'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk proses rapid prototyping/additive manufacturing?', 'options' => ['FDM (3D Printing)', 'Conventional milling', 'SLA (Stereolithography)', 'Sand casting'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan proses pembubutan (turning)! Sebutkan parameter proses dan cara menghitung material removal rate!'],
+                    ['q' => 'Apa perbedaan antara proses casting dan forging? Jelaskan kelebihan dan kekurangan masing-masing!'],
+                    ['q' => 'Jelaskan konsep toleransi dimensi dan suaian (fit) dalam manufaktur! Berikan contoh aplikasi!'],
+                    ['q' => 'Apa yang dimaksud additive manufacturing (3D printing)? Jelaskan prinsip kerja FDM!'],
+                    ['q' => 'Jelaskan konsep lean manufacturing dan bagaimana mengurangi pemborosan (waste) dalam produksi!'],
+                ],
+            ],
+
+            'Getaran Mekanik' => [
+                'pg' => [
+                    ['q' => 'Frekuensi natural sistem pegas-massa bergantung pada?', 'a' => ['Amplitudo getaran', 'Kekakuan pegas (k) dan massa (m)', 'Gaya eksternal', 'Redaman saja'], 'correct' => 1],
+                    ['q' => 'Resonansi terjadi ketika frekuensi eksitasi?', 'a' => ['Lebih rendah dari frekuensi natural', 'Sama dengan frekuensi natural', 'Lebih tinggi dari frekuensi natural', 'Nol'], 'correct' => 1],
+                    ['q' => 'Getaran bebas tanpa redaman (undamped free vibration) memiliki sifat?', 'a' => ['Amplitudo berkurang terus', 'Amplitudo tetap konstan', 'Getaran berhenti sendiri', 'Frekuensi berubah'], 'correct' => 1],
+                    ['q' => 'Rasio redaman kritis (ζ) = 1 menunjukkan sistem?', 'a' => ['Underdamped', 'Critically damped', 'Overdamped', 'Undamped'], 'correct' => 1],
+                    ['q' => 'Vibration isolation digunakan untuk?', 'a' => ['Memperkuat getaran', 'Mengurangi transmisi getaran ke struktur pendukung', 'Meningkatkan frekuensi', 'Menambah massa'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis sistem getaran berdasarkan derajat kebebasan?', 'options' => ['SDOF (Single Degree of Freedom)', 'ZDOF (Zero)', 'MDOF (Multiple DOF)', 'IDOF (Infinite)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter dalam analisis getaran?', 'options' => ['Amplitudo', 'Warna getaran', 'Frekuensi', 'Bau getaran'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode analisis getaran mekanik?', 'options' => ['Analisis modal', 'Analisis warna', 'Fast Fourier Transform (FFT)', 'Analisis rasa'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk sumber getaran mesin?', 'options' => ['Ketidakseimbangan rotor', 'Warna cat mesin', 'Misalignment poros', 'Nama mesin'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah penerapan analisis getaran?', 'options' => ['Predictive maintenance', 'Desain grafis', 'Isolasi getaran mesin', 'Pemrograman web'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan sistem pegas-massa-redaman! Bagaimana pengaruh redaman terhadap respon getaran?'],
+                    ['q' => 'Apa yang dimaksud resonansi? Mengapa resonansi berbahaya dan bagaimana mengatasinya?'],
+                    ['q' => 'Jelaskan konsep frekuensi natural dan mode shape dalam analisis getaran multi DOF!'],
+                    ['q' => 'Apa yang dimaksud dengan vibration isolation? Jelaskan cara mendesain isolator getaran yang efektif!'],
+                    ['q' => 'Jelaskan peran analisis getaran dalam predictive maintenance mesin industri!'],
+                ],
+            ],
+
+            // TEKNIK ELEKTRO (TE)
+            'Rangkaian Listrik' => [
+                'pg' => [
+                    ['q' => 'Hukum Kirchhoff Tegangan (KVL) menyatakan?', 'a' => ['Jumlah arus masuk = keluar di suatu node', 'Jumlah tegangan pada loop tertutup = 0', 'Tegangan berbanding lurus arus', 'Daya = tegangan × arus'], 'correct' => 1],
+                    ['q' => 'Impedansi kapasitor (Xc) pada rangkaian AC?', 'a' => ['Xc = ωL', 'Xc = 1/(ωC)', 'Xc = R', 'Xc = ω/C'], 'correct' => 1],
+                    ['q' => 'Teorema Thevenin menyederhanakan rangkaian menjadi?', 'a' => ['Sumber arus dan tahanan paralel', 'Sumber tegangan dan tahanan seri', 'Sumber daya dan kapasitor', 'Induktor dan kapasitor'], 'correct' => 1],
+                    ['q' => 'Faktor daya (power factor) yang ideal pada beban listrik?', 'a' => ['0', '0.5', '1 (unity)', '-1'], 'correct' => 2],
+                    ['q' => 'Resonansi seri LC terjadi ketika?', 'a' => ['XL > XC', 'XL = XC sehingga impedansi minimum', 'XC > XL', 'R = 0'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah hukum dasar rangkaian listrik?', 'options' => ["Hukum Ohm (V=IR)", 'Hukum Darwin', 'Hukum Kirchhoff', 'Hukum Mendel'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis komponen pasif rangkaian listrik?', 'options' => ['Resistor', 'Transistor', 'Kapasitor', 'Op-amp'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode analisis rangkaian listrik?', 'options' => ['Analisis mesh', 'Analisis warna', 'Analisis node', 'Analisis bau'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teorema rangkaian listrik?', 'options' => ['Teorema Thevenin', 'Teorema Darwin', 'Teorema Norton', 'Teorema Mendel'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis daya dalam rangkaian AC?', 'options' => ['Daya aktif (P)', 'Daya gelap', 'Daya reaktif (Q)', 'Daya negatif selalu'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan Hukum Kirchhoff Arus dan Tegangan! Berikan contoh penerapan dalam analisis rangkaian!'],
+                    ['q' => 'Apa yang dimaksud Teorema Thevenin? Jelaskan langkah-langkah mencari rangkaian ekivalen Thevenin!'],
+                    ['q' => 'Jelaskan analisis rangkaian AC! Apa perbedaan antara daya aktif, reaktif, dan semu?'],
+                    ['q' => 'Apa yang dimaksud resonansi pada rangkaian RLC seri? Jelaskan kondisi dan pengaruhnya!'],
+                    ['q' => 'Jelaskan perbedaan hubungan seri dan paralel pada resistor, kapasitor, dan induktor!'],
+                ],
+            ],
+
+            'Elektronika Dasar' => [
+                'pg' => [
+                    ['q' => 'Dioda semikonduktor berfungsi utama sebagai?', 'a' => ['Penguat sinyal', 'Penyearah arus (hanya mengalirkan arus satu arah)', 'Penyimpan muatan', 'Penghasil frekuensi'], 'correct' => 1],
+                    ['q' => 'Transistor BJT dioperasikan sebagai penguat di daerah?', 'a' => ['Saturasi', 'Cut-off', 'Aktif/Linier', 'Breakdown'], 'correct' => 2],
+                    ['q' => 'Penguat operasional (Op-Amp) ideal memiliki?', 'a' => ['Gain terbatas', 'Impedansi masukan tak terhingga dan impedansi keluaran nol', 'Bandwidth terbatas', 'Arus offset besar'], 'correct' => 1],
+                    ['q' => 'Rangkaian penyearah gelombang penuh (full-wave rectifier) menggunakan?', 'a' => ['Satu dioda', 'Dua atau empat dioda', 'Satu transistor', 'Kapasitor saja'], 'correct' => 1],
+                    ['q' => 'Transistor MOSFET dikontrol oleh?', 'a' => ['Arus basis', 'Tegangan gate-source', 'Arus kolektor', 'Tegangan emitor'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen semikonduktor aktif?', 'options' => ['Transistor BJT', 'Resistor', 'MOSFET', 'Kapasitor'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah konfigurasi penguat transistor?', 'options' => ['Common Emitter', 'Common Collector', 'Common Ground', 'Common Base'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis Op-Amp circuit?', 'options' => ['Inverting amplifier', 'Power amplifier', 'Non-inverting amplifier', 'Signal generator'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah fungsi kapasitor dalam elektronika?', 'options' => ['Filter frekuensi', 'Penguat arus', 'Coupling/decoupling', 'Osilasi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi elektronika dasar?', 'options' => ['Power supply', 'Mesin diesel', 'Amplifier audio', 'Konstruksi beton'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan cara kerja dioda semikonduktor dalam kondisi forward dan reverse bias!'],
+                    ['q' => 'Jelaskan tiga daerah operasi transistor BJT (cut-off, aktif, saturasi) dan kegunaannya!'],
+                    ['q' => 'Apa itu Op-Amp? Jelaskan konfigurasi inverting dan non-inverting amplifier beserta persamaan gain-nya!'],
+                    ['q' => 'Jelaskan cara kerja penyearah (rectifier) gelombang penuh dengan jembatan dioda!'],
+                    ['q' => 'Apa perbedaan antara transistor BJT dan MOSFET? Kapan menggunakan masing-masing?'],
+                ],
+            ],
+
+            'Sistem Tenaga Listrik' => [
+                'pg' => [
+                    ['q' => 'Transformator daya digunakan untuk?', 'a' => ['Menyimpan energi', 'Mengubah level tegangan AC', 'Mengubah AC ke DC', 'Menghasilkan daya'], 'correct' => 1],
+                    ['q' => 'Tegangan transmisi listrik dibuat tinggi untuk?', 'a' => ['Keamanan', 'Mengurangi rugi-rugi daya pada saluran (I²R)', 'Mempercepat transmisi', 'Mengurangi material kabel'], 'correct' => 1],
+                    ['q' => 'Generator sinkron dalam pembangkit listrik bekerja berdasarkan?', 'a' => ['Efek Hall', 'Hukum Faraday (induksi elektromagnetik)', 'Hukum Ohm', 'Efek fotolistrik'], 'correct' => 1],
+                    ['q' => 'Sistem proteksi tenaga listrik menggunakan?', 'a' => ['Hanya sekering', 'Relay proteksi untuk mendeteksi dan mengamankan gangguan', 'Hanya MCB', 'Tidak perlu proteksi'], 'correct' => 1],
+                    ['q' => 'Faktor beban (load factor) dalam sistem tenaga listrik adalah?', 'a' => ['Daya maksimum saja', 'Rasio beban rata-rata terhadap beban puncak', 'Tegangan nominal', 'Frekuensi sistem'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen utama sistem tenaga listrik?', 'options' => ['Pembangkit', 'Generator gas', 'Transmisi', 'Pompa air'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis pembangkit listrik?', 'options' => ['PLTA (tenaga air)', 'PLTM (tenaga musik)', 'PLTU (tenaga uap)', 'PLTS (tenaga suara)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah peralatan proteksi sistem tenaga?', 'options' => ['Relay proteksi', 'Multimeter', 'Circuit breaker', 'Voltmeter'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis gangguan dalam sistem tenaga?', 'options' => ['Short circuit (hubung singkat)', 'Long circuit', 'Open circuit (rangkaian terbuka)', 'Medium circuit'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aspek kualitas daya listrik?', 'options' => ['Tegangan harmonik', 'Warna kabel', 'Flicker tegangan', 'Panjang kabel'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan struktur sistem tenaga listrik dari pembangkitan hingga distribusi ke konsumen!'],
+                    ['q' => 'Mengapa tegangan transmisi dibuat sangat tinggi? Jelaskan dengan perhitungan rugi-rugi daya!'],
+                    ['q' => 'Jelaskan cara kerja transformator daya beserta persamaan dan efisiensinya!'],
+                    ['q' => 'Apa yang dimaksud sistem proteksi tenaga listrik? Jelaskan fungsi relay dan circuit breaker!'],
+                    ['q' => 'Jelaskan konsep renewable energy dalam sistem tenaga listrik modern (PLTS, PLTB)!'],
+                ],
+            ],
+
+            'Kontrol Otomatis' => [
+                'pg' => [
+                    ['q' => 'Sistem kontrol loop tertutup (closed-loop) menggunakan?', 'a' => ['Hanya referensi', 'Feedback dari output untuk mengoreksi error', 'Tidak ada feedback', 'Hanya sensor'], 'correct' => 1],
+                    ['q' => 'Kontroler PID terdiri dari komponen?', 'a' => ['Position, Integral, Direction', 'Proportional, Integral, Derivative', 'Power, Input, Data', 'Phase, Index, Delta'], 'correct' => 1],
+                    ['q' => 'Fungsi alih (transfer function) dalam sistem kontrol menggambarkan?', 'a' => ['Tegangan sistem', 'Hubungan output terhadap input dalam domain Laplace', 'Arus sistem', 'Daya sistem'], 'correct' => 1],
+                    ['q' => 'Stabilitas sistem kontrol dapat dianalisis menggunakan?', 'a' => ['Grafik batang', 'Diagram Bode, Nyquist, atau Root Locus', 'Histogram', 'Pie chart'], 'correct' => 1],
+                    ['q' => 'Sistem kontrol yang memiliki steady-state error nol terhadap masukan step adalah?', 'a' => ['Sistem tipe 0', 'Sistem tipe 1 atau lebih', 'Sistem tanpa integrator', 'Sistem overdamped'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen sistem kontrol?', 'options' => ['Plant/proses', 'Warna sistem', 'Kontroler', 'Bau sistem'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis kontroler industri?', 'options' => ['PID controller', 'Word controller', 'Fuzzy controller', 'Excel controller'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode analisis stabilitas?', 'options' => ['Diagram Bode', 'Diagram batang', 'Root Locus', 'Diagram pie'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah spesifikasi respon transien?', 'options' => ['Rise time', 'Color time', 'Settling time', 'Paint time'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi sistem kontrol otomatis?', 'options' => ['Autopilot pesawat', 'Desain grafis', 'Kontrol suhu industri', 'Editing video'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan sistem kontrol open-loop dan closed-loop! Apa kelebihan closed-loop?'],
+                    ['q' => 'Apa fungsi masing-masing komponen P, I, D dalam kontroler PID? Bagaimana tuning PID dilakukan?'],
+                    ['q' => 'Jelaskan konsep fungsi alih (transfer function)! Bagaimana mendapatkan fungsi alih dari persamaan diferensial?'],
+                    ['q' => 'Apa yang dimaksud stabilitas sistem kontrol? Jelaskan kriteria Routh-Hurwitz!'],
+                    ['q' => 'Jelaskan cara membaca diagram Bode! Apa yang dimaksud gain margin dan phase margin?'],
+                ],
+            ],
+
+            'Telekomunikasi' => [
+                'pg' => [
+                    ['q' => 'Modulasi AM (Amplitude Modulation) mengubah?', 'a' => ['Frekuensi carrier', 'Amplitudo carrier sesuai sinyal informasi', 'Fase carrier', 'Kecepatan transmisi'], 'correct' => 1],
+                    ['q' => 'Bandwidth (lebar pita) dalam telekomunikasi menentukan?', 'a' => ['Kekuatan sinyal', 'Kapasitas data yang bisa ditransmisikan', 'Jarak transmisi', 'Keamanan sinyal'], 'correct' => 1],
+                    ['q' => 'Teorema Shannon-Hartley menentukan?', 'a' => ['Daya sinyal maksimum', 'Kapasitas kanal maksimum berdasarkan bandwidth dan SNR', 'Panjang gelombang', 'Kecepatan cahaya dalam medium'], 'correct' => 1],
+                    ['q' => 'Multiplexing FDM memisahkan sinyal berdasarkan?', 'a' => ['Waktu', 'Frekuensi', 'Kode', 'Ruang'], 'correct' => 1],
+                    ['q' => 'Teknologi 5G beroperasi di frekuensi?', 'a' => ['Hanya < 1 GHz', 'Sub-6 GHz dan mmWave (>24 GHz)', 'Hanya AM band', 'HF band saja'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis modulasi sinyal?', 'options' => ['AM (Amplitude Modulation)', 'Color Modulation', 'FM (Frequency Modulation)', 'Shape Modulation'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik multiplexing?', 'options' => ['FDM (Frequency Division)', 'RDM (Random Division)', 'TDM (Time Division)', 'CDM (Code Division)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah media transmisi dalam telekomunikasi?', 'options' => ['Fiber optik', 'Kain', 'Kabel koaksial', 'Kayu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah protokol dalam jaringan telekomunikasi?', 'options' => ['GSM', 'COBIT', 'LTE', 'SCRUM'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter kualitas sinyal telekomunikasi?', 'options' => ['SNR (Signal-to-Noise Ratio)', 'Warna sinyal', 'BER (Bit Error Rate)', 'Bau sinyal'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara modulasi analog (AM, FM) dan modulasi digital (ASK, FSK, PSK)!'],
+                    ['q' => 'Apa yang dimaksud teorema Shannon-Hartley? Jelaskan implikasinya terhadap desain sistem komunikasi!'],
+                    ['q' => 'Jelaskan teknik multiplexing FDM, TDM, dan CDMA! Kapan masing-masing digunakan?'],
+                    ['q' => 'Apa yang dimaksud dengan noise dalam sistem telekomunikasi? Jelaskan jenis-jenis noise dan dampaknya!'],
+                    ['q' => 'Jelaskan perkembangan generasi teknologi seluler dari 1G hingga 5G beserta perbedaan utamanya!'],
+                ],
+            ],
+
+            'Mikrokontroler' => [
+                'pg' => [
+                    ['q' => 'Perbedaan utama mikrokontroler dengan mikroprosesor adalah?', 'a' => ['Mikrokontroler lebih cepat', 'Mikrokontroler memiliki RAM, ROM, dan I/O terintegrasi dalam satu chip', 'Mikroprosesor lebih murah', 'Tidak ada perbedaan'], 'correct' => 1],
+                    ['q' => 'GPIO (General Purpose Input/Output) pada mikrokontroler berfungsi untuk?', 'a' => ['Komunikasi serial saja', 'Antarmuka digital dengan perangkat eksternal', 'Penyimpanan data', 'Clock system'], 'correct' => 1],
+                    ['q' => 'PWM (Pulse Width Modulation) pada mikrokontroler digunakan untuk?', 'a' => ['Komunikasi I2C', 'Mengontrol motor DC, LED dimming, dan konversi DAC', 'Membaca sensor analog', 'Komunikasi SPI'], 'correct' => 1],
+                    ['q' => 'Protokol komunikasi serial I2C menggunakan berapa jalur?', 'a' => ['1 jalur', '2 jalur (SDA dan SCL)', '3 jalur', '4 jalur'], 'correct' => 1],
+                    ['q' => 'Interrupt pada mikrokontroler digunakan untuk?', 'a' => ['Memperlambat program', 'Merespons kejadian eksternal tanpa polling terus-menerus', 'Menyimpan data', 'Mengatur clock'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah platform mikrokontroler yang populer?', 'options' => ['Arduino Uno (ATmega328P)', 'Raspberry Pi 4', 'STM32', 'Intel Core i7'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah protokol komunikasi serial pada mikrokontroler?', 'options' => ['UART', 'USB 3.0', 'I2C', 'HDMI'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah peripheral umum dalam mikrokontroler?', 'options' => ['ADC (Analog-to-Digital)', 'GPU', 'Timer/Counter', 'Dedicated CPU cache'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis memori dalam mikrokontroler?', 'options' => ['Flash (program memory)', 'Hard Disk', 'SRAM (data memory)', 'SSD'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sensor yang umum dihubungkan ke mikrokontroler?', 'options' => ['DHT11 (suhu/kelembaban)', 'LCD monitor', 'Ultrasonic HC-SR04', 'Keyboard USB'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan arsitektur mikrokontroler AVR ATmega328P yang digunakan pada Arduino!'],
+                    ['q' => 'Apa yang dimaksud dengan ADC dalam mikrokontroler? Jelaskan cara kerja dan parameter pentingnya!'],
+                    ['q' => 'Jelaskan cara mengimplementasikan PWM untuk mengontrol kecepatan motor DC dengan mikrokontroler!'],
+                    ['q' => 'Apa perbedaan protokol komunikasi UART, I2C, dan SPI? Kapan menggunakan masing-masing?'],
+                    ['q' => 'Jelaskan konsep interrupt dalam mikrokontroler! Apa kelebihan interrupt dibandingkan polling?'],
+                ],
+            ],
+
+            // TEKNIK INDUSTRI (TIN)
+            'Riset Operasi' => [
+                'pg' => [
+                    ['q' => 'Metode simplex digunakan untuk menyelesaikan masalah?', 'a' => ['Integer programming', 'Linear programming', 'Dynamic programming', 'Goal programming'], 'correct' => 1],
+                    ['q' => 'Fungsi tujuan dalam linear programming bertujuan untuk?', 'a' => ['Selalu memaksimalkan', 'Memaksimalkan atau meminimalkan nilai objektif', 'Selalu meminimalkan', 'Menyamakan semua variabel'], 'correct' => 1],
+                    ['q' => 'Metode transportasi dalam riset operasi digunakan untuk?', 'a' => ['Routing kendaraan saja', 'Meminimalkan biaya distribusi dari sumber ke tujuan', 'Manajemen inventori', 'Penjadwalan produksi'], 'correct' => 1],
+                    ['q' => 'Teori antrian (queueing theory) menganalisis?', 'a' => ['Aliran produksi', 'Sistem dengan entitas yang menunggu layanan', 'Transportasi barang', 'Optimasi jadwal'], 'correct' => 1],
+                    ['q' => 'Analisis sensitivitas dalam LP digunakan untuk?', 'a' => ['Memvalidasi model', 'Mengetahui dampak perubahan parameter terhadap solusi optimal', 'Memformat laporan', 'Mengubah model'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah metode dalam riset operasi?', 'options' => ['Linear Programming', 'Bubble Sort', 'Integer Programming', 'Binary Search'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah asumsi dalam Linear Programming?', 'options' => ['Linearitas', 'Non-linearitas', 'Kepastian (certainty)', 'Ketidakpastian penuh'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah aplikasi riset operasi dalam industri?', 'options' => ['Optimasi jadwal produksi', 'Desain produk', 'Optimasi rute distribusi', 'Pemasaran produk'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen masalah linear programming?', 'options' => ['Fungsi tujuan', 'Fungsi warna', 'Batasan (constraint)', 'Fungsi bau'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah software yang umum digunakan untuk riset operasi?', 'options' => ['LINGO', 'Photoshop', 'GAMS', 'Instagram'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan komponen-komponen masalah Linear Programming (LP) beserta contoh formulasinya!'],
+                    ['q' => 'Jelaskan metode grafis untuk menyelesaikan LP dengan dua variabel! Bagaimana menentukan solusi optimal?'],
+                    ['q' => 'Apa yang dimaksud analisis sensitivitas dalam LP? Mengapa penting dalam pengambilan keputusan?'],
+                    ['q' => 'Jelaskan model antrian M/M/1! Apa yang dimaksud dengan intensitas lalu lintas (ρ)?'],
+                    ['q' => 'Bagaimana riset operasi diaplikasikan dalam manajemen rantai pasok? Berikan contoh kasus!'],
+                ],
+            ],
+
+            'Ergonomi' => [
+                'pg' => [
+                    ['q' => 'Ergonomi bertujuan untuk?', 'a' => ['Memperindah produk', 'Menyesuaikan pekerjaan/produk dengan kemampuan dan keterbatasan manusia', 'Meningkatkan produksi saja', 'Mengurangi biaya saja'], 'correct' => 1],
+                    ['q' => 'Antropometri dalam ergonomi mempelajari?', 'a' => ['Fisiologi kerja', 'Dimensi dan proporsi tubuh manusia', 'Psikologi kerja', 'Lingkungan kerja'], 'correct' => 1],
+                    ['q' => 'Prinsip persentil dalam desain ergonomis. Desain untuk pengguna umum menggunakan persentil?', 'a' => ['P5 dan P95', 'P50 saja', 'P1 saja', 'P99 saja'], 'correct' => 0],
+                    ['q' => 'Beban kerja mental dapat diukur menggunakan?', 'a' => ['Dynamometer', 'NASA-TLX (Task Load Index)', 'Timbangan', 'Penggaris'], 'correct' => 1],
+                    ['q' => 'Faktor lingkungan kerja yang mempengaruhi produktivitas?', 'a' => ['Hanya suhu', 'Suhu, pencahayaan, kebisingan, dan getaran', 'Hanya pencahayaan', 'Hanya warna dinding'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah aspek ergonomi yang dikaji?', 'options' => ['Ergonomi fisik', 'Ergonomi finansial', 'Ergonomi kognitif', 'Ergonomi marketing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode analisis postur kerja?', 'options' => ['RULA (Rapid Upper Limb Assessment)', 'SWOT Analysis', 'REBA (Rapid Entire Body Assessment)', 'BCG Matrix'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah faktor risiko musculoskeletal disorders (MSDs)?', 'options' => ['Postur canggung', 'Pencahayaan baik', 'Repetisi tinggi', 'Suhu nyaman'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk prinsip desain ergonomis?', 'options' => ['Sesuai dengan antropometri pengguna', 'Desain untuk kenyamanan perancang', 'Meminimalkan kelelahan', 'Estetika diutamakan saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah kondisi lingkungan kerja yang optimal?', 'options' => ['Suhu 20-26°C', 'Suhu 40°C', 'Pencahayaan 300-500 lux', 'Kebisingan 100 dB'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep ergonomi dan mengapa penting dalam perancangan sistem kerja!'],
+                    ['q' => 'Apa yang dimaksud antropometri? Jelaskan cara menggunakan data antropometri dalam desain produk!'],
+                    ['q' => 'Jelaskan konsep beban kerja fisik dan mental! Bagaimana cara mengukur masing-masing?'],
+                    ['q' => 'Apa yang dimaksud musculoskeletal disorders (MSDs)? Bagaimana ergonomi mencegah MSDs?'],
+                    ['q' => 'Jelaskan pengaruh faktor lingkungan (suhu, pencahayaan, kebisingan) terhadap kinerja pekerja!'],
+                ],
+            ],
+
+            'Perencanaan Produksi' => [
+                'pg' => [
+                    ['q' => 'MRP (Material Requirements Planning) digunakan untuk?', 'a' => ['Merekrut tenaga kerja', 'Merencanakan kebutuhan material berdasarkan jadwal produksi', 'Mengelola keuangan', 'Memasarkan produk'], 'correct' => 1],
+                    ['q' => 'Master Production Schedule (MPS) merupakan?', 'a' => ['Jadwal kedatangan bahan baku', 'Rencana produksi item akhir per periode waktu', 'Jadwal maintenance mesin', 'Rencana pemasaran'], 'correct' => 1],
+                    ['q' => 'Sistem produksi Just-In-Time (JIT) bertujuan?', 'a' => ['Memperbesar inventori', 'Meminimalkan inventori dan pemborosan', 'Mempercepat produksi tanpa batas', 'Menghasilkan batch besar'], 'correct' => 1],
+                    ['q' => 'Capacity Requirements Planning (CRP) bertujuan untuk?', 'a' => ['Merencanakan tenaga kerja saja', 'Memastikan kapasitas produksi cukup untuk memenuhi MRP', 'Merencanakan bahan baku', 'Menjadwalkan pengiriman'], 'correct' => 1],
+                    ['q' => 'Bill of Materials (BOM) dalam perencanaan produksi menunjukkan?', 'a' => ['Jadwal produksi', 'Daftar komponen dan bahan baku yang dibutuhkan untuk membuat produk', 'Harga produk', 'Kapasitas mesin'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen utama sistem MRP?', 'options' => ['Master Production Schedule', 'Marketing plan', 'Bill of Materials', 'Financial report'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis sistem produksi?', 'options' => ['Make-to-order (MTO)', 'No-order', 'Make-to-stock (MTS)', 'Never-order'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode peramalan permintaan?', 'options' => ['Moving average', 'Random guessing', 'Exponential smoothing', 'No forecast'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah ukuran lot dalam perencanaan produksi?', 'options' => ['EOQ (Economic Order Quantity)', 'Arbitrary lot', 'Lot-for-lot', 'Maximum lot always'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip lean manufacturing?', 'options' => ['Eliminasi pemborosan (waste)', 'Tambah inventori', 'Nilai dari sudut pandang pelanggan', 'Produksi batch besar selalu'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan sistem MRP dan komponen-komponen inputnya! Bagaimana MRP menentukan kebutuhan material?'],
+                    ['q' => 'Apa yang dimaksud Master Production Schedule? Bagaimana hubungannya dengan peramalan permintaan?'],
+                    ['q' => 'Jelaskan konsep Just-In-Time (JIT) dan bagaimana sistem Kanban mendukung JIT!'],
+                    ['q' => 'Apa yang dimaksud dengan aggregate planning? Jelaskan strategi-strategi yang tersedia!'],
+                    ['q' => 'Bagaimana cara menentukan ukuran lot produksi menggunakan metode EOQ? Jelaskan asumsi dan rumusnya!'],
+                ],
+            ],
+
+            'Manajemen Kualitas' => [
+                'pg' => [
+                    ['q' => 'Total Quality Management (TQM) berfokus pada?', 'a' => ['Kualitas produk akhir saja', 'Perbaikan kualitas secara menyeluruh di seluruh organisasi', 'Kualitas bahan baku saja', 'Kepuasan manajemen saja'], 'correct' => 1],
+                    ['q' => 'Diagram Pareto dalam pengendalian kualitas berdasarkan prinsip?', 'a' => ['50-50', '80-20 (80% masalah berasal dari 20% penyebab)', '90-10', '70-30'], 'correct' => 1],
+                    ['q' => 'Standar internasional untuk sistem manajemen mutu?', 'a' => ['ISO 14001', 'ISO 9001', 'ISO 45001', 'ISO 27001'], 'correct' => 1],
+                    ['q' => 'Peta kendali (control chart) digunakan untuk?', 'a' => ['Menggambar proses', 'Memantau variabilitas proses dan mendeteksi penyimpangan', 'Menghitung biaya', 'Merencanakan produksi'], 'correct' => 1],
+                    ['q' => 'Six Sigma bertujuan mencapai kualitas dengan tingkat cacat?', 'a' => ['100 per juta', '10 per juta', '3.4 per juta (DPMO)', '0.1 per juta'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah 7 alat kualitas (7 QC tools)?', 'options' => ['Diagram Pareto', 'Diagram SWOT', 'Fishbone diagram', 'BCG Matrix'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metodologi peningkatan kualitas?', 'options' => ['Six Sigma DMAIC', 'Waterfall model', 'Kaizen', 'Agile Scrum'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip ISO 9001?', 'options' => ['Fokus pada pelanggan', 'Fokus pada keuntungan saja', 'Perbaikan berkelanjutan', 'Status quo'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis biaya kualitas?', 'options' => ['Prevention cost', 'Marketing cost', 'Appraisal cost', 'Finance cost'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk fase DMAIC dalam Six Sigma?', 'options' => ['Define', 'Discover', 'Measure', 'Model'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep TQM dan prinsip-prinsip dasarnya dalam organisasi manufaktur!'],
+                    ['q' => 'Apa yang dimaksud dengan Statistical Process Control (SPC)? Jelaskan cara menggunakan peta kendali!'],
+                    ['q' => 'Jelaskan metodologi Six Sigma DMAIC! Apa yang dimaksud dengan DPMO?'],
+                    ['q' => 'Jelaskan 7 alat kualitas (7 QC Tools) beserta fungsi masing-masing!'],
+                    ['q' => 'Apa yang dimaksud dengan biaya kualitas (Cost of Quality)? Jelaskan kategori-kategorinya!'],
+                ],
+            ],
+
+            'Sistem Produksi' => [
+                'pg' => [
+                    ['q' => 'Tata letak pabrik (plant layout) bertipe product layout cocok untuk?', 'a' => ['Produksi beragam dalam jumlah kecil', 'Produksi massal dengan aliran proses tetap', 'Produksi custom order', 'Produksi proyek'], 'correct' => 1],
+                    ['q' => 'OEE (Overall Equipment Effectiveness) mengukur?', 'a' => ['Kapasitas mesin maksimal', 'Efektivitas penggunaan mesin (availability × performance × quality)', 'Biaya perawatan mesin', 'Umur mesin'], 'correct' => 1],
+                    ['q' => 'Konsep 5S dalam sistem produksi (Seiri, Seiton, Seiso, Seiketsu, Shitsuke) berasal dari?', 'a' => ['Amerika Serikat', 'Jerman', 'Jepang', 'China'], 'correct' => 2],
+                    ['q' => 'Bottleneck dalam sistem produksi adalah?', 'a' => ['Mesin tercepat', 'Proses/stasiun kerja yang membatasi kapasitas produksi keseluruhan', 'Produk terlaris', 'Bahan baku utama'], 'correct' => 1],
+                    ['q' => 'Preventive maintenance dilakukan untuk?', 'a' => ['Memperbaiki mesin yang rusak', 'Mencegah kerusakan dengan perawatan terjadwal sebelum terjadi', 'Menambah kapasitas', 'Mengganti mesin lama'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis tata letak (layout) pabrik?', 'options' => ['Product layout', 'Random layout', 'Process layout', 'No layout'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis sistem produksi berdasarkan aliran?', 'options' => ['Flow shop', 'No shop', 'Job shop', 'Color shop'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk pemborosan (7 waste) dalam lean production?', 'options' => ['Overproduction', 'Karyawan banyak', 'Waiting time', 'Produksi cepat'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis maintenance?', 'options' => ['Preventive maintenance', 'Decorative maintenance', 'Predictive maintenance', 'Optional maintenance'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah indikator kinerja sistem produksi?', 'options' => ['OEE (Overall Equipment Effectiveness)', 'CEO performance', 'Throughput', 'Employee satisfaction only'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan jenis-jenis tata letak pabrik (product, process, cellular, fixed position)! Kapan masing-masing digunakan?'],
+                    ['q' => 'Apa yang dimaksud OEE? Jelaskan cara menghitung dan interpretasinya!'],
+                    ['q' => 'Jelaskan konsep Theory of Constraints (TOC)! Bagaimana mengidentifikasi dan mengelola bottleneck?'],
+                    ['q' => 'Jelaskan 7 pemborosan (7 Muda) dalam lean manufacturing! Berikan contoh masing-masing!'],
+                    ['q' => 'Apa perbedaan antara push system dan pull system dalam produksi? Jelaskan keunggulan pull system!'],
+                ],
+            ],
+
+            'Analisis Perancangan Kerja' => [
+                'pg' => [
+                    ['q' => 'Time study (studi waktu) digunakan untuk?', 'a' => ['Menentukan jadwal produksi saja', 'Menetapkan waktu standar kerja melalui pengukuran langsung', 'Menganalisis biaya', 'Merencanakan kapasitas saja'], 'correct' => 1],
+                    ['q' => 'Kelonggaran (allowance) dalam penetapan waktu standar kerja mencakup?', 'a' => ['Waktu produktif saja', 'Kebutuhan pribadi, kelelahan, dan keterlambatan tak terhindarkan', 'Hanya waktu istirahat', 'Waktu setup saja'], 'correct' => 1],
+                    ['q' => 'Work sampling (sampling kerja) digunakan untuk?', 'a' => ['Mengukur waktu siklus', 'Menentukan proporsi waktu aktivitas berbeda secara statistik', 'Menganalisis gerakan', 'Merancang alat kerja'], 'correct' => 1],
+                    ['q' => 'Peta tangan kiri-kanan (right/left hand chart) digunakan untuk?', 'a' => ['Analisis aliran produksi', 'Menganalisis dan menyeimbangkan gerakan kedua tangan operator', 'Penjadwalan produksi', 'Analisis kualitas'], 'correct' => 1],
+                    ['q' => 'Prinsip ekonomi gerakan (motion economy) bertujuan untuk?', 'a' => ['Mempercepat tanpa memperhatikan kelelahan', 'Merancang gerakan kerja yang efisien dan mengurangi kelelahan', 'Meningkatkan kompleksitas', 'Memperindah gerakan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah metode pengukuran kerja?', 'options' => ['Time study', 'Market study', 'Work sampling', 'Competitor study'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen waktu standar?', 'options' => ['Waktu normal', 'Waktu istirahat saja', 'Allowance', 'Waktu desain'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah peta proses (process chart) yang valid?', 'options' => ['Peta proses operasi', 'Peta organisasi', 'Peta aliran proses', 'Peta lokasi pasar'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk simbol ASME dalam peta proses?', 'options' => ['Operasi (lingkaran)', 'Keputusan (berlian)', 'Transportasi (panah)', 'Terminal (oval)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sistem penetapan waktu yang terstandarisasi?', 'options' => ['MTM (Methods-Time Measurement)', 'PERT', 'MOST (Maynard Operation Sequence Technique)', 'CPM'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan prosedur time study untuk menetapkan waktu standar kerja! Apa yang dimaksud rating factor?'],
+                    ['q' => 'Apa yang dimaksud work sampling? Jelaskan cara merancang dan melaksanakan studi work sampling!'],
+                    ['q' => 'Jelaskan prinsip-prinsip ekonomi gerakan beserta contoh penerapannya dalam desain stasiun kerja!'],
+                    ['q' => 'Apa yang dimaksud peta aliran proses? Jelaskan simbol-simbol yang digunakan dan cara menganalisisnya!'],
+                    ['q' => 'Bagaimana analisis metode kerja dapat meningkatkan produktivitas? Jelaskan pendekatan ECRS (Eliminate, Combine, Rearrange, Simplify)!'],
+                ],
+            ],
+
+            'Statistik Industri' => [
+                'pg' => [
+                    ['q' => 'Acceptance sampling dalam quality control digunakan untuk?', 'a' => ['Memeriksa semua produk', 'Memutuskan menerima/menolak lot berdasarkan sampel', 'Memproduksi lebih cepat', 'Mendesain produk'], 'correct' => 1],
+                    ['q' => 'Distribusi normal digunakan dalam pengendalian statistik karena?', 'a' => ['Paling mudah dihitung', 'Banyak karakteristik kualitas mendekati distribusi normal', 'Hanya ada satu distribusi', 'Dianjurkan ISO'], 'correct' => 1],
+                    ['q' => 'Koefisien variasi (CV) digunakan untuk?', 'a' => ['Mengukur nilai rata-rata', 'Membandingkan variabilitas relatif antara dataset berbeda skala', 'Menghitung median', 'Mengukur distribusi'], 'correct' => 1],
+                    ['q' => 'Regresi linier berganda digunakan ketika?', 'a' => ['Ada satu variabel independen', 'Ada lebih dari satu variabel independen mempengaruhi variabel dependen', 'Data tidak linear', 'Tidak ada variabel independen'], 'correct' => 1],
+                    ['q' => 'Uji Chi-square digunakan untuk menguji?', 'a' => ['Perbedaan rata-rata', 'Kecocokan data (goodness of fit) atau independensi variabel kategoris', 'Korelasi linear', 'Normalitas saja'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah distribusi statistik yang digunakan dalam industri?', 'options' => ['Distribusi normal', 'Distribusi Fibonacci', 'Distribusi Poisson', 'Distribusi Newton'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah peta kendali (control chart) yang valid?', 'options' => ['X-bar chart', 'Color chart', 'R-chart', 'Mood chart'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode sampling dalam statistik industri?', 'options' => ['Simple random sampling', 'Biased sampling', 'Stratified sampling', 'All-in sampling'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah ukuran variabilitas data?', 'options' => ['Standar deviasi', 'Mean', 'Variance', 'Median'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah uji statistik yang umum dalam industri?', 'options' => ['T-test', 'Color test', 'ANOVA', 'Shape test'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep Statistical Process Control (SPC) dan bagaimana peta kendali X-bar dan R digunakan!'],
+                    ['q' => 'Apa yang dimaksud acceptance sampling? Jelaskan Operating Characteristic (OC) curve!'],
+                    ['q' => 'Jelaskan penggunaan distribusi normal dalam pengendalian kualitas statistik! Apa itu batas kendali 3-sigma?'],
+                    ['q' => 'Bagaimana regresi linier digunakan untuk analisis data industri? Berikan contoh penerapannya!'],
+                    ['q' => 'Jelaskan konsep Design of Experiments (DOE) dalam optimasi proses industri!'],
+                ],
+            ],
+
+            'Manajemen Rantai Pasok' => [
+                'pg' => [
+                    ['q' => 'Rantai pasok (supply chain) mencakup?', 'a' => ['Hanya pabrik', 'Seluruh aliran material, informasi, dan keuangan dari pemasok hingga pelanggan', 'Hanya distribusi', 'Hanya retailer'], 'correct' => 1],
+                    ['q' => 'Bullwhip effect dalam supply chain terjadi karena?', 'a' => ['Produksi berlebih', 'Amplifikasi variabilitas permintaan ke hulu rantai pasok', 'Pengiriman tepat waktu', 'Informasi sempurna'], 'correct' => 1],
+                    ['q' => 'Vendor Managed Inventory (VMI) berarti?', 'a' => ['Pembeli mengelola inventori sendiri', 'Pemasok mengelola level inventori di lokasi pembeli', 'Konsultasi bersama inventori', 'Tidak ada inventori'], 'correct' => 1],
+                    ['q' => 'Lead time dalam supply chain adalah?', 'a' => ['Waktu pengiriman saja', 'Total waktu dari pemesanan hingga penerimaan produk', 'Waktu produksi saja', 'Waktu pembayaran'], 'correct' => 1],
+                    ['q' => 'Strategi supply chain yang responsif (agile) cocok untuk?', 'a' => ['Produk komoditas volume tinggi', 'Produk inovatif dengan permintaan tidak pasti', 'Produk standar permintaan stabil', 'Produk murah'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah aliran dalam supply chain?', 'options' => ['Aliran material', 'Aliran udara', 'Aliran informasi', 'Aliran suara'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi pengadaan (procurement)?', 'options' => ['Single sourcing', 'Random sourcing', 'Multiple sourcing', 'No sourcing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknologi yang mendukung supply chain management?', 'options' => ['ERP system', 'Social media', 'RFID tracking', 'Newspaper'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metrik kinerja supply chain?', 'options' => ['Perfect order fulfillment', 'Employee age', 'Cash-to-cash cycle time', 'Office location'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah risiko dalam supply chain?', 'options' => ['Supply disruption', 'Employee promotion', 'Demand uncertainty', 'Office renovation'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep supply chain management dan elemen-elemen yang terlibat!'],
+                    ['q' => 'Apa yang dimaksud dengan bullwhip effect? Bagaimana cara menguranginya?'],
+                    ['q' => 'Jelaskan perbedaan strategi supply chain lean vs agile! Kapan masing-masing diterapkan?'],
+                    ['q' => 'Apa yang dimaksud dengan supply chain visibility? Bagaimana teknologi RFID dan IoT mendukungnya?'],
+                    ['q' => 'Jelaskan konsep risiko rantai pasok dan strategi mitigasi yang dapat diterapkan!'],
+                ],
+            ],
+
+            // ARSITEKTUR (ARS)
+            'Perancangan Arsitektur' => [
+                'pg' => [
+                    ['q' => 'Program arsitektur (architectural program) berisi?', 'a' => ['Kode komputer', 'Kebutuhan ruang dan hubungan antar fungsi bangunan', 'Anggaran biaya', 'Jadwal konstruksi'], 'correct' => 1],
+                    ['q' => 'Sirkulasi dalam arsitektur berkaitan dengan?', 'a' => ['Sistem MEP', 'Alur pergerakan manusia dan barang dalam bangunan', 'Struktur bangunan', 'Pencahayaan'], 'correct' => 1],
+                    ['q' => 'Denah (floor plan) dalam gambar arsitektur merupakan?', 'a' => ['Tampak depan bangunan', 'Potongan horizontal bangunan setinggi ±1.2m', 'Potongan vertikal', 'Perspektif 3D'], 'correct' => 1],
+                    ['q' => 'Zoning dalam perencanaan arsitektur bertujuan untuk?', 'a' => ['Menentukan warna bangunan', 'Mengelompokkan area berdasarkan fungsi dan privasi', 'Menghitung luas bangunan', 'Menentukan material'], 'correct' => 1],
+                    ['q' => 'Skala 1:100 dalam gambar arsitektur berarti?', 'a' => ['1 cm gambar = 100 m nyata', '1 cm gambar = 100 cm (1 m) nyata', '100 cm gambar = 1 cm nyata', '1 mm gambar = 100 mm nyata'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk elemen desain arsitektur?', 'options' => ['Ruang (space)', 'Suara musik', 'Massa (mass)', 'Bau'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tahap desain arsitektur?', 'options' => ['Schematic design', 'Random design', 'Design development', 'No-plan design'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis gambar arsitektur?', 'options' => ['Denah (plan)', 'Foto panorama', 'Tampak (elevation)', 'Video tour'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip desain arsitektur?', 'options' => ['Proporsi', 'Harga murah selalu', 'Skala', 'Warna gelap selalu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah software yang digunakan dalam perancangan arsitektur?', 'options' => ['AutoCAD', 'Notepad', 'Revit BIM', 'Calculator'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tahapan proses perancangan arsitektur dari programming hingga construction documents!'],
+                    ['q' => 'Apa yang dimaksud dengan program arsitektur? Bagaimana cara menyusunnya?'],
+                    ['q' => 'Jelaskan prinsip-prinsip dasar komposisi dalam arsitektur (proporsi, skala, ritme, dll)!'],
+                    ['q' => 'Bagaimana sirkulasi vertikal dan horizontal dirancang dalam bangunan bertingkat?'],
+                    ['q' => 'Jelaskan konsep zoning dalam perancangan bangunan! Apa yang dimaksud zona publik, semi-publik, dan privat?'],
+                ],
+            ],
+
+            'Teori Arsitektur' => [
+                'pg' => [
+                    ['q' => 'Arsitektur Modernisme ditandai dengan prinsip?', 'a' => ['Ornamen berlebihan', '"Form follows function" dan kesederhanaan bentuk', 'Revivalis gaya lama', 'Dekorasi kompleks'], 'correct' => 1],
+                    ['q' => 'Vitruvius mendefinisikan arsitektur baik harus memenuhi?', 'a' => ['Estetika saja', 'Firmitas (kekuatan), Utilitas (kegunaan), Venustas (keindahan)', 'Biaya murah saja', 'Ukuran besar saja'], 'correct' => 1],
+                    ['q' => 'Arsitektur Dekonstruktivisme dipelopori oleh?', 'a' => ['Le Corbusier', 'Frank Lloyd Wright', 'Frank Gehry dan Zaha Hadid', 'Mies van der Rohe'], 'correct' => 2],
+                    ['q' => 'Genius loci dalam teori arsitektur berarti?', 'a' => ['Desainer jenius', 'Semangat atau karakter khas suatu tempat/lokasi', 'Teknologi tinggi', 'Gaya internasional'], 'correct' => 1],
+                    ['q' => 'Arsitektur vernakular merujuk pada?', 'a' => ['Arsitektur futuristik', 'Arsitektur tradisional yang khas suatu daerah tanpa arsitek formal', 'Arsitektur modern', 'Arsitektur impor'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah aliran arsitektur modern yang valid?', 'options' => ['Modernisme', 'Classicism only', 'Post-modernisme', 'Art Nouveau'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah arsitek modernisme terkenal?', 'options' => ['Le Corbusier', 'Michelangelo', 'Mies van der Rohe', 'Raphael'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah konsep dalam teori arsitektur?', 'options' => ['Genius loci', 'Net profit', 'Fenomenologi arsitektur', 'Market share'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip arsitektur tradisional Jawa?', 'options' => ['Tritangtu (tiga tingkatan)', 'Mancapat (orientasi arah)', 'Saka guru (tiang utama)', 'Atap pelana saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah konsep keberlanjutan (sustainable architecture)?', 'options' => ['Green building', 'Maximum energy use', 'Passive design strategy', 'Ignore environment'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perkembangan arsitektur dari Modernisme hingga Post-modernisme! Apa perbedaan utamanya?'],
+                    ['q' => 'Apa yang dimaksud dengan konsep Vitruvius (Firmitas, Utilitas, Venustas)? Masih relevankah di era modern?'],
+                    ['q' => 'Jelaskan konsep arsitektur vernakular dan nilai-nilai yang terkandung di dalamnya!'],
+                    ['q' => 'Apa yang dimaksud dengan genius loci dalam teori arsitektur? Bagaimana arsitek meresponsnya?'],
+                    ['q' => 'Jelaskan prinsip-prinsip arsitektur hijau (green architecture) dan penerapannya di Indonesia!'],
+                ],
+            ],
+
+            'Struktur Bangunan' => [
+                'pg' => [
+                    ['q' => 'Sistem struktur rangka (frame structure) pada bangunan bertingkat terdiri dari?', 'a' => ['Dinding pemikul saja', 'Kolom dan balok sebagai komponen utama', 'Pelat saja', 'Fondasi saja'], 'correct' => 1],
+                    ['q' => 'Beban mati (dead load) pada bangunan adalah?', 'a' => ['Beban orang', 'Berat sendiri elemen bangunan yang permanen', 'Beban angin', 'Beban gempa'], 'correct' => 1],
+                    ['q' => 'Sistem struktur cangkang (shell structure) efisien karena?', 'a' => ['Menggunakan baja', 'Mentransfer beban melalui tegangan membran (tarik/tekan)', 'Menggunakan banyak kolom', 'Bentuknya kotak'], 'correct' => 1],
+                    ['q' => 'Dilatasi (expansion joint) dalam bangunan berfungsi untuk?', 'a' => ['Menambah kekuatan', 'Mengakomodasi pergerakan diferensial akibat suhu dan gempa', 'Mempercantik tampak', 'Mengurangi berat'], 'correct' => 1],
+                    ['q' => 'Struktur atap rangka baja ringan menggunakan profil?', 'a' => ['WF besar', 'Cold-formed steel (baja ringan/kanal C)', 'Beton bertulang', 'Kayu solid'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis beban pada bangunan?', 'options' => ['Beban mati (dead load)', 'Beban kecantikan', 'Beban hidup (live load)', 'Beban kebisingan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sistem struktur bangunan?', 'options' => ['Sistem rangka (frame)', 'Sistem kamuflase', 'Sistem dinding pemikul (bearing wall)', 'Sistem warna'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah material struktur utama bangunan?', 'options' => ['Beton bertulang', 'Plastik', 'Baja struktural', 'Kain'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk elemen struktur vertikal?', 'options' => ['Kolom', 'Balok', 'Dinding geser (shear wall)', 'Pelat lantai'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk pertimbangan struktur tahan gempa?', 'options' => ['Kekakuan (stiffness)', 'Warna bangunan', 'Daktilitas (ductility)', 'Tinggi bangunan saja'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara sistem struktur rangka (frame) dan sistem dinding pemikul (bearing wall)!'],
+                    ['q' => 'Apa yang dimaksud dengan beban mati dan beban hidup? Bagaimana cara menentukannya dalam perencanaan?'],
+                    ['q' => 'Jelaskan konsep bangunan tahan gempa! Apa yang dimaksud dengan daktilitas struktur?'],
+                    ['q' => 'Jelaskan sistem struktur atap untuk bentang lebar (rangka, shell, kabel, dll)!'],
+                    ['q' => 'Bagaimana memilih sistem fondasi yang tepat berdasarkan kondisi tanah dan beban bangunan?'],
+                ],
+            ],
+
+            'Utilitas Bangunan' => [
+                'pg' => [
+                    ['q' => 'Sistem plumbing dalam bangunan mencakup?', 'a' => ['Listrik saja', 'Air bersih, air kotor, dan drainase', 'AC saja', 'Pencahayaan'], 'correct' => 1],
+                    ['q' => 'HVAC singkatan dari?', 'a' => ['High Voltage Air Conditioning', 'Heating, Ventilation, and Air Conditioning', 'Humidity Ventilation and Cooling', 'Heat Value Air Control'], 'correct' => 1],
+                    ['q' => 'Sistem fire protection pasif dalam bangunan meliputi?', 'a' => ['Sprinkler saja', 'Kompartemenisasi api melalui dinding dan pintu tahan api', 'Alarm kebakaran saja', 'Hydrant saja'], 'correct' => 1],
+                    ['q' => 'Iluminansi (illuminance) dalam pencahayaan diukur dalam satuan?', 'a' => ['Watt', 'Lumen', 'Lux (lm/m²)', 'Candela'], 'correct' => 2],
+                    ['q' => 'Tata udara (air conditioning) pada bangunan bertingkat umumnya menggunakan sistem?', 'a' => ['Window AC unit per ruang saja', 'Chilled water system atau VRF', 'Kipas angin saja', 'Ventilasi alami saja'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah sistem utilitas bangunan?', 'options' => ['Sistem plumbing', 'Sistem dekorasi', 'Sistem HVAC', 'Sistem furnitur'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sistem proteksi kebakaran aktif?', 'options' => ['Sistem sprinkler', 'Dinding tahan api', 'Hydrant', 'Pintu tahan api'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah pertimbangan dalam desain pencahayaan bangunan?', 'options' => ['Tingkat iluminansi (lux)', 'Berat bangunan', 'Kenyamanan visual (glare)', 'Warna cat tembok'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sistem transportasi vertikal dalam bangunan?', 'options' => ['Lift/elevator', 'Tangga spiral saja', 'Eskalator', 'Ramp saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sumber energi terbarukan untuk utilitas bangunan?', 'options' => ['Panel surya (PLTS)', 'Generator diesel', 'Panas bumi (geothermal)', 'PLN saja'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan komponen-komponen sistem plumbing dalam bangunan! Bagaimana air bersih dan air kotor dikelola?'],
+                    ['q' => 'Apa yang dimaksud sistem HVAC? Jelaskan komponen dan cara kerjanya pada gedung bertingkat!'],
+                    ['q' => 'Jelaskan sistem proteksi kebakaran aktif dan pasif pada bangunan bertingkat!'],
+                    ['q' => 'Jelaskan prinsip pencahayaan alami dan buatan dalam bangunan! Bagaimana mengintegrasikan keduanya?'],
+                    ['q' => 'Bagaimana konsep green building mempengaruhi desain sistem utilitas bangunan?'],
+                ],
+            ],
+
+            'Arsitektur Lingkungan' => [
+                'pg' => [
+                    ['q' => 'Orientasi bangunan yang optimal di iklim tropis adalah menghadap?', 'a' => ['Timur dan barat (menangkap matahari)', 'Utara dan selatan (menghindari sinar langsung)', 'Semua arah sama', 'Selatan saja'], 'correct' => 1],
+                    ['q' => 'Ventilasi silang (cross ventilation) dicapai dengan?', 'a' => ['Jendela di satu sisi saja', 'Bukaan di sisi berlawanan yang memanfaatkan perbedaan tekanan', 'AC sentral saja', 'Atap kaca'], 'correct' => 1],
+                    ['q' => 'Green roof (atap hijau) bermanfaat untuk?', 'a' => ['Menambah beban saja', 'Insulasi termal, manajemen air hujan, dan biodiversitas', 'Estetika saja', 'Mengurangi konstruksi'], 'correct' => 1],
+                    ['q' => 'Rating system LEED digunakan untuk?', 'a' => ['Menilai desain arsitektur saja', 'Sertifikasi bangunan hijau berdasarkan kriteria keberlanjutan', 'Mengukur biaya', 'Penilaian estetika'], 'correct' => 1],
+                    ['q' => 'Faktor matahari (solar heat gain) dapat dikurangi dengan?', 'a' => ['Menambah jendela', 'Shading devices (sun shading) dan kaca selektif', 'Memperbesar bangunan', 'Mengurangi dinding'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah strategi desain pasif untuk iklim tropis?', 'options' => ['Cross ventilation', 'Maksimalkan panas matahari', 'Shading dari sinar langsung', 'Tutup semua bukaan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah rating system bangunan hijau?', 'options' => ['LEED', 'ISO 9001', 'GREENSHIP (GBCI)', 'COBIT'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah material bangunan berkelanjutan?', 'options' => ['Bambu', 'Plastik non-daur ulang', 'Kayu bersertifikat FSC', 'Beton biasa saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip arsitektur tropis?', 'options' => ['Atap lebar melindungi dari hujan', 'Atap datar tanpa tritisan', 'Kolong bangunan untuk ventilasi', 'Dinding masif tanpa bukaan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi pengelolaan air di bangunan hijau?', 'options' => ['Rain water harvesting', 'Buang semua air hujan', 'Greywater recycling', 'Gunakan air tanah saja'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan prinsip-prinsip desain arsitektur tropis! Apa yang membedakannya dari arsitektur iklim lain?'],
+                    ['q' => 'Apa yang dimaksud arsitektur hijau (green architecture)? Jelaskan kriteria LEED atau GREENSHIP!'],
+                    ['q' => 'Jelaskan strategi desain pasif untuk mengurangi konsumsi energi bangunan di daerah tropis!'],
+                    ['q' => 'Bagaimana ventilasi alami dirancang untuk memaksimalkan kenyamanan termal tanpa AC?'],
+                    ['q' => 'Jelaskan konsep biophilic design dan manfaatnya bagi kesehatan penghuni bangunan!'],
+                ],
+            ],
+
+            // MANAJEMEN (MNJ)
+            'Manajemen Pemasaran' => [
+                'pg' => [
+                    ['q' => 'Bauran pemasaran (Marketing Mix) 4P terdiri dari?', 'a' => ['People, Place, Profit, Price', 'Product, Price, Place, Promotion', 'Plan, Price, Place, People', 'Product, Profit, People, Plan'], 'correct' => 1],
+                    ['q' => 'Segmentasi pasar bertujuan untuk?', 'a' => ['Menjual ke semua orang', 'Membagi pasar ke kelompok yang memiliki kebutuhan serupa', 'Mengurangi harga', 'Memperluas produk'], 'correct' => 1],
+                    ['q' => 'Brand equity (ekuitas merek) adalah?', 'a' => ['Nilai finansial merek saja', 'Nilai tambah yang diberikan merek kepada produk/layanan', 'Biaya branding', 'Anggaran iklan'], 'correct' => 1],
+                    ['q' => 'Customer Lifetime Value (CLV) mengukur?', 'a' => ['Usia pelanggan', 'Total nilai yang diharapkan dari pelanggan selama hubungan bisnis', 'Frekuensi pembelian saja', 'Harga produk'], 'correct' => 1],
+                    ['q' => 'STP dalam strategi pemasaran singkatan dari?', 'a' => ['Sales, Target, Profit', 'Segmentation, Targeting, Positioning', 'Strategy, Tactic, Plan', 'Sales, Tactics, Pricing'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah elemen dalam bauran pemasaran 7P?', 'options' => ['Product', 'Passion', 'People', 'Perfume'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi penetapan harga?', 'options' => ['Cost-plus pricing', 'Random pricing', 'Penetration pricing', 'No pricing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah media promosi digital?', 'options' => ['Social media ads', 'Koran cetak saja', 'Email marketing', 'Poster dinding saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis riset pemasaran?', 'options' => ['Riset kualitatif', 'Riset astrologi', 'Riset kuantitatif', 'Riset takhayul'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi distribusi?', 'options' => ['Distribusi intensif', 'Distribusi acak', 'Distribusi selektif', 'Distribusi nol'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep STP (Segmentation, Targeting, Positioning) dalam strategi pemasaran!'],
+                    ['q' => 'Apa yang dimaksud bauran pemasaran 4P? Bagaimana evolusinya menjadi 7P?'],
+                    ['q' => 'Jelaskan konsep brand equity dan bagaimana cara membangun ekuitas merek yang kuat!'],
+                    ['q' => 'Apa yang dimaksud dengan pemasaran digital (digital marketing)? Jelaskan channel-channel utamanya!'],
+                    ['q' => 'Bagaimana cara melakukan analisis kompetitor dalam perencanaan pemasaran? Jelaskan framework yang digunakan!'],
+                ],
+            ],
+
+            'Manajemen Keuangan' => [
+                'pg' => [
+                    ['q' => 'Net Present Value (NPV) positif dalam investasi berarti?', 'a' => ['Proyek merugi', 'Proyek menghasilkan nilai lebih besar dari biaya modalnya', 'Proyek impas', 'Tidak ada arti khusus'], 'correct' => 1],
+                    ['q' => 'Rasio likuiditas yang mengukur kemampuan membayar kewajiban jangka pendek?', 'a' => ['Debt-to-equity ratio', 'Current ratio', 'Return on equity', 'Price-earnings ratio'], 'correct' => 1],
+                    ['q' => 'WACC (Weighted Average Cost of Capital) digunakan sebagai?', 'a' => ['Tingkat pertumbuhan perusahaan', 'Discount rate untuk menilai proyek investasi', 'Tingkat pajak', 'Laba perusahaan'], 'correct' => 1],
+                    ['q' => 'Dividen dalam manajemen keuangan adalah?', 'a' => ['Utang perusahaan', 'Distribusi laba perusahaan kepada pemegang saham', 'Biaya operasional', 'Investasi baru'], 'correct' => 1],
+                    ['q' => 'Leverage keuangan (financial leverage) berkaitan dengan?', 'a' => ['Penggunaan ekuitas saja', 'Penggunaan utang untuk memperbesar potensi return', 'Manajemen kas', 'Kontrol biaya'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah metode penilaian investasi?', 'options' => ['NPV (Net Present Value)', 'Brand value', 'IRR (Internal Rate of Return)', 'Logo value'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah laporan keuangan utama?', 'options' => ['Neraca (Balance Sheet)', 'Laporan cuaca', 'Laporan Laba Rugi', 'Laporan olahraga'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah rasio keuangan yang umum dianalisis?', 'options' => ['Rasio likuiditas', 'Rasio popularitas', 'Rasio profitabilitas', 'Rasio estetika'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sumber pendanaan (financing) perusahaan?', 'options' => ['Ekuitas (saham)', 'Barter', 'Utang (obligasi)', 'Donasi selalu'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik manajemen modal kerja?', 'options' => ['Cash management', 'Social media management', 'Inventory management', 'Event management'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep time value of money! Bagaimana cara menghitung present value dan future value?'],
+                    ['q' => 'Apa yang dimaksud NPV dan IRR? Bagaimana keduanya digunakan dalam keputusan investasi?'],
+                    ['q' => 'Jelaskan konsep struktur modal (capital structure)! Apa yang dimaksud dengan WACC?'],
+                    ['q' => 'Jelaskan analisis laporan keuangan menggunakan rasio! Sebutkan jenis-jenis rasio dan interpretasinya!'],
+                    ['q' => 'Apa yang dimaksud manajemen modal kerja? Jelaskan siklus konversi kas dan cara mengoptimalkannya!'],
+                ],
+            ],
+
+            'Manajemen SDM' => [
+                'pg' => [
+                    ['q' => 'Manajemen SDM berfungsi untuk?', 'a' => ['Mengelola keuangan', 'Mengelola sumber daya manusia agar berkontribusi pada tujuan organisasi', 'Memasarkan produk', 'Mengelola operasi'], 'correct' => 1],
+                    ['q' => 'Analisis jabatan (job analysis) menghasilkan?', 'a' => ['Anggaran HRD', 'Job description dan job specification', 'Jadwal training', 'Gaji karyawan'], 'correct' => 1],
+                    ['q' => 'Performance appraisal bertujuan untuk?', 'a' => ['Menghukum karyawan', 'Mengevaluasi kinerja karyawan secara objektif', 'Menentukan kenaikan gaji saja', 'Memantau kehadiran'], 'correct' => 1],
+                    ['q' => 'Kompetensi dalam manajemen SDM merujuk pada?', 'a' => ['Gaji karyawan', 'Kombinasi pengetahuan, keterampilan, dan perilaku yang dibutuhkan', 'Lama kerja saja', 'Jabatan saja'], 'correct' => 1],
+                    ['q' => 'Employee turnover yang tinggi mengindikasikan?', 'a' => ['Perusahaan berkembang', 'Masalah dalam kepuasan, budaya, atau kompensasi', 'Tidak ada artinya', 'Perusahaan efisien'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah fungsi utama manajemen SDM?', 'options' => ['Rekrutmen dan seleksi', 'Produksi barang', 'Pelatihan dan pengembangan', 'Penjualan produk'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode rekrutmen?', 'options' => ['Job posting internal', 'Undian acak', 'Headhunting', 'Penunjukan tanpa seleksi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah pendekatan pengembangan karyawan?', 'options' => ['On-the-job training', 'Tidak ada training', 'Coaching dan mentoring', 'Belajar sendiri saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk kompensasi karyawan?', 'options' => ['Gaji pokok', 'Hukuman', 'Tunjangan', 'Pengurangan hak'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah hak karyawan yang dilindungi undang-undang di Indonesia?', 'options' => ['Hak cuti tahunan', 'Hak tidak bekerja', 'Hak pesangon', 'Hak tidak masuk kerja'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan proses rekrutmen dan seleksi karyawan! Apa perbedaan rekrutmen internal dan eksternal?'],
+                    ['q' => 'Apa yang dimaksud pelatihan dan pengembangan (training & development)? Jelaskan jenis-jenis pelatihan!'],
+                    ['q' => 'Jelaskan sistem manajemen kinerja (performance management)! Bagaimana menetapkan KPI karyawan?'],
+                    ['q' => 'Apa yang dimaksud dengan kompensasi dan benefit? Jelaskan faktor-faktor yang mempengaruhi penetapan gaji!'],
+                    ['q' => 'Bagaimana cara membangun budaya organisasi yang positif? Jelaskan peran HR dalam employee engagement!'],
+                ],
+            ],
+
+            'Perilaku Organisasi' => [
+                'pg' => [
+                    ['q' => 'Teori motivasi Maslow menyatakan bahwa kebutuhan manusia tersusun secara?', 'a' => ['Acak', 'Hierarki dari kebutuhan dasar hingga aktualisasi diri', 'Sejajar semua sama penting', 'Dari paling tinggi ke dasar'], 'correct' => 1],
+                    ['q' => 'Kepemimpinan transformasional berfokus pada?', 'a' => ['Penghargaan transaksional saja', 'Menginspirasi dan mengubah motivasi bawahan untuk tujuan lebih tinggi', 'Kontrol ketat', 'Hukuman kesalahan'], 'correct' => 1],
+                    ['q' => 'Konflik dalam organisasi tidak selalu negatif karena?', 'a' => ['Konflik selalu buruk', 'Konflik fungsional dapat mendorong inovasi dan peningkatan kinerja', 'Konflik menguras energi saja', 'Konflik tidak ada manfaatnya'], 'correct' => 1],
+                    ['q' => 'Groupthink dalam organisasi terjadi ketika?', 'a' => ['Anggota kelompok berpendapat berbeda-beda', 'Tekanan konformitas menekan pemikiran kritis', 'Kelompok terlalu kecil', 'Tidak ada pemimpin'], 'correct' => 1],
+                    ['q' => 'Budaya organisasi (organizational culture) mempengaruhi?', 'a' => ['Hanya penampilan kantor', 'Perilaku, keputusan, dan kinerja seluruh anggota organisasi', 'Hanya seragam karyawan', 'Hanya slogan perusahaan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah teori motivasi yang valid?', 'options' => ["Maslow's Hierarchy", 'Theory X saja', 'Herzberg Two-Factor', 'Theory Z saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah gaya kepemimpinan?', 'options' => ['Transformasional', 'Invisible leadership', 'Transaksional', 'No leadership'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah faktor yang mempengaruhi kepuasan kerja?', 'options' => ['Kondisi kerja', 'Warna kantor saja', 'Hubungan dengan rekan', 'Desain logo'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis kekuasaan dalam organisasi?', 'options' => ['Kekuasaan posisional', 'Kekuasaan fisik', 'Kekuasaan personal', 'Kekuasaan supernatural'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah dimensi budaya organisasi (Schein)?', 'options' => ['Artefak', 'Nilai keuangan saja', 'Nilai-nilai', 'Keuntungan saja'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan teori motivasi Maslow dan Herzberg! Apa implikasi keduanya bagi manajer?'],
+                    ['q' => 'Apa perbedaan kepemimpinan transformasional dan transaksional? Mana yang lebih efektif?'],
+                    ['q' => 'Jelaskan dinamika kelompok dalam organisasi! Apa yang dimaksud groupthink dan bagaimana mencegahnya?'],
+                    ['q' => 'Apa yang dimaksud budaya organisasi? Bagaimana budaya mempengaruhi kinerja?'],
+                    ['q' => 'Jelaskan pendekatan manajemen konflik dalam organisasi! Kapan konflik bisa menjadi konstruktif?'],
+                ],
+            ],
+
+            'Kewirausahaan' => [
+                'pg' => [
+                    ['q' => 'Lean Startup Methodology menekankan?', 'a' => ['Perencanaan panjang sebelum launch', 'Build-Measure-Learn cycle dengan minimum viable product', 'Pendanaan besar di awal', 'Meniru kompetitor'], 'correct' => 1],
+                    ['q' => 'Business Model Canvas terdiri dari berapa blok?', 'a' => ['5 blok', '7 blok', '9 blok', '12 blok'], 'correct' => 2],
+                    ['q' => 'Elevator pitch adalah?', 'a' => ['Presentasi panjang investor', 'Penjelasan singkat bisnis dalam waktu sangat terbatas (30-60 detik)', 'Negosiasi gaji', 'Rapat manajemen'], 'correct' => 1],
+                    ['q' => 'Venture capital (VC) biasanya berinvestasi pada?', 'a' => ['Bisnis stabil mapan', 'Startup berpotensi tinggi dengan pertumbuhan cepat', 'Hanya properti', 'Hanya saham'], 'correct' => 1],
+                    ['q' => 'Minimum Viable Product (MVP) adalah?', 'a' => ['Produk akhir yang sempurna', 'Versi produk dengan fitur minimum untuk validasi hipotesis pasar', 'Prototype tanpa fungsi', 'Produk termurah'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen Business Model Canvas?', 'options' => ['Value Proposition', 'Employee salary', 'Customer Segments', 'Office location'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sumber pendanaan startup?', 'options' => ['Bootstrapping', 'Magic money', 'Angel investor', 'Free money'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah karakteristik entrepreneur?', 'options' => ['Risk-taking', 'Risk avoidance always', 'Innovative thinking', 'Status quo always'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah analisis yang digunakan dalam perencanaan bisnis?', 'options' => ['SWOT Analysis', 'Zodiac Analysis', 'PESTLE Analysis', 'Horoscope Analysis'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tahapan perkembangan startup?', 'options' => ['Ideation', 'Death stage', 'Growth', 'No stage'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan metodologi Lean Startup! Apa yang dimaksud dengan Build-Measure-Learn cycle?'],
+                    ['q' => 'Apa itu Business Model Canvas? Jelaskan 9 bloknya secara ringkas!'],
+                    ['q' => 'Jelaskan tahapan pendanaan startup dari seed funding hingga IPO!'],
+                    ['q' => 'Bagaimana cara melakukan validasi ide bisnis sebelum membangun produk penuh?'],
+                    ['q' => 'Jelaskan perbedaan antara entrepreneur dan intrapreneur! Apa tantangan masing-masing?'],
+                ],
+            ],
+
+            'Manajemen Operasi' => [
+                'pg' => [
+                    ['q' => 'Manajemen operasi berfokus pada?', 'a' => ['Keuangan perusahaan', 'Merancang, mengelola, dan meningkatkan proses penciptaan nilai', 'Pemasaran produk', 'Manajemen SDM'], 'correct' => 1],
+                    ['q' => 'Capacity utilization mengukur?', 'a' => ['Kualitas produk', 'Seberapa besar kapasitas yang digunakan dibanding kapasitas maksimum', 'Biaya produksi', 'Jumlah karyawan'], 'correct' => 1],
+                    ['q' => 'Service level agreement (SLA) dalam operasi layanan mengatur?', 'a' => ['Harga layanan saja', 'Standar kualitas dan waktu respon layanan yang disepakati', 'Jumlah karyawan', 'Lokasi kantor'], 'correct' => 1],
+                    ['q' => 'Process improvement menggunakan siklus PDCA. P singkatan dari?', 'a' => ['Perform', 'Plan', 'Process', 'Produce'], 'correct' => 1],
+                    ['q' => 'Outsourcing dalam manajemen operasi dilakukan ketika?', 'a' => ['Semua aktivitas lebih baik dioutsource', 'Aktivitas bukan core competency lebih efisien jika dilakukan pihak luar', 'Tidak ada tenaga kerja', 'Biaya tidak menjadi pertimbangan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah keputusan strategis dalam manajemen operasi?', 'options' => ['Desain produk/jasa', 'Desain seragam saja', 'Strategi lokasi', 'Warna bangunan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk dalam produktivitas operasi?', 'options' => ['Labor productivity', 'Popularity measure', 'Capital productivity', 'Color productivity'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah strategi peningkatan proses?', 'options' => ['PDCA Cycle', 'Status quo', 'Kaizen', 'Do nothing'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk trade-off dalam operasi?', 'options' => ['Cost vs quality', 'Night vs day', 'Speed vs cost', 'Hot vs cold'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tools untuk pemetaan proses?', 'options' => ['Value Stream Mapping', 'Mood board', 'SIPOC diagram', 'Inspiration board'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan ruang lingkup manajemen operasi dan keputusan-keputusan strategis yang terlibat!'],
+                    ['q' => 'Apa yang dimaksud dengan produktivitas dalam manajemen operasi? Bagaimana cara mengukur dan meningkatkannya?'],
+                    ['q' => 'Jelaskan konsep PDCA (Plan-Do-Check-Act) dalam peningkatan proses operasi!'],
+                    ['q' => 'Bagaimana cara merancang tata letak fasilitas (facility layout) yang efisien?'],
+                    ['q' => 'Jelaskan pertimbangan dalam keputusan make-or-buy (insourcing vs outsourcing)!'],
+                ],
+            ],
+
+            // AKUNTANSI (AKT)
+            'Akuntansi Keuangan' => [
+                'pg' => [
+                    ['q' => 'Persamaan dasar akuntansi adalah?', 'a' => ['Aset = Liabilitas + Ekuitas', 'Aset = Pendapatan - Beban', 'Liabilitas = Aset + Ekuitas', 'Ekuitas = Aset - Pendapatan'], 'correct' => 0],
+                    ['q' => 'Laporan posisi keuangan (neraca) menunjukkan?', 'a' => ['Aliran kas', 'Posisi keuangan pada titik waktu tertentu', 'Kinerja selama periode', 'Perubahan ekuitas'], 'correct' => 1],
+                    ['q' => 'Metode penyusutan garis lurus (straight-line) menghitung biaya penyusutan secara?', 'a' => ['Semakin besar setiap tahun', 'Sama setiap tahun', 'Semakin kecil setiap tahun', 'Tidak tentu'], 'correct' => 1],
+                    ['q' => 'Prinsip akrual dalam akuntansi berarti?', 'a' => ['Transaksi dicatat saat kas diterima', 'Transaksi dicatat saat terjadi, bukan saat kas berpindah', 'Hanya mencatat pemasukan', 'Mencatat saat jatuh tempo saja'], 'correct' => 1],
+                    ['q' => 'Goodwill dalam akuntansi timbul dari?', 'a' => ['Pembelian mesin', 'Akuisisi perusahaan lain di atas nilai aset neto', 'Kenaikan harga saham', 'Pembayaran utang'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah laporan keuangan utama (PSAK/IFRS)?', 'options' => ['Laporan Laba Rugi', 'Laporan cuaca', 'Neraca (Laporan Posisi Keuangan)', 'Laporan olahraga'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk aset lancar?', 'options' => ['Kas', 'Tanah', 'Piutang usaha', 'Mesin'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah metode penilaian persediaan?', 'options' => ['FIFO (First In First Out)', 'LIFO (Last In Last Out)', 'Average cost', 'Maximum cost'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prinsip akuntansi yang diakui?', 'options' => ['Prinsip accrual', 'Prinsip tebak-tebakan', 'Prinsip konsistensi', 'Prinsip acak'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk liabilitas jangka panjang?', 'options' => ['Obligasi jangka panjang', 'Utang usaha', 'Utang bank jangka panjang', 'Utang gaji'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan siklus akuntansi dari transaksi hingga penyusunan laporan keuangan!'],
+                    ['q' => 'Apa yang dimaksud dengan prinsip accrual? Bagaimana perbedaannya dengan cash basis accounting?'],
+                    ['q' => 'Jelaskan laporan laba rugi komprehensif! Apa perbedaan antara laba kotor, operasional, dan bersih?'],
+                    ['q' => 'Bagaimana metode FIFO, LIFO, dan Average digunakan dalam penilaian persediaan? Apa dampaknya terhadap laporan keuangan?'],
+                    ['q' => 'Jelaskan konsep penyusutan aset tetap! Bandingkan metode garis lurus dan metode saldo menurun!'],
+                ],
+            ],
+
+            'Akuntansi Manajemen' => [
+                'pg' => [
+                    ['q' => 'Perbedaan utama akuntansi manajemen dengan akuntansi keuangan?', 'a' => ['Mengikuti PSAK', 'Untuk pihak eksternal', 'Untuk pengambilan keputusan internal', 'Diaudit eksternal'], 'correct' => 2],
+                    ['q' => 'Biaya relevan dalam pengambilan keputusan adalah?', 'a' => ['Biaya historis saja', 'Biaya yang berbeda antar alternatif dan mempengaruhi keputusan', 'Biaya tetap saja', 'Semua biaya tanpa terkecuali'], 'correct' => 1],
+                    ['q' => 'Break-even point (BEP) terjadi ketika?', 'a' => ['Pendapatan melebihi total biaya', 'Total pendapatan sama dengan total biaya (laba = 0)', 'Hanya biaya variabel tertutup', 'Hanya biaya tetap tertutup'], 'correct' => 1],
+                    ['q' => 'Activity-Based Costing (ABC) lebih akurat dari traditional costing karena?', 'a' => ['Lebih sederhana', 'Mengalokasikan overhead berdasarkan aktivitas yang sebenarnya mengonsumsi sumber daya', 'Lebih murah', 'Mengabaikan overhead'], 'correct' => 1],
+                    ['q' => 'Contribution margin adalah?', 'a' => ['Laba bersih', 'Selisih antara pendapatan dan biaya variabel', 'Biaya tetap', 'Margin keuntungan total'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis biaya berdasarkan perilakunya?', 'options' => ['Biaya tetap (fixed cost)', 'Biaya dekoratif', 'Biaya variabel', 'Biaya imajinasi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik analisis biaya dalam akuntansi manajemen?', 'options' => ['Cost-Volume-Profit analysis', 'Color analysis', 'Break-even analysis', 'Shape analysis'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis anggaran (budget)?', 'options' => ['Anggaran penjualan', 'Anggaran imajinasi', 'Anggaran produksi', 'Anggaran harapan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk biaya produksi?', 'options' => ['Bahan baku langsung', 'Biaya pemasaran', 'Tenaga kerja langsung', 'Biaya administrasi'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah ukuran kinerja dalam balanced scorecard?', 'options' => ['Perspektif keuangan', 'Perspektif cuaca', 'Perspektif pelanggan', 'Perspektif astrologi'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan biaya tetap dan biaya variabel! Bagaimana keduanya berperilaku terhadap perubahan volume?'],
+                    ['q' => 'Apa yang dimaksud analisis CVP (Cost-Volume-Profit)? Jelaskan cara menghitung Break-Even Point!'],
+                    ['q' => 'Jelaskan konsep Activity-Based Costing (ABC)! Mengapa lebih akurat dari traditional costing?'],
+                    ['q' => 'Apa yang dimaksud dengan anggaran (budgeting)? Jelaskan proses penyusunan anggaran induk (master budget)!'],
+                    ['q' => 'Jelaskan konsep Balanced Scorecard sebagai alat pengukuran kinerja! Jelaskan empat perspektifnya!'],
+                ],
+            ],
+
+            'Audit' => [
+                'pg' => [
+                    ['q' => 'Tujuan utama audit laporan keuangan adalah?', 'a' => ['Mendeteksi semua kecurangan', 'Memberikan opini atas kewajaran penyajian laporan keuangan', 'Menyusun laporan keuangan', 'Mengelola risiko bisnis'], 'correct' => 1],
+                    ['q' => 'Opini Wajar Tanpa Pengecualian (WTP/Unqualified) berarti?', 'a' => ['Ada kesalahan material', 'Laporan keuangan disajikan wajar sesuai standar', 'Audit tidak lengkap', 'Ada pembatasan ruang lingkup'], 'correct' => 1],
+                    ['q' => 'Risiko audit (audit risk) merupakan kombinasi dari?', 'a' => ['Risiko bisnis saja', 'Inherent risk × Control risk × Detection risk', 'Fraud risk saja', 'Business risk × Legal risk'], 'correct' => 1],
+                    ['q' => 'Materialitas dalam audit digunakan untuk?', 'a' => ['Menentukan biaya audit', 'Menentukan ambang batas salah saji yang signifikan bagi pengguna', 'Mengatur tim audit', 'Membuat laporan'], 'correct' => 1],
+                    ['q' => 'Internal control dalam audit mencakup?', 'a' => ['Kontrol keuangan saja', 'Control environment, risk assessment, control activities, information, monitoring', 'Kontrol operasional saja', 'Hanya pengendalian fisik'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis opini audit?', 'options' => ['Wajar Tanpa Pengecualian (WTP)', 'Opini sempurna', 'Tidak Memberikan Pendapat (TMP)', 'Opini baik'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah prosedur audit yang umum?', 'options' => ['Konfirmasi', 'Imajinasi', 'Inspeksi', 'Dugaan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen risiko audit?', 'options' => ['Inherent risk', 'Business risk', 'Control risk', 'Market risk'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis audit?', 'options' => ['Audit keuangan', 'Audit makanan', 'Audit operasional', 'Audit hiburan'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah standar audit yang berlaku di Indonesia?', 'options' => ['SPAP (Standar Profesional Akuntan Publik)', 'GAAP Amerika', 'ISA (International Standards on Auditing)', 'Standar informal'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tujuan audit laporan keuangan dan standar umum yang berlaku!'],
+                    ['q' => 'Apa yang dimaksud dengan risiko audit? Jelaskan komponen inherent risk, control risk, dan detection risk!'],
+                    ['q' => 'Jelaskan konsep materialitas dalam audit! Bagaimana auditor menetapkan batas materialitas?'],
+                    ['q' => 'Jelaskan framework COSO untuk internal control! Apa saja komponen-komponennya?'],
+                    ['q' => 'Apa perbedaan antara audit eksternal dan audit internal? Jelaskan peran masing-masing!'],
+                ],
+            ],
+
+            'Perpajakan' => [
+                'pg' => [
+                    ['q' => 'PPh Pasal 21 dikenakan atas?', 'a' => ['Penghasilan bunga bank', 'Penghasilan dari pekerjaan atau jasa orang pribadi', 'Omzet penjualan', 'Dividen perusahaan'], 'correct' => 1],
+                    ['q' => 'PPN (Pajak Pertambahan Nilai) di Indonesia berlaku tarif standar?', 'a' => ['5%', '10%', '11%', '12%'], 'correct' => 2],
+                    ['q' => 'Self-assessment system dalam perpajakan berarti?', 'a' => ['Pajak dihitung negara', 'Wajib pajak menghitung, menyetor, dan melaporkan sendiri', 'Pajak dihitung bank', 'Pajak dipotong pemberi kerja saja'], 'correct' => 1],
+                    ['q' => 'NPWP (Nomor Pokok Wajib Pajak) berfungsi sebagai?', 'a' => ['Nomor rekening pajak', 'Identitas wajib pajak dalam administrasi perpajakan', 'Nomor seri faktur', 'Kode pembayaran'], 'correct' => 1],
+                    ['q' => 'Tax planning dalam manajemen perpajakan bertujuan untuk?', 'a' => ['Menghindari pajak secara ilegal', 'Meminimalkan beban pajak secara legal melalui perencanaan yang tepat', 'Menunda pembayaran saja', 'Memperbesar biaya perusahaan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis pajak berdasarkan pemungutnya?', 'options' => ['Pajak pusat', 'Pajak swasta', 'Pajak daerah', 'Pajak individu saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah pajak penghasilan yang berlaku di Indonesia?', 'options' => ['PPh Pasal 21', 'PPh Pasal 100', 'PPh Pasal 25', 'PPh Pasal 99'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah kewajiban Wajib Pajak di Indonesia?', 'options' => ['Mendaftarkan diri (NPWP)', 'Membayar pajak orang lain', 'Melaporkan SPT', 'Mengabaikan pajak'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah subjek pajak penghasilan (PPh)?', 'options' => ['Orang pribadi', 'Hewan peliharaan', 'Badan usaha', 'Tanah kosong saja'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk objek PPN?', 'options' => ['Penyerahan Barang Kena Pajak', 'Jual beli saham', 'Penyerahan Jasa Kena Pajak', 'Hibah antar keluarga'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan sistem self-assessment dalam perpajakan Indonesia! Apa kewajiban wajib pajak dalam sistem ini?'],
+                    ['q' => 'Jelaskan mekanisme perhitungan PPh Pasal 21 untuk karyawan tetap! Apa yang dimaksud PTKP dan PKP?'],
+                    ['q' => 'Apa yang dimaksud PPN? Jelaskan mekanisme pajak masukan dan pajak keluaran!'],
+                    ['q' => 'Jelaskan perbedaan antara tax avoidance, tax evasion, dan tax planning!'],
+                    ['q' => 'Jelaskan konsep transfer pricing dalam perpajakan internasional dan potensi penyalahgunaannya!'],
+                ],
+            ],
+
+            'Sistem Informasi Akuntansi' => [
+                'pg' => [
+                    ['q' => 'SIA (Sistem Informasi Akuntansi) bertujuan untuk?', 'a' => ['Mengotomasi pemasaran', 'Mengumpulkan, memproses, dan melaporkan data keuangan secara efisien', 'Mengelola SDM', 'Mengoptimalkan logistik'], 'correct' => 1],
+                    ['q' => 'Siklus pengeluaran (expenditure cycle) dalam SIA mencakup?', 'a' => ['Penjualan ke pelanggan', 'Pembelian dan pembayaran kepada pemasok', 'Penggajian karyawan saja', 'Pendapatan saja'], 'correct' => 1],
+                    ['q' => 'Jejak audit (audit trail) dalam SIA penting karena?', 'a' => ['Mempercepat transaksi', 'Memungkinkan penelusuran setiap transaksi dari sumber ke laporan', 'Menghemat penyimpanan', 'Meningkatkan kecepatan'], 'correct' => 1],
+                    ['q' => 'ERP mendukung SIA dengan cara?', 'a' => ['Mengotomasi marketing saja', 'Mengintegrasikan data keuangan dari seluruh fungsi bisnis dalam satu sistem', 'Memisahkan data keuangan', 'Menghapus jurnal manual'], 'correct' => 1],
+                    ['q' => 'Pengendalian preventif dalam SIA mencakup?', 'a' => ['Audit setelah kejadian', 'Kontrol akses, otorisasi, dan validasi input untuk mencegah kesalahan', 'Laporan setelah kesalahan', 'Backup data saja'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah siklus bisnis dalam SIA?', 'options' => ['Siklus pendapatan', 'Siklus cuaca', 'Siklus pengeluaran', 'Siklus alam'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah komponen SIA?', 'options' => ['People (pengguna)', 'Flora', 'Data (transaksi)', 'Fauna'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah kontrol dalam SIA?', 'options' => ['Input controls', 'Color controls', 'Output controls', 'Smell controls'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah ancaman terhadap SIA?', 'options' => ['Fraud keuangan', 'Cuaca buruk', 'Hacking sistem', 'Bencana alam (banjir)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah software SIA yang umum digunakan?', 'options' => ['SAP FI/CO', 'Instagram', 'Accurate Online', 'TikTok'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan komponen-komponen SIA dan bagaimana mereka berinteraksi untuk menghasilkan informasi keuangan!'],
+                    ['q' => 'Jelaskan siklus pendapatan dalam SIA! Apa saja aktivitas dan dokumen yang terlibat?'],
+                    ['q' => 'Apa yang dimaksud dengan pengendalian internal dalam SIA? Jelaskan jenis-jenis pengendalian yang diterapkan!'],
+	                ],
+            ],
+
         ];
  
         return $data[$nama] ?? [];
     }
 
-    // ── Helpers ──────────────────────────────────────────────────
     private function insertBank(int $dosenId, int $mkId, string $nama, string $deskripsi): int
     {
         return DB::table('bank_soal')->insertGetId([
@@ -670,5 +1704,4 @@ class UjianSeeder extends Seeder
         ]);
     }
 
-    // ... (Fungsi helper lainnya tidak berubah dan taruh di sini) ...
 }
