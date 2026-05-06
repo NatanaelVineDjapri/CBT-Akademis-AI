@@ -1,0 +1,212 @@
+"use client";
+
+import useSWR from "swr";
+import { useState } from "react";
+import { Plus, Trash2, Pencil, X, Search, Megaphone } from "lucide-react";
+import { getPengumuman, createPengumuman, updatePengumuman, deletePengumuman, type Pengumuman } from "@/services/PengumumanService";
+import BreadCrumb from "@/components/BreadCrumb";
+
+const roleOptions = [
+  { value: "", label: "Semua Pengguna" },
+  { value: "mahasiswa", label: "Mahasiswa" },
+  { value: "dosen", label: "Dosen" },
+  { value: "peserta_mahasiswa_baru", label: "Peserta PMB" },
+];
+
+function RoleBadge({ role }: { role: string | null }) {
+  if (!role) return <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">Semua</span>;
+  const map: Record<string, string> = { mahasiswa: "Mahasiswa", dosen: "Dosen", peserta_mahasiswa_baru: "Peserta PMB" };
+  const colors: Record<string, string> = { mahasiswa: "bg-blue-50 text-blue-600", dosen: "bg-purple-50 text-purple-600", peserta_mahasiswa_baru: "bg-amber-50 text-amber-600" };
+  return <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${colors[role] ?? "bg-gray-100 text-gray-500"}`}>{map[role] ?? role}</span>;
+}
+
+type FormState = { judul: string; isi: string; target_role: string; expired_at: string };
+const emptyForm: FormState = { judul: "", isi: "", target_role: "", expired_at: "" };
+
+export default function PengumumanPage() {
+  const { data, isLoading, mutate } = useSWR("/pengumuman", getPengumuman, { revalidateOnFocus: false });
+  const [search, setSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editItem, setEditItem] = useState<Pengumuman | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
+  const [loading, setLoading] = useState(false);
+
+  const openAdd = () => { setEditItem(null); setForm(emptyForm); setShowModal(true); };
+  const openEdit = (item: Pengumuman) => {
+    setEditItem(item);
+    setForm({
+      judul: item.judul,
+      isi: item.isi,
+      target_role: item.target_role ?? "",
+      expired_at: item.expired_at ? item.expired_at.slice(0, 16) : "",
+    });
+    setShowModal(true);
+  };
+  const closeModal = () => { setShowModal(false); setEditItem(null); };
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (!form.judul.trim() || !form.isi.trim()) return;
+    setLoading(true);
+    try {
+      if (editItem) {
+        await updatePengumuman(editItem.id, { judul: form.judul, isi: form.isi, target_role: form.target_role || undefined, expired_at: form.expired_at || undefined });
+      } else {
+        await createPengumuman({ judul: form.judul, isi: form.isi, target_role: form.target_role || undefined, expired_at: form.expired_at || undefined });
+      }
+      await mutate();
+      closeModal();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    await deletePengumuman(id);
+    mutate();
+  };
+
+  const filtered = (data ?? []).filter(item =>
+    item.judul.toLowerCase().includes(search.toLowerCase()) ||
+    item.isi.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      <BreadCrumb />
+
+      <div className="bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-4">
+          <div className="flex items-center gap-2">
+            <Megaphone size={15} className="text-gray-400" />
+            <span className="text-sm font-semibold text-gray-800">Daftar Pengumuman</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={openAdd}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              <Plus size={13} /> Tambah
+            </button>
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Cari pengumuman..."
+                className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none w-48 focus:border-[var(--color-primary)] transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-8">#</th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5">Judul & Isi</th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-28">Target</th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-28">Tanggal</th>
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-28">Expired</th>
+                <th className="pb-2.5 px-5 w-20" />
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i} className="border-b border-gray-100">
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <td key={j} className="py-3.5 px-5"><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
+                    ))}
+                  </tr>
+                ))
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-xs text-gray-400">
+                    {search ? "Tidak ada hasil pencarian." : "Belum ada pengumuman."}
+                  </td>
+                </tr>
+              ) : filtered.map((item, idx) => {
+                const isLast = idx === filtered.length - 1;
+                return (
+                  <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${!isLast ? "border-b border-gray-100" : ""}`}>
+                    <td className="py-3.5 px-5 text-xs text-gray-400">{idx + 1}</td>
+                    <td className="py-3.5 px-5 max-w-xs">
+                      <p className="text-sm font-medium text-gray-800 truncate">{item.judul}</p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{item.isi}</p>
+                    </td>
+                    <td className="py-3.5 px-5"><RoleBadge role={item.target_role} /></td>
+                    <td className="py-3.5 px-5 text-xs text-gray-500 whitespace-nowrap">
+                      {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                    </td>
+                    <td className="py-3.5 px-5 text-xs text-gray-500 whitespace-nowrap">
+                      {item.expired_at
+                        ? new Date(item.expired_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+                        : <span className="text-gray-300">—</span>}
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-green-500 hover:text-green-600 transition-colors cursor-pointer">
+                          <Pencil size={14} />
+                        </button>
+                        <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg text-red-400 hover:text-red-500 transition-colors cursor-pointer">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
+              <h3 className="text-base font-bold text-white">{editItem ? "Edit Pengumuman" : "Tambah Pengumuman"}</h3>
+              <button onClick={closeModal} className="text-white/70 hover:text-white cursor-pointer"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Judul</label>
+                <input value={form.judul} onChange={e => setForm(f => ({ ...f, judul: e.target.value }))} placeholder="Judul pengumuman"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Isi</label>
+                <textarea value={form.isi} onChange={e => setForm(f => ({ ...f, isi: e.target.value }))} placeholder="Tulis isi pengumuman..." rows={4}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 resize-none outline-none focus:border-[var(--color-primary)] transition-colors" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Target Pengguna</label>
+                <select value={form.target_role} onChange={e => setForm(f => ({ ...f, target_role: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors bg-white">
+                  {roleOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Expired At <span className="text-gray-400">(opsional)</span></label>
+                <input type="datetime-local" value={form.expired_at} onChange={e => setForm(f => ({ ...f, expired_at: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={closeModal} className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-semibold cursor-pointer hover:bg-gray-50">Batal</button>
+                <button type="submit" disabled={loading} className="flex-1 text-white py-2.5 rounded-lg text-sm font-semibold cursor-pointer disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)" }}>
+                  {loading ? "Menyimpan..." : editItem ? "Simpan Perubahan" : "Unggah"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

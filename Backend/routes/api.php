@@ -98,6 +98,12 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::put('/{id}', [ProdiController::class, 'update']);
             Route::delete('/{id}', [ProdiController::class, 'destroy']);
         });
+
+        Route::prefix('pengumuman')->group(function () {
+            Route::post('/', [PengumumanController::class, 'store']);
+            Route::put('/{id}', [PengumumanController::class, 'update']);
+            Route::delete('/{id}', [PengumumanController::class, 'destroy']);
+        });
     });
 
     Route::middleware('role:admin_akademis_ai,admin_universitas')->group(function () {

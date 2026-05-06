@@ -20,6 +20,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Megaphone,
 } from "lucide-react";
 import { preload } from "swr";
 import { User } from "@/types";
@@ -95,6 +96,11 @@ const menuByRole: Record<string, MenuItem[]> = {
       label: "User",
       href: "/admin-universitas/user",
       icon: <Users size={18} />,
+    },
+    {
+      label: "Pengumuman",
+      href: "/admin-universitas/pengumuman",
+      icon: <Megaphone size={18} />,
     },
     {
       label: "Log",
@@ -195,6 +201,8 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
     try {
       await logout();
     } finally {
+      sessionStorage.removeItem("stat-animated");
+      sessionStorage.removeItem("dashboard-visited");
       router.push("/login");
     }
   };
