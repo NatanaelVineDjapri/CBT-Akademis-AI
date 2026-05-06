@@ -1951,7 +1951,247 @@ class UjianSeeder extends Seeder
                     ['q' => 'Apa perbedaan antara pelayanan kesehatan kuratif dan promotif? Berikan contohnya!'],
                 ],
             ],
+                //DKV
+                 'Desain Grafis' => [
+                'pg' => [
+                    ['q' => 'Prinsip desain yang mengacu pada pembagian bobot visual secara sama atau seimbang disebut?', 'a' => ['Kontras', 'Kesatuan', 'Keseimbangan (Balance)', 'Irama'], 'correct' => 2],
+                    ['q' => 'Format file gambar digital yang menggunakan grafik vektor dan tidak pecah saat diperbesar adalah?', 'a' => ['JPEG', 'PNG', 'SVG', 'GIF'], 'correct' => 2],
+                    ['q' => 'Warna primer yang digunakan dalam proses pencetakan (printing) adalah?', 'a' => ['RGB', 'CMYK', 'HSV', 'LAB'], 'correct' => 1],
+                    ['q' => 'Kerapatan jumlah piksel per inci pada gambar digital disebut dengan?', 'a' => ['Resolusi (DPI/PPI)', 'Dimensi', 'Skala', 'Proporsi'], 'correct' => 0],
+                    ['q' => 'Jarak antar baris teks dalam desain grafis dikenal sebagai?', 'a' => ['Tracking', 'Kerning', 'Leading', 'Alignment'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk elemen dasar desain grafis?', 'options' => ['Garis', 'Bentuk (Shape)', 'Warna', 'Imajinasi'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk prinsip-prinsip desain?', 'options' => ['Keseimbangan', 'Irama (Rhythm)', 'Kontras', 'Kecepatan'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah format file gambar yang mendukung transparansi latar belakang?', 'options' => ['PNG', 'JPEG', 'GIF', 'SVG'], 'correct' => [0, 2, 3]],
+                    ['q' => 'Manakah software yang digunakan untuk mengolah gambar berbasis vektor?', 'options' => ['Adobe Illustrator', 'CorelDRAW', 'Adobe Photoshop', 'Figma'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah jenis-jenis keseimbangan visual?', 'options' => ['Simetris', 'Asimetris', 'Radial', 'Vertikal'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan mendasar antara grafis berbasis vektor dan grafis berbasis raster!'],
+                    ['q' => 'Sebutkan dan jelaskan prinsip-prinsip dasar dalam desain grafis!'],
+                    ['q' => 'Mengapa mode warna RGB dan CMYK berbeda penggunaannya? Jelaskan fungsi masing-masing!'],
+                    ['q' => 'Apa yang dimaksud dengan hierarki visual? Bagaimana cara menerapkannya dalam sebuah desain poster?'],
+                    ['q' => 'Jelaskan fungsi dari elemen garis dan bentuk dalam menyampaikan pesan visual!'],
+                ],
+            ],
 
+            'Tipografi' => [
+                'pg' => [
+                    ['q' => 'Kategori huruf yang memiliki garis-garis kecil atau kaki pada ujung huruf disebut?', 'a' => ['Sans-serif', 'Serif', 'Script', 'Display'], 'correct' => 1],
+                    ['q' => 'Satuan ukuran tinggi huruf dalam tipografi adalah?', 'a' => ['Piksel', 'Inci', 'Point (pt)', 'Milimeter'], 'correct' => 2],
+                    ['q' => 'Pengaturan jarak secara keseluruhan antara huruf di dalam satu kata atau kalimat disebut?', 'a' => ['Kerning', 'Leading', 'Tracking', 'Alignment'], 'correct' => 2],
+                    ['q' => 'Anatomi huruf yang berupa garis vertikal atau bagian utama dari sebuah huruf disebut?', 'a' => ['Stem', 'Bowl', 'Serif', 'Ascender'], 'correct' => 0],
+                    ['q' => 'Huruf yang tidak memiliki kait atau kaki pada ujungnya adalah?', 'a' => ['Serif', 'Sans-serif', 'Slab-serif', 'Monospace'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk klasifikasi huruf (typeface)?', 'options' => ['Serif', 'Sans-serif', 'Script', 'Vector'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah anatomi huruf (letterform) yang penting diketahui?', 'options' => ['Baseline', 'X-height', 'Ascender', 'Font size'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah hal yang memengaruhi keterbacaan (readability) teks?', 'options' => ['Pemilihan jenis huruf', 'Kontras warna teks dengan latar belakang', 'Ukuran huruf', 'Banyaknya gambar'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk satuan ukuran dalam tipografi?', 'options' => ['Point', 'Pica', 'Em', 'Centimeter'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang merupakan tujuan penggunaan hierarki tipografi?', 'options' => ['Menunjukkan bagian mana yang lebih penting', 'Membuat teks lebih menarik', 'Menghindari kebingungan pembaca', 'Mengurangi ukuran font'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara huruf Serif dan Sans-serif serta kapan waktu yang tepat untuk menggunakannya!'],
+                    ['q' => 'Apa yang dimaksud dengan kerning dan tracking? Jelaskan perbedaannya!'],
+                    ['q' => 'Uraikan elemen-elemen anatomi huruf seperti baseline, x-height, ascender, dan descender!'],
+                    ['q' => 'Bagaimana tipografi yang baik dapat memengaruhi keterbacaan (readability) dan kemudahan dibaca (legibility)?'],
+                    ['q' => 'Sebutkan jenis-jenis huruf yang termasuk kategori dekoratif atau script beserta karakteristiknya!'],
+                ],
+            ],
+
+            'Ilustrasi' => [
+                'pg' => [
+                    ['q' => 'Jenis ilustrasi yang digunakan untuk menjelaskan suatu naskah atau cerita agar lebih menarik disebut?', 'a' => ['Ilustrasi komik', 'Ilustrasi vignet', 'Ilustrasi karya sastra', 'Ilustrasi medis'], 'correct' => 2],
+                    ['q' => 'Teknik pewarnaan kering dalam ilustrasi dapat dilakukan menggunakan?', 'a' => ['Cat air', 'Pensil warna', 'Cat minyak', 'Tinta'], 'correct' => 1],
+                    ['q' => 'Sketsa kasar yang dibuat berurutan untuk menggambarkan adegan dalam cerita disebut?', 'a' => ['Layout', 'Storyboard', 'Thumbnail', 'Vignette'], 'correct' => 1],
+                    ['q' => 'Teknik perspektif yang menggunakan satu titik hilang di cakrawala disebut?', 'a' => ['Perspektif satu titik', 'Perspektif dua titik', 'Perspektif tiga titik', 'Perspektif isometrik'], 'correct' => 0],
+                    ['q' => 'Ilustrasi bergaya karikatur biasanya bertujuan untuk?', 'a' => ['Menjelaskan fungsi alat', 'Melebih-lebihkan karakter wajah untuk tujuan humor/kritik', 'Memberikan informasi akurat', 'Membuat panduan medis'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk teknik dalam menggambar ilustrasi?', 'options' => ['Teknik arsir', 'Teknik dussel', 'Teknik pointilis', 'Teknik casting'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk media untuk ilustrasi manual?', 'options' => ['Kertas gambar', 'Tinta', 'Pensil', 'Digital tablet'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah gaya ilustrasi yang sering ditemukan dalam publikasi?', 'options' => ['Realistis', 'Karikatur', 'Abstrak', 'Programmer'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk elemen dasar dalam ilustrasi?', 'options' => ['Proporsi', 'Komposisi', 'Warna', 'Kecepatan'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah langkah awal dalam proses pembuatan ilustrasi?', 'options' => ['Menentukan tema/konsep', 'Membuat sketsa kasar', 'Mewarnai', 'Menambahkan teks'], 'correct' => [0, 1]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara ilustrasi dekoratif dan ilustrasi realis!'],
+                    ['q' => 'Uraikan tahapan pembuatan storyboard dalam proses produksi animasi atau komik!'],
+                    ['q' => 'Jelaskan fungsi dari teknik arsir dan dussel dalam menciptakan volume serta bayangan pada ilustrasi!'],
+                    ['q' => 'Bagaimana prinsip perspektif diterapkan untuk memberikan kesan kedalaman pada gambar ilustrasi?'],
+                    ['q' => 'Sebutkan dan jelaskan media digital yang sering digunakan oleh ilustrator saat ini!'],
+                ],
+            ],
+
+            'Animasi' => [
+                'pg' => [
+                    ['q' => 'Prinsip animasi yang memberikan kesan kelenturan atau berat pada suatu objek adalah?', 'a' => ['Staging', 'Squash and Stretch', 'Solid Drawing', 'Timing'], 'correct' => 1],
+                    ['q' => 'Standar jumlah frame per detik (FPS) untuk animasi agar terlihat halus adalah?', 'a' => ['12 FPS', '24 FPS', '60 FPS', '100 FPS'], 'correct' => 1],
+                    ['q' => 'Teknik animasi yang menggunakan benda fisik yang digerakkan sedikit demi sedikit dan difoto adalah?', 'a' => ['Animasi 2D', 'Animasi 3D', 'Stop-motion', 'CGI'], 'correct' => 2],
+                    ['q' => 'Gambar yang berada di antara dua keyframe utama untuk mengisi gerak disebut?', 'a' => ['In-betweens', 'Keyframe', 'Breakdown', 'Clean-up'], 'correct' => 0],
+                    ['q' => 'Prinsip yang mengatur waktu atau ritme gerakan dalam animasi adalah?', 'a' => ['Spacing', 'Timing', 'Slow In and Slow Out', 'Arcs'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang merupakan prinsip dasar animasi (12 Principles of Animation)?', 'options' => ['Squash and Stretch', 'Anticipation', 'Exaggeration', 'Flash Animation'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis-jenis animasi yang banyak diproduksi?', 'options' => ['Animasi 2D', 'Animasi 3D', 'Animasi Clay', 'Animasi Musik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah tahapan dalam pembuatan animasi?', 'options' => ['Pra-produksi', 'Produksi', 'Pasca-produksi', 'Logistik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah software yang umum digunakan untuk animasi 2D?', 'options' => ['Adobe Animate', 'Toon Boom Harmony', 'Autodesk Maya', 'Adobe After Effects'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah yang termasuk fungsi utama keyframe?', 'options' => ['Menentukan posisi awal', 'Menentukan posisi akhir', 'Menentukan pose ekstrem gerakan', 'Mengatur warna background'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep prinsip animasi Squash and Stretch dan berikan contoh penerapannya pada sebuah bola!'],
+                    ['q' => 'Apa perbedaan utama antara Keyframes dan In-betweens dalam animasi 2D?'],
+                    ['q' => 'Uraikan tahapan pembuatan film animasi mulai dari naskah hingga tahap rendering!'],
+                    ['q' => 'Jelaskan prinsip Slow In and Slow Out dan bagaimana penerapannya memengaruhi kehalusan gerakan!'],
+                    ['q' => 'Apa perbedaan antara animasi tradisional dan animasi 3D berbasis komputer (CGI)?'],
+                ],
+            ],
+
+            'Branding' => [
+                'pg' => [
+                    ['q' => 'Kumpulan kesan, persepsi, dan emosi yang dimiliki pelanggan terhadap suatu produk atau perusahaan disebut?', 'a' => ['Logo', 'Brand', 'Merek dagang', 'Iklan'], 'correct' => 1],
+                    ['q' => 'Panduan yang mengatur penggunaan logo, warna, dan tipografi perusahaan adalah?', 'a' => ['Brand Guideline', 'Mood board', 'Storyboard', 'SOP'], 'correct' => 0],
+                    ['q' => 'Posisi merek di benak konsumen dibandingkan dengan kompetitor disebut?', 'a' => ['Brand awareness', 'Brand positioning', 'Brand equity', 'Brand identity'], 'correct' => 1],
+                    ['q' => 'Nilai tambah yang diberikan merek pada produk atau layanan disebut?', 'a' => ['Brand equity', 'Brand loyalty', 'Brand identity', 'Brand trust'], 'correct' => 0],
+                    ['q' => 'Slogan atau kalimat singkat yang mewakili karakter merek disebut?', 'a' => ['Logo', 'Tagline', 'Headline', 'Copywriting'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk elemen visual dari sebuah brand?', 'options' => ['Logo', 'Warna khas', 'Font/Tipografi', 'Harga produk'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah tujuan dari pembentukan strategi branding?', 'options' => ['Membangun loyalitas pelanggan', 'Meningkatkan kesadaran merek', 'Membedakan dengan kompetitor', 'Menurunkan kualitas produk'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah tingkat kesadaran merek (brand awareness) yang ada?', 'options' => ['Brand recognition', 'Brand recall', 'Unaware', 'Brand equity'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk bentuk touchpoint antara merek dan konsumen?', 'options' => ['Kemasan produk', 'Iklan media sosial', 'Layanan pelanggan', 'Bahan baku mentah'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis-jenis strategi merek (brand strategy)?', 'options' => ['Individual brand', 'Family brand', 'Co-branding', 'Sub-branding'], 'correct' => [0, 1, 2, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara brand identity dan brand image!'],
+                    ['q' => 'Apa yang dimaksud dengan Brand Positioning? Berikan contoh cara menentukan posisi tersebut di pasar!'],
+                    ['q' => 'Uraikan isi dari brand guideline dan mengapa penting untuk konsistensi sebuah perusahaan!'],
+                    ['q' => 'Jelaskan konsep Brand Equity dan bagaimana cara mengukurnya!'],
+                    ['q' => 'Bagaimana cara membangun loyalitas merek melalui pengalaman pelanggan (customer experience)?'],
+                ],
+            ],
+
+            //DI 
+            'Desain Interior Dasar' => [
+                'pg' => [
+                    ['q' => 'Unsur desain interior yang dapat menciptakan ilusi ruang dan mengarahkan pandangan mata adalah?', 'a' => ['Tekstur', 'Garis', 'Warna', 'Bentuk'], 'correct' => 1],
+                    ['q' => 'Pemisahan area dalam ruangan berdasarkan fungsinya disebut?', 'a' => ['Sirkulasi', 'Zoning', 'Layout', 'Clustering'], 'correct' => 1],
+                    ['q' => 'Skema warna yang menggunakan warna-warna bertetangga dalam roda warna disebut?', 'a' => ['Komplementer', 'Monokromatik', 'Analogus', 'Triadik'], 'correct' => 2],
+                    ['q' => 'Gambar potongan horizontal ruangan yang dilihat dari atas disebut?', 'a' => ['Tampak depan', 'Denah (floor plan)', 'Potongan vertikal', 'Perspektif'], 'correct' => 1],
+                    ['q' => 'Prinsip desain interior yang mengatur keteraturan pengulangan elemen disebut?', 'a' => ['Keseimbangan', 'Proporsi', 'Ritme', 'Harmoni'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah elemen dasar desain interior?', 'options' => ['Garis', 'Bentuk', 'Tekstur', 'Suara'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah prinsip-prinsip desain interior yang diakui?', 'options' => ['Keseimbangan', 'Proporsi', 'Ritme', 'Kebetulan'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah tahapan dalam proses desain interior?', 'options' => ['Programming', 'Schematic design', 'Design development', 'Demolisi acak'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah gaya desain interior yang dikenal secara internasional?', 'options' => ['Minimalis', 'Skandinavian', 'Industrial', 'Baroque'], 'correct' => [0, 1, 2, 3]],
+                    ['q' => 'Manakah pertimbangan utama dalam mendesain ruang residensial?', 'options' => ['Kebutuhan penghuni', 'Sirkulasi ruang', 'Pencahayaan alami', 'Nilai saham properti'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan elemen-elemen dasar desain interior dan bagaimana masing-masing berkontribusi pada suasana ruangan!'],
+                    ['q' => 'Apa yang dimaksud dengan zoning dalam desain interior? Jelaskan cara penerapannya pada ruang hunian!'],
+                    ['q' => 'Jelaskan prinsip-prinsip dasar desain interior (keseimbangan, proporsi, ritme, harmoni) beserta contohnya!'],
+                    ['q' => 'Uraikan tahapan proses desain interior dari konsep hingga implementasi!'],
+                    ['q' => 'Jelaskan perbedaan gaya desain interior minimalis dan industrial dari segi elemen dan karakter ruang!'],
+                ],
+            ],
+
+            'Material Interior' => [
+                'pg' => [
+                    ['q' => 'Material lantai yang paling umum digunakan di iklim tropis karena tahan lembap adalah?', 'a' => ['Karpet wol', 'Parket kayu solid', 'Keramik/granit', 'Linoleum'], 'correct' => 2],
+                    ['q' => 'Jenis finishing cat dengan tampilan paling mengkilap disebut?', 'a' => ['Matte', 'Satin', 'Semi-gloss', 'Gloss'], 'correct' => 3],
+                    ['q' => 'Material dinding yang memiliki kemampuan penyerapan suara yang baik adalah?', 'a' => ['Kaca', 'Beton ekspos', 'Panel akustik', 'Keramik'], 'correct' => 2],
+                    ['q' => 'Material plafon ringan yang umum digunakan pada bangunan modern adalah?', 'a' => ['Beton cor', 'Gypsum board', 'Granit', 'Marmer'], 'correct' => 1],
+                    ['q' => 'Material interior yang berasal dari sumber terbarukan dan ramah lingkungan adalah?', 'a' => ['PVC', 'Aluminium', 'Bambu', 'Kaca tempered'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk kategori material lantai interior?', 'options' => ['Keramik', 'Parket kayu', 'Vinyl', 'Cat tembok'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah pertimbangan dalam memilih material interior?', 'options' => ['Daya tahan', 'Kemudahan perawatan', 'Estetika', 'Warna favorit desainer semata'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis finishing dinding interior yang umum?', 'options' => ['Cat', 'Wallpaper', 'Panel kayu', 'Beton bertulang'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah material yang termasuk kategori sustainable untuk interior?', 'options' => ['Bambu', 'Kayu bersertifikat FSC', 'Material daur ulang', 'Karpet plastik non-daur ulang'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk material plafon interior?', 'options' => ['Gypsum board', 'GRC board', 'Akustik tile', 'Granit'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan kriteria pemilihan material lantai untuk ruang komersial dan residensial!'],
+                    ['q' => 'Apa perbedaan antara material alami dan material sintetis dalam desain interior? Berikan contoh masing-masing!'],
+                    ['q' => 'Jelaskan jenis-jenis finishing dinding dan pengaruhnya terhadap suasana ruang!'],
+                    ['q' => 'Bagaimana pemilihan material interior dapat mendukung konsep keberlanjutan (sustainable design)?'],
+                    ['q' => 'Jelaskan karakteristik dan keunggulan bambu sebagai material interior alternatif yang modern!'],
+                ],
+            ],
+
+            'Pencahayaan' => [
+                'pg' => [
+                    ['q' => 'Satuan yang digunakan untuk mengukur intensitas cahaya yang jatuh pada suatu permukaan adalah?', 'a' => ['Lumen', 'Candela', 'Lux', 'Watt'], 'correct' => 2],
+                    ['q' => 'Jenis pencahayaan yang berfungsi sebagai sumber utama cahaya dalam suatu ruangan disebut?', 'a' => ['Accent lighting', 'Task lighting', 'Ambient lighting', 'Decorative lighting'], 'correct' => 2],
+                    ['q' => 'Suhu warna lampu yang menghasilkan cahaya hangat berada pada kisaran?', 'a' => ['6500K', '5000K', '4000K', '2700-3000K'], 'correct' => 3],
+                    ['q' => 'Pencahayaan yang digunakan untuk menonjolkan objek atau elemen dekoratif tertentu disebut?', 'a' => ['Ambient lighting', 'Task lighting', 'Accent lighting', 'General lighting'], 'correct' => 2],
+                    ['q' => 'Keadaan tidak nyaman akibat cahaya yang terlalu terang atau kontras berlebih disebut?', 'a' => ['Reflektansi', 'Glare (silau)', 'Luminansi', 'Difusi'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis pencahayaan buatan yang digunakan dalam desain interior?', 'options' => ['Ambient lighting', 'Task lighting', 'Accent lighting', 'Sunlight'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi kenyamanan visual dalam ruangan?', 'options' => ['Tingkat iluminansi', 'Silau (glare)', 'Distribusi cahaya', 'Warna furnitur semata'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis lampu yang umum digunakan dalam desain interior?', 'options' => ['LED', 'Fluorescent', 'Halogen', 'Obor tradisional'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah pertimbangan dalam merancang pencahayaan ruang kerja?', 'options' => ['Keseragaman cahaya', 'Minimalisasi silau', 'Suhu warna yang tepat', 'Ukuran meja'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah keunggulan penggunaan lampu LED dibandingkan lampu konvensional?', 'options' => ['Hemat energi', 'Umur lebih panjang', 'Menghasilkan sedikit panas', 'Selalu paling murah'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tiga jenis pencahayaan (ambient, task, accent) dan fungsi masing-masing dalam desain interior!'],
+                    ['q' => 'Bagaimana suhu warna (color temperature) memengaruhi suasana dan psikologi penghuni ruangan?'],
+                    ['q' => 'Jelaskan cara mengintegrasikan pencahayaan alami dan buatan secara optimal dalam sebuah ruang interior!'],
+                    ['q' => 'Apa yang dimaksud dengan layering light? Jelaskan cara menerapkannya dalam desain interior!'],
+                    ['q' => 'Bagaimana pemilihan jenis dan jumlah lampu yang tepat dapat memengaruhi konsumsi energi bangunan?'],
+                ],
+            ],
+
+            'Furniture Design' => [
+                'pg' => [
+                    ['q' => 'Prinsip paling mendasar dalam desain furnitur yang ergonomis adalah?', 'a' => ['Estetika yang menarik', 'Kesesuaian dengan dimensi tubuh manusia', 'Penggunaan material mahal', 'Ukuran yang besar'], 'correct' => 1],
+                    ['q' => 'Sambungan furnitur tradisional yang mengunci tanpa menggunakan paku atau lem disebut?', 'a' => ['Dowel joint', 'Mortise and tenon', 'Biscuit joint', 'Pocket screw'], 'correct' => 1],
+                    ['q' => 'Material furnitur yang paling tahan terhadap cuaca dan cocok untuk penggunaan outdoor adalah?', 'a' => ['MDF', 'Kayu jati/teak solid', 'Plywood biasa', 'Particleboard'], 'correct' => 1],
+                    ['q' => 'Furnitur yang dapat difungsikan lebih dari satu kegunaan disebut?', 'a' => ['Modular furniture', 'Custom furniture', 'Multifunctional furniture', 'Built-in furniture'], 'correct' => 2],
+                    ['q' => 'Proses penyelesaian permukaan furnitur untuk melindungi dan memperindah tampilan disebut?', 'a' => ['Konstruksi', 'Finishing', 'Joinery', 'Upholstery'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah material yang umum digunakan dalam pembuatan furnitur interior?', 'options' => ['Kayu solid', 'MDF (Medium Density Fiberboard)', 'Baja', 'Bambu'], 'correct' => [0, 1, 2, 3]],
+                    ['q' => 'Manakah jenis sambungan (joint) yang digunakan dalam konstruksi furnitur kayu?', 'options' => ['Mortise and tenon', 'Dowel joint', 'Finger joint', 'Sambungan semen'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah pertimbangan utama dalam mendesain furnitur yang baik?', 'options' => ['Fungsi', 'Kenyamanan', 'Estetika', 'Popularitas merek semata'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis furnitur berdasarkan sistem pemasangannya?', 'options' => ['Freestanding', 'Built-in', 'Modular', 'Furnitur melayang'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah teknik finishing yang umum diterapkan pada furnitur?', 'options' => ['Pengecatan', 'Pelapisan veneer', 'Polishing/wax', 'Pengelasan besi'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan prinsip-prinsip desain furnitur yang baik dari aspek fungsi, estetika, dan konstruksi!'],
+                    ['q' => 'Apa perbedaan antara furnitur freestanding, built-in, dan modular? Kapan masing-masing tepat digunakan?'],
+                    ['q' => 'Jelaskan jenis-jenis sambungan (joint) dalam konstruksi furnitur kayu beserta kelebihan masing-masing!'],
+                    ['q' => 'Bagaimana cara memilih material furnitur yang tepat berdasarkan kebutuhan ruangan dan anggaran?'],
+                    ['q' => 'Apa yang dimaksud dengan furnitur multifungsi? Berikan contoh penerapannya dalam desain interior ruang sempit!'],
+                ],
+            ],
+
+            'Ergonomi' => [
+                'pg' => [
+                    ['q' => 'Cabang ergonomi yang berfokus pada kesesuaian dimensi produk dengan ukuran tubuh manusia disebut?', 'a' => ['Ergonomi kognitif', 'Ergonomi antropometri/fisik', 'Ergonomi organisasi', 'Ergonomi lingkungan'], 'correct' => 1],
+                    ['q' => 'Tinggi meja kerja standar yang ergonomis untuk posisi duduk adalah sekitar?', 'a' => ['60 cm', '72-75 cm', '90 cm', '100 cm'], 'correct' => 1],
+                    ['q' => 'Persentil yang digunakan untuk mengakomodasi 90% populasi pengguna dalam desain adalah?', 'a' => ['P5 dan P50', 'P5 dan P95', 'P50 saja', 'P1 dan P99'], 'correct' => 1],
+                    ['q' => 'Area kerja yang dapat dijangkau hanya dengan menggerakkan lengan bawah tanpa menggeser bahu disebut?', 'a' => ['Jangkauan maksimum', 'Jangkauan normal', 'Jangkauan optimal', 'Jangkauan lateral'], 'correct' => 1],
+                    ['q' => 'Postur kerja yang menyebabkan kelelahan dan risiko cedera muskuloskeletal disebut postur?', 'a' => ['Netral', 'Canggung (awkward posture)', 'Tegak', 'Rileks'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah aspek yang dikaji ergonomi dalam konteks desain interior?', 'options' => ['Dimensi ruang dan furnitur', 'Sirkulasi dan aksesibilitas', 'Kenyamanan termal dan pencahayaan', 'Nilai estetika subjektif semata'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah prinsip ergonomi yang diterapkan dalam desain furnitur dan ruang?', 'options' => ['Sesuai ukuran tubuh pengguna', 'Mendukung postur netral', 'Mudah dijangkau tanpa usaha berlebih', 'Warna yang menarik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah data antropometri yang penting dalam desain interior?', 'options' => ['Tinggi duduk', 'Jangkauan tangan', 'Lebar bahu', 'Warna kulit'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah standar aksesibilitas yang perlu diperhatikan dalam desain interior publik?', 'options' => ['Lebar pintu minimum untuk kursi roda', 'Ketinggian pegangan tangga', 'Ramp untuk pengguna difabel', 'Warna dinding'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah kondisi lingkungan interior yang memengaruhi kenyamanan ergonomis penghuni?', 'options' => ['Suhu dan kelembapan ruangan', 'Tingkat kebisingan', 'Kualitas udara dalam ruangan', 'Warna favorit desainer'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep ergonomi dalam desain interior dan mengapa penerapannya penting bagi kesehatan penghuni!'],
+                    ['q' => 'Bagaimana data antropometri digunakan dalam menentukan dimensi furnitur dan tata letak ruang?'],
+                    ['q' => 'Jelaskan prinsip desain universal (universal design) dan penerapannya dalam interior yang aksesibel untuk semua kalangan!'],
+                    ['q' => 'Apa yang dimaksud dengan kenyamanan termal dalam ruangan? Faktor apa saja yang memengaruhinya dan bagaimana solusi desainnya?'],
+                    ['q' => 'Bagaimana ergonomi diterapkan dalam mendesain dapur (kitchen) agar efisien, nyaman, dan aman digunakan?'],
+                ],
+            ],
         ];
  
         return $data[$nama] ?? [];
