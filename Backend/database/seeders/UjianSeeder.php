@@ -38,17 +38,15 @@ class UjianSeeder extends Seeder
         $sdCBIds    = $this->insertSoalCB($sdCB, $bankSD, $mkTI501);
         $sdEssayIds = $this->insertSoalEssay($sdEssay, $bankSD, $mkTI501);
         
-        // ... Lanjutkan sisa logika ujian dan peserta di sini ...
     }
 
-    // ══════════════════════════════════════════════════════════════
     // Posisikan method getSoal5 di luar method run() seperti ini:
-    // ══════════════════════════════════════════════════════════════
     private function getSoal5(string $nama): array
     {
   
     
         $data = [
+            //TI
              'Logika Matematika' => [
                 'pg' => [
                     ['q' => 'Negasi dari "Semua mahasiswa lulus" adalah?', 'a' => ['Semua tidak lulus', 'Ada yang tidak lulus', 'Tidak ada yang lulus', 'Semua lulus ujian'], 'correct' => 1],
@@ -289,9 +287,106 @@ class UjianSeeder extends Seeder
                 ],
             ],
 
-            // ─────────────────────────────────────────────────────
+            'Struktur Data' => [
+                'pg' => [
+                    ['q' => 'Struktur data yang bersifat LIFO (Last In First Out) adalah?', 'a' => ['Queue', 'Stack', 'Tree', 'Linked List'], 'correct' => 1],
+                    ['q' => 'Operasi untuk menambahkan elemen pada antrean (queue) disebut?', 'a' => ['Enqueue', 'Dequeue', 'Push', 'Pop'], 'correct' => 0],
+                    ['q' => 'Jika sebuah antrean (queue) menggunakan array dengan ukuran 5, dan telah diisi 5 elemen, maka kondisi tersebut disebut?', 'a' => ['Underflow', 'Overflow', 'Empty', 'Full'], 'correct' => 1],
+                    ['q' => 'Kompleksitas waktu terbaik dari algoritma Binary Search adalah?', 'a' => ['O(n)', 'O(n^2)', 'O(log n)', 'O(1)'], 'correct' => 2],
+                    ['q' => 'Binary Tree yang setiap node-nya memiliki paling banyak 2 anak disebut?', 'a' => ['General Tree', 'Binary Tree', 'AVL Tree', 'Graph'], 'correct' => 1],
+                    ['q' => 'Algoritma sorting yang membandingkan elemen yang berdekatan dan menukarnya jika salah adalah?', 'a' => ['Selection Sort', 'Bubble Sort', 'Insertion Sort', 'Merge Sort'], 'correct' => 1],
+                    ['q' => 'Struktur data yang cocok untuk menyimpan data dengan relasi hirarki adalah?', 'a' => ['Graph', 'Stack', 'Tree', 'Queue'], 'correct' => 2],
+                    ['q' => 'Pada Linked List, setiap node terdiri dari dua bagian utama, yaitu?', 'a' => ['Data dan Next', 'Key dan Value', 'Head dan Tail', 'Index dan Data'], 'correct' => 0],
+                    ['q' => 'Operasi pengambilan elemen pada Stack disebut?', 'a' => ['Enqueue', 'Dequeue', 'Push', 'Pop'], 'correct' => 3],
+                    ['q' => 'Manakah traversal pada Binary Tree yang mengunjungi root terlebih dahulu?', 'a' => ['In-order', 'Pre-order', 'Post-order', 'Level-order'], 'correct' => 1],
+                    ['q' => 'Struktur data mana yang digunakan dalam Breadth-First Search (BFS) pada graf?', 'a' => ['Stack', 'Queue', 'Linked List', 'Array'], 'correct' => 1],
+                    ['q' => 'Kompleksitas waktu terburuk untuk Quick Sort pada kondisi tertentu adalah?', 'a' => ['O(log n)', 'O(n)', 'O(n log n)', 'O(n^2)'], 'correct' => 3],
+                    ['q' => 'Hashing digunakan untuk?', 'a' => ['Mengurutkan data', 'Mencari data secara instan O(1)', 'Menghubungkan antar node', 'Membuat hirarki'], 'correct' => 1],
+                    ['q' => 'Kondisi saat Stack penuh dan tidak dapat ditambahkan elemen lagi disebut?', 'a' => ['Underflow', 'Overflow', 'Empty', 'Active'], 'correct' => 1],
+                    ['q' => 'Algoritma yang menggunakan teknik divide and conquer untuk memecah array menjadi dua bagian adalah?', 'a' => ['Merge Sort', 'Bubble Sort', 'Insertion Sort', 'Linear Search'], 'correct' => 0],
+                    ['q' => 'Pada graf, jika sebuah sisi memiliki arah, maka disebut?', 'a' => ['Undirected Graph', 'Directed Graph', 'Weighted Graph', 'Tree'], 'correct' => 1],
+                    ['q' => 'Pencarian data pada array yang dilakukan secara berurutan dari awal sampai akhir disebut?', 'a' => ['Binary Search', 'Linear Search', 'Interpolation Search', 'Depth First Search'], 'correct' => 1],
+                    ['q' => 'Struktur data yang dapat diakses dari kedua ujungnya (bisa enqueue dan dequeue di kedua sisi) adalah?', 'a' => ['Stack', 'Double-Ended Queue (Deque)', 'Circular Queue', 'Priority Queue'], 'correct' => 1],
+                    ['q' => 'Simpul pada tree yang tidak memiliki anak disebut?', 'a' => ['Root', 'Parent', 'Leaf', 'Sibling'], 'correct' => 2],
+                    ['q' => 'Pencarian dengan cara membagi array menjadi dua bagian untuk setiap langkahnya disebut?', 'a' => ['Linear Search', 'Binary Search', 'Hash Search', 'Sequential Search'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah struktur data yang bersifat linier?', 'options' => ['Array', 'Tree', 'Linked List', 'Graph'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah algoritma yang termasuk dalam kategori comparison sort?', 'options' => ['Merge Sort', 'Radix Sort', 'Quick Sort', 'Counting Sort'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah operasi dasar yang berlaku pada Stack?', 'options' => ['Push', 'Enqueue', 'Pop', 'Peek'], 'correct' => [0, 2, 3]],
+                    ['q' => 'Manakah yang merupakan jenis graf (Graph) dalam struktur data?', 'options' => ['Directed Graph', 'Cyclic Graph', 'Weighted Graph', 'Sequential Graph'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah metode traversal pada Binary Tree?', 'options' => ['Pre-order', 'Cross-order', 'In-order', 'Post-order'], 'correct' => [0, 2, 3]],
+                    ['q' => 'Manakah struktur data abstrak (Abstract Data Type)?', 'options' => ['Stack', 'Array', 'Queue', 'Linked List'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah kondisi error yang dapat terjadi pada struktur data tertentu?', 'options' => ['Stack Overflow', 'Memory Leak', 'Queue Underflow', 'Index Out of Bounds'], 'correct' => [0, 2, 3]],
+                    ['q' => 'Manakah struktur data yang mengimplementasikan antrean prioritas (Priority Queue)?', 'options' => ['Binary Heap', 'Linked List', 'Circular Array', 'Matrix'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah implementasi untuk menelusuri Graf secara mendalam (DFS)?', 'options' => ['Stack', 'Queue', 'Rekursi', 'Hash Table'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah teknik hashing collision resolution?', 'options' => ['Chaining', 'Linear Probing', 'Bubble Hashing', 'Double Hashing'], 'correct' => [0, 1, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara Stack dan Queue! Berikan masing-masing dua contoh penerapannya dalam kehidupan nyata atau pemrograman!'],
+                    ['q' => 'Apa yang dimaksud dengan struktur data Linked List? Jelaskan perbedaan antara Singly Linked List dan Doubly Linked List!'],
+                    ['q' => 'Jelaskan konsep Binary Search Tree (BST) dan bagaimana cara melakukan pencarian nilai di dalamnya!'],
+                    ['q' => 'Bagaimana algoritma Bubble Sort bekerja? Jelaskan tahapan iterasi pada array [5, 1, 4, 2, 8] hingga terurut!'],
+                    ['q' => 'Apa yang dimaksud dengan Graph? Jelaskan representasi Adjacency Matrix dan Adjacency List pada Graph!'],
+                    ['q' => 'Mengapa operasi Binary Search jauh lebih efisien dibandingkan Linear Search? Jelaskan dengan menyebutkan kompleksitas waktunya!'],
+                    ['q' => 'Jelaskan apa yang dimaksud dengan Hash Collision dan sebutkan dua metode untuk mengatasinya!'],
+                    ['q' => 'Apa fungsi struktur data Priority Queue? Jelaskan bagaimana struktur data Heap digunakan untuk mengimplementasikannya!'],
+                    ['q' => 'Jelaskan konsep rekursi dalam implementasi struktur data seperti Tree dan kaitannya dengan memori Stack!'],
+                    ['q' => 'Analisis dan bandingkan kompleksitas waktu (Time Complexity) antara Selection Sort, Insertion Sort, dan Merge Sort pada kondisi Best, Average, dan Worst!'],
+                ],
+            ],
+
+            'Kalkulus' => [
+                'pg' => [
+                    ['q' => 'Nilai dari $\\lim_{x \\to 2} (3x^2 - 4x + 1)$ adalah?', 'a' => ['5', '9', '7', '3'], 'correct' => 0],
+                    ['q' => 'Turunan pertama dari fungsi $f(x) = 2x^3 - 5x^2 + 7$ adalah?', 'a' => ['6x^2 - 10x', '6x^2 - 5x', '3x^2 - 10x', '6x^2 + 10x'], 'correct' => 0],
+                    ['q' => 'Integral dari fungsi $f(x) = 4x^3 - 2x$ terhadap x adalah?', 'a' => ['x^4 - x^2 + C', 'x^4 - x^2', '4x^4 - 2x^2 + C', 'x^4 + x^2 + C'], 'correct' => 0],
+                    ['q' => 'Jika $f(x) = \\sin(x)$, maka turunan pertamanya $f\'(x)$ adalah?', 'a' => ['-\\cos(x)', '\\cos(x)', '\\sin(x)', '-\\sin(x)'], 'correct' => 1],
+                    ['q' => 'Nilai dari $\\lim_{x \\to 0} \\frac{\\sin(2x)}{x}$ adalah?', 'a' => ['1', '2', '0', '\\infty'], 'correct' => 1],
+                    ['q' => 'Turunan dari $f(x) = \\cos(3x)$ adalah?', 'a' => ['-\\sin(3x)', '-3\\sin(3x)', '3\\sin(3x)', '\\sin(3x)'], 'correct' => 1],
+                    ['q' => 'Jika $f(x) = (x^2 + 3)^4$, maka turunan pertamanya adalah?', 'a' => ['4(x^2 + 3)^3', '8x(x^2 + 3)^3', '4x(x^2 + 3)^3', '8(x^2 + 3)^3'], 'correct' => 1],
+                    ['q' => 'Integral tertentu $\\int_0^1 3x^2 dx$ adalah?', 'a' => ['1', '2', '3', '0'], 'correct' => 0],
+                    ['q' => 'Persamaan garis singgung pada kurva $f(x) = x^2$ di titik $(2, 4)$ memiliki gradien sebesar?', 'a' => ['2', '4', '1', '8'], 'correct' => 1],
+                    ['q' => 'Aturan yang digunakan untuk mencari turunan dari pembagian dua fungsi adalah?', 'a' => ['Product Rule', 'Chain Rule', 'Quotient Rule', 'Addition Rule'], 'correct' => 2],
+                    ['q' => 'Nilai dari $\\int (2x + 3)^5 dx$ adalah?', 'a' => ['\\frac{(2x+3)^6}{12} + C', '\\frac{(2x+3)^6}{6} + C', '(2x+3)^6 + C', '\\frac{(2x+3)^4}{4} + C'], 'correct' => 0],
+                    ['q' => 'Fungsi $f(x) = x^3 - 3x^2$ mencapai nilai stasioner saat $x$ bernilai?', 'a' => ['0 dan 2', '0 dan -2', '1 dan 3', '2 dan -2'], 'correct' => 0],
+                    ['q' => 'Jika sebuah fungsi kontinu pada interval $[a, b]$ dan $f(a) \\times f(b) < 0$, maka menurut Teorema Nilai Antara terdapat titik $c \\in (a, b)$ sedemikian sehingga?', 'a' => ['f(c) = 0', 'f\'(c) = 0', 'f(c) = 1', 'f(c) = \\infty'], 'correct' => 0],
+                    ['q' => 'Limit $\\lim_{x \\to \\infty} \\frac{2x^2 + 3}{3x^2 - 5x}$ adalah?', 'a' => ['\\frac{2}{3}', '0', '\\infty', '1'], 'correct' => 0],
+                    ['q' => 'Turunan dari $f(x) = e^{2x}$ adalah?', 'a' => ['e^{2x}', '2e^{2x}', 'xe^{2x}', '2e^x'], 'correct' => 1],
+                    ['q' => 'Integral dari $\\int \\frac{1}{x} dx$ adalah?', 'a' => ['\\ln|x| + C', 'x + C', 'e^x + C', '0'], 'correct' => 0],
+                    ['q' => 'Titik balik minimum dari grafik fungsi $f(x) = x^2 - 4x + 4$ berada pada sumbu x di titik?', 'a' => ['x=2', 'x=4', 'x=-2', 'x=0'], 'correct' => 0],
+                    ['q' => 'Aturan rantai (Chain Rule) pada kalkulus digunakan untuk mencari turunan dari fungsi?', 'a' => ['Penjumlahan', 'Komposisi', 'Perkalian', 'Pembagian'], 'correct' => 1],
+                    ['q' => 'Nilai dari $\\lim_{x \\to 0} \\frac{1-\\cos(x)}{x^2}$ adalah?', 'a' => ['1', '0', '\\frac{1}{2}', '\\infty'], 'correct' => 2],
+                    ['q' => 'Integral tak tentu $\\int \\frac{1}{1+x^2} dx$ adalah?', 'a' => ['\\arctan(x) + C', '\\arcsin(x) + C', '\\ln|x| + C', 'x + C'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah dari fungsi berikut yang memiliki turunan yang sama dengan dirinya sendiri?', 'options' => ['f(x) = e^x', 'f(x) = 0', 'f(x) = \\cos(x)', 'f(x) = \\tan(x)'], 'correct' => [0, 1]],
+                    ['q' => 'Manakah metode yang valid dalam integrasi?', 'options' => ['Substitusi', 'Parsial', 'Pecahan Parsial', 'Matriks'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah kondisi suatu fungsi dikatakan kontinu pada titik x = c?', 'options' => ['f(c) terdefinisi', 'Limit f(x) x->c ada', 'Limit f(x) x->c = f(c)', 'Limit f(x) x->c $\\neq$ f(c)'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah aturan dalam pencarian limit (Limit Laws)?', 'options' => ['Sum Law', 'Difference Law', 'Product Law', 'Constant Multiple Law'], 'correct' => [0, 1, 2, 3]],
+                    ['q' => 'Manakah yang merupakan bentuk tak tentu pada limit?', 'options' => ['0/0', '$\\infty/\\infty$', '$1^\\infty$', '$0 \\times \\infty$'], 'correct' => [0, 1, 2, 3]],
+                    ['q' => 'Manakah teknik turunan yang benar untuk fungsi majemuk?', 'options' => ['Aturan Rantai', 'Aturan Perkalian', 'Aturan Pembagian', 'Aturan Substitusi'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah aturan penentuan nilai ekstrim (maksimum/minimum) suatu fungsi?', 'options' => ['Uji turunan pertama', 'Uji turunan kedua', 'Uji titik ujung', 'Uji limit tak hingga'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah fungsi yang monoton naik pada seluruh daerah asalnya?', 'options' => ['f(x) = e^x', 'f(x) = x^3', 'f(x) = x^2', 'f(x) = \\ln(x)'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah integral yang hasilnya dapat diselesaikan dengan substitusi $u = \\ln(x)$?', 'options' => ['\\int \\frac{\\ln(x)}{x} dx', '\\int \\frac{e^x}{x} dx', '\\int \\frac{1}{x \\ln(x)} dx', '\\int \\sin(\\ln(x)) \\frac{1}{x} dx'], 'correct' => [0, 2, 3]],
+                    ['q' => 'Manakah dari fungsi trigonometri berikut yang memiliki turunan berupa fungsi negatif?', 'options' => ['\\sin(x)', '\\cos(x)', '\\tan(x)', '\\csc(x)'], 'correct' => [1, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Tentukan nilai dari limit berikut: $\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3}$.'],
+                    ['q' => 'Tentukan turunan pertama dari fungsi $f(x) = (2x^2 + 1)(x - 3)$ menggunakan aturan perkalian (Product Rule).'],
+                    ['q' => 'Tentukan titik stasioner dan jenisnya (maksimum/minimum lokal) dari fungsi $f(x) = x^3 - 3x^2 - 9x + 5$.'],
+                    ['q' => 'Selesaikan integral tak tentu berikut: $\\int (3x^2 + 4x - 5) dx$.'],
+                    ['q' => 'Hitunglah nilai integral tentu dari $\\int_1^3 (2x - 1) dx$.'],
+                    ['q' => 'Jelaskan konsep Teorema Dasar Kalkulus (Fundamental Theorem of Calculus) dan sebutkan hubungannya antara turunan dan integral.'],
+                    ['q' => 'Tentukan turunan fungsi berikut menggunakan aturan rantai (Chain Rule): $f(x) = \\sqrt{x^2 + 5}$.'],
+                    ['q' => 'Hitunglah nilai dari $\\lim_{x \\to 0} \\frac{\\tan(3x)}{4x}$ menggunakan sifat limit fungsi trigonometri.'],
+                    ['q' => 'Gunakan metode integrasi parsial untuk menyelesaikan: $\\int x \\cos(x) dx$.'],
+                    ['q' => 'Tentukan interval di mana fungsi $f(x) = \\frac{1}{3}x^3 - 2x^2 + 3x$ merupakan fungsi naik dan fungsi turun.'],
+                ],
+            ],
+
             // SISTEM INFORMASI (SI)
-            // ─────────────────────────────────────────────────────
+
 
             'Analisis Sistem' => [
                 'pg' => [
