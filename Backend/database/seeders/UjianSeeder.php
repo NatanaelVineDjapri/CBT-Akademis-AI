@@ -1686,6 +1686,271 @@ class UjianSeeder extends Seeder
                     ['q' => 'Apa yang dimaksud dengan pengendalian internal dalam SIA? Jelaskan jenis-jenis pengendalian yang diterapkan!'],
 	                ],
             ],
+            //Ilmu Hukum
+             'Hukum Perdata' => [
+                'pg' => [
+                    ['q' => 'Asas dalam perjanjian yang menyatakan bahwa perjanjian yang dibuat berlaku sebagai undang-undang bagi yang membuatnya disebut?', 'a' => ['Pacta sunt servanda', 'Asas konsensualisme', 'Asas kebebasan berkontrak', 'Asas personalitas'], 'correct' => 0],
+                    ['q' => 'Menurut KUH Perdata, syarat sahnya suatu perjanjian diatur dalam pasal?', 'a' => ['1320', '1338', '1457', '1233'], 'correct' => 0],
+                    ['q' => 'Perbuatan melanggar hukum dalam KUH Perdata diatur dalam Pasal?', 'a' => ['1365', '1266', '1338', '1444'], 'correct' => 0],
+                    ['q' => 'Hak kebendaan yang memberikan kenikmatan sepenuhnya atas suatu benda disebut?', 'a' => ['Hak pakai', 'Hak milik', 'Hak gadai', 'Hak memungut hasil'], 'correct' => 1],
+                    ['q' => 'Apabila debitur tidak memenuhi kewajiban dalam perjanjian, disebut dengan?', 'a' => ['Overmacht', 'Wanprestasi', 'Ganti rugi', 'Pembatalan'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk syarat sahnya perjanjian menurut Pasal 1320 KUH Perdata?', 'options' => ['Kesepakatan para pihak', 'Bentuk tertulis di notaris', 'Kecakapan untuk membuat perikatan', 'Objek yang halal'], 'correct' => [0, 2, 3]],
+                    ['q' => 'Manakah yang merupakan subjek hukum perdata?', 'options' => ['Orang (Natuurlijke persoon)', 'Hewan peliharaan', 'Badan hukum (Rechtspersoon)', 'Benda tak bergerak'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah bentuk wanprestasi yang umum terjadi?', 'options' => ['Terlambat memenuhi prestasi', 'Melakukan apa yang tidak boleh dilakukan', 'Sengaja merusak barang', 'Tidak memenuhi prestasi sama sekali'], 'correct' => [0, 3]],
+                    ['q' => 'Manakah yang termasuk benda dalam pengertian hukum perdata?', 'options' => ['Benda bergerak', 'Benda tidak berwujud', 'Benda abstrak imajiner', 'Benda tidak bergerak'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah cara berakhirnya suatu perikatan?', 'options' => ['Pembayaran', 'Kesepakatan', 'Kompensasi cuaca', 'Pemusnahan barang yang terutang'], 'correct' => [0, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan empat syarat sahnya perjanjian menurut Pasal 1320 KUH Perdata dan akibat hukum jika salah satu syarat tidak terpenuhi!'],
+                    ['q' => 'Apa yang dimaksud dengan wanprestasi? Sebutkan bentuk-bentuk wanprestasi dan upaya hukum yang dapat dilakukan oleh kreditur!'],
+                    ['q' => 'Jelaskan perbedaan antara benda bergerak dan benda tidak bergerak beserta contoh dan signifikansinya dalam hukum perdata!'],
+                    ['q' => 'Jelaskan konsep perbuatan melawan hukum (onrechtmatige daad) menurut Pasal 1365 KUH Perdata dan unsur-unsurnya!'],
+                    ['q' => 'Bagaimana proses hapusnya perikatan berdasarkan ketentuan Kitab Undang-Undang Hukum Perdata?'],
+                ],
+            ],
+
+            'Hukum Pidana' => [
+                'pg' => [
+                    ['q' => 'Asas yang menyatakan bahwa tiada suatu perbuatan dapat dipidana kecuali atas kekuatan aturan pidana dalam undang-undang yang telah ada sebelum perbuatan dilakukan disebut asas?', 'a' => ['Teritorial', 'Legalitas', 'Nasionalitas', 'Universal'], 'correct' => 1],
+                    ['q' => 'Percobaan melakukan tindak pidana diatur dalam Kitab Undang-Undang Hukum Pidana (KUHP) pada Pasal?', 'a' => ['53', '55', '338', '340'], 'correct' => 0],
+                    ['q' => 'Pelaku yang menyuruh melakukan tindak pidana disebut?', 'a' => ['Medeplegen', 'Doen plegen', 'Uitlokker', 'Pleger'], 'correct' => 1],
+                    ['q' => 'Tindak pidana yang dilakukan dengan kesengajaan (dolus) berarti pelaku?', 'a' => ['Melakukan karena keliru', 'Menghendaki dan mengetahui perbuatan serta akibatnya', 'Tidak sengaja', 'Melakukan karena terpaksa'], 'correct' => 1],
+                    ['q' => 'Alasan penghapus pidana yang berasal dari luar diri pelaku disebut?', 'a' => ['Noodweer (pembelaan terpaksa)', 'Overmacht (daya paksa)', 'Gila', 'Perintah undang-undang'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk dalam jenis pidana pokok menurut KUHP?', 'options' => ['Pidana mati', 'Pidana penjara', 'Pidana pengawasan', 'Pidana denda'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah yang termasuk alasan pembenar yang menghapus sifat melawan hukum dari perbuatan?', 'options' => ['Daya paksa (overmacht)', 'Pembelaan terpaksa (noodweer)', 'Menjalankan undang-undang', 'Sakit jiwa'], 'correct' => [1, 2]],
+                    ['q' => 'Manakah bentuk penyertaan (deelneming) dalam tindak pidana?', 'options' => ['Melakukan sendiri (pleger)', 'Membantu (medeplichtige)', 'Menggerakkan (uitlokker)', 'Membela diri sendiri'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk unsur subjektif dari suatu tindak pidana?', 'options' => ['Niat (voornemen)', 'Akibat perbuatan', 'Kesalahan (schuld)', 'Sifat melawan hukum'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah jenis pidana tambahan menurut KUHP?', 'options' => ['Pencabutan hak-hak tertentu', 'Perampasan barang tertentu', 'Pidana kurungan', 'Pengumuman putusan hakim'], 'correct' => [0, 1, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan asas legalitas dalam hukum pidana Indonesia dan sebutkan pengecualiannya jika ada!'],
+                    ['q' => 'Apa yang dimaksud dengan delik dolus (sengaja) dan delik culpa (kealpaan)? Berikan contoh untuk masing-masing!'],
+                    ['q' => 'Uraikan bentuk-bentuk penyertaan (deelneming) dalam melakukan tindak pidana menurut KUHP!'],
+                    ['q' => 'Jelaskan perbedaan antara alasan pembenar dan alasan pemaaf dalam hukum pidana, beserta contohnya!'],
+                    ['q' => 'Jelaskan tahapan percobaan tindak pidana (poging) dan syarat-syarat pemidanaannya menurut Pasal 53 KUHP!'],
+                ],
+            ],
+
+            'Hukum Tata Negara' => [
+                'pg' => [
+                    ['q' => 'Lembaga yang berwenang untuk menguji undang-undang terhadap Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 adalah?', 'a' => ['Mahkamah Agung', 'Mahkamah Konstitusi', 'Komisi Yudisial', 'DPR'], 'correct' => 1],
+                    ['q' => 'Sistem pemerintahan yang dianut oleh Negara Kesatuan Republik Indonesia berdasarkan UUD 1945 adalah?', 'a' => ['Parlementer', 'Presidensial', 'Semipresidensial', 'Monarki konstitusional'], 'correct' => 1],
+                    ['q' => 'Lembaga negara yang memegang kekuasaan membentuk undang-undang adalah?', 'a' => ['Presiden', 'DPR', 'MPR', 'DPD'], 'correct' => 1],
+                    ['q' => 'Hak DPR untuk meminta keterangan kepada Pemerintah mengenai kebijakan pemerintah yang penting dan strategis disebut hak?', 'a' => ['Angket', 'Interpelasi', 'Petisi', 'Pendapat'], 'correct' => 1],
+                    ['q' => 'Perubahan (amandemen) terhadap UUD 1945 dilakukan sebanyak berapa kali?', 'a' => ['2 kali', '3 kali', '4 kali', '5 kali'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk lembaga yudikatif di Indonesia?', 'options' => ['Mahkamah Agung', 'Presiden', 'Mahkamah Konstitusi', 'DPR'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah hak yang dimiliki oleh Dewan Perwakilan Rakyat (DPR)?', 'options' => ['Hak interpelasi', 'Hak angket', 'Hak veto', 'Hak menyatakan pendapat'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah bentuk susunan negara dan pemerintahan yang sah menurut UUD 1945?', 'options' => ['Negara kesatuan', 'Negara federal', 'Republik', 'Monarki absolut'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah tugas dan wewenang MPR setelah amandemen?', 'options' => ['Mengubah dan menetapkan UUD', 'Memilih Presiden dan Wakil Presiden', 'Melantik Presiden dan/atau Wakil Presiden', 'Menetapkan Garis-Garis Besar Haluan Negara'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah sumber hukum tata negara di Indonesia?', 'options' => ['UUD 1945', 'Yurisprudensi perdata', 'Konvensi ketatanegaraan', 'Hukum kebiasaan internasional'], 'correct' => [0, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan pembagian kekuasaan (Trias Politica) dalam sistem ketatanegaraan Republik Indonesia!'],
+                    ['q' => 'Apa perbedaan mendasar antara sistem pemerintahan Presidensial dan Parlementer? Mengapa Indonesia memilih Presidensial?'],
+                    ['q' => 'Uraikan wewenang dari Mahkamah Konstitusi sebagaimana diatur dalam UUD 1945!'],
+                    ['q' => 'Jelaskan fungsi legislasi, pengawasan, dan anggaran yang dimiliki oleh DPR!'],
+                    ['q' => 'Bagaimana prosedur perubahan UUD 1945 berdasarkan Pasal 37 UUD 1945?'],
+                ],
+            ],
+
+            'Hukum Internasional' => [
+                'pg' => [
+                    ['q' => 'Menurut Statuta Mahkamah Internasional Pasal 38, yang bukan merupakan sumber hukum internasional adalah?', 'a' => ['Perjanjian internasional', 'Keputusan pengadilan', 'Pendapat para ahli hukum', 'Resolusi Dewan Keamanan PBB'], 'correct' => 3],
+                    ['q' => 'Subjek hukum internasional yang memegang peranan paling utama adalah?', 'a' => ['Individu', 'Negara', 'Organisasi internasional', 'Perusahaan multinasional'], 'correct' => 1],
+                    ['q' => 'Asas yang menyatakan bahwa hukum internasional berlaku terhadap semua negara tanpa memandang batas wilayah disebut asas?', 'a' => ['Teritorial', 'Kebangsaan', 'Universal', 'Kepentingan umum'], 'correct' => 2],
+                    ['q' => 'Proses pengesahan suatu perjanjian internasional oleh suatu negara disebut?', 'a' => ['Signature', 'Ratification', 'Accession', 'Reservation'], 'correct' => 1],
+                    ['q' => 'Organisasi internasional yang dibentuk untuk menjaga perdamaian dan keamanan dunia adalah?', 'a' => ['WTO', 'PBB (United Nations)', 'ASEAN', 'Uni Eropa'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk sumber hukum internasional menurut Statuta Mahkamah Internasional?', 'options' => ['Perjanjian internasional', 'Hukum kebiasaan internasional', 'Prinsip hukum umum', 'Hukum pidana lokal'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah subjek hukum internasional yang diakui?', 'options' => ['Negara', 'Tahta Suci (Vatikan)', 'Palang Merah Internasional', 'Individu sebagai pelaku bisnis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah tahapan dalam pembuatan perjanjian internasional?', 'options' => ['Perundingan', 'Penandatanganan', 'Ratifikasi', 'Pemutusan sepihak'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah asas-asas yurisdiksi dalam hukum internasional?', 'options' => ['Asas teritorial', 'Asas nasionalitas aktif', 'Asas perlindungan', 'Asas diskriminasi'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah organ utama dari Perserikatan Bangsa-Bangsa (PBB)?', 'options' => ['Majelis Umum', 'Mahkamah Internasional', 'Dewan Keamanan', 'Organisasi Kesehatan Dunia (WHO)'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan sumber-sumber hukum internasional berdasarkan Pasal 38 Statuta Mahkamah Internasional!'],
+                    ['q' => 'Bagaimana pengakuan (recognition) terhadap suatu negara dalam hukum internasional dan apa akibat hukumnya?'],
+                    ['q' => 'Jelaskan perbedaan antara yurisdiksi teritorial dan yurisdiksi universal dalam hukum internasional!'],
+                    ['q' => 'Apa itu ratifikasi? Mengapa proses ratifikasi penting bagi suatu negara dalam memberlakukan perjanjian internasional?'],
+                    ['q' => 'Uraikan peran dan fungsi Mahkamah Internasional (International Court of Justice) dalam penyelesaian sengketa antarnegara!'],
+                ],
+            ],
+
+            'Hukum Bisnis' => [
+                'pg' => [
+                    ['q' => 'Bentuk badan usaha yang modalnya terbagi atas saham-saham dan tanggung jawab pemegang saham terbatas pada nilai nominal sahamnya adalah?', 'a' => ['Firma', 'CV', 'Perseroan Terbatas (PT)', 'Koperasi'], 'correct' => 2],
+                    ['q' => 'Undang-undang yang mengatur tentang Hak atas Kekayaan Intelektual berupa merek di Indonesia adalah?', 'a' => ['UU No. 28 Tahun 2014', 'UU No. 20 Tahun 2016', 'UU No. 13 Tahun 2016', 'UU No. 5 Tahun 1999'], 'correct' => 1],
+                    ['q' => 'Larangan praktik monopoli dan persaingan usaha tidak sehat diatur oleh lembaga?', 'a' => ['KPK', 'KPPU', 'BPSK', 'OJK'], 'correct' => 1],
+                    ['q' => 'Pernyataan kesanggupan untuk membayar sejumlah uang tertentu pada waktu yang telah ditentukan disebut?', 'a' => ['Cek', 'Bilyet giro', 'Promes (promissory note)', 'Akta otentik'], 'correct' => 2],
+                    ['q' => 'Lembaga yang berwenang menyelesaikan sengketa antara konsumen dan pelaku usaha di luar pengadilan adalah?', 'a' => ['BPSK', 'Pengadilan Niaga', 'Kepolisian', 'Kementerian Perdagangan'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk bentuk persekutuan badan usaha bukan badan hukum?', 'options' => ['Firma', 'Perseroan Terbatas', 'Commanditaire Vennootschap (CV)', 'Perusahaan Umum (Perum)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang termasuk Hak Kekayaan Intelektual (HKI)?', 'options' => ['Hak Cipta', 'Hak Paten', 'Rahasia Dagang', 'Hak Sewa'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah prinsip-prinsip dalam hukum perlindungan konsumen?', 'options' => ['Prinsip keamanan dan keselamatan', 'Prinsip kebebasan informasi', 'Prinsip pertanggungjawaban mutlak', 'Prinsip monopoli'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang dapat menyebabkan pailitnya suatu perusahaan?', 'options' => ['Memiliki dua atau lebih kreditur', 'Tidak membayar utang yang telah jatuh tempo', 'Meningkatnya aset perusahaan', 'Adanya keputusan pengadilan niaga'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah klausul yang dilarang dalam perjanjian standar/baku konsumen?', 'options' => ['Klausul pengalihan tanggung jawab', 'Klausul sepihak', 'Klausul harga', 'Klausul penyelesaian sengketa'], 'correct' => [0, 1]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara Firma dan Perseroan Terbatas (PT) dalam aspek tanggung jawab pemilik modal!'],
+                    ['q' => 'Apa yang dimaksud dengan HAKI (Hak atas Kekayaan Intelektual)? Mengapa perlindungan HAKI penting dalam dunia bisnis?'],
+                    ['q' => 'Uraikan prosedur pengajuan kepailitan dan penundaan kewajiban pembayaran utang (PKPU) berdasarkan UU Kepailitan!'],
+                    ['q' => 'Jelaskan peran KPPU dalam menjaga iklim persaingan usaha yang sehat di Indonesia!'],
+                    ['q' => 'Bagaimana perlindungan konsumen diatur dalam undang-undang terkait transaksi e-commerce?'],
+                ],
+            ],
+            
+            //Pendidikan Dokter 
+             'Anatomi' => [
+                'pg' => [
+                    ['q' => 'Bidang imajiner yang membagi tubuh menjadi bagian depan dan belakang disebut bidang?', 'a' => ['Sagital', 'Koronal (Frontal)', 'Transversal', 'Median'], 'correct' => 1],
+                    ['q' => 'Organ utama yang berfungsi sebagai sistem respirasi adalah?', 'a' => ['Jantung', 'Paru-paru', 'Hati', 'Lambung'], 'correct' => 1],
+                    ['q' => 'Otot yang terletak di bagian depan paha dan berfungsi untuk ekstensi lutut adalah?', 'a' => ['Biceps femoris', 'Quadriceps femoris', 'Gastrocnemius', 'Deltoid'], 'correct' => 1],
+                    ['q' => 'Jaringan yang berfungsi sebagai penyokong dan penghubung antar organ tubuh adalah?', 'a' => ['Epitel', 'Otot', 'Konektif/Penyambung', 'Saraf'], 'correct' => 2],
+                    ['q' => 'Sistem saraf pusat (Central Nervous System) terdiri dari otak dan?', 'a' => ['Saraf kranial', 'Sumsum tulang belakang', 'Saraf simpatis', 'Saraf tepi'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk organ sistem pencernaan?', 'options' => ['Lambung', 'Usus halus', 'Jantung', 'Hati'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah bagian penyusun rangka aksial?', 'options' => ['Tengkorak', 'Tulang belakang', 'Tulang paha', 'Tulang rusuk'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah yang termasuk jenis sendi berdasarkan strukturnya?', 'options' => ['Sendi fibrosa', 'Sendi kartilaginosa', 'Sendi sinovial', 'Sendi otot'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah lapisan kulit (integumen) utama?', 'options' => ['Epidermis', 'Hipodermis', 'Dermis', 'Endodermis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah ruang penyusun jantung?', 'options' => ['Atrium kanan', 'Ventrikel kiri', 'Aorta', 'Septum'], 'correct' => [0, 1]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan pembagian posisi anatomi tubuh manusia beserta terminologi arah dan bidangnya!'],
+                    ['q' => 'Uraikan struktur sistem pernapasan manusia dari saluran napas atas hingga alveolus!'],
+                    ['q' => 'Jelaskan perbedaan antara sistem saraf pusat dan sistem saraf tepi serta fungsinya masing-masing!'],
+                    ['q' => 'Sebutkan empat jaringan utama penyusun tubuh manusia dan jelaskan fungsi dasarnya!'],
+                    ['q' => 'Jelaskan anatomi makroskopis dari organ jantung dan aliran darah di dalamnya!'],
+                ],
+            ],
+
+            'Fisiologi' => [
+                'pg' => [
+                    ['q' => 'Fungsi utama dari sel darah merah (eritrosit) adalah?', 'a' => ['Melawan infeksi', 'Membekukan darah', 'Mengangkut oksigen', 'Mengatur suhu tubuh'], 'correct' => 2],
+                    ['q' => 'Hormon yang diproduksi oleh pankreas untuk menurunkan kadar gula darah adalah?', 'a' => ['Glukagon', 'Insulin', 'Adrenalin', 'Tiroksin'], 'correct' => 1],
+                    ['q' => 'Proses mempertahankan kondisi internal yang stabil dalam tubuh disebut?', 'a' => ['Metabolisme', 'Homeostasis', 'Katabolisme', 'Respirasi'], 'correct' => 1],
+                    ['q' => 'Organ utama tempat terjadinya penyerapan kembali (reabsorpsi) zat sisa pada ginjal adalah?', 'a' => ['Glomerulus', 'Tubulus kontortus proksimal', 'Lengkung Henle', 'Ureter'], 'correct' => 1],
+                    ['q' => 'Bagian otak yang berfungsi mengatur keseimbangan dan koordinasi gerakan adalah?', 'a' => ['Serebrum', 'Serebelum', 'Medula oblongata', 'Talamus'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah fungsi dari sistem ekskresi manusia?', 'options' => ['Mengeluarkan keringat', 'Menyaring darah', 'Mengatur tekanan darah', 'Memompa darah'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah hormon yang berperan dalam sistem reproduksi wanita?', 'options' => ['Estrogen', 'Progesteron', 'Testosteron', 'FSH'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah yang termasuk organ aksesori sistem pencernaan?', 'options' => ['Hati', 'Pankreas', 'Kantung empedu', 'Usus besar'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi laju filtrasi glomerulus?', 'options' => ['Tekanan darah', 'Diameter arteriol', 'Kadar air tubuh', 'Suhu tubuh'], 'correct' => [0, 1]],
+                    ['q' => 'Proses fisiologis apa saja yang terjadi saat tubuh berkeringat?', 'options' => ['Mendinginkan suhu tubuh', 'Mengeluarkan garam berlebih', 'Menaikkan tekanan darah', 'Membuang cairan'], 'correct' => [0, 1, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan mekanisme fisiologis bagaimana insulin dan glukagon bekerja sama mengatur kadar gula darah!'],
+                    ['q' => 'Uraikan proses pembentukan urine di ginjal mulai dari filtrasi, reabsorpsi, hingga augmentasi!'],
+                    ['q' => 'Bagaimana sistem saraf otonom (simpatis dan parasimpatis) merespons situasi stres dan relaksasi?'],
+                    ['q' => 'Jelaskan fungsi fisiologis hemoglobin dalam proses transportasi oksigen dan karbon dioksida dalam darah!'],
+                    ['q' => 'Jelaskan kerja refleks (refleks lengkung) pada sistem saraf dan pentingnya bagi kelangsungan hidup!'],
+                ],
+            ],
+
+            'Biokimia' => [
+                'pg' => [
+                    ['q' => 'Monomer penyusun dari molekul protein adalah?', 'a' => ['Asam lemak', 'Glukosa', 'Asam amino', 'Nukleotida'], 'correct' => 2],
+                    ['q' => 'Tempat utama berlangsungnya tahapan siklus Krebs di dalam sel adalah?', 'a' => ['Sitoplasma', 'Mitokondria', 'Nukleus', 'Retikulum endoplasma'], 'correct' => 1],
+                    ['q' => 'Fungsi utama karbohidrat di dalam tubuh makhluk hidup adalah?', 'a' => ['Sumber energi utama', 'Pembentuk membran sel', 'Katalisator reaksi', 'Penyimpan informasi genetik'], 'correct' => 0],
+                    ['q' => 'Senyawa organik yang bertindak sebagai katalis biologis untuk mempercepat reaksi adalah?', 'a' => ['Enzim', 'Vitamin', 'Hormon', 'Koenzim'], 'correct' => 0],
+                    ['q' => 'Basa nitrogen yang hanya ditemukan pada molekul RNA dan bukan pada DNA adalah?', 'a' => ['Adenin', 'Guanin', 'Timin', 'Urasil'], 'correct' => 3],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk kelompok lipid?', 'options' => ['Trigliserida', 'Steroid', 'Fosfolipid', 'Selulosa'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi kerja enzim?', 'options' => ['Suhu', 'Derajat keasaman (pH)', 'Konsentrasi substrat', 'Warna substrat'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah tahapan dalam proses respirasi sel?', 'options' => ['Glikolisis', 'Siklus Krebs', 'Transpor elektron', 'Fotosintesis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah komponen penyusun nukleotida?', 'options' => ['Gula pentosa', 'Basa nitrogen', 'Gugus fosfat', 'Asam amino'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah vitamin yang larut dalam lemak?', 'options' => ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E'], 'correct' => [0, 2, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan struktur asam amino dan pembentukan ikatan peptida!'],
+                    ['q' => 'Apa yang dimaksud dengan enzim? Jelaskan bagaimana mekanisme substrat berikatan pada sisi aktif enzim!'],
+                    ['q' => 'Uraikan perbedaan antara DNA dan RNA baik dari segi struktur maupun fungsinya!'],
+                    ['q' => 'Jelaskan tahapan proses glikolisis dan produk akhirnya!'],
+                    ['q' => 'Jelaskan perbedaan antara asam lemak jenuh dan asam lemak tak jenuh, serta dampaknya terhadap kesehatan!'],
+                ],
+            ],
+
+            'Patologi' => [
+                'pg' => [
+                    ['q' => 'Proses kematian sel yang terprogram atau biasa disebut "cell suicide" adalah?', 'a' => ['Nekrosis', 'Apoptosis', 'Atrofi', 'Hiperplasia'], 'correct' => 1],
+                    ['q' => 'Peradangan (inflamasi) akut biasanya ditandai dengan 4 tanda utama (Celsus), yaitu rubor, kalor, dolor, dan?', 'a' => ['Tumor (pembengkakan)', 'Sepsis', 'Atrofi', 'Nekrosis'], 'correct' => 0],
+                    ['q' => 'Karakteristik dari tumor ganas (malignant) antara lain?', 'a' => ['Tumbuh lambat', 'Batasnya jelas', 'Dapat bermetastasis (menyebar)', 'Berkapsul'], 'correct' => 2],
+                    ['q' => 'Kondisi kematian jaringan lokal yang tidak mendapat suplai darah disebut?', 'a' => ['Edema', 'Nekrosis', 'Infark', 'Iskemik'], 'correct' => 2],
+                    ['q' => 'Penyebab utama dari infeksi pada sindrom defisiensi imun (AIDS) adalah virus?', 'a' => ['Hepatitis B', 'HIV', 'Dengue', 'Influenza'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk tanda utama (gejala) peradangan akut?', 'options' => ['Kemerahan (rubor)', 'Panas (kalor)', 'Nyeri (dolor)', 'Kedinginan'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis adaptasi seluler?', 'options' => ['Hipertrofi', 'Hiperplasia', 'Metaplasia', 'Katabolisme'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah bentuk nekrosis yang dikenali?', 'options' => ['Nekrosis koagulatif', 'Nekrosis likuifaktif', 'Nekrosis kaseosa', 'Nekrosis seluler'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk proses penyembuhan luka?', 'options' => ['Fase inflamasi', 'Fase proliferasi', 'Fase remodeling', 'Fase nekrosis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi timbulnya penyakit (etiologi)?', 'options' => ['Genetika', 'Infeksi', 'Lingkungan', 'Astrologi'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara apoptosis dan nekrosis!'],
+                    ['q' => 'Uraikan proses inflamasi atau peradangan akut mulai dari vasodilatasi hingga pembentukan pus!'],
+                    ['q' => 'Jelaskan karakteristik dan perbedaan antara neoplasma jinak dan neoplasma ganas!'],
+                    ['q' => 'Apa yang dimaksud dengan metastasis dan bagaimana sel kanker menyebar ke organ lain?'],
+                    ['q' => 'Jelaskan patofisiologi terjadinya iskemia pada otot jantung dan akibatnya!'],
+                ],
+            ],
+
+            'Farmakologi' => [
+                'pg' => [
+                    ['q' => 'Cabang farmakologi yang mempelajari efek tubuh terhadap obat (farmakokinetika) meliputi proses?', 'a' => ['Absorpsi, Distribusi, Metabolisme, Ekskresi', 'Reseptor dan agonis', 'Efek toksik', 'Dosis minimal'], 'correct' => 0],
+                    ['q' => 'Rute pemberian obat yang memberikan efek paling cepat ke dalam sirkulasi darah adalah?', 'a' => ['Oral', 'Intravena (IV)', 'Topikal', 'Intramuskular'], 'correct' => 1],
+                    ['q' => 'Obat yang bekerja dengan cara meniru atau mengaktifkan reseptor disebut?', 'a' => ['Antagonis', 'Agonis', 'Inhibitor', 'Placebo'], 'correct' => 1],
+                    ['q' => 'Tempat utama terjadinya metabolisme obat di dalam tubuh manusia adalah?', 'a' => ['Ginjal', 'Hati (hepar)', 'Lambung', 'Paru-paru'], 'correct' => 1],
+                    ['q' => 'Istilah untuk dosis yang menimbulkan efek toksik atau racun adalah?', 'a' => ['Dosis efektif', 'Dosis letal', 'Dosis toksik', 'Dosis pemeliharaan'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk proses farmakokinetik?', 'options' => ['Absorpsi', 'Distribusi', 'Ekskresi', 'Farmakodinamik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah rute pemberian obat yang umum digunakan?', 'options' => ['Oral', 'Intravena', 'Inhalasi', 'Laser'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi respons obat pada pasien?', 'options' => ['Usia', 'Berat badan', 'Genetika', 'Warna rambut'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah bentuk sediaan obat yang termasuk dalam sediaan cair?', 'options' => ['Sirup', 'Suspensi', 'Tablet', 'Larutan'], 'correct' => [0, 1, 3]],
+                    ['q' => 'Manakah jenis efek samping obat?', 'options' => ['Reaksi alergi', 'Efek toksik', 'Idiosinkrasi', 'Efek imajiner'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan empat proses utama dalam farmakokinetika (ADME)!'],
+                    ['q' => 'Apa perbedaan antara agonis dan antagonis dalam farmakodinamika? Berikan contohnya!'],
+                    ['q' => 'Uraikan rute pemberian obat secara oral dan faktor apa saja yang memengaruhi absorpsi obat di saluran cerna!'],
+                    ['q' => 'Jelaskan peran enzim hati dalam metabolisme obat dan konsep first-pass effect!'],
+                    ['q' => 'Apa yang dimaksud dengan indeks terapi? Mengapa hal tersebut penting dalam menentukan dosis obat?'],
+                ],
+            ],
+
+            'Ilmu Klinik' => [
+                'pg' => [
+                    ['q' => 'Prosedur pengumpulan informasi riwayat penyakit pasien dengan cara wawancara disebut?', 'a' => ['Pemeriksaan fisik', 'Anamnesis', 'Pemeriksaan penunjang', 'Diagnosis'], 'correct' => 1],
+                    ['q' => 'Persetujuan tindakan medis yang diberikan oleh pasien setelah mendapat penjelasan disebut?', 'a' => ['Informed consent', 'Rekam medis', 'Diagnosis', 'Terapi'], 'correct' => 0],
+                    ['q' => 'Pemeriksaan fisik menggunakan stetoskop untuk mendengarkan suara organ dalam disebut?', 'a' => ['Inspeksi', 'Palpasi', 'Perkusi', 'Auskultasi'], 'correct' => 3],
+                    ['q' => 'Dokumen yang berisi catatan lengkap mengenai kesehatan dan perawatan pasien disebut?', 'a' => ['Surat rujukan', 'Rekam medis', 'Resep dokter', 'Informed consent'], 'correct' => 1],
+                    ['q' => 'Tindakan pencegahan terjadinya penyakit atau infeksi selama tindakan medis dikenal sebagai?', 'a' => ['Sterilisasi', 'Asepsis', 'Kuratif', 'Rehabilitasi'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk metode dasar dalam pemeriksaan fisik?', 'options' => ['Inspeksi', 'Auskultasi', 'Palpasi', 'Refleksi'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah prinsip dasar etika kedokteran / profesi klinis?', 'options' => ['Beneficence (berbuat baik)', 'Non-maleficence (jangan merugikan)', 'Autonomy (otonomi)', 'Profitability (mencari untung)'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk pemeriksaan penunjang klinis?', 'options' => ['Pemeriksaan darah', 'Rontgen (X-ray)', 'USG', 'Wawancara pasien'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah komponen penting dalam informed consent?', 'options' => ['Risiko tindakan', 'Tujuan tindakan', 'Alternatif tindakan', 'Biaya tindakan'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis pelayanan kesehatan?', 'options' => ['Preventif', 'Kuratif', 'Rehabilitatif', 'Konstruksional'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan tahapan yang dilakukan dalam manajemen klinis mulai dari anamnesis hingga penegakan diagnosis!'],
+                    ['q' => 'Apa pentingnya informed consent dalam menjamin hak otonomi pasien?'],
+                    ['q' => 'Uraikan 4 teknik pemeriksaan fisik dasar (inspeksi, palpasi, perkusi, auskultasi)!'],
+                    ['q' => 'Jelaskan aspek kerahasiaan medis (medical secrecy) dan kewajiban klinisi dalam menjaganya!'],
+                    ['q' => 'Apa perbedaan antara pelayanan kesehatan kuratif dan promotif? Berikan contohnya!'],
+                ],
+            ],
 
         ];
  
