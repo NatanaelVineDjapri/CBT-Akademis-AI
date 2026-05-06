@@ -1951,6 +1951,7 @@ class UjianSeeder extends Seeder
                     ['q' => 'Apa perbedaan antara pelayanan kesehatan kuratif dan promotif? Berikan contohnya!'],
                 ],
             ],
+
                 //DKV
                  'Desain Grafis' => [
                 'pg' => [
@@ -2192,6 +2193,249 @@ class UjianSeeder extends Seeder
                     ['q' => 'Bagaimana ergonomi diterapkan dalam mendesain dapur (kitchen) agar efisien, nyaman, dan aman digunakan?'],
                 ],
             ],
+
+            //Psikologi (Psi)
+              'Psikologi Umum' => [
+                'pg' => [
+                    ['q' => 'Tokoh yang dikenal sebagai bapak psikologi modern dan mendirikan laboratorium psikologi pertama adalah?', 'a' => ['Sigmund Freud', 'Wilhelm Wundt', 'John B. Watson', 'Jean Piaget'], 'correct' => 1],
+                    ['q' => 'Aliran psikologi yang berfokus pada perilaku yang dapat diamati dan mengabaikan proses mental internal adalah?', 'a' => ['Psikoanalisis', 'Behaviorisme', 'Humanisme', 'Kognitivisme'], 'correct' => 1],
+                    ['q' => 'Teori perkembangan kognitif yang membagi tahapan menjadi 4 fase dipelopori oleh?', 'a' => ['Erik Erikson', 'Jean Piaget', 'Ivan Pavlov', 'B.F. Skinner'], 'correct' => 1],
+                    ['q' => 'Proses penerimaan dan penginterpretasian stimulus dari lingkungan oleh otak disebut?', 'a' => ['Sensasi', 'Persepsi', 'Atensi', 'Motivasi'], 'correct' => 1],
+                    ['q' => 'Teori motivasi yang menggambarkan kebutuhan manusia dalam bentuk piramida dicetuskan oleh?', 'a' => ['Abraham Maslow', 'Carl Rogers', 'Albert Bandura', 'William James'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk aliran atau perspektif utama dalam psikologi?', 'options' => ['Behaviorisme', 'Psikoanalisis', 'Humanisme', 'Biologi'], 'correct' => [0, 1, 2, 3]],
+                    ['q' => 'Manakah tahapan perkembangan kognitif menurut Jean Piaget?', 'options' => ['Sensorimotor', 'Praoperasional', 'Operasional konkrit', 'Psikoseksual'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah komponen penyusun kepribadian menurut Sigmund Freud?', 'options' => ['Id', 'Ego', 'Superego', 'Libido'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis memori berdasarkan durasi penyimpanannya?', 'options' => ['Sensory memory', 'Short-term memory', 'Long-term memory', 'Flash memory'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah proses belajar yang dipelajari dalam psikologi?', 'options' => ['Classical conditioning', 'Operant conditioning', 'Observational learning', 'Structural learning'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara aliran Behaviorisme dan Humanisme dalam melihat motivasi manusia!'],
+                    ['q' => 'Uraikan tahapan perkembangan kognitif menurut Jean Piaget!'],
+                    ['q' => 'Jelaskan teori struktur kepribadian menurut Sigmund Freud (Id, Ego, Superego) dan bagaimana ketiganya berinteraksi!'],
+                    ['q' => 'Apa perbedaan antara sensasi dan persepsi? Berikan contoh bagaimana persepsi bisa memengaruhi tindakan!'],
+                    ['q' => 'Uraikan teori hierarki kebutuhan Abraham Maslow dan aplikasinya!'],
+                ],
+            ],
+
+            'Psikologi Sosial' => [
+                'pg' => [
+                    ['q' => 'Kecenderungan individu untuk mengubah sikap atau perilakunya agar sesuai dengan norma kelompok disebut?', 'a' => ['Kepatuhan (Obedience)', 'Konformitas (Conformity)', 'Otonomi', 'Prasangka'], 'correct' => 1],
+                    ['q' => 'Proses di mana seseorang menyimpulkan penyebab dari perilaku orang lain disebut?', 'a' => ['Atribusi', 'Sosialisasi', 'Stereotip', 'Diskriminasi'], 'correct' => 0],
+                    ['q' => 'Sikap negatif terhadap suatu kelompok dan anggotanya tanpa adanya bukti yang cukup disebut?', 'a' => ['Stereotip', 'Prasangka (Prejudice)', 'Diskriminasi', 'Konformitas'], 'correct' => 1],
+                    ['q' => 'Perilaku yang secara sengaja ditujukan untuk merugikan orang lain disebut?', 'a' => ['Agresi', 'Altruisme', 'Kooperasi', 'Empati'], 'correct' => 0],
+                    ['q' => 'Teori yang menyatakan bahwa prasangka timbul akibat persaingan memperebutkan sumber daya yang terbatas disebut?', 'a' => ['Teori Pembelajaran Sosial', 'Teori Realistik Konflik Kelompok', 'Teori Identitas Sosial', 'Teori Atribusi'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah komponen utama yang membentuk sikap (attitude)?', 'options' => ['Kognitif', 'Afektif', 'Perilaku (Behavioral)', 'Fisik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah fenomena pengaruh sosial yang dipelajari?', 'options' => ['Konformitas', 'Kepatuhan', 'Persuasi', 'Hipnotis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi perilaku prososial / altruisme?', 'options' => ['Empati', 'Norma sosial', 'Kehadiran orang lain (bystander effect)', 'Suhu udara'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis atribusi dalam teori atribusi?', 'options' => ['Atribusi internal (disposisional)', 'Atribusi eksternal (situasional)', 'Atribusi sosial', 'Atribusi biologis'], 'correct' => [0, 1]],
+                    ['q' => 'Manakah bentuk prasangka atau diskriminasi sosial?', 'options' => ['Rasisme', 'Seksisme', 'Ageism', 'Konsumerisme'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan percobaan konformitas oleh Solomon Asch dan implikasinya terhadap perilaku manusia dalam kelompok!'],
+                    ['q' => 'Apa itu prasangka dan bagaimana psikologi sosial menjelaskan cara menguranginya melalui kontak antarkelompok?'],
+                    ['q' => 'Uraikan teori atribusi dan bagaimana kesalahan atribusi yang mendasar (fundamental attribution error) dapat terjadi!'],
+                    ['q' => 'Jelaskan konsep bystander effect dan mengapa seseorang cenderung tidak menolong dalam keadaan darurat ketika banyak orang di sekitarnya!'],
+                    ['q' => 'Apa perbedaan antara stereotip, prasangka, dan diskriminasi? Berikan contoh keterkaitannya!'],
+                ],
+            ],
+
+            'Psikologi Klinis' => [
+                'pg' => [
+                    ['q' => 'Pedoman diagnostik gangguan mental yang paling banyak digunakan oleh psikolog klinis saat ini adalah?', 'a' => ['ICD dan DSM', 'MMPI', 'WISC', 'Rorschach'], 'correct' => 0],
+                    ['q' => 'Terapi yang bertujuan mengubah pola pikir dan perilaku maladaptif menjadi adaptif adalah?', 'a' => ['Psikoanalisis', 'Terapi Perilaku Kognitif (CBT)', 'Terapi Humanistik', 'Terapi Gestalt'], 'correct' => 1],
+                    ['q' => 'Proses pengumpulan data untuk memahami masalah pasien pada awal terapi disebut?', 'a' => ['Intervensi', 'Asesmen klinis', 'Evaluasi', 'Konseling'], 'correct' => 1],
+                    ['q' => 'Gangguan kecemasan di mana seseorang mengalami kecemasan yang berlebihan secara terus-menerus terhadap berbagai aktivitas disebut?', 'a' => ['Fobia spesifik', 'Gangguan Panik', 'General Anxiety Disorder (GAD)', 'OCD'], 'correct' => 2],
+                    ['q' => 'Asesmen proyektif yang menggunakan noda tinta untuk menganalisis kepribadian adalah tes?', 'a' => ['MMPI-2', 'Tes Rorschach', 'WAIS-IV', 'TAT'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk fungsi utama psikolog klinis?', 'options' => ['Asesmen', 'Psikoterapi', 'Psikoedukasi', 'Meracik obat'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah klasifikasi gangguan mental yang umum?', 'options' => ['Gangguan kecemasan', 'Gangguan mood', 'Gangguan kepribadian', 'Gangguan neurologis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah metode asesmen dalam psikologi klinis?', 'options' => ['Wawancara klinis', 'Observasi', 'Tes psikologi', 'X-ray medis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah pendekatan terapi yang dikenal dalam psikologi klinis?', 'options' => ['Psikoanalitik', 'Kognitif-Perilaku', 'Humanistik', 'Neurologis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah hal yang melanggar etika profesi psikologi klinis?', 'options' => ['Melanggar kerahasiaan pasien', 'Menjalin hubungan ganda', 'Memberikan diagnosis tanpa asesmen', 'Mendengarkan keluhan pasien'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan peran Terapi Perilaku Kognitif (CBT) dalam menangani gangguan kecemasan!'],
+                    ['q' => 'Apa saja langkah-langkah yang dilakukan dalam asesmen klinis?'],
+                    ['q' => 'Uraikan perbedaan antara psikolog klinis dan psikiater dalam menangani gangguan mental!'],
+                    ['q' => 'Jelaskan kriteria dan gejala dari gangguan depresi mayor (Major Depressive Disorder)!'],
+                    ['q' => 'Diskusikan pentingnya batas etika dan kerahasiaan dalam praktik psikologi klinis!'],
+                ],
+            ],
+
+            'Psikologi Industri' => [
+                'pg' => [
+                    ['q' => 'Tingkat kepuasan seseorang terhadap pekerjaannya dikenal dengan istilah?', 'a' => ['Motivasi kerja', 'Keterikatan kerja (employee engagement)', 'Kepuasan kerja (job satisfaction)', 'Kinerja'], 'correct' => 2],
+                    ['q' => 'Proses menemukan, menarik, dan menyeleksi kandidat karyawan yang kompeten disebut?', 'a' => ['Rekrutmen dan seleksi', 'Analisis jabatan', 'Pelatihan', 'Penilaian kinerja'], 'correct' => 0],
+                    ['q' => 'Sikap dan keterlibatan emosional karyawan terhadap pekerjaannya di perusahaan disebut?', 'a' => ['Kepuasan kerja', 'Keterikatan (Engagement)', 'Stres kerja', 'Turnover'], 'correct' => 1],
+                    ['q' => 'Tes yang dirancang untuk mengukur kemampuan intelektual umum calon karyawan adalah tes?', 'a' => ['Kepribadian', 'Kecerdasan (seperti IST, WAIS)', 'Minat dan bakat', 'Sikap kerja'], 'correct' => 1],
+                    ['q' => 'Teori yang mengelompokkan faktor kepuasan dan ketidakpuasan kerja menjadi dua faktor dicetuskan oleh?', 'a' => ['Maslow', 'Herzberg', 'McClelland', 'Vroom'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk fungsi utama Manajemen SDM dan Psikologi Industri?', 'options' => ['Rekrutmen', 'Pelatihan', 'Evaluasi Kinerja', 'Perancangan Produk'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah metode penilaian kinerja yang sering digunakan?', 'options' => ['360-degree feedback', 'Key Performance Indicator (KPI)', 'Behaviorally Anchored Rating Scales', 'Tes proyektif'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah faktor yang memengaruhi motivasi karyawan di tempat kerja?', 'options' => ['Kompensasi', 'Lingkungan kerja', 'Gaya kepemimpinan', 'Warna seragam'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis tes psikologi yang sering digunakan untuk seleksi karyawan?', 'options' => ['Tes Inteligensi', 'Tes Kepribadian (DISC, MBTI)', 'Tes Kraepelin/Pauli', 'Tes medis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah penyebab utama terjadinya stres kerja?', 'options' => ['Beban kerja berlebih', 'Kurangnya dukungan sosial', 'Konflik peran', 'Ukuran kantor'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan teori dua faktor Herzberg (Hygiene Factors dan Motivator Factors) dalam konteks kepuasan kerja!'],
+                    ['q' => 'Uraikan proses seleksi karyawan yang efektif dalam organisasi!'],
+                    ['q' => 'Apa itu 360-degree feedback dan bagaimana metode ini membantu dalam penilaian kinerja karyawan?'],
+                    ['q' => 'Diskusikan dampak stres kerja terhadap produktivitas dan bagaimana perusahaan dapat memitigasinya!'],
+                    ['q' => 'Jelaskan pentingnya ergonomi kognitif dalam perancangan sistem kerja di industri!'],
+                ],
+            ],
+
+            'Psikometri' => [
+                'pg' => [
+                    ['q' => 'Derajat sejauh mana suatu alat ukur mengukur apa yang seharusnya diukur disebut?', 'a' => ['Reliabilitas', 'Validitas', 'Objektivitas', 'Praktikalitas'], 'correct' => 1],
+                    ['q' => 'Konsistensi atau kestabilan hasil dari suatu alat ukur disebut?', 'a' => ['Validitas', 'Reliabilitas', 'Norma', 'Objektivitas'], 'correct' => 1],
+                    ['q' => 'Skala yang biasanya menggunakan lima pilihan jawaban seperti "Sangat Setuju" hingga "Sangat Tidak Setuju" adalah skala?', 'a' => ['Thurstone', 'Guttman', 'Likert', 'Semantic Differential'], 'correct' => 2],
+                    ['q' => 'Statistik yang digunakan untuk menguji homogenitas atau konsistensi internal suatu alat ukur adalah?', 'a' => ['Koefisien Alpha Cronbach', 'Chi-Square', 'Uji-T', 'ANOVA'], 'correct' => 0],
+                    ['q' => 'Prosedur untuk mengubah skor mentah menjadi skor yang dapat dibandingkan dengan populasi acuan disebut?', 'a' => ['Standardisasi norma', 'Koreksi', 'Validasi', 'Konversi'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah jenis-jenis validitas dalam psikometri?', 'options' => ['Validitas isi (content validity)', 'Validitas konstruk (construct validity)', 'Validitas kriteria (criterion validity)', 'Validitas biologis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis-jenis reliabilitas instrumen?', 'options' => ['Test-retest', 'Split-half', 'Internal consistency', 'External consistency'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah langkah dalam pengembangan instrumen pengukuran psikologi?', 'options' => ['Menentukan konstruk', 'Menulis aitem', 'Uji coba (try-out)', 'Mencetak alat'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah metode skala yang dikenal dalam psikometri?', 'options' => ['Skala Likert', 'Skala Guttman', 'Skala Thurstone', 'Skala Nominal'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang memengaruhi reliabilitas suatu alat tes?', 'options' => ['Panjang tes', 'Kondisi saat tes', 'Heterogenitas kelompok', 'Ukuran kertas tes'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan perbedaan antara validitas dan reliabilitas serta berikan contoh untuk masing-masing!'],
+                    ['q' => 'Apa yang dimaksud dengan Alpha Cronbach? Bagaimana cara menginterpretasikan nilai Alpha Cronbach pada instrumen pengukuran?'],
+                    ['q' => 'Uraikan tahapan pembuatan skala psikologi mulai dari spesifikasi tujuan hingga uji coba!'],
+                    ['q' => 'Jelaskan konsep validitas konstruk dan bagaimana cara mengujinya menggunakan analisis faktor!'],
+                    ['q' => 'Apa perbedaan antara tes kecepatan (speed test) dan tes kemampuan (power test) dalam pengukuran psikometri?'],
+                ],
+            ],
+
+            //Ilmu Komunikasi
+             'Public Relations' => [
+                'pg' => [
+                    ['q' => 'Fungsi manajemen yang membangun dan mempertahankan hubungan yang saling menguntungkan antara organisasi dan publiknya disebut?', 'a' => ['Periklanan', 'Pemasaran', 'Public Relations (PR)', 'Penjualan'], 'correct' => 2],
+                    ['q' => 'Pernyataan tertulis yang ditujukan kepada media massa mengenai informasi atau peristiwa penting organisasi disebut?', 'a' => ['Press release', 'Brosur', 'Majalah internal', 'Flyer'], 'correct' => 0],
+                    ['q' => 'Upaya untuk mengatasi situasi krisis yang dapat merusak reputasi perusahaan disebut?', 'a' => ['Manajemen krisis', 'Publisitas', 'Corporate Social Responsibility', 'Kampanye promosi'], 'correct' => 0],
+                    ['q' => 'Program yang berfokus pada tanggung jawab sosial dan kepedulian perusahaan terhadap lingkungan/masyarakat disebut?', 'a' => ['Corporate Social Responsibility (CSR)', 'Media relation', 'Investor relation', 'Customer service'], 'correct' => 0],
+                    ['q' => 'Model komunikasi PR yang paling ideal dan seimbang adalah model?', 'a' => ['Persuasi satu arah', 'Dua arah asimetris', 'Dua arah simetris', 'Publisitas murni'], 'correct' => 2],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk publik dalam ruang lingkup Public Relations?', 'options' => ['Media', 'Karyawan', 'Investor', 'Kompetitor'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang merupakan tugas dari seorang Public Relations?', 'options' => ['Membuat siaran pers', 'Mengelola acara perusahaan', 'Menulis pidato eksekutif', 'Menjual produk secara langsung'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah saluran komunikasi yang digunakan dalam kegiatan PR?', 'options' => ['Press conference', 'Media sosial', 'Newsletter perusahaan', 'Billboard iklan komersial'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah komponen penting dalam menangani krisis perusahaan?', 'options' => ['Transparansi', 'Respon cepat', 'Pusat informasi krisis', 'Mengabaikan media'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah bentuk tanggung jawab sosial (CSR) perusahaan?', 'options' => ['Pemberdayaan masyarakat', 'Pelestarian lingkungan', 'Pemberian beasiswa', 'Diskon harga produk'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan fungsi dan peran Public Relations dalam membangun citra positif perusahaan!'],
+                    ['q' => 'Apa perbedaan antara periklanan (advertising) dan publisitas (publicity)?'],
+                    ['q' => 'Uraikan langkah-langkah yang harus dilakukan oleh seorang praktisi PR saat menghadapi krisis perusahaan!'],
+                    ['q' => 'Jelaskan konsep dan pentingnya program Corporate Social Responsibility (CSR) bagi perusahaan!'],
+                    ['q' => 'Bagaimana media relations memengaruhi kredibilitas suatu organisasi di mata media massa?'],
+                ],
+            ],
+
+            'Jurnalistik' => [
+                'pg' => [
+                    ['q' => 'Unsur-unsur pokok dalam penulisan berita yang baik sering dikenal dengan istilah?', 'a' => ['5W+1H', 'AIDA', 'STP', 'SMART'], 'correct' => 0],
+                    ['q' => 'Tulisan yang berisi pendapat subjektif penulis mengenai suatu isu hangat yang sedang terjadi disebut?', 'a' => ['Berita langsung (straight news)', 'Tajuk rencana (editorial)', 'Feature', 'Iklan'], 'correct' => 1],
+                    ['q' => 'Pemberitaan yang dilakukan dengan penyelidikan mendalam terhadap suatu kasus disebut?', 'a' => ['Jurnalistik investigasi', 'Berita foto', 'Wawancara khusus', 'Berita opini'], 'correct' => 0],
+                    ['q' => 'Struktur penulisan berita di mana informasi terpenting diletakkan di awal paragraf disebut?', 'a' => ['Piramida terbalik', 'Kronologis', 'Piramida tegak', 'Struktur bebas'], 'correct' => 0],
+                    ['q' => 'Pedoman moral dan etika yang harus dipatuhi oleh wartawan dalam menjalankan tugasnya adalah?', 'a' => ['Kode Etik Jurnalistik', 'UU Pers', 'SOP Perusahaan', 'Undang-undang penyiaran'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk jenis-jenis berita?', 'options' => ['Straight news', 'Feature', 'Editorial', 'Iklan baris'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah prinsip dasar kerja jurnalistik?', 'options' => ['Akurat', 'Berimbang (Cover both sides)', 'Objektif', 'Bersifat memihak'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah teknik reportase yang sering digunakan oleh wartawan?', 'options' => ['Wawancara', 'Observasi', 'Studi dokumen', 'Eksperimen medis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah bagian-bagian dari struktur berita piramida terbalik?', 'options' => ['Lead (teras berita)', 'Tubuh berita', 'Ekor berita', 'Kesimpulan akhir'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah peran media massa dalam jurnalisme?', 'options' => ['Menginformasikan', 'Mendidik', 'Menghibur', 'Memanipulasi opini'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan struktur penulisan berita dengan format piramida terbalik!'],
+                    ['q' => 'Apa itu prinsip Cover Both Sides? Mengapa prinsip ini sangat penting dalam penulisan berita objektif?'],
+                    ['q' => 'Uraikan perbedaan antara straight news dan feature!'],
+                    ['q' => 'Jelaskan peran jurnalistik investigasi dalam membongkar suatu kasus kejahatan!'],
+                    ['q' => 'Diskusikan pentingnya mematuhi Kode Etik Jurnalistik dalam kebebasan pers!'],
+                ],
+            ],
+
+            'Komunikasi Massa' => [
+                'pg' => [
+                    ['q' => 'Teori yang menyatakan bahwa media massa tidak selalu memengaruhi apa yang harus dipikirkan, tetapi memengaruhi apa yang harus dipikirkan disebut?', 'a' => ['Teori Jarum Hipodermis', 'Teori Agenda Setting', 'Teori Kultivasi', 'Teori Uses and Gratifications'], 'correct' => 1],
+                    ['q' => 'Komunikasi massa memiliki karakteristik khalayak yang?', 'a' => ['Homogen, sedikit, dan saling kenal', 'Heterogen, anonim, dan tersebar luas', 'Terbatas dan eksklusif', 'Hanya satu orang saja'], 'correct' => 1],
+                    ['q' => 'Teori yang menyebutkan bahwa media massa membentuk persepsi penonton tentang realitas sosial jika menonton televisi dalam waktu lama adalah?', 'a' => ['Agenda Setting', 'Kultivasi', 'Jarum Hipodermis', 'Spiral Keheningan'], 'correct' => 1],
+                    ['q' => 'Proses penyaringan pesan yang dilakukan oleh redaktur atau editor sebelum disiarkan disebut?', 'a' => ['Gatekeeping', 'Encoding', 'Decoding', 'Feedback'], 'correct' => 0],
+                    ['q' => 'Umpan balik (feedback) dalam komunikasi massa umumnya bersifat?', 'a' => ['Langsung', 'Tertunda dan tidak langsung', 'Dua arah', 'Interaktif'], 'correct' => 1],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah karakteristik komunikasi massa?', 'options' => ['Sumber melembaga', 'Pesan bersifat umum', 'Khalayak heterogen', 'Feedback langsung'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah fungsi utama komunikasi massa menurut para ahli?', 'options' => ['Informasi', 'Edukasi', 'Hiburan', 'Promosi bisnis'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah teori efek komunikasi massa yang dikenal?', 'options' => ['Jarum Hipodermis', 'Uses and Gratifications', 'Kultivasi', 'Relativitas'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah elemen dalam model komunikasi massa?', 'options' => ['Sender', 'Message', 'Channel', 'Receiver'], 'correct' => [0, 1, 2, 3]],
+                    ['q' => 'Manakah yang memengaruhi khalayak dalam komunikasi massa?', 'options' => ['Kredibilitas media', 'Isi pesan', 'Kebutuhan khalayak', 'Warna media'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan Teori Agenda Setting dan bagaimana media memengaruhi topik yang diperbincangkan di masyarakat!'],
+                    ['q' => 'Apa perbedaan antara umpan balik (feedback) dalam komunikasi antarpribadi dan komunikasi massa?'],
+                    ['q' => 'Uraikan peran gatekeeper dalam proses produksi media massa!'],
+                    ['q' => 'Jelaskan Teori Kultivasi dan bagaimana pengaruh tayangan televisi terhadap pandangan hidup penontonnya!'],
+                    ['q' => 'Diskusikan dampak konvergensi media terhadap perkembangan komunikasi massa saat ini!'],
+                ],
+            ],
+
+            'Broadcasting' => [
+                'pg' => [
+                    ['q' => 'Penyiaran yang menggunakan gelombang frekuensi radio untuk mengirimkan suara kepada khalayak disebut?', 'a' => ['Televisi', 'Radio siaran', 'Internet', 'Surat kabar'], 'correct' => 1],
+                    ['q' => 'Tahapan pra-produksi dalam program penyiaran meliputi?', 'a' => ['Editing dan mixing', 'Pembuatan naskah dan perencanaan anggaran', 'Penyebaran acara', 'Proses syuting'], 'correct' => 1],
+                    ['q' => 'Format siaran televisi yang menampilkan informasi dan hiburan yang disiarkan langsung disebut?', 'a' => ['Siaran tunda (recorded)', 'Siaran langsung (live)', 'Program drama', 'Iklan'], 'correct' => 1],
+                    ['q' => 'Alat yang berfungsi untuk mengatur tingkat suara (audio) dalam studio penyiaran disebut?', 'a' => ['Switcher', 'Audio Mixer', 'Kamera', 'Microphone'], 'correct' => 1],
+                    ['q' => 'Komisi yang bertugas mengatur dan mengawasi penyelenggaraan penyiaran di Indonesia adalah?', 'a' => ['KPI', 'Dewan Pers', 'KPPU', 'OJK'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah yang termasuk tahapan produksi dalam broadcasting?', 'options' => ['Pra-produksi', 'Produksi', 'Pasca-produksi', 'Marketing'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah perangkat yang digunakan dalam studio televisi?', 'options' => ['Kamera video', 'Vision Switcher', 'Teleprompter', 'Peralatan cetak'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis program televisi?', 'options' => ['News', 'Talkshow', 'Variety Show', 'Majalah Dinding'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah media transmisi yang digunakan dalam penyiaran?', 'options' => ['Gelombang elektromagnetik', 'Kabel serat optik', 'Streaming internet', 'Surat fisik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah yang termasuk fungsi kru produksi dalam penyiaran?', 'options' => ['Sutradara', 'Kameramen', 'Editor', 'Presenter'], 'correct' => [0, 1, 2, 3]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan proses produksi program siaran televisi mulai dari tahap pra-produksi hingga pasca-produksi!'],
+                    ['q' => 'Apa peran penting seorang produser dalam program siaran siaran langsung (live)?'],
+                    ['q' => 'Uraikan perbedaan teknis antara siaran radio dan siaran televisi!'],
+                    ['q' => 'Jelaskan regulasi penyiaran yang diatur oleh KPI, khususnya mengenai isi siaran dan batasan waktu iklan!'],
+                    ['q' => 'Bagaimana perkembangan teknologi digital memengaruhi metode penyiaran konvensional?'],
+                ],
+            ],
+
+            'Media Digital' => [
+                'pg' => [
+                    ['q' => 'Penerapan strategi untuk meningkatkan visibilitas situs web di halaman hasil mesin pencari disebut?', 'a' => ['SEM', 'SEO (Search Engine Optimization)', 'SMM', 'Content Marketing'], 'correct' => 1],
+                    ['q' => 'Karakteristik media digital yang memungkinkan pengguna untuk berinteraksi dengan konten disebut?', 'a' => ['Interaktivitas', 'Linier', 'Statik', 'Massa'], 'correct' => 0],
+                    ['q' => 'Proses penggabungan berbagai jenis media (teks, audio, video) ke dalam satu platform digital disebut?', 'a' => ['Konvergensi media', 'Diversifikasi', 'Fragmentasi', 'Evolusi'], 'correct' => 0],
+                    ['q' => 'Metrik yang mengukur seberapa banyak pengguna yang melihat iklan atau konten digital adalah?', 'a' => ['Click-through rate (CTR)', 'Impressions', 'Bounce rate', 'Conversion rate'], 'correct' => 1],
+                    ['q' => 'Etika yang harus diterapkan dalam berinteraksi di dunia digital dikenal sebagai?', 'a' => ['Cyber ethics / Netiquette', 'Etika profesi TI', 'Hukum tata negara', 'Etika bisnis'], 'correct' => 0],
+                ],
+                'cb' => [
+                    ['q' => 'Manakah platform yang termasuk media sosial digital?', 'options' => ['Instagram', 'X (Twitter)', 'TikTok', 'Koran cetak'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah elemen dari strategi pemasaran digital?', 'options' => ['SEO', 'Media sosial', 'Email marketing', 'Billboard konvensional'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah jenis konten digital yang populer?', 'options' => ['Video singkat', 'Infografis', 'Podcast', 'Koran fisik'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah metrik keberhasilan dalam analisis media digital?', 'options' => ['Engagement rate', 'Follower growth', 'Reach', 'Berat kertas'], 'correct' => [0, 1, 2]],
+                    ['q' => 'Manakah ancaman keamanan dalam penggunaan media digital?', 'options' => ['Cyberbullying', 'Penyebaran hoaks', 'Phishing', 'Kerusakan mesin'], 'correct' => [0, 1, 2]],
+                ],
+                'essay' => [
+                    ['q' => 'Jelaskan konsep konvergensi media dan dampaknya pada industri media digital saat ini!'],
+                    ['q' => 'Apa itu Search Engine Optimization (SEO) dan bagaimana penerapannya dalam mengoptimalkan konten?'],
+                    ['q' => 'Uraikan perbedaan antara pemasaran melalui media sosial (SMM) dan mesin pencari (SEM)!'],
+                    ['q' => 'Jelaskan pentingnya Netiquette dalam berinteraksi di platform media digital!'],
+                    ['q' => 'Bagaimana data analitik digunakan untuk mengukur efektivitas suatu kampanye di media digital?'],
+                ],
+            ],
+
         ];
  
         return $data[$nama] ?? [];
