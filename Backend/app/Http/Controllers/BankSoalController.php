@@ -328,20 +328,23 @@ class BankSoalController extends Controller
             return response()->json(['message' => 'Bank soal harus berstatus shared!'], 400);
         }
 
-        $request->validate([
-            'expired_at' => 'nullable|date|after:now',
-        ], [
-            'expired_at.after' => 'Tanggal expired harus setelah sekarang!',
-        ]);
+        // Kembalikan link yang sudah ada jika sudah pernah digenerate
+        $existing = BankSoalShared::where('bank_soal_id', $id)
+            ->whereNotNull('token')
+            ->whereNull('user_id')
+            ->first();
 
-        // Generate token unik 32 karakter
+        if ($existing) {
+            $link = env('FRONTEND_URL') . '/bank-soal/join?token=' . $existing->token;
+            return response()->json(['message' => 'Link berhasil digenerate!', 'link' => $link], 200);
+        }
+
         $token = Str::random(32);
 
         BankSoalShared::create([
             'bank_soal_id' => $id,
-            'user_id' => null, // null karena belum tahu siapa yang akan akses
+            'user_id' => null,
             'token' => $token,
-            'expired_at' => $request->expired_at,
         ]);
 
         $link = env('FRONTEND_URL') . '/bank-soal/join?token=' . $token;
@@ -383,11 +386,18 @@ class BankSoalController extends Controller
             ->exists();
 
         if ($alreadyJoined) {
-            return response()->json(['message' => 'Kamu sudah punya akses ke bank soal ini!'], 400);
+            return response()->json([
+                'message' => 'Kamu sudah punya akses ke bank soal ini!',
+                'data' => $shared->bankSoal,
+            ], 200);
         }
 
-        // Update record → assign user_id ke user yang login
-        $shared->update(['user_id' => $authUser->id]);
+        // Buat record baru untuk user yang join, biarkan token record tetap aktif
+        BankSoalShared::create([
+            'bank_soal_id' => $shared->bank_soal_id,
+            'user_id' => $authUser->id,
+            'token' => null,
+        ]);
 
         return response()->json([
             'message' => 'Berhasil join bank soal!',

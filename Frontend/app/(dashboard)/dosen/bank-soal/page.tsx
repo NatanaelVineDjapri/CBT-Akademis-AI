@@ -42,6 +42,7 @@ export default function DosenBankSoalPage() {
   const [editItem, setEditItem] = useState<BankSoalItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<BankSoalItem | null>(null);
   const [shareItem, setShareItem] = useState<BankSoalItem | null>(null);
+  const [shareLink, setShareLink] = useState<string | undefined>();
 
   const handleCreate = async (formData: Parameters<typeof createBankSoal>[0]) => {
     await createBankSoal(formData);
@@ -75,7 +76,7 @@ export default function DosenBankSoalPage() {
           onPageChange={setPage}
           onEdit={(item) => setEditItem(item)}
           onDelete={(item) => setDeleteItem(item)}
-          onShare={(item) => setShareItem(item)}
+          onShare={(item, link) => { setShareItem(item); setShareLink(link); }}
           canEdit={true}
           onTambah={() => setShowCreate(true)}
         />
@@ -113,7 +114,8 @@ export default function DosenBankSoalPage() {
       {shareItem && (
         <ShareByEmailModal
           item={shareItem}
-          onClose={() => setShareItem(null)}
+          onClose={() => { setShareItem(null); setShareLink(undefined); }}
+          initialLink={shareLink}
         />
       )}
     </div>

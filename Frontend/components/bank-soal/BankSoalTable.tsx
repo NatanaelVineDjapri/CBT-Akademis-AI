@@ -1,10 +1,11 @@
 "use client";
 
+import { useRef } from "react";
 import { Pencil, Trash2, Plus, Mail } from "lucide-react";
 import Link from "next/link";
 import { preload } from "swr";
 import api from "@/services/api";
-import { getBabByMataKuliah } from "@/services/BankSoalServices";
+import { getBabByMataKuliah, generateBankSoalLink } from "@/services/BankSoalServices";
 import type { BankSoalItem, BankSoalMeta } from "@/types";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -30,7 +31,7 @@ interface Props {
   onPageChange: (p: number) => void;
   onEdit: (item: BankSoalItem) => void;
   onDelete: (item: BankSoalItem) => void;
-  onShare?: (item: BankSoalItem) => void;
+  onShare?: (item: BankSoalItem, link?: string) => void;
   canEdit: boolean;
   createHref?: string;
   onTambah?: () => void;
@@ -51,6 +52,8 @@ export default function BankSoalTable({
   onTambah,
   basePath = "/dosen/bank-soal",
 }: Props) {
+  const linkCache = useRef<Map<number, string>>(new Map());
+
   return (
     <div className="flex flex-col gap-3">
       <div
@@ -96,29 +99,29 @@ export default function BankSoalTable({
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">
                   #
                 </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-72">
                   Nama Bank Soal
                 </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">
                   Mata Kuliah
                 </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">
                   Bab
                 </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">
                   Jumlah Soal
                 </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">
                   Permission
                 </th>
                 {canEdit && (
-                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">
                     Actions
                   </th>
                 )}
@@ -139,21 +142,21 @@ export default function BankSoalTable({
                       <td className="px-5 py-3 text-xs text-gray-400">
                         {rowNum}
                       </td>
-                      <td className="px-4 py-3 font-medium text-gray-800">
+                      <td className="px-4 py-3 font-medium text-gray-800 max-w-0">
                         <Link
                           href={`${basePath}/${item.id}`}
-                          className="hover:underline"
+                          className="hover:underline truncate block"
                           style={{ color: "var(--color-primary)" }}
                         >
                           {item.nama}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-gray-500 truncate">
                         {item.mata_kuliah?.kode ??
                           item.mata_kuliah?.nama ??
                           "-"}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-gray-500 truncate">
                         {item.bab?.nama_bab ?? "-"}
                       </td>
                       <td className="px-4 py-3 text-gray-600">
@@ -182,10 +185,15 @@ export default function BankSoalTable({
                             </button>
                             {onShare && item.permission === "shared" && (
                               <button
-                                onClick={() => onShare(item)}
-                                onMouseEnter={() => preload(`/bank-soal/${item.id}/shared-users`, () => api.get(`/bank-soal/${item.id}/shared-users`).then(r => r.data.data))}
+                                onClick={() => onShare(item, linkCache.current.get(item.id))}
+                                onMouseEnter={() => {
+                                  preload(`/bank-soal/${item.id}/shared-users`, () => api.get(`/bank-soal/${item.id}/shared-users`).then(r => r.data.data));
+                                  if (!linkCache.current.has(item.id)) {
+                                    generateBankSoalLink(item.id).then(link => linkCache.current.set(item.id, link));
+                                  }
+                                }}
                                 className="text-blue-400 hover:text-blue-500 transition-colors"
-                                title="Share via email"
+                                title="Bagikan"
                               >
                                 <Mail size={15} />
                               </button>

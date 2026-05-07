@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Loader2, Users } from "lucide-react";
+import { X, Loader2, Users, Link2, Copy, Check } from "lucide-react";
 import useSWR, { mutate } from "swr";
-import { shareByEmail } from "@/services/BankSoalServices";
+import { shareByEmail, generateBankSoalLink } from "@/services/BankSoalServices";
 import api from "@/services/api";
 import type { BankSoalItem } from "@/types";
 
@@ -22,9 +22,10 @@ interface UserSuggestion {
 interface Props {
   item: BankSoalItem;
   onClose: () => void;
+  initialLink?: string;
 }
 
-export default function ShareByEmailModal({ item, onClose }: Props) {
+export default function ShareByEmailModal({ item, onClose, initialLink }: Props) {
   const [email, setEmail] = useState("");
   const [suggestions, setSuggestions] = useState<UserSuggestion[]>([]);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
@@ -32,12 +33,29 @@ export default function ShareByEmailModal({ item, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [generatedLink, setGeneratedLink] = useState(initialLink ?? "");
+  const [loadingLink, setLoadingLink] = useState(!initialLink);
+  const [copied, setCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (initialLink) return;
+    generateBankSoalLink(item.id)
+      .then(setGeneratedLink)
+      .finally(() => setLoadingLink(false));
+  }, [item.id, initialLink]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const sharedKey = `/bank-soal/${item.id}/shared-users`;
   const { data: sharedData } = useSWR(sharedKey, () =>
     api.get(sharedKey).then(r => r.data.data as SharedUser[])
   );
+
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -100,7 +118,7 @@ export default function ShareByEmailModal({ item, onClose }: Props) {
           className="flex items-center justify-between px-6 py-4 rounded-t-2xl"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
-          <h3 className="text-base font-bold text-white">Share via Email</h3>
+          <h3 className="text-base font-bold text-white">Bagikan Bank Soal</h3>
           <button onClick={onClose} className="text-white/70 hover:text-white">
             <X className="w-5 h-5" />
           </button>
@@ -110,6 +128,39 @@ export default function ShareByEmailModal({ item, onClose }: Props) {
           <div className="rounded-xl px-4 py-3" style={{ backgroundColor: "var(--color-primary-light)" }}>
             <p className="text-xs text-gray-500">Bank Soal</p>
             <p className="text-sm font-medium mt-0.5" style={{ color: "var(--color-primary)" }}>{item.nama}</p>
+          </div>
+
+          {/* Generate Link */}
+          <div className="rounded-xl border border-gray-100 overflow-hidden">
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 border-b border-gray-100">
+              <Link2 className="w-3.5 h-3.5 text-gray-400" />
+              <p className="text-xs font-semibold text-gray-500">Share via Link</p>
+            </div>
+            <div className="p-3">
+              <div className="flex items-center gap-2">
+                {loadingLink ? (
+                  <div className="flex-1 flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 bg-gray-50">
+                    <Loader2 size={13} className="animate-spin text-gray-400" />
+                    <span className="text-xs text-gray-400">Generating...</span>
+                  </div>
+                ) : (
+                  <input
+                    readOnly
+                    value={generatedLink}
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 bg-gray-50 outline-none truncate"
+                  />
+                )}
+                <button
+                  onClick={handleCopy}
+                  disabled={!generatedLink}
+                  className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-white transition-colors cursor-pointer disabled:opacity-40"
+                  style={{ backgroundColor: copied ? "#22c55e" : "var(--color-primary)" }}
+                >
+                  {copied ? <Check size={13} /> : <Copy size={13} />}
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+            </div>
           </div>
 
           {(sharedData ?? []).length > 0 && (

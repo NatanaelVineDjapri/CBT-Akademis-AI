@@ -153,3 +153,13 @@ export const updateBankSoal = async (
 export const shareByEmail = async (id: number, email: string): Promise<void> => {
   await api.post(`/bank-soal/${id}/share-email`, { email });
 };
+
+export const generateBankSoalLink = async (id: number): Promise<string> => {
+  const res = await api.post(`/bank-soal/${id}/generate-link`);
+  return res.data.link;
+};
+
+export const joinBankSoalByLink = async (token: string): Promise<number> => {
+  const res = await api.post("/bank-soal/join", { token });
+  return res.data.data.id;
+};
