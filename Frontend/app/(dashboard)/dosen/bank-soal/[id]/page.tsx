@@ -37,8 +37,6 @@ export default function DaftarSoalPage({ params }: Props) {
   const soalList = data?.data ?? [];
   const canEdit = data?.can_edit ?? false;
 
-  const handleDelete = (soal: SoalItem) => setDeletingSoal(soal);
-
   const handleConfirmDelete = async () => {
     if (!deletingSoal) return;
     setDeleting(true);
@@ -58,7 +56,6 @@ export default function DaftarSoalPage({ params }: Props) {
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1">
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
@@ -93,33 +90,33 @@ export default function DaftarSoalPage({ params }: Props) {
           </div>
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading} canEdit={canEdit} onEdit={setEditingSoal} onDelete={handleDelete} />
+        <SoalTable soalList={soalList} isLoading={isLoading} canEdit={canEdit} onEdit={setEditingSoal} onDelete={(s) => setDeletingSoal(s)} />
 
-      {(showAddSoal || editingSoal) && bankSoal && (
-        <AddSoalModal
-          bankSoal={bankSoal}
-          soal={editingSoal ?? undefined}
-          onClose={() => { setShowAddSoal(false); setEditingSoal(null); }}
-          onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
-        />
-      )}
+        {(showAddSoal || editingSoal) && bankSoal && (
+          <AddSoalModal
+            bankSoal={bankSoal}
+            soal={editingSoal ?? undefined}
+            onClose={() => { setShowAddSoal(false); setEditingSoal(null); }}
+            onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
+          />
+        )}
 
-      {deletingSoal && (
-        <ConfirmModal
-          message={`Hapus soal "${deletingSoal.deskripsi.slice(0, 60)}..."?`}
-          loading={deleting}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeletingSoal(null)}
-        />
-      )}
+        {deletingSoal && (
+          <ConfirmModal
+            message={`Hapus soal "${deletingSoal.deskripsi.slice(0, 60)}..."?`}
+            loading={deleting}
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setDeletingSoal(null)}
+          />
+        )}
 
-      {showGenerateAI && (
-        <GenerateAIModal
-          bankSoalId={id}
-          onClose={() => setShowGenerateAI(false)}
-          onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
-        />
-      )}
+        {showGenerateAI && (
+          <GenerateAIModal
+            bankSoalId={id}
+            onClose={() => setShowGenerateAI(false)}
+            onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
+          />
+        )}
       </div>
     </div>
   );

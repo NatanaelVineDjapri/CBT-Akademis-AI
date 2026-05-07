@@ -117,7 +117,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
             ],
-        ], 200);
+        ], 200)->withCookie(cookie('user_role', $user->role, 60 * 24 * 7));
     }
 
     public function verifyLogin(Request $request)
@@ -164,7 +164,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
             ],
-        ], 200);
+        ], 200)->withCookie(cookie('user_role', $user->role, 60 * 24 * 7));
     }
 
     public function logout(Request $request)
@@ -177,7 +177,8 @@ class AuthController extends Controller
             'message' => 'Logout berhasil!',
         ], 200)
             ->withCookie(Cookie::forget('laravel_session', '/'))
-            ->withCookie(Cookie::forget('XSRF-TOKEN', '/'));
+            ->withCookie(Cookie::forget('XSRF-TOKEN', '/'))
+            ->withCookie(Cookie::forget('user_role', '/'));
     }
 
     public function me(Request $request)
