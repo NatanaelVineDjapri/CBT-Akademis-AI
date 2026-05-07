@@ -34,6 +34,9 @@ class DatabaseSeeder extends Seeder
             BankSoalExternalUnivSeeder::class,
             SimulasiEssaySeeder::class,
             PmbSeeder::class,
+            ProdiSeeder::class,
+            MatkulSeeder::class,
+            MatkulDosenSeeder::class,
         ]);
     }
 }

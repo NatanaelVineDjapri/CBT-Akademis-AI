@@ -15,15 +15,9 @@ class MatkulSeeder extends Seeder
 
             // FTI
             'TI' => [
-                'Pemrograman Web','Basis Data','Algoritma dan Pemrograman','Struktur Data',
-                'Sistem Operasi','Jaringan Komputer','Pemrograman Berorientasi Objek',
-                'Rekayasa Perangkat Lunak','Kecerdasan Buatan','Machine Learning',
-                'Pengolahan Citra Digital','Keamanan Sistem Informasi','Pemrograman Mobile',
-                'Cloud Computing','Data Mining','Interaksi Manusia Komputer',
-                'Matematika Diskrit','Kalkulus','Statistika dan Probabilitas',
-                'Logika Matematika','Basis Data Lanjut','Pemrograman Fungsional',
-                'Arsitektur Komputer','Kompilator','Grafika Komputer',
-                'Internet of Things','Big Data Analytics','DevOps','Etika Profesi TI',
+                'Etika Profesi TI','DevOps','Big Data Analytics','Internet of Things',
+                'Grafika Komputer','Kompilator','Arsitektur Komputer','Pemrograman Fungsional',
+                'Basis Data Lanjut','Logika Matematika','Struktur Data', 'Kalkulus'
             ],
 
             'SI' => [
@@ -49,11 +43,16 @@ class MatkulSeeder extends Seeder
                 'Kontrol Otomatis','Telekomunikasi','Mikrokontroler'
             ],
 
+            'TIN' => [
+                'Riset Operasi','Ergonomi', 'Perencanaan Produksi','Manajemen Kualitas',
+                'Sistem Produksi', 'Analisis Perancangan Kerja', 'Statistik Industri',
+                'Manajemen Rantai Pasok'
+            ],
             'ARS' => [
                 'Perancangan Arsitektur','Teori Arsitektur','Struktur Bangunan',
                 'Utilitas Bangunan','Arsitektur Lingkungan'
+    
             ],
-
             // FEB
             'MAN' => [
                 'Manajemen Pemasaran','Manajemen Keuangan','Manajemen SDM',

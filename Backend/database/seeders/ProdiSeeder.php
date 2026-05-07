@@ -20,14 +20,15 @@ class ProdiSeeder extends Seeder
             ],
 
             'FT' => [
-                ['nama' => 'Teknik Sipil',      'kode' => 'TS'],
-                ['nama' => 'Teknik Mesin',      'kode' => 'TM'],
-                ['nama' => 'Teknik Elektro',    'kode' => 'TE'],
-                ['nama' => 'Arsitektur',        'kode' => 'ARS'],
+                ['nama' => 'Teknik Sipil',     'kode' => 'TS'],
+                ['nama' => 'Teknik Mesin',     'kode' => 'TM'],
+                ['nama' => 'Teknik Elektro',   'kode' => 'TE'],
+                ['nama' => 'Teknik Industri',  'kode' => 'TIN'], // ← tambah ini
+                ['nama' => 'Arsitektur',       'kode' => 'ARS'],
             ],
 
             'FEB' => [
-                ['nama' => 'Manajemen',         'kode' => 'MAN'],
+                ['nama' => 'Manajemen',         'kode' => 'MNJ'],
                 ['nama' => 'Akuntansi',         'kode' => 'AKT'],
             ],
 
@@ -36,7 +37,7 @@ class ProdiSeeder extends Seeder
             ],
 
             'FK' => [
-                ['nama' => 'Pendidikan Dokter', 'kode' => 'PD'],
+                ['nama' => 'Pendidikan Dokter', 'kode' => 'KD'],
             ],
 
             'FSRD' => [
