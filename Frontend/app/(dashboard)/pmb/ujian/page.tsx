@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Calendar, Clock, FileText, Headphones } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Calendar, Clock, Headphones } from "lucide-react";
 
 const ujianData = {
   akanDatang: [
@@ -117,7 +118,9 @@ export default function UjianPesertaPage() {
   );
 }
 
-function UjianCard({ ujian, tab }) {
+function UjianCard({ ujian, tab }: { ujian: any; tab: string }) {
+  const router = useRouter();
+
   return (
     <div
       style={{
@@ -228,6 +231,11 @@ function UjianCard({ ujian, tab }) {
         </div>
       )}
       <button
+        onClick={() =>
+          tab === "selesai"
+            ? router.push(`/pmb/ujian/hasil/${ujian.id}`)
+            : router.push(`/pmb/ujian/${ujian.id}`)
+        }
         style={{
           width: "100%",
           padding: "10px 0",
