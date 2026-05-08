@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankSoal;
+use App\Models\JawabanPeserta;
+use App\Models\JenisSoal;
 use App\Models\NilaiAkhir;
+use App\Models\OpsiJawaban;
 use App\Models\PesertaUjian;
+use App\Models\Soal;
 use App\Models\Ujian;
 use App\Events\JawabanMasuk;
-use App\Models\JawabanPeserta;
 use App\Models\UjianSoal;
 use App\Models\UjianSetting;
 use Illuminate\Http\Request;
@@ -768,5 +772,454 @@ class UjianController extends Controller
                 'total' => $paginated->total(),
             ],
         ]);
+    }
+
+    // ── Dosen: CRUD Ujian ──────────────────────────────────────────────────────
+
+    public function index(Request $request)
+    {
+        $authUser = $request->user();
+        $search   = $request->query('search', '');
+        $perPage  = (int) $request->query('per_page', 10);
+        $now      = now();
+
+        $query = Ujian::with(['mataKuliah', 'ujianSetting'])
+            ->withCount(['ujianSoal', 'pesertaUjian'])
+            ->where('created_by', $authUser->id)
+            ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']))
+            ->orderBy('start_date', 'desc');
+
+        $paginated = $query->paginate($perPage);
+
+        $data = collect($paginated->items())->map(fn($u) => [
+            'id'             => $u->id,
+            'nama_ujian'     => $u->nama_ujian,
+            'mata_kuliah'    => $u->mataKuliah?->nama,
+            'mata_kuliah_id' => $u->mata_kuliah_id,
+            'start_date'     => $u->start_date,
+            'end_date'       => $u->end_date,
+            'durasi_menit'   => $u->durasi_menit,
+            'jumlah_soal'    => $u->ujian_soal_count,
+            'jumlah_peserta' => $u->peserta_ujian_count,
+            'passing_grade'  => $u->ujianSetting?->passing_grade,
+            'kode_akses'     => $u->kode_akses,
+            'is_kode_aktif'  => $u->is_kode_aktif,
+            'status'         => match(true) {
+                $u->end_date && $now->gt($u->end_date)     => 'selesai',
+                $u->start_date && $now->gte($u->start_date) => 'berlangsung',
+                default                                     => 'belum_mulai',
+            },
+        ]);
+
+        return response()->json([
+            'message' => 'Daftar ujian berhasil diambil!',
+            'data'    => $data,
+            'meta'    => [
+                'current_page' => $paginated->currentPage(),
+                'last_page'    => $paginated->lastPage(),
+                'per_page'     => $paginated->perPage(),
+                'total'        => $paginated->total(),
+            ],
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $authUser = $request->user();
+
+        $request->validate([
+            'nama_ujian'     => 'required|string|max:255',
+            'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
+            'start_date'     => 'required|date',
+            'end_date'       => 'required|date|after:start_date',
+            'durasi_menit'   => 'required|integer|min:1',
+            'kode_akses'     => 'nullable|string|max:50',
+            'is_kode_aktif'  => 'boolean',
+            'randomize_soal' => 'boolean',
+            'max_attempt'    => 'integer|min:1',
+            'passing_grade'  => 'nullable|numeric|min:0|max:100',
+        ], [
+            'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai!',
+        ]);
+
+        $ujian = Ujian::create([
+            'created_by'     => $authUser->id,
+            'mata_kuliah_id' => $request->mata_kuliah_id,
+            'nama_ujian'     => $request->nama_ujian,
+            'jenis_ujian'    => 'perkuliahan',
+            'start_date'     => $request->start_date,
+            'end_date'       => $request->end_date,
+            'durasi_menit'   => $request->durasi_menit,
+            'kode_akses'     => $request->kode_akses,
+            'is_kode_aktif'  => $request->boolean('is_kode_aktif', false),
+        ]);
+
+        UjianSetting::create([
+            'ujian_id'        => $ujian->id,
+            'randomize_soal'  => $request->boolean('randomize_soal', false),
+            'max_attempt'     => $request->input('max_attempt', 1),
+            'passing_grade'   => $request->input('passing_grade', 60),
+            'proctoring_aktif' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Ujian berhasil dibuat!',
+            'data'    => ['id' => $ujian->id],
+        ], 201);
+    }
+
+    public function show(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::with(['mataKuliah', 'ujianSetting'])
+            ->where('created_by', $authUser->id)
+            ->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Detail ujian berhasil diambil!',
+            'data'    => [
+                'id'              => $ujian->id,
+                'nama_ujian'      => $ujian->nama_ujian,
+                'mata_kuliah_id'  => $ujian->mata_kuliah_id,
+                'mata_kuliah'     => $ujian->mataKuliah?->nama,
+                'start_date'      => $ujian->start_date,
+                'end_date'        => $ujian->end_date,
+                'durasi_menit'    => $ujian->durasi_menit,
+                'kode_akses'      => $ujian->kode_akses,
+                'is_kode_aktif'   => $ujian->is_kode_aktif,
+                'randomize_soal'  => $ujian->ujianSetting?->randomize_soal ?? false,
+                'max_attempt'     => $ujian->ujianSetting?->max_attempt ?? 1,
+                'passing_grade'   => $ujian->ujianSetting?->passing_grade ?? 60,
+            ],
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $request->validate([
+            'nama_ujian'     => 'sometimes|string|max:255',
+            'mata_kuliah_id' => 'sometimes|exists:mata_kuliah,id',
+            'start_date'     => 'sometimes|date',
+            'end_date'       => 'sometimes|date|after:start_date',
+            'durasi_menit'   => 'sometimes|integer|min:1',
+            'kode_akses'     => 'nullable|string|max:50',
+            'is_kode_aktif'  => 'boolean',
+            'randomize_soal' => 'boolean',
+            'max_attempt'    => 'integer|min:1',
+            'passing_grade'  => 'nullable|numeric|min:0|max:100',
+        ], [
+            'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai!',
+        ]);
+
+        $ujian->update($request->only([
+            'nama_ujian', 'mata_kuliah_id', 'start_date', 'end_date',
+            'durasi_menit', 'kode_akses', 'is_kode_aktif',
+        ]));
+
+        UjianSetting::updateOrCreate(
+            ['ujian_id' => $ujian->id],
+            array_filter([
+                'randomize_soal'  => $request->has('randomize_soal') ? $request->boolean('randomize_soal') : null,
+                'max_attempt'     => $request->input('max_attempt'),
+                'passing_grade'   => $request->input('passing_grade'),
+            ], fn($v) => $v !== null)
+        );
+
+        return response()->json(['message' => 'Ujian berhasil diupdate!']);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $ujian = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $aktif = $ujian->pesertaUjian()
+            ->whereIn('status', ['sedang_berlangsung', 'selesai'])
+            ->exists();
+
+        if ($aktif) {
+            return response()->json([
+                'message' => 'Ujian tidak bisa dihapus karena sudah ada peserta yang mengikuti.',
+            ], 422);
+        }
+
+        $ujian->delete();
+
+        return response()->json(['message' => 'Ujian berhasil dihapus!']);
+    }
+
+    // ── Dosen: Manajemen Soal Ujian ────────────────────────────────────────────
+
+    public function getSoal(Request $request, $id)
+    {
+        $authUser = $request->user();
+        $ujian    = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $soalList = UjianSoal::with([
+                'soal.jenisSoal',
+                'soal.bab:id,nama_bab',
+                'soal.bankSoal:id,nama',
+            ])
+            ->where('ujian_id', $ujian->id)
+            ->orderBy('urutan')
+            ->get()
+            ->map(fn($us) => [
+                'ujian_soal_id'     => $us->id,
+                'soal_id'           => $us->soal_id,
+                'urutan'            => $us->urutan,
+                'bobot'             => $us->bobot,
+                'deskripsi'         => $us->soal?->deskripsi,
+                'bab'               => $us->soal?->bab?->nama_bab,
+                'jenis_soal'        => $us->soal?->jenisSoal->first()?->jenis_soal,
+                'tingkat_kesulitan' => $us->soal?->tingkat_kesulitan,
+                'dari_bank_soal'    => $us->soal?->bankSoal?->nama,
+            ]);
+
+        return response()->json([
+            'message' => 'Daftar soal ujian berhasil diambil!',
+            'ujian'   => [
+                'id'             => $ujian->id,
+                'nama_ujian'     => $ujian->nama_ujian,
+                'mata_kuliah_id' => $ujian->mata_kuliah_id,
+            ],
+            'data'    => $soalList,
+        ]);
+    }
+
+    public function availableSoal(Request $request, $id)
+    {
+        $authUser = $request->user();
+        $ujian    = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $existingSoalIds = UjianSoal::where('ujian_id', $ujian->id)->pluck('soal_id');
+
+        $query = Soal::with(['jenisSoal', 'bab:id,nama_bab', 'bankSoal:id,nama'])
+            ->where('mata_kuliah_id', $ujian->mata_kuliah_id)
+            ->whereNotIn('id', $existingSoalIds)
+            ->whereHas('bankSoal', fn($bq) => $bq
+                ->where('created_by', $authUser->id)
+                ->orWhereHas('sharedUsers', fn($sq) => $sq->where('user_id', $authUser->id))
+                ->orWhere('permission', 'public')
+            );
+
+        if ($request->bab_id) {
+            $query->where('bab_id', $request->bab_id);
+        }
+
+        if ($request->search) {
+            $query->whereRaw('LOWER(deskripsi) LIKE ?', ['%' . strtolower($request->search) . '%']);
+        }
+
+        $perPage  = (int) $request->query('per_page', 20);
+        $paginated = $query->orderBy('created_at', 'asc')->paginate($perPage);
+
+        $data = collect($paginated->items())->map(fn($s) => [
+            'id'                => $s->id,
+            'deskripsi'         => $s->deskripsi,
+            'bab'               => $s->bab?->nama_bab,
+            'bab_id'            => $s->bab_id,
+            'jenis_soal'        => $s->jenisSoal->first()?->jenis_soal,
+            'tingkat_kesulitan' => $s->tingkat_kesulitan,
+            'bank_soal'         => $s->bankSoal?->nama,
+        ]);
+
+        return response()->json([
+            'message' => 'Soal tersedia berhasil diambil!',
+            'data'    => $data,
+            'meta'    => [
+                'current_page' => $paginated->currentPage(),
+                'last_page'    => $paginated->lastPage(),
+                'per_page'     => $paginated->perPage(),
+                'total'        => $paginated->total(),
+            ],
+        ]);
+    }
+
+    public function addSoal(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $request->validate([
+            'soal_ids'   => 'required|array|min:1',
+            'soal_ids.*' => 'required|integer|exists:soal,id',
+        ]);
+
+        $ujian = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $existingSoalIds = UjianSoal::where('ujian_id', $ujian->id)->pluck('soal_id')->toArray();
+        $nextUrutan      = UjianSoal::where('ujian_id', $ujian->id)->max('urutan') ?? 0;
+
+        $added = 0;
+        foreach ($request->soal_ids as $soalId) {
+            if (in_array($soalId, $existingSoalIds)) continue;
+
+            $nextUrutan++;
+            UjianSoal::create([
+                'ujian_id' => $ujian->id,
+                'soal_id'  => $soalId,
+                'bobot'    => 1.0,
+                'urutan'   => $nextUrutan,
+            ]);
+            $added++;
+        }
+
+        return response()->json([
+            'message' => "$added soal berhasil ditambahkan ke ujian!",
+        ]);
+    }
+
+    public function addSoalRandom(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $request->validate([
+            'bab_id'       => 'nullable|integer|exists:bab,id',
+            'bank_soal_id' => 'nullable|integer|exists:bank_soal,id',
+            'jumlah'       => 'required|integer|min:1|max:200',
+        ]);
+
+        $ujian = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $existingSoalIds = UjianSoal::where('ujian_id', $ujian->id)->pluck('soal_id');
+
+        $query = Soal::where('mata_kuliah_id', $ujian->mata_kuliah_id)
+            ->whereNotIn('id', $existingSoalIds)
+            ->whereHas('bankSoal', fn($bq) => $bq
+                ->where('created_by', $authUser->id)
+                ->orWhereHas('sharedUsers', fn($sq) => $sq->where('user_id', $authUser->id))
+                ->orWhere('permission', 'public')
+            );
+
+        if ($request->bab_id) {
+            $query->where('bab_id', $request->bab_id);
+        }
+
+        if ($request->bank_soal_id) {
+            $query->where('bank_soal_id', $request->bank_soal_id);
+        }
+
+        $soalIds = $query->inRandomOrder()->limit($request->jumlah)->pluck('id');
+
+        if ($soalIds->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada soal tersedia untuk kriteria tersebut.'], 422);
+        }
+
+        $nextUrutan = UjianSoal::where('ujian_id', $ujian->id)->max('urutan') ?? 0;
+
+        foreach ($soalIds as $soalId) {
+            $nextUrutan++;
+            UjianSoal::create([
+                'ujian_id' => $ujian->id,
+                'soal_id'  => $soalId,
+                'bobot'    => 1.0,
+                'urutan'   => $nextUrutan,
+            ]);
+        }
+
+        return response()->json([
+            'message' => "{$soalIds->count()} soal acak berhasil ditambahkan ke ujian!",
+        ]);
+    }
+
+    public function buatSoal(Request $request, $id)
+    {
+        $authUser = $request->user();
+
+        $request->validate([
+            'jenis_soal'          => 'required|in:pilihan_ganda,essay,checklist',
+            'tingkat_kesulitan'   => 'required|in:mudah,sedang,sulit',
+            'deskripsi'           => 'required|string',
+            'bab_id'              => 'nullable|integer|exists:bab,id',
+            'opsi'                => 'nullable|array',
+            'kunci'               => 'nullable',
+            'simpan_ke_bank_soal' => 'boolean',
+            'bank_soal_id'        => 'nullable|integer|exists:bank_soal,id',
+            'bobot'               => 'nullable|numeric|min:0',
+        ]);
+
+        $ujian = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $bankSoalId = null;
+
+        if ($request->boolean('simpan_ke_bank_soal')) {
+            $request->validate([
+                'bank_soal_id' => 'required|integer|exists:bank_soal,id',
+            ]);
+
+            // Pastikan bank soal milik dosen ini
+            $bankSoal   = BankSoal::where('id', $request->bank_soal_id)
+                ->where('created_by', $authUser->id)
+                ->firstOrFail();
+            $bankSoalId = $bankSoal->id;
+        }
+
+        $soal = Soal::create([
+            'bank_soal_id'      => $bankSoalId,
+            'mata_kuliah_id'    => $ujian->mata_kuliah_id,
+            'bab_id'            => $request->bab_id,
+            'deskripsi'         => $request->deskripsi,
+            'tingkat_kesulitan' => $request->tingkat_kesulitan,
+            'ai_generated'      => false,
+        ]);
+
+        $jenisSoal = JenisSoal::create([
+            'soal_id'    => $soal->id,
+            'jenis_soal' => $request->jenis_soal,
+        ]);
+
+        if (!empty($request->opsi) && !empty($request->kunci)) {
+            $kunci = $request->kunci;
+            foreach ($request->opsi as $huruf => $teks) {
+                $isCorrect = is_array($kunci)
+                    ? in_array($huruf, $kunci)
+                    : $huruf === $kunci;
+
+                OpsiJawaban::create([
+                    'jenis_soal_id' => $jenisSoal->id,
+                    'opsi'          => $huruf,
+                    'teks'          => $teks,
+                    'is_correct'    => $isCorrect,
+                ]);
+            }
+        }
+
+        $nextUrutan = (UjianSoal::where('ujian_id', $ujian->id)->max('urutan') ?? 0) + 1;
+
+        UjianSoal::create([
+            'ujian_id' => $ujian->id,
+            'soal_id'  => $soal->id,
+            'bobot'    => $request->input('bobot', 1.0),
+            'urutan'   => $nextUrutan,
+        ]);
+
+        return response()->json([
+            'message' => 'Soal berhasil dibuat dan ditambahkan ke ujian!',
+        ], 201);
+    }
+
+    public function removeSoal(Request $request, $id, $ujianSoalId)
+    {
+        $authUser = $request->user();
+        $ujian    = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+
+        $ujianSoal = UjianSoal::where('ujian_id', $ujian->id)
+            ->where('id', $ujianSoalId)
+            ->firstOrFail();
+
+        $removedUrutan = $ujianSoal->urutan;
+        $ujianSoal->delete();
+
+        // Geser urutan soal di bawahnya
+        UjianSoal::where('ujian_id', $ujian->id)
+            ->where('urutan', '>', $removedUrutan)
+            ->decrement('urutan');
+
+        return response()->json(['message' => 'Soal berhasil dihapus dari ujian!']);
     }
 }

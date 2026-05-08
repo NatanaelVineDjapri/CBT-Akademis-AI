@@ -56,7 +56,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
         Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
         Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
-        Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']); 
+        Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']);
     });
     Route::prefix('bank-soal')->group(function () {
         Route::get('/global', [BankSoalController::class, 'global']);
@@ -66,14 +66,14 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
     });
 
     Route::middleware('role:admin_akademis_ai')->group(function () {
-        Route::get('/settings/maintenance',  [SettingsController::class, 'getMaintenanceStatus']);
+        Route::get('/settings/maintenance', [SettingsController::class, 'getMaintenanceStatus']);
         Route::post('/settings/maintenance', [SettingsController::class, 'toggleMaintenance']);
 
-        Route::get('/dashboard/admin-akademis',                        [DashboardController::class, 'adminAkademis']);
-        Route::get('/dashboard/admin-akademis/distribusi-pengguna',   [DashboardController::class, 'adminAkademisDistribusiPengguna']);
-        Route::get('/dashboard/admin-akademis/aktivitas-ujian',       [DashboardController::class, 'adminAkademisAktivitasUjian']);
-        Route::get('/dashboard/admin-akademis/kelulusan',             [DashboardController::class, 'adminAkademisKelulusan']);
-        Route::get('/dashboard/admin-akademis/tren-nilai',            [DashboardController::class, 'adminAkademisTrenNilai']);
+        Route::get('/dashboard/admin-akademis', [DashboardController::class, 'adminAkademis']);
+        Route::get('/dashboard/admin-akademis/distribusi-pengguna', [DashboardController::class, 'adminAkademisDistribusiPengguna']);
+        Route::get('/dashboard/admin-akademis/aktivitas-ujian', [DashboardController::class, 'adminAkademisAktivitasUjian']);
+        Route::get('/dashboard/admin-akademis/kelulusan', [DashboardController::class, 'adminAkademisKelulusan']);
+        Route::get('/dashboard/admin-akademis/tren-nilai', [DashboardController::class, 'adminAkademisTrenNilai']);
         Route::get('/dashboard/admin-akademis/pertumbuhan-pengguna', [DashboardController::class, 'adminAkademisPertumbuhanPengguna']);
 
         Route::prefix('universitas')->group(function () {
@@ -114,15 +114,15 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
 
     Route::middleware('role:admin_universitas')->group(function () {
         Route::get('/dashboard/admin-universitas', [DashboardController::class, 'adminUniversitas']);
-        Route::get('/dashboard/admin-universitas/performa',   [DashboardController::class, 'adminUniversitasPerforma']);
-        Route::get('/dashboard/admin-universitas/distribusi',        [DashboardController::class, 'adminUniversitasDistribusi']);
-        Route::get('/dashboard/admin-universitas/performa-prodi',   [DashboardController::class, 'adminUniversitasPerformaProdi']);
-        Route::get('/dashboard/admin-universitas/aktivitas-ujian',  [DashboardController::class, 'adminUniversitasAktivitasUjian']);
-        Route::get('/dashboard/admin-universitas/kelulusan',        [DashboardController::class, 'adminUniversitasKelulusan']);
-        Route::get('/dashboard/admin-universitas/tren-nilai',       [DashboardController::class, 'adminUniversitasTrenNilai']);
+        Route::get('/dashboard/admin-universitas/performa', [DashboardController::class, 'adminUniversitasPerforma']);
+        Route::get('/dashboard/admin-universitas/distribusi', [DashboardController::class, 'adminUniversitasDistribusi']);
+        Route::get('/dashboard/admin-universitas/performa-prodi', [DashboardController::class, 'adminUniversitasPerformaProdi']);
+        Route::get('/dashboard/admin-universitas/aktivitas-ujian', [DashboardController::class, 'adminUniversitasAktivitasUjian']);
+        Route::get('/dashboard/admin-universitas/kelulusan', [DashboardController::class, 'adminUniversitasKelulusan']);
+        Route::get('/dashboard/admin-universitas/tren-nilai', [DashboardController::class, 'adminUniversitasTrenNilai']);
 
-        Route::get('/audit',                    [AuditController::class, 'index']);
-        Route::get('/audit/{model}/{id}',       [AuditController::class, 'show']);
+        Route::get('/audit', [AuditController::class, 'index']);
+        Route::get('/audit/{model}/{id}', [AuditController::class, 'show']);
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
@@ -149,8 +149,8 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
 
         Route::prefix('pmb/penerimaan')->group(function () {
             Route::get('/statistik', [PmbPenerimaanController::class, 'statistik']);
-            Route::get('/peserta',   [PmbPenerimaanController::class, 'index']);
-            Route::post('/proses',   [PmbPenerimaanController::class, 'proses']);
+            Route::get('/peserta', [PmbPenerimaanController::class, 'index']);
+            Route::post('/proses', [PmbPenerimaanController::class, 'proses']);
         });
 
         Route::get('/ujian/admin-universitas/hasil', [UjianController::class, 'hasilUjianAdminUniversitas']);
@@ -166,12 +166,26 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/dashboard/dosen/performa', [DashboardController::class, 'dosenPerforma']);
         Route::get('/mata-kuliah/dosen', [MataKuliahController::class, 'dosenMataKuliah']);
         Route::get('/jadwal/dosen', [UjianController::class, 'jadwalDosen']);
+
         Route::get('/ujian/dosen/hasil', [UjianController::class, 'hasilUjianDosen']);
         Route::get('/ujian/dosen/hasil/{id}', [UjianController::class, 'detailUjianDosen']);
         Route::get('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}', [UjianController::class, 'detailPesertaUjianDosen']);
         Route::put('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}/periksa-essay', [UjianController::class, 'periksaEssay']);
         Route::put('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}/reset-essay', [UjianController::class, 'resetEssay']);
         Route::get('/ujian/dosen/hasil/{id}/export-pdf', [UjianController::class, 'exportPDF']);
+
+        Route::get('/ujian/dosen', [UjianController::class, 'index']);
+        Route::post('/ujian/dosen', [UjianController::class, 'store']);
+        Route::get('/ujian/dosen/{id}', [UjianController::class, 'show']);
+        Route::put('/ujian/dosen/{id}', [UjianController::class, 'update']);
+        Route::delete('/ujian/dosen/{id}', [UjianController::class, 'destroy']);
+
+        Route::get('/ujian/dosen/{id}/soal', [UjianController::class, 'getSoal']);
+        Route::get('/ujian/dosen/{id}/available-soal', [UjianController::class, 'availableSoal']);
+        Route::post('/ujian/dosen/{id}/soal', [UjianController::class, 'addSoal']);
+        Route::post('/ujian/dosen/{id}/soal/random', [UjianController::class, 'addSoalRandom']);
+        Route::post('/ujian/dosen/{id}/soal/buat-baru', [UjianController::class, 'buatSoal']);
+        Route::delete('/ujian/dosen/{id}/soal/{ujianSoalId}', [UjianController::class, 'removeSoal']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {
