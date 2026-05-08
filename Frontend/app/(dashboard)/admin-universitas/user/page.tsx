@@ -2,11 +2,148 @@
 
 import useSWR, { preload } from "swr";
 import Link from "next/link";
-import { GraduationCap, Users, BookOpen } from "lucide-react";
+import { GraduationCap, Users, BookOpen, Download, X, Loader2 } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import EmptyState from "@/components/EmptyState";
 import { useUser } from "@/context/UserContext";
-import { getFakultas, getProdi, type FakultasItem } from "@/services/AdminUserServices";
+import { useState } from "react";
+import { getFakultas, getProdi, exportAdminUsers, type FakultasItem, type ProdiItem } from "@/services/AdminUserServices";
+
+const COLUMN_OPTIONS = [
+  { key: "nama",        label: "Nama" },
+  { key: "email",       label: "Email" },
+  { key: "role",        label: "Role" },
+  { key: "nim",         label: "NIM" },
+  { key: "nidn",        label: "NIDN" },
+  { key: "prodi",       label: "Program Studi" },
+  { key: "tahun_masuk", label: "Angkatan" },
+  { key: "no_telp",     label: "No. Telepon" },
+  { key: "alamat",      label: "Alamat" },
+];
+
+const ROLE_OPTIONS = [
+  { value: "",                          label: "Semua Role" },
+  { value: "mahasiswa",                 label: "Mahasiswa" },
+  { value: "dosen",                     label: "Dosen" },
+  { value: "peserta_mahasiswa_baru",    label: "Peserta PMB" },
+  { value: "admin_universitas",         label: "Admin Universitas" },
+];
+
+function ExportModal({ onClose }: { onClose: () => void }) {
+  const [role, setRole] = useState("");
+  const [tahunDari, setTahunDari] = useState("");
+  const [tahunSampai, setTahunSampai] = useState("");
+  const [prodiId, setProdiId] = useState("");
+  const [columns, setColumns] = useState<string[]>(["nama", "email", "role", "nim", "nidn", "prodi", "tahun_masuk"]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const { data: prodiData } = useSWR("/prodi/all", () => getProdi({ per_page: 500 }), { revalidateOnFocus: false });
+  const prodiList: ProdiItem[] = prodiData?.data ?? [];
+
+  const toggleColumn = (key: string) => {
+    setColumns(prev => prev.includes(key) ? prev.filter(c => c !== key) : [...prev, key]);
+  };
+
+  const handleExport = async () => {
+    if (columns.length === 0) { setError("Pilih minimal 1 kolom."); return; }
+    setLoading(true);
+    setError("");
+    try {
+      const blob = await exportAdminUsers({
+        role: role || undefined,
+        tahun_dari: tahunDari || undefined,
+        tahun_sampai: tahunSampai || undefined,
+        prodi_id: prodiId ? Number(prodiId) : undefined,
+        columns,
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `data-user-${new Date().toISOString().slice(0,10)}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      onClose();
+    } catch {
+      setError("Gagal export. Coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)]";
+  const labelClass = "text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between px-6 py-4 rounded-t-2xl shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
+          <h3 className="text-base font-bold text-white">Export Data User</h3>
+          <button onClick={onClose} className="text-white/70 hover:text-white cursor-pointer"><X className="w-5 h-5" /></button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 p-6 space-y-4">
+          <div>
+            <label className={labelClass}>Role</label>
+            <select value={role} onChange={e => setRole(e.target.value)} className={inputClass}>
+              {ROLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className={labelClass}>Angkatan (Tahun Masuk)</label>
+            <div className="grid grid-cols-2 gap-2">
+              <input type="number" value={tahunDari} onChange={e => setTahunDari(e.target.value)}
+                className={inputClass} placeholder="Dari (2021)" min={2000} max={2099} />
+              <input type="number" value={tahunSampai} onChange={e => setTahunSampai(e.target.value)}
+                className={inputClass} placeholder="Sampai (2024)" min={2000} max={2099} />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Program Studi</label>
+            <select value={prodiId} onChange={e => setProdiId(e.target.value)} className={inputClass}>
+              <option value="">Semua Prodi</option>
+              {prodiList.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className={labelClass}>Kolom yang Di-export</label>
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              {COLUMN_OPTIONS.map(col => (
+                <label key={col.key} className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={columns.includes(col.key)}
+                    onChange={() => toggleColumn(col.key)}
+                    className="accent-[var(--color-primary)] w-4 h-4"
+                  />
+                  <span className="text-sm text-gray-700">{col.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {error && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+        </div>
+
+        <div className="shrink-0 px-6 py-4 border-t border-gray-100 flex gap-3">
+          <button onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">
+            Batal
+          </button>
+          <button onClick={handleExport} disabled={loading}
+            className="flex-1 text-white text-sm font-semibold py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            style={{ backgroundColor: "var(--color-primary)" }}>
+            {loading
+              ? <><Loader2 size={14} className="animate-spin" />Mengekspor...</>
+              : <><Download size={14} />Export Excel</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function FakultasCardSkeleton() {
   return (
@@ -76,6 +213,7 @@ function FakultasCard({ item, href }: { item: FakultasItem; href: string }) {
 
 export default function AdminUserFakultasPage() {
   const { user } = useUser();
+  const [showExport, setShowExport] = useState(false);
 
   const { data } = useSWR(
     user?.universitas_id ? ["/fakultas", user.universitas_id] : null,
@@ -91,11 +229,21 @@ export default function AdminUserFakultasPage() {
         <Breadcrumb />
       </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h2 className="text-base font-bold mb-1" style={{ color: "var(--color-primary)" }}>
-          Manajemen User
-        </h2>
-        <p className="text-xs text-gray-400">Pilih fakultas untuk melihat program studi dan daftar user.</p>
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-bold mb-1" style={{ color: "var(--color-primary)" }}>
+            Manajemen User
+          </h2>
+          <p className="text-xs text-gray-400">Pilih fakultas untuk melihat program studi dan daftar user.</p>
+        </div>
+        <button
+          onClick={() => setShowExport(true)}
+          className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap"
+          style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+        >
+          <Download size={15} />
+          Export
+        </button>
       </div>
 
       {!data ? (
@@ -117,6 +265,8 @@ export default function AdminUserFakultasPage() {
           ))}
         </div>
       )}
+
+      {showExport && <ExportModal onClose={() => setShowExport(false)} />}
     </div>
   );
 }

@@ -92,6 +92,7 @@ export const updateAdminUser = async (id: number, data: {
   nim?: string;
   nidn?: string;
   no_telp?: string;
+  alamat?: string;
   tahun_masuk?: number | string;
   prodi_id?: number;
 }): Promise<AdminUserItem> => {
@@ -101,6 +102,20 @@ export const updateAdminUser = async (id: number, data: {
 
 export const deleteAdminUser = async (id: number): Promise<void> => {
   await api.delete(`/users/${id}`);
+};
+
+export const exportAdminUsers = async (params: {
+  role?: string;
+  tahun_dari?: string;
+  tahun_sampai?: string;
+  prodi_id?: number;
+  columns?: string[];
+}): Promise<Blob> => {
+  const res = await api.get("/users/export-excel", {
+    params: { ...params, columns: params.columns?.join(",") },
+    responseType: "blob",
+  });
+  return res.data;
 };
 
 export const importAdminUsers = async (data: FormData): Promise<{ gagal: { baris: number; kolom: string; error: string }[] }> => {

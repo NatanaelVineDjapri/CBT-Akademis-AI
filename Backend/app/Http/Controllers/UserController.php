@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Imports\UsersImport;
+use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
@@ -109,10 +110,14 @@ class UserController extends Controller
         $user = User::when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
             ->findOrFail($id);
 
+        $allowedRoles = $authUser->role === 'admin_akademis_ai'
+            ? 'admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru'
+            : 'dosen,mahasiswa,peserta_mahasiswa_baru';
+
         $request->validate([
             'nama' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
-            'role' => 'sometimes|in:admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',
+            'role' => 'sometimes|in:' . $allowedRoles,
             'nim' => 'nullable|string',
             'nidn' => 'nullable|string',
             'no_telp' => 'nullable|string',
@@ -216,6 +221,46 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    public function exportExcel(Request $request)
+    {
+        $authUser = $request->user();
+
+        $columns  = $this->resolveColumns($request);
+        $users    = $this->fetchUsersForExport($request, $authUser);
+        $filename = 'data-user-' . now()->format('Ymd-His') . '.xlsx';
+
+        return Excel::download(new UsersExport(collect($users), $columns), $filename);
+    }
+
+    private function resolveColumns(Request $request): array
+    {
+        $raw = $request->input('columns', 'nama,email,role,nim,nidn,prodi,tahun_masuk');
+        return is_array($raw) ? $raw : explode(',', $raw);
+    }
+
+    private function fetchUsersForExport(Request $request, $authUser): \Illuminate\Support\Collection
+    {
+        return User::with('prodi')
+            ->when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
+            ->when($request->role,        fn($q) => $q->where('role', $request->role))
+            ->when($request->tahun_dari,  fn($q) => $q->where('tahun_masuk', '>=', $request->tahun_dari))
+            ->when($request->tahun_sampai, fn($q) => $q->where('tahun_masuk', '<=', $request->tahun_sampai))
+            ->when($request->prodi_id,    fn($q) => $q->where('prodi_id', $request->prodi_id))
+            ->orderBy('nama')
+            ->get()
+            ->map(fn($u) => [
+                'nama'        => $u->nama,
+                'email'       => $u->email,
+                'role'        => $u->role,
+                'nim'         => $u->nim,
+                'nidn'        => $u->nidn,
+                'prodi'       => $u->prodi?->nama,
+                'tahun_masuk' => $u->tahun_masuk,
+                'no_telp'     => $u->no_telp,
+                'alamat'      => $u->alamat,
+            ]);
+    }
 
     public function destroy(Request $request, $id)
     {

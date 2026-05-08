@@ -21,7 +21,6 @@ use App\Http\Controllers\SettingsController;
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/login/2fa-verify', [AuthController::class, 'verifyLogin']);
-    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/verify-reset-token', [AuthController::class, 'verifyResetToken']);
@@ -107,6 +106,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
     });
 
     Route::middleware('role:admin_akademis_ai,admin_universitas')->group(function () {
+        Route::post('/auth/register', [AuthController::class, 'register']);
         Route::get('/universitas', [UniversitasController::class, 'index']);
         Route::get('/fakultas', [FakultasController::class, 'index']);
         Route::get('/prodi', [ProdiController::class, 'index']);
@@ -126,6 +126,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
 
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::get('/export-excel', [UserController::class, 'exportExcel']);
             Route::post('/', [UserController::class, 'store']);
             Route::get('/{id}', [UserController::class, 'show']);
             Route::put('/{id}', [UserController::class, 'updateByAdmin']);

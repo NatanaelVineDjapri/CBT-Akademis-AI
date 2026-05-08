@@ -17,11 +17,16 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        $authUser = $request->user();
+        $allowedRoles = $authUser->role === 'admin_akademis_ai'
+            ? 'admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru'
+            : 'dosen,mahasiswa,peserta_mahasiswa_baru';
+
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:admin_akademis_ai,admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',
+            'role' => 'required|in:' . $allowedRoles,
             'nim' => 'nullable|string',
             'nidn' => 'nullable|string',
             'no_telp' => 'nullable|string',

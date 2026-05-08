@@ -69,6 +69,7 @@ function UserFormModal({ mode, prodiId, item, onClose, onSaved }: UserFormModalP
   const [nim, setNim] = useState(item?.nim ?? "");
   const [nidn, setNidn] = useState(item?.nidn ?? "");
   const [noTelp, setNoTelp] = useState(item?.no_telp ?? "");
+  const [alamat, setAlamat] = useState(item?.alamat ?? "");
   const [tahunMasuk, setTahunMasuk] = useState(item?.tahun_masuk ? String(item.tahun_masuk) : "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -87,6 +88,7 @@ function UserFormModal({ mode, prodiId, item, onClose, onSaved }: UserFormModalP
         nim: nim.trim() || undefined,
         nidn: nidn.trim() || undefined,
         no_telp: noTelp.trim() || undefined,
+        alamat: alamat.trim() || undefined,
         tahun_masuk: tahunMasuk ? Number(tahunMasuk) : undefined,
         prodi_id: prodiId,
       };
@@ -115,11 +117,11 @@ function UserFormModal({ mode, prodiId, item, onClose, onSaved }: UserFormModalP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl flex flex-col max-h-[90vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
-          <h3 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
+        <div className="flex items-center justify-between px-6 py-4 rounded-t-2xl shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
+          <h3 className="text-base font-bold text-white">
             {mode === "create" ? "Tambah User" : "Edit User"}
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+          <button onClick={onClose} className="text-white/70 hover:text-white cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -167,16 +169,20 @@ function UserFormModal({ mode, prodiId, item, onClose, onSaved }: UserFormModalP
             <label className={labelClass}>No. Telepon</label>
             <input type="text" value={noTelp} onChange={e => setNoTelp(e.target.value)} className={inputClass} placeholder="08xxxxxxxxxx" />
           </div>
+          <div>
+            <label className={labelClass}>Alamat</label>
+            <textarea value={alamat} onChange={e => setAlamat(e.target.value)} className={inputClass} placeholder="Alamat lengkap" rows={2} />
+          </div>
 
           {error && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
         </div>
 
         <div className="shrink-0 px-6 py-4 border-t border-gray-100 flex gap-3">
-          <button onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer">
+          <button onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">
             Batal
           </button>
           <button onClick={handleSubmit} disabled={saving}
-            className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            className="flex-1 text-white text-sm font-semibold py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             style={{ backgroundColor: "var(--color-primary)" }}>
             {saving ? <><Loader2 size={14} className="animate-spin" /> Menyimpan...</> : "Simpan"}
           </button>
@@ -365,6 +371,7 @@ export default function AdminUserListPage({
         }} />
       </div>
 
+      <div className="flex-1">
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -438,7 +445,7 @@ export default function AdminUserListPage({
                   </tr>
                 ))
               ) : items.map((item, idx) => {
-                const no = ((meta?.current_page ?? 1) - 1) * 15 + idx + 1;
+                const no = ((meta?.current_page ?? 1) - 1) * (meta?.per_page ?? 10) + idx + 1;
                 const nimNidn = item.nim || item.nidn || "-";
                 return (
                   <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
@@ -468,6 +475,8 @@ export default function AdminUserListPage({
             <EmptyState message="Tidak ada user ditemukan." flat />
           )}
         </div>
+
+      </div>
       </div>
 
       {meta && meta.last_page > 1 && (
