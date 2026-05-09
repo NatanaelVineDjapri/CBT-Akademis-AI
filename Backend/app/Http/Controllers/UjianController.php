@@ -14,9 +14,18 @@ use App\Events\JawabanMasuk;
 use App\Models\UjianSoal;
 use App\Models\UjianSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UjianController extends Controller
 {
+    private function generateKodeAkses(): string
+    {
+        do {
+            $kode = strtoupper(Str::random(6));
+        } while (Ujian::where('kode_akses', $kode)->exists());
+        return $kode;
+    }
+
     public function ujianMahasiswa(Request $request)
     {
         PesertaUjian::autoExpire();
@@ -838,29 +847,82 @@ class UjianController extends Controller
             'randomize_soal' => 'boolean',
             'max_attempt'    => 'integer|min:1',
             'passing_grade'  => 'nullable|numeric|min:0|max:100',
+            'soal'                     => 'nullable|array',
+            'soal.*.soal_id'           => 'nullable|integer|exists:soal,id',
+            'soal.*.bobot'             => 'nullable|numeric|min:0',
+            'soal.*.deskripsi'         => 'nullable|string',
+            'soal.*.jenis_soal'        => 'nullable|in:pilihan_ganda,essay,checklist',
+            'soal.*.tingkat_kesulitan' => 'nullable|in:mudah,sedang,sulit',
+            'soal.*.bab_id'            => 'nullable|integer|exists:bab,id',
+            'soal.*.bank_soal_id'      => 'nullable|integer|exists:bank_soal,id',
+            'soal.*.opsi'              => 'nullable|array',
+            'soal.*.kunci'             => 'nullable',
         ], [
             'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai!',
         ]);
 
-        $ujian = Ujian::create([
-            'created_by'     => $authUser->id,
-            'mata_kuliah_id' => $request->mata_kuliah_id,
-            'nama_ujian'     => $request->nama_ujian,
-            'jenis_ujian'    => 'perkuliahan',
-            'start_date'     => $request->start_date,
-            'end_date'       => $request->end_date,
-            'durasi_menit'   => $request->durasi_menit,
-            'kode_akses'     => $request->kode_akses,
-            'is_kode_aktif'  => $request->boolean('is_kode_aktif', false),
-        ]);
+        \DB::transaction(function () use ($request, $authUser, &$ujian) {
+            $ujian = Ujian::create([
+                'created_by'     => $authUser->id,
+                'mata_kuliah_id' => $request->mata_kuliah_id,
+                'nama_ujian'     => $request->nama_ujian,
+                'jenis_ujian'    => 'perkuliahan',
+                'start_date'     => $request->start_date,
+                'end_date'       => $request->end_date,
+                'durasi_menit'   => $request->durasi_menit,
+                'kode_akses'     => $request->kode_akses ?? $this->generateKodeAkses(),
+                'is_kode_aktif'  => $request->boolean('is_kode_aktif', false),
+            ]);
 
-        UjianSetting::create([
-            'ujian_id'        => $ujian->id,
-            'randomize_soal'  => $request->boolean('randomize_soal', false),
-            'max_attempt'     => $request->input('max_attempt', 1),
-            'passing_grade'   => $request->input('passing_grade', 60),
-            'proctoring_aktif' => false,
-        ]);
+            UjianSetting::create([
+                'ujian_id'         => $ujian->id,
+                'randomize_soal'   => $request->boolean('randomize_soal', false),
+                'max_attempt'      => $request->input('max_attempt', 1),
+                'passing_grade'    => $request->input('passing_grade', 60),
+                'proctoring_aktif' => false,
+            ]);
+
+            foreach (($request->soal ?? []) as $i => $item) {
+                $soalId = $item['soal_id'] ?? null;
+
+                // Buat soal baru inline jika tidak ada soal_id
+                if (!$soalId && !empty($item['deskripsi'])) {
+                    $newSoal = Soal::create([
+                        'bank_soal_id'      => $item['bank_soal_id'] ?? null,
+                        'mata_kuliah_id'    => $ujian->mata_kuliah_id,
+                        'bab_id'            => $item['bab_id'] ?? null,
+                        'deskripsi'         => $item['deskripsi'],
+                        'tingkat_kesulitan' => $item['tingkat_kesulitan'] ?? 'sedang',
+                        'ai_generated'      => false,
+                    ]);
+                    $jenisSoal = JenisSoal::create([
+                        'soal_id'    => $newSoal->id,
+                        'jenis_soal' => $item['jenis_soal'] ?? 'essay',
+                    ]);
+                    if (!empty($item['opsi']) && !empty($item['kunci'])) {
+                        $kunci = $item['kunci'];
+                        foreach ($item['opsi'] as $huruf => $teks) {
+                            OpsiJawaban::create([
+                                'jenis_soal_id' => $jenisSoal->id,
+                                'opsi'          => $huruf,
+                                'teks'          => $teks,
+                                'is_correct'    => is_array($kunci) ? in_array($huruf, $kunci) : $huruf === $kunci,
+                            ]);
+                        }
+                    }
+                    $soalId = $newSoal->id;
+                }
+
+                if ($soalId) {
+                    UjianSoal::create([
+                        'ujian_id' => $ujian->id,
+                        'soal_id'  => $soalId,
+                        'bobot'    => $item['bobot'] ?? 1.0,
+                        'urutan'   => $i + 1,
+                    ]);
+                }
+            }
+        });
 
         return response()->json([
             'message' => 'Ujian berhasil dibuat!',
@@ -924,9 +986,9 @@ class UjianController extends Controller
         UjianSetting::updateOrCreate(
             ['ujian_id' => $ujian->id],
             array_filter([
-                'randomize_soal'  => $request->has('randomize_soal') ? $request->boolean('randomize_soal') : null,
-                'max_attempt'     => $request->input('max_attempt'),
-                'passing_grade'   => $request->input('passing_grade'),
+                'randomize_soal' => $request->has('randomize_soal') ? $request->boolean('randomize_soal') : null,
+                'max_attempt'    => $request->input('max_attempt'),
+                'passing_grade'  => $request->input('passing_grade'),
             ], fn($v) => $v !== null)
         );
 
@@ -995,13 +1057,22 @@ class UjianController extends Controller
     public function availableSoal(Request $request, $id)
     {
         $authUser = $request->user();
-        $ujian    = Ujian::where('created_by', $authUser->id)->findOrFail($id);
 
-        $existingSoalIds = UjianSoal::where('ujian_id', $ujian->id)->pluck('soal_id');
+        // Create mode: mata_kuliah_id passed directly, skip ujian lookup
+        if ($request->has('mata_kuliah_id')) {
+            $matkulId   = (int) $request->query('mata_kuliah_id');
+            $excludeIds = $request->query('exclude_ids')
+                ? array_map('intval', explode(',', $request->query('exclude_ids')))
+                : [];
+        } else {
+            $ujian      = Ujian::where('created_by', $authUser->id)->findOrFail($id);
+            $matkulId   = $ujian->mata_kuliah_id;
+            $excludeIds = UjianSoal::where('ujian_id', $ujian->id)->pluck('soal_id')->toArray();
+        }
 
         $query = Soal::with(['jenisSoal', 'bab:id,nama_bab', 'bankSoal:id,nama'])
-            ->where('mata_kuliah_id', $ujian->mata_kuliah_id)
-            ->whereNotIn('id', $existingSoalIds)
+            ->where('mata_kuliah_id', $matkulId)
+            ->whereNotIn('id', $excludeIds)
             ->whereHas('bankSoal', fn($bq) => $bq
                 ->where('created_by', $authUser->id)
                 ->orWhereHas('sharedUsers', fn($sq) => $sq->where('user_id', $authUser->id))
@@ -1010,6 +1081,10 @@ class UjianController extends Controller
 
         if ($request->bab_id) {
             $query->where('bab_id', $request->bab_id);
+        }
+
+        if ($request->bank_soal_id) {
+            $query->where('bank_soal_id', $request->bank_soal_id);
         }
 
         if ($request->search) {
@@ -1222,4 +1297,5 @@ class UjianController extends Controller
 
         return response()->json(['message' => 'Soal berhasil dihapus dari ujian!']);
     }
+
 }
