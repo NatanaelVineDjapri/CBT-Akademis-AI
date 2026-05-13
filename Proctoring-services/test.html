@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proctoring Test</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f4f4f5;
+      color: #18181b;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header-left i { font-size: 20px; color: #71717a; }
+    .header-title { font-size: 16px; font-weight: 600; color: #18181b; }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pid-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #71717a;
+    }
+    .pid-wrap input {
+      width: 72px;
+      font-size: 13px;
+      padding: 5px 8px;
+      border: 1px solid #d4d4d8;
+      border-radius: 8px;
+      background: #fff;
+      color: #18181b;
+      outline: none;
+    }
+    .pid-wrap input:focus { border-color: #a1a1aa; }
+    .risk-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: 1px solid #d4d4d8;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 13px;
+      color: #71717a;
+    }
+    .risk-pill i { font-size: 14px; }
+    #risk {
+      font-size: 15px;
+      font-weight: 600;
+      color: #18181b;
+      min-width: 24px;
+      text-align: right;
+    }
+
+    /* Body grid */
+    .body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Camera panel */
+    .cam-panel {
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f4f4f5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #71717a;
+      font-weight: 500;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d4d4d8;
+      transition: background 0.3s;
+    }
+    .status-dot.live { background: #22c55e; box-shadow: 0 0 0 2px #dcfce7; }
+    #camStatus { font-size: 12px; color: #a1a1aa; }
+
+    .cam-body {
+      background: #111;
+      flex: 1;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .cam-body video { width: 100%; display: block; }
+    .cam-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: #555;
+      font-size: 13px;
+    }
+    .cam-placeholder i { font-size: 32px; }
+
+    .cam-footer {
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid #f4f4f5;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-family: inherit;
+      border-radius: 8px;
+      border: 1px solid #d4d4d8;
+      background: #fff;
+      color: #18181b;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn:hover { background: #f4f4f5; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn i { font-size: 14px; }
+    .btn-primary { background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
+    .btn-primary:hover { background: #0284c7; border-color: #0284c7; }
+    .btn-danger  { background: #ef4444; border-color: #ef4444; color: #fff; }
+    .btn-danger:hover  { background: #dc2626; border-color: #dc2626; }
+
+    /* Log panel */
+    .log-panel {
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .badge {
+      font-size: 11px;
+      background: #f4f4f5;
+      border: 1px solid #e4e4e7;
+      border-radius: 6px;
+      padding: 1px 7px;
+      color: #71717a;
+    }
+    .log-clear {
+      font-size: 12px;
+      color: #a1a1aa;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .log-clear:hover { color: #71717a; background: #f4f4f5; }
+
+    .log-body {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 220px;
+      max-height: 280px;
+      padding: 6px 0;
+    }
+    .log-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      line-height: 1.5;
+    }
+    .log-item:hover { background: #fafafa; }
+    .log-time { color: #a1a1aa; white-space: nowrap; flex-shrink: 0; }
+    .log-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+    .log-dot.ok   { background: #22c55e; }
+    .log-dot.warn { background: #f59e0b; }
+    .log-dot.err  { background: #ef4444; }
+    .log-dot.info { background: #60a5fa; }
+    .log-msg { color: #52525b; flex: 1; }
+    .log-msg.ok   { color: #16a34a; }
+    .log-msg.warn { color: #b45309; }
+    .log-msg.err  { color: #dc2626; }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 6px;
+      color: #a1a1aa;
+      font-size: 13px;
+      padding: 2rem;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .empty-state i { font-size: 28px; }
+
+    /* Stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .stat-label { font-size: 11px; color: #a1a1aa; margin-bottom: 4px; }
+    .stat-val   { font-size: 20px; font-weight: 600; color: #18181b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="header-left">
+        <i class="ti ti-shield-check"></i>
+        <span class="header-title">Proctoring Session</span>
+      </div>
+      <div class="header-right">
+        <div class="pid-wrap">
+          <label for="pid">ID Peserta</label>
+          <input id="pid" type="number" value="1" min="1" />
+        </div>
+        <div class="risk-pill">
+          <i class="ti ti-activity"></i>
+          Risk Score
+          <span id="risk">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <!-- Camera panel -->
+      <div class="cam-panel">
+        <div class="panel-header">
+          <span class="panel-label">
+            <span class="status-dot" id="dotCam"></span>
+            Kamera
+          </span>
+          <span id="camStatus">Belum aktif</span>
+        </div>
+        <div class="cam-body" id="camBox">
+          <div class="cam-placeholder" id="placeholder">
+            <i class="ti ti-camera-off"></i>
+            <span>Kamera belum dinyalakan</span>
+          </div>
+          <video id="video" autoplay muted playsinline style="display:none"></video>
+          <canvas id="canvas" style="display:none"></canvas>
+        </div>
+        <div class="cam-footer">
+          <button class="btn btn-primary" id="btnStart" onclick="startSession()">
+            <i class="ti ti-player-play"></i>
+            Mulai Sesi
+          </button>
+          <button class="btn btn-danger" id="btnEnd" onclick="endSession()" disabled>
+            <i class="ti ti-player-stop"></i>
+            Akhiri Sesi
+          </button>
+        </div>
+      </div>
+
+      <!-- Log panel -->
+      <div class="log-panel">
+        <div class="panel-header">
+          <span class="panel-label">
+            <i class="ti ti-list" style="font-size:14px"></i>
+            Log Aktivitas
+            <span class="badge" id="logCount">0</span>
+          </span>
+          <button class="log-clear" onclick="clearLog()">Hapus</button>
+        </div>
+        <div class="log-body" id="logBody">
+          <div class="empty-state" id="emptyState">
+            <i class="ti ti-clock-pause"></i>
+            <span>Menunggu sesi dimulai</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Event</div>
+        <div class="stat-val" id="statEvents">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Frame Dikirim</div>
+        <div class="stat-val" id="statFrames">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Status</div>
+        <div class="stat-val" id="statStatus" style="font-size:14px;padding-top:3px;color:#71717a;font-weight:500">Idle</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let ws, stream, interval;
+    let logCount = 0, frameCount = 0, eventCount = 0;
+
+    const video   = document.getElementById('video');
+    const canvas  = document.getElementById('canvas');
+    const logBody = document.getElementById('logBody');
+
+    function fmt(d) {
+      return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function addLog(msg, type = 'info') {
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+
+      logCount++;
+      document.getElementById('logCount').textContent = logCount;
+
+      const row = document.createElement('div');
+      row.className = 'log-item';
+      row.innerHTML = `
+        <span class="log-time">${fmt(new Date())}</span>
+        <span class="log-dot ${type}"></span>
+        <span class="log-msg ${type}">${msg}</span>
+      `;
+      logBody.appendChild(row);
+      logBody.scrollTop = logBody.scrollHeight;
+    }
+
+    function clearLog() {
+      logBody.innerHTML = `
+        <div class="empty-state" id="emptyState">
+          <i class="ti ti-clock-pause"></i>
+          <span>Menunggu sesi dimulai</span>
+        </div>`;
+      logCount = 0;
+      document.getElementById('logCount').textContent = '0';
+    }
+
+    async function startSession() {
+      const pid = document.getElementById('pid').value;
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        document.getElementById('placeholder').style.display = 'none';
+        document.getElementById('dotCam').classList.add('live');
+        document.getElementById('camStatus').textContent = 'Aktif';
+      } catch (e) {
+        addLog('Gagal mengakses kamera: ' + e.message, 'err');
+        return;
+      }
+
+      try {
+        ws = new WebSocket(`ws://localhost:8001/ws/proctoring/${pid}`);
+
+        ws.onopen = () => addLog('WebSocket terhubung', 'ok');
+
+        ws.onmessage = (evt) => {
+          try {
+            const data = JSON.parse(evt.data);
+            if (data.type === 'frame_result') {
+              document.getElementById('risk').textContent = data.risk_score ?? 0;
+              if (data.events && data.events.length > 0) {
+                data.events.forEach(e => {
+                  eventCount++;
+                  document.getElementById('statEvents').textContent = eventCount;
+                  addLog(`${e.type} — ${JSON.stringify(e.detail)}`, 'warn');
+                });
+              } else {
+                addLog(`Wajah terdeteksi: ${data.face_count ?? 1}`, 'ok');
+              }
+            }
+            if (data.type === 'session_ended') {
+              addLog(`Sesi selesai — total risk: ${data.summary?.risk_score}, event: ${data.summary?.total_events}`, 'info');
+            }
+          } catch (_) {}
+        };
+
+        ws.onerror = () => addLog('Koneksi WebSocket error', 'err');
+        ws.onclose = () => addLog('WebSocket terputus', 'info');
+
+      } catch (e) {
+        addLog('Tidak dapat terhubung ke server WebSocket', 'warn');
+      }
+
+      document.getElementById('btnStart').disabled = true;
+      document.getElementById('btnEnd').disabled   = false;
+      document.getElementById('statStatus').textContent = 'Berjalan';
+      document.getElementById('statStatus').style.color = '#16a34a';
+      addLog(`Sesi dimulai — peserta #${pid}`, 'ok');
+
+      interval = setInterval(() => {
+        if (ws && ws.readyState !== WebSocket.OPEN) return;
+        canvas.width  = video.videoWidth  || 640;
+        canvas.height = video.videoHeight || 480;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const frame = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ frame, timestamp: new Date().toISOString() }));
+        }
+        frameCount++;
+        document.getElementById('statFrames').textContent = frameCount;
+        addLog(`Frame #${frameCount} dikirim`, 'info');
+      }, 5000);
+    }
+
+    function endSession() {
+      clearInterval(interval);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: 'end_session' }));
+      }
+      stream?.getTracks().forEach(t => t.stop());
+      video.style.display = 'none';
+      document.getElementById('placeholder').style.display = 'flex';
+      document.getElementById('dotCam').classList.remove('live');
+      document.getElementById('camStatus').textContent = 'Selesai';
+      document.getElementById('btnStart').disabled = false;
+      document.getElementById('btnEnd').disabled   = true;
+      document.getElementById('statStatus').textContent = 'Selesai';
+      document.getElementById('statStatus').style.color = '#71717a';
+      addLog('Sesi diakhiri', 'info');
+    }
+  </script>
+</body>
+</html>

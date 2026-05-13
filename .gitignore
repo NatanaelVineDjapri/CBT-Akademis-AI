@@ -12,3 +12,8 @@ Frontend/node_modules/
 Frontend/dist/
 Frontend/.env
 Frontend/.env.local
+
+# Python
+Proctoring-services/venv/
+Proctoring-services/__pycache__/
+Proctoring-services/*.pyc

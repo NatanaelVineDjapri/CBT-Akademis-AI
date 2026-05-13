@@ -17,6 +17,9 @@ use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\PmbPenerimaanController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ProctoringController;
+
+Route::post('/proctoring/save', [ProctoringController::class, 'save']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);

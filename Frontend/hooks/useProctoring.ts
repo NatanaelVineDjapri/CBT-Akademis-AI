@@ -27,22 +27,20 @@ interface SessionEnded {
 }
  
 interface UseProctoringOptions {
-  examId: string;
-  userId: string;
+  pesertaUjianId: string | number;
   wsUrl?: string;
-  /** Interval kirim frame ke server (ms). Default 1000 */
+  /** Interval kirim frame ke server (ms). Default 5000 */
   captureInterval?: number;
   /** Callback tiap ada event kecurangan */
   onEvent?: (events: ProctoringEvent[], riskScore: number) => void;
   /** Callback saat sesi selesai dan summary sudah diterima dari server */
   onSessionEnded?: (summary: SessionEnded["summary"]) => void;
 }
- 
+
 export function useProctoring({
-  examId,
-  userId,
+  pesertaUjianId,
   wsUrl = "ws://localhost:8001",
-  captureInterval = 1000,
+  captureInterval = 5000,
   onEvent,
   onSessionEnded,
 }: UseProctoringOptions) {
@@ -83,7 +81,7 @@ export function useProctoring({
     (videoEl: HTMLVideoElement) => {
       startCamera(videoEl);
  
-      const ws = new WebSocket(`${wsUrl}/ws/proctoring/${examId}/${userId}`);
+      const ws = new WebSocket(`${wsUrl}/ws/proctoring/${pesertaUjianId}`);
       wsRef.current = ws;
  
       ws.onopen = () => {
@@ -106,7 +104,7 @@ export function useProctoring({
       ws.onerror = (err) => console.error("[Proctoring] WS error", err);
       ws.onclose = ()  => console.log("[Proctoring] WS closed");
     },
-    [examId, userId, wsUrl, captureInterval, startCamera, captureAndSend, onEvent, onSessionEnded]
+    [pesertaUjianId, wsUrl, captureInterval, startCamera, captureAndSend, onEvent, onSessionEnded]
   );
  
   // ── End session (panggil saat ujian selesai) ──────────────────────────────
