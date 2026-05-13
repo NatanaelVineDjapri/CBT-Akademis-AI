@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BankSoal;
 use App\Models\JenisSoal;
+use App\Models\MediaSoal;
 use App\Models\OpsiJawaban;
 use App\Models\Soal;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class SoalController extends Controller
             'bab_id'            => 'nullable|integer|exists:bab,id',
             'opsi'              => 'nullable|array',
             'kunci'             => 'nullable',
+            'gambar_url'        => 'nullable|url',
         ]);
 
         $bankSoal = BankSoal::findOrFail($request->bank_soal_id);
@@ -54,6 +56,14 @@ class SoalController extends Controller
             }
         }
 
+        if ($request->filled('gambar_url')) {
+            MediaSoal::create([
+                'soal_id'    => $soal->id,
+                'tipe_media' => 'gambar',
+                'url'        => $request->gambar_url,
+            ]);
+        }
+
         return response()->json(['message' => 'Soal berhasil disimpan.'], 201);
     }
 
@@ -66,6 +76,8 @@ class SoalController extends Controller
             'bab_id'            => 'nullable|integer|exists:bab,id',
             'opsi'              => 'nullable|array',
             'kunci'             => 'nullable',
+            'gambar_url'        => 'nullable|url',
+            'hapus_gambar'      => 'nullable|boolean',
         ]);
 
         $soal = Soal::findOrFail($id);
@@ -98,6 +110,17 @@ class SoalController extends Controller
                     'is_correct'    => $isCorrect,
                 ]);
             }
+        }
+
+        if ($request->filled('gambar_url')) {
+            $soal->mediaSoal()->where('tipe_media', 'gambar')->delete();
+            MediaSoal::create([
+                'soal_id'    => $soal->id,
+                'tipe_media' => 'gambar',
+                'url'        => $request->gambar_url,
+            ]);
+        } elseif ($request->boolean('hapus_gambar')) {
+            $soal->mediaSoal()->where('tipe_media', 'gambar')->delete();
         }
 
         return response()->json(['message' => 'Soal berhasil diupdate.']);

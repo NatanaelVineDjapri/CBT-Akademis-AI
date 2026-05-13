@@ -30,4 +30,26 @@ class UploadController extends Controller
             'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
         ]);
     }
+
+    public function soalSignature(Request $request)
+    {
+        $timestamp = time();
+
+        $params = [
+            'folder'    => 'soal',
+            'timestamp' => $timestamp,
+        ];
+
+        ksort($params);
+        $stringToSign = collect($params)->map(fn($v, $k) => "$k=$v")->implode('&');
+        $stringToSign .= env('CLOUDINARY_API_SECRET');
+
+        return response()->json([
+            'signature'  => sha1($stringToSign),
+            'timestamp'  => $timestamp,
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'folder'     => 'soal',
+        ]);
+    }
 }

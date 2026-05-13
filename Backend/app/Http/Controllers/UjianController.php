@@ -93,22 +93,39 @@ class UjianController extends Controller
             'jawaban' => 'required|string',
         ]);
 
-        // Ambil data peserta + user + ujian
         $peserta = PesertaUjian::with('user', 'ujian')->findOrFail($request->peserta_ujian_id);
 
-        // Pastikan yang submit adalah peserta yang login
         if ($peserta->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Simpan / update jawaban
+        // Auto-grade PG & checklist
+        $ujianSoal  = UjianSoal::with(['soal.jenisSoal.opsiJawaban'])->findOrFail($request->ujian_soal_id);
+        $jenisSoal  = $ujianSoal->soal?->jenisSoal->first();
+        $tipe       = $jenisSoal?->jenis_soal ?? 'essay';
+        $bobot      = (float) ($ujianSoal->bobot ?? 0);
+        $finalNilai = null;
+
+        if ($tipe === 'pilihan_ganda') {
+            $correct    = $jenisSoal->opsiJawaban->firstWhere('is_correct', true)?->opsi ?? '';
+            $finalNilai = strtoupper(trim($request->jawaban)) === strtoupper(trim($correct)) ? $bobot : 0.0;
+        } elseif ($tipe === 'checklist') {
+            $correctOpsi = $jenisSoal->opsiJawaban
+                ->where('is_correct', true)->pluck('opsi')
+                ->map(fn($o) => strtoupper(trim($o)))->sort()->values()->toArray();
+            $jawaban = collect(explode(',', $request->jawaban))
+                ->map(fn($s) => strtoupper(trim($s)))->sort()->values()->toArray();
+            $finalNilai = $jawaban === $correctOpsi ? $bobot : 0.0;
+        }
+
         JawabanPeserta::updateOrCreate(
             [
                 'peserta_ujian_id' => $request->peserta_ujian_id,
-                'ujian_soal_id' => $request->ujian_soal_id,
+                'ujian_soal_id'    => $request->ujian_soal_id,
             ],
             [
-                'jawaban' => $request->jawaban,
+                'jawaban'     => $request->jawaban,
+                'final_nilai' => $finalNilai,
             ]
         );
 
@@ -140,6 +157,61 @@ class UjianController extends Controller
             ]
         ]);
     }
+    public function selesaiUjian(Request $request)
+    {
+        $request->validate(['peserta_ujian_id' => 'required|exists:peserta_ujian,id']);
+
+        $peserta = PesertaUjian::with(['ujian.ujianSetting', 'ujian.gradeSetting', 'jawabanPeserta'])
+            ->findOrFail($request->peserta_ujian_id);
+
+        if ($peserta->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($peserta->status === 'selesai') {
+            return response()->json(['message' => 'Ujian sudah selesai.'], 422);
+        }
+
+        $peserta->update(['status' => 'selesai', 'selesai_at' => now()]);
+
+        $ujian      = $peserta->ujian;
+        $totalBobot = UjianSoal::where('ujian_id', $peserta->ujian_id)->sum('bobot');
+        $totalEarned = $peserta->jawabanPeserta->whereNotNull('final_nilai')->sum('final_nilai');
+        $nilaiTotal = $totalBobot > 0 ? round(($totalEarned / $totalBobot) * 100, 2) : 0;
+
+        $hasUngradedEssay = $peserta->jawabanPeserta->contains(fn($jwb) => $jwb->final_nilai === null);
+
+        $grade = null;
+        $lulus = false;
+        if (!$hasUngradedEssay) {
+            $passingGrade = $ujian->ujianSetting?->passing_grade;
+            $lulus        = $passingGrade !== null && $nilaiTotal >= $passingGrade;
+            foreach ($ujian->gradeSetting->sortByDesc('nilai_min') as $gs) {
+                if ($nilaiTotal >= $gs->nilai_min && $nilaiTotal <= $gs->nilai_max) {
+                    $grade = $gs->grade;
+                    break;
+                }
+            }
+        }
+
+        NilaiAkhir::updateOrCreate(
+            ['peserta_ujian_id' => $peserta->id],
+            [
+                'nilai_total' => $nilaiTotal,
+                'grade'       => $grade,
+                'lulus'       => $lulus,
+                'graded_at'   => $hasUngradedEssay ? null : now(),
+            ]
+        );
+
+        return response()->json([
+            'message'    => 'Ujian berhasil diselesaikan.',
+            'nilai_total' => $nilaiTotal,
+            'lulus'      => $lulus,
+            'grade'      => $grade,
+        ]);
+    }
+
     public function jadwalMahasiswa(Request $request)
     {
         $authUser = $request->user();
@@ -539,9 +611,11 @@ class UjianController extends Controller
 
         // Refresh jawaban setelah update
         $peserta->load('jawabanPeserta');
-        $totalNilai = $peserta->jawabanPeserta->sum('final_nilai');
 
-        // Hitung grade & lulus
+        $totalBobot  = UjianSoal::where('ujian_id', $ujianId)->sum('bobot');
+        $totalEarned = $peserta->jawabanPeserta->whereNotNull('final_nilai')->sum('final_nilai');
+        $totalNilai  = $totalBobot > 0 ? round(($totalEarned / $totalBobot) * 100, 2) : 0;
+
         $grade = null;
         $lulus = false;
         foreach ($ujian->gradeSetting->sortByDesc('nilai_min') as $gs) {
@@ -592,11 +666,11 @@ class UjianController extends Controller
             }
         }
 
-        // Recalculate nilai_akhir dari non-essay saja
-        $peserta->load('jawabanPeserta.ujianSoal.soal.jenisSoal');
-        $totalNilai = $peserta->jawabanPeserta
-            ->filter(fn($jwb) => $jwb->ujianSoal?->soal?->jenisSoal->first()?->jenis_soal !== 'essay')
-            ->sum('final_nilai');
+        // Recalculate nilai_akhir (essay = null → 0, normalisasi ke 100)
+        $peserta->load('jawabanPeserta');
+        $totalBobot  = UjianSoal::where('ujian_id', $ujianId)->sum('bobot');
+        $totalEarned = $peserta->jawabanPeserta->whereNotNull('final_nilai')->sum('final_nilai');
+        $totalNilai  = $totalBobot > 0 ? round(($totalEarned / $totalBobot) * 100, 2) : 0;
 
         $grade = null;
         foreach ($ujian->gradeSetting->sortByDesc('nilai_min') as $gs) {
@@ -749,7 +823,7 @@ class UjianController extends Controller
         $sortBy = $colMap[$request->query('sort_by', 'tanggal')] ?? 'nilai_akhir.graded_at';
         $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
 
-        $query = NilaiAkhir::with(['pesertaUjian.ujian'])
+        $query = NilaiAkhir::with(['pesertaUjian.ujian.mataKuliah'])
             ->join('peserta_ujian', 'nilai_akhir.peserta_ujian_id', '=', 'peserta_ujian.id')
             ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
             ->where('peserta_ujian.user_id', $authUser->id)
@@ -764,6 +838,7 @@ class UjianController extends Controller
         $data = collect($paginated->items())->map(fn($nilai) => [
             'id' => $nilai->id,
             'nama_ujian' => $nilai->pesertaUjian->ujian->nama_ujian ?? '-',
+            'mata_kuliah' => $nilai->pesertaUjian->ujian->mataKuliah->nama ?? null,
             'tanggal' => $nilai->graded_at?->format('d/m/y'),
             'pukul' => $nilai->graded_at?->format('H.i'),
             'nilai' => $nilai->nilai_total,
@@ -964,16 +1039,19 @@ class UjianController extends Controller
         $ujian = Ujian::where('created_by', $authUser->id)->findOrFail($id);
 
         $request->validate([
-            'nama_ujian'     => 'sometimes|string|max:255',
-            'mata_kuliah_id' => 'sometimes|exists:mata_kuliah,id',
-            'start_date'     => 'sometimes|date',
-            'end_date'       => 'sometimes|date|after:start_date',
-            'durasi_menit'   => 'sometimes|integer|min:1',
-            'kode_akses'     => 'nullable|string|max:50',
-            'is_kode_aktif'  => 'boolean',
-            'randomize_soal' => 'boolean',
-            'max_attempt'    => 'integer|min:1',
-            'passing_grade'  => 'nullable|numeric|min:0|max:100',
+            'nama_ujian'       => 'sometimes|string|max:255',
+            'mata_kuliah_id'   => 'sometimes|exists:mata_kuliah,id',
+            'start_date'       => 'sometimes|date',
+            'end_date'         => 'sometimes|date|after:start_date',
+            'durasi_menit'     => 'sometimes|integer|min:1',
+            'kode_akses'       => 'nullable|string|max:50',
+            'is_kode_aktif'    => 'boolean',
+            'randomize_soal'   => 'boolean',
+            'max_attempt'      => 'integer|min:1',
+            'passing_grade'    => 'nullable|numeric|min:0|max:100',
+            'soal_bobot'       => 'sometimes|array',
+            'soal_bobot.*.id'  => 'required|integer|exists:ujian_soal,id',
+            'soal_bobot.*.bobot' => 'required|numeric|min:0',
         ], [
             'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai!',
         ]);
@@ -991,6 +1069,12 @@ class UjianController extends Controller
                 'passing_grade'  => $request->input('passing_grade'),
             ], fn($v) => $v !== null)
         );
+
+        foreach ($request->input('soal_bobot', []) as $item) {
+            UjianSoal::where('ujian_id', $ujian->id)
+                ->where('id', $item['id'])
+                ->update(['bobot' => (float) $item['bobot']]);
+        }
 
         return response()->json(['message' => 'Ujian berhasil diupdate!']);
     }

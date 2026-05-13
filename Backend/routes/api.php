@@ -43,6 +43,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
     });
 
     Route::post('/upload/signature', [UploadController::class, 'signature']);
+    Route::post('/upload/soal-signature', [UploadController::class, 'soalSignature']);
 
     Route::get('/dashboard/mahasiswa', [DashboardController::class, 'mahasiswa']);
     Route::get('/pengumuman', [PengumumanController::class, 'index']);
@@ -57,6 +58,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
         Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
         Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']);
+        Route::post('/ujian/selesai', [UjianController::class, 'selesaiUjian']);
     });
     Route::prefix('bank-soal')->group(function () {
         Route::get('/global', [BankSoalController::class, 'global']);
