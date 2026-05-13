@@ -33,7 +33,8 @@ from detector import ProctoringDetector
 # ── Konfigurasi ─────────────────────────────────────────────────────────────
 LARAVEL_API_URL  = os.getenv("LARAVEL_API_URL", "http://localhost:8000/api")
 LARAVEL_API_KEY  = os.getenv("LARAVEL_API_KEY", "")          # opsional bearer token
-YAW_THRESHOLD       = float(os.getenv("YAW_THRESHOLD", "20"))   # derajat
+YAW_THRESHOLD       = float(os.getenv("YAW_THRESHOLD", "20"))    # derajat
+PITCH_THRESHOLD     = float(os.getenv("PITCH_THRESHOLD", "15"))  # derajat
 MAX_FACES           = int(os.getenv("MAX_FACES", "1"))
 LOOKING_AWAY_SECS   = float(os.getenv("LOOKING_AWAY_SECS", "5"))  # detik
 
@@ -61,6 +62,7 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
 
     detector = ProctoringDetector(
         yaw_threshold=YAW_THRESHOLD,
+        pitch_threshold=PITCH_THRESHOLD,
         max_allowed_faces=MAX_FACES,
         looking_away_duration=LOOKING_AWAY_SECS,
     )

@@ -1,3 +1,4 @@
+import os
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -49,24 +50,27 @@ class ProctoringDetector:
 
     _LM_INDICES = [4, 152, 263, 33, 287, 57]
 
-    def __init__(self, yaw_threshold: float = 20.0, max_allowed_faces: int = 1,
-                 looking_away_duration: float = 5.0):
+    def __init__(self, yaw_threshold: float = 20.0, pitch_threshold: float = 15.0,
+                 max_allowed_faces: int = 1, looking_away_duration: float = 5.0):
         """
         yaw_threshold          – sudut (derajat) nengok kiri/kanan sebelum dianggap curang
         max_allowed_faces      – normalnya 1; kalau lebih → multiple_faces event
         looking_away_duration  – detik terus-menerus nengok sebelum event di-fire
         """
         self.yaw_threshold = yaw_threshold
+        self.pitch_threshold = pitch_threshold
         self.max_allowed_faces = max_allowed_faces
         self.looking_away_duration = timedelta(seconds=looking_away_duration)
 
-        # timer untuk debounce looking_away
         self._looking_away_since: Optional[datetime] = None
-        self._looking_away_fired: bool = False
+        self._multi_face_since: Optional[datetime] = None
 
-        # Haar cascade untuk counting — lebih robust terhadap partial/multi-face
-        cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-        self._cascade = cv2.CascadeClassifier(cascade_path)
+        # OpenCV DNN face detector — lebih akurat dari Haar Cascade
+        base = os.path.dirname(os.path.abspath(__file__))
+        self._dnn = cv2.dnn.readNetFromCaffe(
+            os.path.join(base, "deploy.prototxt"),
+            os.path.join(base, "face_detector.caffemodel"),
+        )
 
         # FaceMesh hanya untuk head-pose (1 wajah utama)
         self._mp_mesh = mp.solutions.face_mesh.FaceMesh(
@@ -98,16 +102,17 @@ class ProctoringDetector:
 
         frame_events: List[dict] = []
 
-        # ── 1. Deteksi jumlah wajah (Haar Cascade) ───────────────────
-        gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray  = cv2.equalizeHist(gray)
-        faces = self._cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=4,
-            minSize=(40, 40),
+        # ── 1. Deteksi jumlah wajah (OpenCV DNN) ─────────────────────
+        blob = cv2.dnn.blobFromImage(
+            cv2.resize(frame, (300, 300)), 1.0,
+            (300, 300), (104.0, 177.0, 123.0),
         )
-        face_count = len(faces)
+        self._dnn.setInput(blob)
+        detections = self._dnn.forward()
+        face_count = sum(
+            1 for i in range(detections.shape[2])
+            if detections[0, 0, i, 2] > 0.5  # confidence threshold
+        )
 
         if face_count == 0:
             ev = self._add_event("no_face", ts, {"message": "Tidak ada wajah terdeteksi"})
@@ -115,11 +120,18 @@ class ProctoringDetector:
             return {"face_count": 0, "events": frame_events, "risk_score": self.risk_score}
 
         if face_count > self.max_allowed_faces:
-            ev = self._add_event("multiple_faces", ts, {
-                "message": f"Terdeteksi {face_count} wajah dalam frame",
-                "count": face_count,
-            })
-            frame_events.append(ev)
+            now = datetime.now()
+            if self._multi_face_since is None:
+                self._multi_face_since = now
+            elif now - self._multi_face_since >= self.looking_away_duration:
+                ev = self._add_event("multiple_faces", ts, {
+                    "message": f"Terdeteksi {face_count} wajah selama {int((now - self._multi_face_since).total_seconds())}s",
+                    "count": face_count,
+                })
+                frame_events.append(ev)
+                self._multi_face_since = now  # reset timer, bisa fire lagi 5 detik kemudian
+        else:
+            self._multi_face_since = None
 
         # ── 2. Head pose (hanya saat 1 wajah) ───────────────────────
         if face_count == 1:
@@ -128,27 +140,31 @@ class ProctoringDetector:
 
             if mesh_result.multi_face_landmarks:
                 lm = mesh_result.multi_face_landmarks[0].landmark
-                yaw = self._get_yaw(lm, frame.shape)
-                if yaw is not None and abs(yaw) > self.yaw_threshold:
-                    is_looking_away = True
-                    now = datetime.now()
+                pose = self._get_head_pose(lm, frame.shape)
+                if pose is not None:
+                    yaw, pitch = pose
+                    if abs(yaw) > self.yaw_threshold or abs(pitch) > self.pitch_threshold:
+                        is_looking_away = True
+                        now = datetime.now()
 
-                    if self._looking_away_since is None:
-                        # mulai timer
-                        self._looking_away_since = now
-                        self._looking_away_fired = False
-                    elif not self._looking_away_fired:
-                        elapsed = now - self._looking_away_since
-                        if elapsed >= self.looking_away_duration:
-                            direction = "kanan" if yaw > 0 else "kiri"
-                            ev = self._add_event("looking_away", ts, {
-                                "message": f"Peserta menengok ke {direction} selama {int(elapsed.total_seconds())}s",
-                                "direction": direction,
-                                "yaw_deg": round(float(yaw), 2),
-                                "duration_sec": round(elapsed.total_seconds(), 1),
-                            })
-                            frame_events.append(ev)
-                            self._looking_away_fired = True
+                        if self._looking_away_since is None:
+                            self._looking_away_since = now
+                        else:
+                            elapsed = now - self._looking_away_since
+                            if elapsed >= self.looking_away_duration:
+                                if abs(yaw) > self.yaw_threshold:
+                                    direction = "kanan" if yaw > 0 else "kiri"
+                                else:
+                                    direction = "atas" if pitch > 0 else "bawah"
+                                ev = self._add_event("looking_away", ts, {
+                                    "message": f"Peserta menengok ke {direction} selama {int(elapsed.total_seconds())}s",
+                                    "direction": direction,
+                                    "yaw_deg": round(yaw, 2),
+                                    "pitch_deg": round(pitch, 2),
+                                    "duration_sec": round(elapsed.total_seconds(), 1),
+                                })
+                                frame_events.append(ev)
+                                self._looking_away_since = now
 
             if not is_looking_away:
                 # kembali lurus → reset timer supaya bisa trigger lagi nanti
@@ -175,7 +191,7 @@ class ProctoringDetector:
         self.events = []
         self.risk_score = 0
         self._looking_away_since = None
-        self._looking_away_fired = False
+        self._multi_face_since = None
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -195,10 +211,12 @@ class ProctoringDetector:
         arr = np.frombuffer(raw, np.uint8)
         return cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
-    def _get_yaw(self, landmarks, frame_shape) -> Optional[float]:
+    def _get_head_pose(self, landmarks, frame_shape) -> Optional[tuple]:
         """
-        Hitung yaw (rotasi horizontal kepala) pakai solvePnP.
-        Return derajat: positif = nengok kanan, negatif = nengok kiri.
+        Hitung yaw & pitch pakai solvePnP.
+        Return (yaw, pitch) dalam derajat:
+          yaw   → positif = kanan, negatif = kiri
+          pitch → positif = atas,  negatif = bawah
         """
         h, w = frame_shape[:2]
 
@@ -223,7 +241,5 @@ class ProctoringDetector:
             return None
 
         rmat, _ = cv2.Rodrigues(rvec)
-        # RQDecomp3x3 → (angles_deg, R, Q, Qx, Qy, Qz)
         angles, *_ = cv2.RQDecomp3x3(rmat)
-        # angles[1] = yaw
-        return float(angles[1])
+        return float(angles[1]), float(angles[0])  # yaw, pitch
