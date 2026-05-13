@@ -35,6 +35,26 @@ export const uploadToCloudinary = async (file: File, sig?: UploadSignature): Pro
   return data.secure_url as string;
 };
 
+export const uploadSoalImage = async (file: File): Promise<string> => {
+  const res = await api.post("/upload/soal-signature");
+  const { signature, timestamp, api_key, cloud_name, folder } = res.data;
+
+  const body = new FormData();
+  body.append("file", file);
+  body.append("api_key", api_key);
+  body.append("timestamp", String(timestamp));
+  body.append("signature", signature);
+  body.append("folder", folder);
+
+  const upload = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+    { method: "POST", body }
+  );
+  if (!upload.ok) throw new Error("Upload gambar gagal");
+  const data = await upload.json();
+  return data.secure_url as string;
+};
+
 export const updateProfile = async (data: {
   nama?: string;
   nim?: string;

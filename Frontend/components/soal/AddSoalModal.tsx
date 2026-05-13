@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { X, Loader2, ImagePlus, Trash2 } from "lucide-react";
 import useSWR from "swr";
 import { getBabByMataKuliah, createSoal, updateSoal } from "@/services/BankSoalServices";
+import { uploadSoalImage } from "@/services/UserServices";
 import type { SoalItem } from "@/services/BankSoalServices";
 import type { BankSoalItem } from "@/types";
 
@@ -47,6 +48,8 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
     return existingJenis.opsi_jawaban.filter(o => o.is_correct).map(o => o.opsi);
   };
 
+  const existingGambar = soal?.media_soal?.find(m => m.tipe === "gambar")?.url ?? null;
+
   const [jenisSoal, setJenisSoal]     = useState(existingJenis?.jenis_soal ?? "pilihan_ganda");
   const [kesulitan, setKesulitan]     = useState(soal?.tingkat_kesulitan ?? "sedang");
   const [deskripsi, setDeskripsi]     = useState(soal?.deskripsi ?? "");
@@ -55,6 +58,11 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
   const [kunci, setKunci]             = useState<string[]>(initKunci);
   const [saving, setSaving]           = useState(false);
   const [error, setError]             = useState("");
+  const [gambarPreview, setGambarPreview] = useState<string | null>(existingGambar);
+  const [gambarFile, setGambarFile]       = useState<File | null>(null);
+  const [hapusGambar, setHapusGambar]     = useState(false);
+  const [uploading, setUploading]         = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const mataKuliahId = bankSoal.mata_kuliah_id;
   const { data: babs } = useSWR(
@@ -72,6 +80,21 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setGambarFile(file);
+    setGambarPreview(URL.createObjectURL(file));
+    setHapusGambar(false);
+  };
+
+  const handleHapusGambar = () => {
+    setGambarFile(null);
+    setGambarPreview(null);
+    setHapusGambar(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSave = async () => {
     if (!deskripsi.trim()) { setError("Deskripsi soal wajib diisi."); return; }
     if (jenisSoal !== "essay") {
@@ -82,6 +105,13 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
     setSaving(true);
     setError("");
     try {
+      let gambarUrl: string | null = null;
+      if (gambarFile) {
+        setUploading(true);
+        gambarUrl = await uploadSoalImage(gambarFile);
+        setUploading(false);
+      }
+
       const payload = {
         jenis_soal:        jenisSoal,
         tingkat_kesulitan: kesulitan,
@@ -89,7 +119,10 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
         bab_id:            babId || null,
         opsi:              jenisSoal !== "essay" ? opsi : undefined,
         kunci:             jenisSoal !== "essay" ? (jenisSoal === "pilihan_ganda" ? kunci[0] : kunci) : undefined,
+        gambar_url:        gambarUrl,
+        hapus_gambar:      isEdit ? hapusGambar : undefined,
       };
+
       if (isEdit && soal) {
         await updateSoal(soal.id, payload);
       } else {
@@ -99,6 +132,7 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
       onClose();
     } catch {
       setError("Gagal menyimpan soal. Coba lagi.");
+      setUploading(false);
     } finally {
       setSaving(false);
     }
@@ -144,6 +178,29 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
             <textarea rows={3} value={deskripsi} onChange={e => setDeskripsi(e.target.value)}
               placeholder="Tulis pertanyaan di sini..."
               className={inputClass + " resize-none"} />
+          </div>
+
+          {/* Gambar */}
+          <div>
+            <label className="text-xs font-semibold text-gray-500 mb-1.5 block uppercase tracking-wide">
+              Gambar <span className="text-gray-400 font-normal normal-case">(opsional)</span>
+            </label>
+            {gambarPreview ? (
+              <div className="relative inline-block">
+                <img src={gambarPreview} alt="preview" className="max-h-40 rounded-lg border border-gray-200 object-contain" />
+                <button type="button" onClick={handleHapusGambar}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 cursor-pointer hover:bg-red-600">
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 border border-dashed border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors cursor-pointer w-full">
+                <ImagePlus size={16} />
+                Upload gambar soal
+              </button>
+            )}
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
           </div>
 
           {/* Kesulitan + Bab */}
@@ -214,10 +271,14 @@ export default function AddSoalModal({ bankSoal, soal, defaultBabId, onClose, on
             className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer">
             Batal
           </button>
-          <button type="button" onClick={handleSave} disabled={saving}
+          <button type="button" onClick={handleSave} disabled={saving || uploading}
             className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             style={{ backgroundColor: "var(--color-primary)" }}>
-            {saving ? <><Loader2 size={14} className="animate-spin" /> Menyimpan...</> : "Simpan Soal"}
+            {uploading
+              ? <><Loader2 size={14} className="animate-spin" /> Upload gambar...</>
+              : saving
+              ? <><Loader2 size={14} className="animate-spin" /> Menyimpan...</>
+              : "Simpan Soal"}
           </button>
         </div>
       </div>

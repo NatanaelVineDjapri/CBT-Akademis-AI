@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { preload } from "swr";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, BookOpen } from "lucide-react";
 import { getNilaiDetail } from "@/services/NilaiServices";
 import type { Nilai, NilaiMeta } from "@/types";
 import NilaiTableSkeleton from "@/components/skeleton/NilaiTableSkeleton";
@@ -11,37 +11,19 @@ export type SortBy = "nama_ujian" | "tanggal" | "nilai" | "grade";
 export type SortDir = "asc" | "desc";
 
 function ColHeader({
-  label,
-  col,
-  sortBy,
-  sortDir,
-  onSort,
-  center,
-  className,
+  label, col, sortBy, sortDir, onSort, className,
 }: {
-  label: string;
-  col: SortBy;
-  sortBy: SortBy;
-  sortDir: SortDir;
-  onSort: (col: SortBy) => void;
-  center?: boolean;
-  className?: string;
+  label: string; col: SortBy; sortBy: SortBy; sortDir: SortDir;
+  onSort: (col: SortBy) => void; className?: string;
 }) {
   const active = sortBy === col;
   const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
   return (
-    <th
-      className={`px-4 py-3 text-xs text-gray-400 font-bold cursor-pointer select-none ${center ? "text-center" : "text-left"} ${className ?? ""}`}
-      onClick={() => onSort(col)}
-    >
-      <span
-        className={`flex items-center gap-1 ${center ? "justify-center" : ""}`}
-      >
+    <th className={`text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none ${className ?? ""}`}
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">
         {label}
-        <Icon
-          size={12}
-          className={active ? "text-gray-600" : "text-gray-300"}
-        />
+        <Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} />
       </span>
     </th>
   );
@@ -60,136 +42,83 @@ interface Props {
 }
 
 export default function NilaiTable({
-  nilaiList,
-  meta,
-  perPage,
-  sortBy,
-  sortDir,
-  onSort,
-  showSkeleton,
-  search,
-  onSearch,
+  nilaiList, meta, perPage, sortBy, sortDir, onSort, showSkeleton, search, onSearch,
 }: Props) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden px-3 pb-2">
-      <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-4">
-        <h2
-          className="text-base font-bold shrink-0"
-          style={{ color: "var(--color-primary)" }}
-        >
-          Riwayat Nilai
-        </h2>
-        <SearchInput
-          value={search}
-          onChange={onSearch}
-          placeholder="Cari nama ujian..."
-        />
+    <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div>
+          <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Riwayat Nilai</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Semua hasil ujian yang telah Anda ikuti.</p>
+        </div>
+        <SearchInput value={search} onChange={onSearch} placeholder="Cari nama ujian..." />
       </div>
 
-      <table className="w-full text-sm table-fixed">
-        <colgroup>
-          <col className="w-12" />
-          <col className="w-56" />
-          <col className="w-32" />
-          <col className="w-24" />
-          <col className="w-20" />
-          <col className="w-20" />
-          {/* <col className="w-24" /> */}
-        </colgroup>
-        <thead>
-          <tr className="border-b border-gray-100">
-            <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">
-              #
-            </th>
-            <ColHeader
-              label="Nama Ujian"
-              col="nama_ujian"
-              sortBy={sortBy}
-              sortDir={sortDir}
-              onSort={onSort}
-            />
-            <ColHeader
-              label="Tanggal"
-              col="tanggal"
-              sortBy={sortBy}
-              sortDir={sortDir}
-              onSort={onSort}
-            />
-            <th className="text-left px-4 py-3 text-xs text-gray-400 font-bold">
-              Pukul
-            </th>
-            <ColHeader
-              label="Nilai"
-              col="nilai"
-              sortBy={sortBy}
-              sortDir={sortDir}
-              onSort={onSort}
-            />
-            <ColHeader
-              label="Grade"
-              col="grade"
-              sortBy={sortBy}
-              sortDir={sortDir}
-              onSort={onSort}
-              center
-            />
-            {/* <th className="px-4 py-3" /> */}
-          </tr>
-        </thead>
-        <tbody>
-          {showSkeleton ? (
-            <NilaiTableSkeleton count={perPage} />
-          ) : (
-            nilaiList.map((item, idx) => {
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+              <ColHeader label="Nama Ujian" col="nama_ujian" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+              <ColHeader label="Tanggal" col="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+              <ColHeader label="Nilai" col="nilai" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+              <ColHeader label="Grade" col="grade" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+              <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {showSkeleton ? (
+              <NilaiTableSkeleton count={perPage} />
+            ) : nilaiList.map((item, idx) => {
               const no = ((meta?.current_page ?? 1) - 1) * perPage + idx + 1;
               return (
-                <tr
-                  key={item.id}
-                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-4 py-4 text-gray-400">
-                    {String(no).padStart(2, "0")}
-                  </td>
-                  <td className="px-4 py-4 text-gray-700 font-medium truncate">
+                <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td className="px-5 py-3 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
+                  <td className="px-4 py-3">
                     <Link
                       href={`/mahasiswa/nilai/${item.id}`}
-                      className="hover:underline"
+                      className="font-medium text-gray-800 hover:underline"
                       style={{ color: "var(--color-primary)" }}
-                      onMouseEnter={() =>
-                        preload(`/nilai/${item.id}`, () =>
-                          getNilaiDetail(item.id),
-                        )
-                      } 
+                      onMouseEnter={() => preload(`/nilai/${item.id}`, () => getNilaiDetail(item.id))}
                     >
                       {item.nama_ujian}
                     </Link>
+                    {item.mata_kuliah && (
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <BookOpen size={11} className="text-gray-400" />
+                        <span className="text-xs text-gray-400">{item.mata_kuliah}</span>
+                      </div>
+                    )}
                   </td>
-                  <td className="px-4 py-4 text-gray-500">{item.tanggal}</td>
-                  <td className="px-4 py-4 text-gray-500">{item.pukul}</td>
-                  <td className="px-4 py-4 text-gray-700">{item.nilai}</td>
-                  <td className="px-4 py-4 text-center">
-                    <span
-                      className="font-semibold"
-                      style={{
-                        color: item.lulus
-                          ? "var(--color-primary)"
-                          : "var(--color-danger, #ef4444)",
-                      }}
-                    >
-                      {item.grade}
+                  <td className="px-4 py-3">
+                    <p className="text-xs text-gray-700">{item.tanggal}</p>
+                    <p className="text-xs text-gray-400">{item.pukul}</p>
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-gray-800">{item.nilai ?? "-"}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-sm font-bold"
+                      style={{ color: item.lulus ? "var(--color-primary)" : "#ef4444" }}>
+                      {item.grade ?? "-"}
                     </span>
                   </td>
-                 
+                  <td className="px-4 py-3">
+                    <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap"
+                      style={item.lulus
+                        ? { backgroundColor: "var(--color-primary-light)", color: "var(--color-primary)" }
+                        : { backgroundColor: "#fee2e2", color: "#ef4444" }}>
+                      {item.lulus ? "Lulus" : "Tidak Lulus"}
+                    </span>
+                  </td>
                 </tr>
               );
-            })
-          )}
-        </tbody>
-      </table>
+            })}
+          </tbody>
+        </table>
 
-      {!showSkeleton && nilaiList.length === 0 && (
-        <EmptyState message="Belum ada riwayat nilai." flat />
-      )}
+        {!showSkeleton && nilaiList.length === 0 && (
+          <EmptyState message="Belum ada riwayat nilai." flat />
+        )}
+      </div>
     </div>
   );
 }

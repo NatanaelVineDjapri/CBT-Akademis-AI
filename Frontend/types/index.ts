@@ -110,6 +110,7 @@ export interface UjianMeta {
 export interface Nilai {
   id: number;
   nama_ujian: string;
+  mata_kuliah?: string;
   tanggal: string;
   pukul: string;
   nilai: number;

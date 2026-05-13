@@ -9,6 +9,7 @@ import BankSoalSkeleton from "@/components/skeleton/BankSoalSkeleton";
 import BankSoalFormModal from "@/components/bank-soal/BankSoalFormModal";
 import BankSoalDeleteModal from "@/components/bank-soal/BankSoalDeleteModal";
 import { useDebounce } from "@/hooks/useDebounce";
+import { usePerPage } from "@/hooks/usePerPage";
 import {
   getBankSoal,
   createBankSoal,
@@ -23,12 +24,13 @@ export default function DosenBankSoalPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
+  const perPage = usePerPage(57, 1, 530);
 
-  useEffect(() => { setPage(1); }, [debouncedSearch]);
+  useEffect(() => { setPage(1); }, [debouncedSearch, perPage]);
 
   const { data, mutate } = useSWR(
-    ["/bank-soal", debouncedSearch, page],
-    ([, s, p]: [string, string, number]) => getBankSoal({ search: s, page: p, per_page: 10 }),
+    ["/bank-soal", debouncedSearch, page, perPage],
+    ([, s, p]: [string, string, number]) => getBankSoal({ search: s, page: p, per_page: perPage }),
     { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
   );
 
@@ -62,25 +64,27 @@ export default function DosenBankSoalPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
+    <div className="flex flex-col gap-4 h-full">
       <div className="shrink-0">
         <Breadcrumb />
       </div>
 
-      {!data ? <BankSoalSkeleton /> : (
-        <BankSoalTable
-          data={data.data}
-          meta={data.meta}
-          search={search}
-          onSearchChange={(v) => setSearch(v)}
-          onPageChange={setPage}
-          onEdit={(item) => setEditItem(item)}
-          onDelete={(item) => setDeleteItem(item)}
-          onShare={(item, link) => { setShareItem(item); setShareLink(link); }}
-          canEdit={true}
-          onTambah={() => setShowCreate(true)}
-        />
-      )}
+      <div className="flex-1">
+        {!data ? <BankSoalSkeleton /> : (
+          <BankSoalTable
+            data={data.data}
+            meta={data.meta}
+            search={search}
+            onSearchChange={(v) => setSearch(v)}
+            onPageChange={setPage}
+            onEdit={(item) => setEditItem(item)}
+            onDelete={(item) => setDeleteItem(item)}
+            onShare={(item, link) => { setShareItem(item); setShareLink(link); }}
+            canEdit={true}
+            onTambah={() => setShowCreate(true)}
+          />
+        )}
+      </div>
 
       <AksesBankSoalGlobalCard href="/dosen/bank-soal/global" />
 

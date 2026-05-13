@@ -25,6 +25,7 @@ export default function UjianModal({
   const [tab, setTab]               = useState<"detail" | "soal">("detail");
   const [showTambah, setShowTambah] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [bobotChanges, setBobotChanges] = useState<Record<number, number>>({});
 
   const isCreateStep2 = mode === "create" && step2;
   const isOnSoalView  = isCreateStep2 || (mode === "edit" && tab === "soal");
@@ -49,6 +50,7 @@ export default function UjianModal({
     passing_grade:  form.passing_grade ? Number(form.passing_grade) : undefined,
     max_attempt:    form.max_attempt   ? Number(form.max_attempt)   : 1,
     is_kode_aktif:  form.is_kode_aktif,
+    soal_bobot: Object.entries(bobotChanges).map(([id, bobot]) => ({ id: Number(id), bobot })),
     soal: localSoal.map(s => s.soal_id !== undefined
       ? { soal_id: s.soal_id, bobot: s.bobot }
       : {
@@ -240,7 +242,7 @@ export default function UjianModal({
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Soal</th>
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Jenis</th>
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Kesulitan</th>
-                  {isCreateStep2 && <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Bobot</th>}
+                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Bobot</th>
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-14">Aksi</th>
                 </tr>
               </thead>
@@ -263,8 +265,9 @@ export default function UjianModal({
                         : "-"}
                     </td>
                     <td className="px-4 py-3">
-                      <input type="number" min={0} step={0.5} value={item.bobot}
-                        onChange={e => handleLocalBobot(item._localId, Number(e.target.value))}
+                      <input type="number" min={0} step={0.5}
+                        defaultValue={item.bobot}
+                        onBlur={e => handleLocalBobot(item._localId, parseFloat(e.target.value) || 0)}
                         className="w-16 border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 focus:outline-none focus:border-[var(--color-primary)]" />
                     </td>
                     <td className="px-4 py-3">
@@ -290,6 +293,16 @@ export default function UjianModal({
                       {item.tingkat_kesulitan
                         ? <span className="text-xs font-medium" style={{ color: KESULITAN_BADGE[item.tingkat_kesulitan]?.color ?? "#6b7280" }}>{KESULITAN_BADGE[item.tingkat_kesulitan]?.label ?? item.tingkat_kesulitan}</span>
                         : "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <input type="number" min={0} step={0.5}
+                        defaultValue={item.bobot}
+                        onBlur={e => {
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val) && val !== item.bobot)
+                            setBobotChanges(prev => ({ ...prev, [item.ujian_soal_id]: val }));
+                        }}
+                        className="w-16 border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 focus:outline-none focus:border-[var(--color-primary)]" />
                     </td>
                     <td className="px-4 py-3">
                       <button onClick={() => handleDeleteSoal(item.ujian_soal_id)}

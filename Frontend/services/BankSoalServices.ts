@@ -105,6 +105,7 @@ export const createSoal = async (data: {
   bab_id?: number | null;
   opsi?: Record<string, string>;
   kunci?: string | string[];
+  gambar_url?: string | null;
 }): Promise<void> => {
   await api.post("/soal", data);
 };
@@ -116,6 +117,8 @@ export const updateSoal = async (id: number, data: {
   bab_id?: number | null;
   opsi?: Record<string, string>;
   kunci?: string | string[];
+  gambar_url?: string | null;
+  hapus_gambar?: boolean;
 }): Promise<void> => {
   await api.put(`/soal/${id}`, data);
 };

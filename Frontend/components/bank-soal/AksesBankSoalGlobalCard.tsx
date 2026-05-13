@@ -7,7 +7,7 @@ interface Props {
 export default function AksesBankSoalGlobalCard({ href = "/bank-soal/global" }: Props) {
   return (
     <div
-      className="rounded-2xl px-6 py-8 flex flex-col items-center text-center"
+      className="rounded-2xl px-6 py-6 flex flex-col items-center text-center"
       style={{ backgroundColor: "var(--color-primary)" }}
     >
       <p className="text-base font-bold text-white mb-1">Akses Bank Soal Global</p>

@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Loader2, BookOpen, Clock, Users, CalendarDays } from "lucide-react";
+import { Plus, Pencil, Trash2, BookOpen, Clock, Users, CalendarDays } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -12,16 +12,18 @@ import { usePerPage } from "@/hooks/usePerPage";
 import api from "@/services/api";
 import { fetcher, StatusBadge, fmt } from "@/components/dosen/ujian/constants";
 import UjianModal from "@/components/dosen/ujian/UjianModal";
+import ConfirmModal from "@/components/ConfirmModal";
 import { EMPTY_FORM } from "@/components/dosen/ujian/types";
 import type { UjianItem, MataKuliahOption, UjianForm } from "@/components/dosen/ujian/types";
 
 export default function DosenUjianPage() {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
-  const [modal, setModal]   = useState<{ mode: "create" | "edit"; form: UjianForm } | null>(null);
-  const [deleting, setDeleting] = useState<number | null>(null);
+  const [modal, setModal]         = useState<{ mode: "create" | "edit"; form: UjianForm } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<UjianItem | null>(null);
+  const [deleting, setDeleting]           = useState(false);
   const debouncedSearch = useDebounce(search);
-  const perPage = usePerPage(64, 1, 430);
+  const perPage = usePerPage(53, 1, 450);
 
   useEffect(() => { setPage(1); }, [debouncedSearch, perPage]);
 
@@ -40,34 +42,39 @@ export default function DosenUjianPage() {
   const openCreate = () => setModal({ mode: "create", form: EMPTY_FORM });
 
   const openEdit = async (item: UjianItem) => {
-    const res = await api.get(`/ujian/dosen/${item.id}`);
-    const d = res.data.data;
-    setModal({
-      mode: "edit",
-      form: {
-        id:             d.id,
-        nama_ujian:     d.nama_ujian,
-        mata_kuliah_id: String(d.mata_kuliah_id ?? ""),
-        durasi_menit:   String(d.durasi_menit ?? ""),
-        passing_grade:  String(d.passing_grade ?? ""),
-        max_attempt:    String(d.max_attempt ?? "1"),
-        start_date:     d.start_date ? d.start_date.slice(0, 16) : "",
-        end_date:       d.end_date   ? d.end_date.slice(0, 16)   : "",
-        kode_akses:     d.kode_akses ?? "",
-        is_kode_aktif:  d.is_kode_aktif ?? false,
-      },
-    });
+    try {
+      const res = await api.get(`/ujian/dosen/${item.id}`);
+      const d = res.data.data;
+      setModal({
+        mode: "edit",
+        form: {
+          id:             d.id,
+          nama_ujian:     d.nama_ujian,
+          mata_kuliah_id: String(d.mata_kuliah_id ?? ""),
+          durasi_menit:   String(d.durasi_menit ?? ""),
+          passing_grade:  String(d.passing_grade ?? ""),
+          max_attempt:    String(d.max_attempt ?? "1"),
+          start_date:     d.start_date ? d.start_date.slice(0, 16) : "",
+          end_date:       d.end_date   ? d.end_date.slice(0, 16)   : "",
+          kode_akses:     d.kode_akses ?? "",
+          is_kode_aktif:  d.is_kode_aktif ?? false,
+        },
+      });
+    } catch {
+      alert("Gagal membuka data ujian.");
+    }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Hapus ujian ini?")) return;
-    setDeleting(id);
+  const handleDelete = async () => {
+    if (!confirmDelete) return;
+    setDeleting(true);
     try {
-      await api.delete(`/ujian/dosen/${id}`);
+      await api.delete(`/ujian/dosen/${confirmDelete.id}`);
+      setConfirmDelete(null);
       mutate();
     } catch (e: any) {
       alert(e?.response?.data?.message ?? "Gagal menghapus.");
-    } finally { setDeleting(null); }
+    } finally { setDeleting(false); }
   };
 
   return (
@@ -155,13 +162,11 @@ export default function DosenUjianPage() {
                         <div className="flex items-center gap-2">
                           <button onClick={() => openEdit(item)}
                             className="transition-colors cursor-pointer" title="Edit">
-                            <Pencil size={15} className="text-gray-400 hover:text-gray-600" />
+                            <Pencil size={15} className="text-green-500 hover:text-green-600" />
                           </button>
-                          <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id}
+                          <button onClick={() => setConfirmDelete(item)}
                             className="transition-colors cursor-pointer" title="Hapus">
-                            {deleting === item.id
-                              ? <Loader2 size={15} className="animate-spin text-red-400" />
-                              : <Trash2 size={15} className="text-red-400" />}
+                            <Trash2 size={15} className="text-red-400 hover:text-red-500" />
                           </button>
                         </div>
                       </td>
@@ -194,6 +199,17 @@ export default function DosenUjianPage() {
           initial={modal.form}
           matkulList={matkulList}
           onClose={() => { setModal(null); mutate(); }}
+        />
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          title="Hapus Ujian"
+          message={`Yakin ingin menghapus ujian "${confirmDelete.nama_ujian}"? Tindakan ini tidak bisa dibatalkan.`}
+          confirmLabel="Ya, Hapus"
+          loading={deleting}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmDelete(null)}
         />
       )}
     </div>

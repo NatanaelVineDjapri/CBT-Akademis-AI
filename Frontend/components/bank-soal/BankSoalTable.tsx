@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Pencil, Trash2, Plus, Mail } from "lucide-react";
+import { Pencil, Trash2, Plus, Mail, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { preload } from "swr";
 import api from "@/services/api";
@@ -17,10 +17,10 @@ const permissionLabel: Record<string, string> = {
   private: "Private",
 };
 
-const permissionColor: Record<string, string> = {
-  public: "text-green-600",
-  shared: "text-blue-500",
-  private: "text-gray-400",
+const permissionBadge: Record<string, { bg: string; color: string }> = {
+  public: { bg: "var(--color-primary-light)", color: "var(--color-primary)" },
+  shared: { bg: "#dbeafe", color: "#2563eb" },
+  private: { bg: "#f3f4f6", color: "#6b7280" },
 };
 
 interface Props {
@@ -56,18 +56,12 @@ export default function BankSoalTable({
 
   return (
     <div className="flex flex-col gap-3">
-      <div
-        className="bg-white rounded-2xl overflow-hidden"
-        // style={{ border: "2px solid var(--color-primary)" }}
-      >
-        {/* Header */}
+      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h2
-            className="text-base font-bold"
-            style={{ color: "var(--color-primary)" }}
-          >
-            Bank Soal
-          </h2>
+          <div>
+            <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Bank Soal</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Kelola bank soal dan soal-soal Anda.</p>
+          </div>
           <div className="flex items-center gap-2">
             <SearchInput
               value={search}
@@ -108,9 +102,6 @@ export default function BankSoalTable({
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-72">
                   Nama Bank Soal
                 </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">
-                  Mata Kuliah
-                </th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">
                   Bab
                 </th>
@@ -142,19 +133,20 @@ export default function BankSoalTable({
                       <td className="px-5 py-3 text-xs text-gray-400">
                         {rowNum}
                       </td>
-                      <td className="px-4 py-3 font-medium text-gray-800 max-w-0">
+                      <td className="px-4 py-3">
                         <Link
                           href={`${basePath}/${item.id}`}
-                          className="hover:underline truncate block"
+                          className="font-medium hover:underline"
                           style={{ color: "var(--color-primary)" }}
                         >
                           {item.nama}
                         </Link>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 truncate">
-                        {item.mata_kuliah?.kode ??
-                          item.mata_kuliah?.nama ??
-                          "-"}
+                        {item.mata_kuliah && (
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <BookOpen size={11} className="text-gray-400" />
+                            <span className="text-xs text-gray-400">{item.mata_kuliah.nama}</span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-gray-500 truncate">
                         {item.bab?.nama_bab ?? "-"}
@@ -162,10 +154,13 @@ export default function BankSoalTable({
                       <td className="px-4 py-3 text-gray-600">
                         {item.soal_count ?? 0}
                       </td>
-                      <td
-                        className={`px-4 py-3 font-medium ${permissionColor[item.permission]}`}
-                      >
-                        {permissionLabel[item.permission] ?? item.permission}
+                      <td className="px-4 py-3">
+                        <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap"
+                          style={permissionBadge[item.permission]
+                            ? { backgroundColor: permissionBadge[item.permission].bg, color: permissionBadge[item.permission].color }
+                            : {}}>
+                          {permissionLabel[item.permission] ?? item.permission}
+                        </span>
                       </td>
                       {canEdit && (
                         <td className="px-4 py-3">
@@ -173,13 +168,13 @@ export default function BankSoalTable({
                             <button
                               onClick={() => onEdit(item)}
                               onMouseEnter={() => item.mata_kuliah_id && preload(`/bab?mata_kuliah_id=${item.mata_kuliah_id}`, () => getBabByMataKuliah(item.mata_kuliah_id!))}
-                              className="text-green-500 hover:text-green-600 transition-colors"
+                              className="text-green-500 hover:text-green-600 transition-colors cursor-pointer"
                             >
                               <Pencil size={15} />
                             </button>
                             <button
                               onClick={() => onDelete(item)}
-                              className="text-red-400 hover:text-red-500 transition-colors"
+                              className="text-red-400 hover:text-red-500 transition-colors cursor-pointer"
                             >
                               <Trash2 size={15} />
                             </button>
@@ -192,7 +187,7 @@ export default function BankSoalTable({
                                     generateBankSoalLink(item.id).then(link => linkCache.current.set(item.id, link));
                                   }
                                 }}
-                                className="text-blue-400 hover:text-blue-500 transition-colors"
+                                className="text-blue-400 hover:text-blue-500 transition-colors cursor-pointer"
                                 title="Bagikan"
                               >
                                 <Mail size={15} />

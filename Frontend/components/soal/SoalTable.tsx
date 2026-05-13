@@ -1,6 +1,7 @@
 "use client";
 
-import { FileText, Image, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { FileText, Image, Pencil, Trash2, X } from "lucide-react";
 import SoalTableSkeleton from "@/components/skeleton/SoalTableSkeleton";
 import type { SoalItem } from "@/services/BankSoalServices";
 
@@ -25,7 +26,22 @@ const kesulitanColor: Record<string, string> = {
 };
 
 export default function SoalTable({ soalList, isLoading, canEdit = false, onEdit, onDelete }: Props) {
+  const [lightbox, setLightbox] = useState<string | null>(null);
+
   return (
+    <>
+    {lightbox && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+        onClick={() => setLightbox(null)}>
+        <button className="absolute top-4 right-4 text-white/70 hover:text-white cursor-pointer"
+          onClick={() => setLightbox(null)}>
+          <X size={24} />
+        </button>
+        <img src={lightbox} alt="Gambar soal"
+          className="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl"
+          onClick={e => e.stopPropagation()} />
+      </div>
+    )}
     <div className="overflow-x-auto flex-1">
       <table className="w-full text-sm">
         <thead>
@@ -102,10 +118,13 @@ export default function SoalTable({ soalList, isLoading, canEdit = false, onEdit
 
                   <td className="px-4 py-3">
                     {hasMedia ? (
-                      <div className="flex items-center gap-1 text-xs" style={{ color: "var(--color-primary)" }}>
+                      <button
+                        onClick={() => setLightbox(soal.media_soal[0].url)}
+                        className="flex items-center gap-1 text-xs cursor-pointer hover:opacity-70 transition-opacity"
+                        style={{ color: "var(--color-primary)" }}>
                         <Image size={13} />
-                        {soal.media_soal.length}
-                      </div>
+                        Lihat Gambar
+                      </button>
                     ) : (
                       <span className="text-gray-300 text-xs">—</span>
                     )}
@@ -136,5 +155,6 @@ export default function SoalTable({ soalList, isLoading, canEdit = false, onEdit
         </tbody>
       </table>
     </div>
+    </>
   );
 }
