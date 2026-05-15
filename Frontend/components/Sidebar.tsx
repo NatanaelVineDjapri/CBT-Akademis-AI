@@ -26,7 +26,7 @@ import {
 import { preload } from "swr";
 import { User } from "@/types";
 import { logout } from "../services/AuthServices";
-import { getMyMataKuliah } from "../services/MataKuliahServices";
+import { getMyMataKuliah, getMataKuliah } from "../services/MataKuliahServices";
 import { getJadwal, getJadwalDosen } from "../services/UserServices";
 import { getNilai } from "../services/NilaiServices";
 import { getMyUjian, getHasilUjianDosen, getHasilUjianAdminUniversitas } from "../services/UjianServices";
@@ -93,6 +93,11 @@ const menuByRole: Record<string, MenuItem[]> = {
       label: "Penerimaan PMB",
       href: "/admin-universitas/penerimaan-pmb",
       icon: <GraduationCap size={18} />,
+    },
+    {
+      label: "Mata Kuliah",
+      href: "/admin-universitas/mata-kuliah",
+      icon: <BookOpen size={18} />,
     },
     {
       label: "KRS",
@@ -340,6 +345,10 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                     const pp = calcPerPage(53, 1, 395);
                     preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
                       getHasilUjianAdminUniversitas({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
+                  } else if (item.href === "/admin-universitas/mata-kuliah") {
+                    const pp = calcPerPage(53, 1, 390);
+                    preload(["/mata-kuliah", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
+                      getMataKuliah({ search: s, prodi_id: p, page: pg, per_page: pp }));
                   } else if (item.href === "/admin-universitas/krs") {
                     const pp = calcPerPage(65, 1, 360);
                     preload(["/krs/mahasiswa", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>

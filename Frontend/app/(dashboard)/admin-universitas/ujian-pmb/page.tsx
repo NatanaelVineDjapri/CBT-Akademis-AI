@@ -76,11 +76,11 @@ export default function AdminUjianPmbPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full">
-      <div className="shrink-0"><Breadcrumb /></div>
+    <div className="flex flex-col gap-4">
+      <div><Breadcrumb /></div>
 
-      <div className="flex-1">
-        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      <div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <div>
               <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Manajemen Ujian PMB</h2>

@@ -399,10 +399,11 @@ export default function KrsPage() {
   const selectedProdi = prodis.find(p => p.id === prodiId);
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4 h-full">
       <div className="shrink-0"><Breadcrumb /></div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col flex-1 min-h-0">
+      <div className="flex-1">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
@@ -433,7 +434,7 @@ export default function KrsPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto flex-1">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
@@ -446,13 +447,22 @@ export default function KrsPage() {
               </tr>
             </thead>
             <tbody>
-              {data?.data.map((item, idx) => {
+              {!data ? Array.from({ length: perPage }).map((_, i) => (
+                <tr key={i} className="border-b border-gray-50 animate-pulse">
+                  <td className="px-5 py-3"><div className="h-3 bg-gray-100 rounded w-6" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-gray-100 rounded w-40 mb-1.5" /><div className="h-2.5 bg-gray-100 rounded w-24" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-gray-100 rounded w-32" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-gray-100 rounded w-12" /></td>
+                  <td className="px-4 py-3"><div className="h-5 bg-gray-100 rounded-full w-24" /></td>
+                  <td className="px-4 py-3"><div className="h-6 bg-gray-100 rounded-lg w-16" /></td>
+                </tr>
+              )) : data.data.map((item, idx) => {
                 const rowNum = String(((data.meta.current_page - 1) * data.meta.per_page) + idx + 1).padStart(2, "0");
                 return (
                   <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3 text-xs text-gray-400">{rowNum}</td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-gray-800">{item.nama}</p>
+                      <p className="font-medium" style={{ color: "var(--color-primary)" }}>{item.nama}</p>
                       {item.nim && <p className="text-xs text-gray-400 mt-0.5">{item.nim}</p>}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{item.prodi ?? "-"}</td>
@@ -480,12 +490,8 @@ export default function KrsPage() {
           </table>
 
           {data?.data.length === 0 && <EmptyState message="Tidak ada mahasiswa." flat />}
-          {!data && (
-            <div className="py-10 flex items-center justify-center text-gray-400 text-sm">
-              <Loader2 size={18} className="animate-spin mr-2" /> Memuat...
-            </div>
-          )}
         </div>
+      </div>
       </div>
 
       {data?.meta && data.meta.last_page > 1 && (
