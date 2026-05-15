@@ -8,15 +8,16 @@ import { JENIS_OPTIONS, KESULITAN_OPTIONS, OPSI_KEYS, inputCls, labelCls } from 
 import type { BabOption, BankSoalOption, LocalSoalItem } from "./types";
 
 export default function BuatPanel({
-  mode, ujianId, matkulId, babs, onSaved, onAdd, onClose,
+  mode, ujianId, matkulId, babs, onSaved, onAdd, onClose, apiPath = "/ujian/dosen",
 }: {
   mode: "create" | "edit";
   ujianId?: string;
-  matkulId: number;
+  matkulId?: number;
   babs: BabOption[];
   onSaved?: () => void;
   onAdd?: (items: LocalSoalItem[]) => void;
   onClose: () => void;
+  apiPath?: string;
 }) {
   const [jenisSoal, setJenisSoal]               = useState("pilihan_ganda");
   const [kesulitan, setKesulitan]               = useState("sedang");
@@ -30,7 +31,7 @@ export default function BuatPanel({
   const [error, setError]                       = useState("");
 
   const { data: bankSoalData } = useSWR(
-    simpanKeBankSoal ? ["/bank-soal/matkul", matkulId] : null,
+    simpanKeBankSoal && matkulId ? ["/bank-soal/matkul", matkulId] : null,
     () => api.get("/bank-soal", { params: { mata_kuliah_id: matkulId, per_page: 100 } }).then(r => r.data.data ?? []),
     { revalidateOnFocus: false },
   );
@@ -83,7 +84,7 @@ export default function BuatPanel({
         }]);
         onClose();
       } else {
-        await api.post(`/ujian/dosen/${ujianId}/soal/buat-baru`, payload);
+        await api.post(`${apiPath}/${ujianId}/soal/buat-baru`, payload);
         onSaved?.();
         onClose();
       }

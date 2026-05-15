@@ -10,12 +10,14 @@ import TambahSoalModal from "./TambahSoalModal";
 import type { LocalSoalItem, MataKuliahOption, UjianForm, UjianSoalItem } from "./types";
 
 export default function UjianModal({
-  mode, initial, matkulList, onClose,
+  mode, initial, matkulList, onClose, apiPath = "/ujian/dosen", requiresMataKuliah = true,
 }: {
   mode: "create" | "edit";
   initial: UjianForm;
   matkulList: MataKuliahOption[];
   onClose: () => void;
+  apiPath?: string;
+  requiresMataKuliah?: boolean;
 }) {
   const [form, setForm]             = useState<UjianForm>(initial);
   const [saving, setSaving]         = useState(false);
@@ -31,10 +33,11 @@ export default function UjianModal({
   const isOnSoalView  = isCreateStep2 || (mode === "edit" && tab === "soal");
   const soalUjianId   = mode === "edit" ? form.id : undefined;
   const soalMatkulId  = form.mata_kuliah_id ? Number(form.mata_kuliah_id) : null;
+  const canAddSoal    = requiresMataKuliah ? !!soalMatkulId : true;
 
   const { data: soalData, mutate: mutateSoal } = useSWR(
-    mode === "edit" && tab === "soal" && soalUjianId ? ["/ujian/soal/modal", soalUjianId] : null,
-    () => api.get(`/ujian/dosen/${soalUjianId}/soal`).then(r => r.data),
+    mode === "edit" && tab === "soal" && soalUjianId ? ["/ujian/soal/modal", soalUjianId, apiPath] : null,
+    () => api.get(`${apiPath}/${soalUjianId}/soal`).then(r => r.data),
     { revalidateOnFocus: false },
   );
   const soalList: UjianSoalItem[] = soalData?.data ?? [];
@@ -43,7 +46,7 @@ export default function UjianModal({
 
   const buildPayload = () => ({
     nama_ujian:     form.nama_ujian,
-    mata_kuliah_id: Number(form.mata_kuliah_id),
+    ...(requiresMataKuliah && { mata_kuliah_id: Number(form.mata_kuliah_id) }),
     start_date:     form.start_date,
     end_date:       form.end_date,
     durasi_menit:   Number(form.durasi_menit),
@@ -67,8 +70,8 @@ export default function UjianModal({
   });
 
   const validate = () => {
-    if (!form.nama_ujian || !form.mata_kuliah_id || !form.start_date || !form.end_date || !form.durasi_menit) {
-      setError("Nama, mata kuliah, jadwal, dan durasi wajib diisi."); return false;
+    if (!form.nama_ujian || (requiresMataKuliah && !form.mata_kuliah_id) || !form.start_date || !form.end_date || !form.durasi_menit) {
+      setError(requiresMataKuliah ? "Nama, mata kuliah, jadwal, dan durasi wajib diisi." : "Nama, jadwal, dan durasi wajib diisi."); return false;
     }
     return true;
   };
@@ -82,7 +85,7 @@ export default function UjianModal({
   const handleCreateFinal = async () => {
     setSaving(true); setError("");
     try {
-      await api.post("/ujian/dosen", buildPayload());
+      await api.post(apiPath, buildPayload());
       onClose();
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Gagal menyimpan.");
@@ -93,7 +96,7 @@ export default function UjianModal({
     if (!validate()) return;
     setSaving(true); setError("");
     try {
-      await api.put(`/ujian/dosen/${form.id}`, buildPayload());
+      await api.put(`${apiPath}/${form.id}`, buildPayload());
       onClose();
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Gagal menyimpan.");
@@ -104,7 +107,7 @@ export default function UjianModal({
     if (!confirm("Hapus soal ini dari ujian?")) return;
     setDeletingId(ujianSoalId);
     try {
-      await api.delete(`/ujian/dosen/${soalUjianId}/soal/${ujianSoalId}`);
+      await api.delete(`${apiPath}/${soalUjianId}/soal/${ujianSoalId}`);
       mutateSoal();
     } catch { alert("Gagal menghapus soal."); }
     finally { setDeletingId(null); }
@@ -171,6 +174,7 @@ export default function UjianModal({
                 value={form.nama_ujian} onChange={e => set("nama_ujian", e.target.value)} />
             </div>
 
+            {requiresMataKuliah && (
             <div>
               <label className={labelCls}>Mata Kuliah</label>
               <select className={inputCls} value={form.mata_kuliah_id}
@@ -181,6 +185,7 @@ export default function UjianModal({
                 ))}
               </select>
             </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -370,11 +375,12 @@ export default function UjianModal({
         </div>
       </div>
 
-      {showTambah && soalMatkulId && (
+      {showTambah && canAddSoal && (
         <TambahSoalModal
           mode={isCreateStep2 ? "create" : "edit"}
-          matkulId={soalMatkulId}
+          matkulId={soalMatkulId ?? undefined}
           ujianId={soalUjianId ? String(soalUjianId) : undefined}
+          apiPath={apiPath}
           excludeIds={isCreateStep2 ? localSoal.filter(s => s.soal_id !== undefined).map(s => s.soal_id!) : undefined}
           onClose={() => setShowTambah(false)}
           onAdd={isCreateStep2 ? handleAddLocal : undefined}

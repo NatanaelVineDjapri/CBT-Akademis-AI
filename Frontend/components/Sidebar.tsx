@@ -307,8 +307,9 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                     preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
                       getBankSoal({ search: s, page: p, per_page: 10 }));
                   } else if (item.href === "/dosen/hasil-ujian") {
-                    preload(["/ujian/dosen/hasil", "", 1], ([, s, p]: [string, string, number]) =>
-                      getHasilUjianDosen({ search: s, page: p, per_page: 10 }));
+                    const pp = calcPerPage(53, 1, 480);
+                    preload(["/ujian/dosen/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
+                      getHasilUjianDosen({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
                   } else if (item.href === "/dosen/jadwal") {
                     preload("/jadwal/dosen", getJadwalDosen);
                   // — admin universitas —
@@ -327,6 +328,7 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                   } else if (item.href === "/admin-universitas/penerimaan-pmb") {
                     preload(["/pmb/penerimaan/peserta", "", new Date().getFullYear()], ([, s, t]: [string, string, number]) =>
                       getPmbPeserta({ search: s, tahun: t, per_page: 200 }));
+                    preload("/pmb/penerimaan/statistik", getPmbStatistik);
                   } else if (item.href === "/admin-universitas/hasil-ujian-pmb") {
                     const pp = calcPerPage(53, 1, 395);
                     preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>

@@ -473,6 +473,7 @@ export const labels: Record<string, string> = {
   global: "Global",
   monitoring: "Monitoring",
   "hasil-ujian": "Hasil Ujian",
+  "ujian-pmb": "Ujian PMB",
   "hasil-ujian-pmb": "Hasil Ujian PMB",
   "penerimaan-pmb": "Penerimaan PMB",
   user: "User",
@@ -488,6 +489,27 @@ export const roleLabels: Record<string, string> = {
   mahasiswa: "Mahasiswa",
   peserta_mahasiswa_baru: "Peserta Mahasiswa Baru",
 };
+
+export const ROLE_OPTIONS = [
+  { value: "dosen",                  label: "Dosen" },
+  { value: "mahasiswa",              label: "Mahasiswa" },
+  { value: "peserta_mahasiswa_baru", label: "Peserta PMB" },
+  { value: "admin_universitas",      label: "Admin Universitas" },
+];
+
+export const ROLE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  dosen:                  { label: "Dosen",       bg: "var(--color-primary-light)", color: "var(--color-primary)" },
+  mahasiswa:              { label: "Mahasiswa",    bg: "var(--akademik-prodi-bg)",   color: "var(--akademik-prodi-icon)" },
+  peserta_mahasiswa_baru: { label: "Peserta PMB", bg: "var(--akademik-tahun-bg)",   color: "var(--akademik-tahun-icon)" },
+  admin_universitas:      { label: "Admin Univ",  bg: "var(--color-warning-light)", color: "var(--color-warning)" },
+};
+
+export const USER_ROLE_TABS = [
+  { key: "",                       label: "Semua" },
+  { key: "dosen",                  label: "Dosen" },
+  { key: "mahasiswa",              label: "Mahasiswa" },
+  { key: "peserta_mahasiswa_baru", label: "Peserta PMB" },
+];
 
 export const tips = [
   "Jangan pernah membagikan password Anda kepada siapapun, termasuk pihak yang mengaku dari layanan resmi, karena hal ini bisa membahayakan keamanan akun Anda.",

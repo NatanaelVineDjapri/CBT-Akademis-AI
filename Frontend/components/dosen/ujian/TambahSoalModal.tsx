@@ -10,20 +10,21 @@ import AcakPanel from "./AcakPanel";
 import type { BabOption, LocalSoalItem } from "./types";
 
 export default function TambahSoalModal({
-  mode, ujianId, matkulId, excludeIds, onClose, onSaved, onAdd,
+  mode, ujianId, matkulId, excludeIds, onClose, onSaved, onAdd, apiPath = "/ujian/dosen",
 }: {
   mode: "create" | "edit";
   ujianId?: string;
-  matkulId: number;
+  matkulId?: number;
   excludeIds?: number[];
   onClose: () => void;
   onSaved?: () => void;
   onAdd?: (items: LocalSoalItem[]) => void;
+  apiPath?: string;
 }) {
   const [tab, setTab] = useState<"pilih" | "buat" | "acak">("pilih");
 
   const { data: babs = [] } = useSWR<BabOption[]>(
-    ["/bab/matkul-tambah", matkulId],
+    matkulId ? ["/bab/matkul-tambah", matkulId] : null,
     () => api.get("/bab", { params: { mata_kuliah_id: matkulId } }).then(r => r.data.data ?? []),
     { revalidateOnFocus: false },
   );
@@ -57,9 +58,9 @@ export default function TambahSoalModal({
           ))}
         </div>
 
-        {tab === "pilih" && <PilihPanel mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} />}
-        {tab === "buat"  && <BuatPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} />}
-        {tab === "acak"  && <AcakPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} />}
+        {tab === "pilih" && <PilihPanel mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
+        {tab === "buat"  && <BuatPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
+        {tab === "acak"  && <AcakPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
       </div>
     </div>
   );

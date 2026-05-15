@@ -31,7 +31,7 @@ function ProdiCard({ item, href, fakultasId }: { item: ProdiItem; href: string; 
     <Link
       href={href}
       onMouseEnter={() => {
-        const pp = calcPerPage(44, 1, 430);
+        const pp = calcPerPage(44, 1, 500);
         preload(["/users", String(item.id), "", "", 1, pp], () =>
           getAdminUsers({ prodi_id: item.id, per_page: pp, page: 1 }));
         preload(["/prodi/single", String(item.id)], () =>

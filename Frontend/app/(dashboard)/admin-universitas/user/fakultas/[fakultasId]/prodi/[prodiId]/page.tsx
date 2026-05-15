@@ -20,27 +20,7 @@ import {
   importAdminUsers,
   type AdminUserItem,
 } from "@/services/AdminUserServices";
-
-const ROLE_OPTIONS = [
-  { value: "dosen",                  label: "Dosen" },
-  { value: "mahasiswa",              label: "Mahasiswa" },
-  { value: "peserta_mahasiswa_baru", label: "Peserta PMB" },
-  { value: "admin_universitas",      label: "Admin Universitas" },
-];
-
-const ROLE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
-  dosen:                  { label: "Dosen",          bg: "var(--color-primary-light)",  color: "var(--color-primary)" },
-  mahasiswa:              { label: "Mahasiswa",       bg: "var(--akademik-prodi-bg)",    color: "var(--akademik-prodi-icon)" },
-  peserta_mahasiswa_baru: { label: "Peserta PMB",    bg: "var(--akademik-tahun-bg)",    color: "var(--akademik-tahun-icon)" },
-  admin_universitas:      { label: "Admin Univ",     bg: "var(--color-warning-light)",  color: "var(--color-warning)" },
-};
-
-const TABS = [
-  { key: "",                          label: "Semua" },
-  { key: "dosen",                     label: "Dosen" },
-  { key: "mahasiswa",                 label: "Mahasiswa" },
-  { key: "peserta_mahasiswa_baru",    label: "Peserta PMB" },
-];
+import { ROLE_OPTIONS, ROLE_BADGE, USER_ROLE_TABS } from "@/types";
 
 function RoleBadge({ role }: { role: string }) {
   const b = ROLE_BADGE[role] ?? { label: role, bg: "#f3f4f6", color: "#6b7280" };
@@ -311,7 +291,7 @@ export default function AdminUserListPage({
 }) {
   const { fakultasId, prodiId } = use(params);
 
-  const perPage = usePerPage(44, 1, 430);
+  const perPage = usePerPage(44, 1, 500);
   const [search, setSearch] = useState("");
   const [roleTab, setRoleTab] = useState("");
   const [page, setPage] = useState(1);
@@ -325,7 +305,7 @@ export default function AdminUserListPage({
 
   useEffect(() => { setPage(1); }, [debouncedSearch, roleTab, perPage]);
 
-  const { data, mutate } = useSWR(
+  const { data, isLoading, mutate } = useSWR(
     ["/users", prodiId, roleTab, debouncedSearch, page, perPage],
     ([, pid, role, s, p, pp]: [string, string, string, string, number, number]) =>
       getAdminUsers({ prodi_id: Number(pid), role: role || undefined, search: s, per_page: pp, page: p }),
@@ -404,7 +384,7 @@ export default function AdminUserListPage({
 
         {/* Role Tabs */}
         <div className="flex gap-1 px-5 pt-3 pb-0 border-b border-gray-100">
-          {TABS.map(tab => (
+          {USER_ROLE_TABS.map(tab => (
             <button
               key={tab.key}
               onClick={() => setRoleTab(tab.key)}
@@ -434,8 +414,8 @@ export default function AdminUserListPage({
               </tr>
             </thead>
             <tbody>
-              {!data ? (
-                Array.from({ length: 5 }).map((_, i) => (
+              {isLoading ? (
+                Array.from({ length: perPage }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
                     {Array.from({ length: 7 }).map((_, j) => (
                       <td key={j} className="px-4 py-4">

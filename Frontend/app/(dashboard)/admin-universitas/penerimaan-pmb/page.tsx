@@ -10,7 +10,7 @@ import SearchInput from "@/components/filtering/SearchInput";
 import EmptyState from "@/components/EmptyState";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
-import { getPmbPeserta, prosesPenerimaan } from "@/services/PmbPenerimaanServices";
+import { getPmbPeserta, prosesPenerimaan, getPmbStatistik } from "@/services/PmbPenerimaanServices";
 import { useUser } from "@/context/UserContext";
 import type { PmbPesertaItem, PmbNimSequences } from "@/types";
 
@@ -55,6 +55,12 @@ export default function PenerimaanPMBPage() {
     ([, s, t, p, pp]: [string, string, number, number, number]) =>
       getPmbPeserta({ search: s, tahun: t, page: p, per_page: pp }),
     { revalidateOnFocus: false, keepPreviousData: true }
+  );
+
+  const { data: statistikData, isLoading: statLoading } = useSWR(
+    "/pmb/penerimaan/statistik",
+    getPmbStatistik,
+    { revalidateOnFocus: false }
   );
 
 
@@ -149,10 +155,10 @@ export default function PenerimaanPMBPage() {
 
       // Sync nim_sequences dari fetch all
       if (allData.nim_sequences) nimSequencesRef.current = allData.nim_sequences;
-      nimAssignedRef.current = {};
 
       const threshold = Number(batasNilai);
       setRows(prev => {
+        nimAssignedRef.current = {};
         const next = { ...prev };
         allPeserta.forEach(item => {
           const nilai  = item.nilai_pmb ?? null;
@@ -266,7 +272,7 @@ export default function PenerimaanPMBPage() {
         {result && (
           <div className="px-5 py-3 bg-green-50 border-b border-green-100 shrink-0">
             <p className="text-sm text-green-700 font-medium">
-              Berhasil diproses — <span className="font-bold">{result.diterima}</span> diterima,{" "}
+              Berhasil diproses  <span className="font-bold">{result.diterima}</span> diterima,{" "}
               <span className="font-bold">{result.ditolak}</span> ditolak.
             </p>
           </div>
@@ -296,7 +302,7 @@ export default function PenerimaanPMBPage() {
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Nama</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-48">Email</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Tahun Masuk</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM (jika diterima)</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">Prodi</th>
                 <th className="text-right text-xs text-gray-400 font-medium px-4 py-3 w-24">Nilai PMB</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Status</th>
@@ -330,14 +336,11 @@ export default function PenerimaanPMBPage() {
                       <td className="px-4 py-3 text-xs text-gray-500">{item.tahun_masuk ?? "-"}</td>
 
                       <td className="px-4 py-3">
-                        <input
-                          type="text"
-                          value={row.nim}
-                          onChange={e => setRow(item.id, { nim: e.target.value })}
-                          disabled={!isDiterima}
-                          placeholder="NIM"
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs disabled:bg-gray-50 disabled:text-gray-400 focus:outline-none focus:border-[var(--color-primary)]"
-                        />
+                        {isDiterima && row.nim ? (
+                          <span className="text-xs font-mono font-medium text-gray-700">{row.nim}</span>
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
+                        )}
                       </td>
 
                       <td className="px-4 py-3 text-xs text-gray-700">

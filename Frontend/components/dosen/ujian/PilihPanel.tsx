@@ -11,7 +11,7 @@ import { JENIS_BADGE, KESULITAN_BADGE } from "./constants";
 import type { AvailableSoalItem, BabOption, LocalSoalItem } from "./types";
 
 export default function PilihPanel({
-  mode, ujianId, matkulId, excludeIds, babs, onSaved, onAdd, onClose,
+  mode, ujianId, matkulId, excludeIds, babs, onSaved, onAdd, onClose, apiPath = "/ujian/dosen",
 }: {
   mode: "create" | "edit";
   ujianId?: string;
@@ -21,6 +21,7 @@ export default function PilihPanel({
   onSaved?: () => void;
   onAdd?: (items: LocalSoalItem[]) => void;
   onClose: () => void;
+  apiPath?: string;
 }) {
   const [babId, setBabId]       = useState("");
   const [search, setSearch]     = useState("");
@@ -39,7 +40,7 @@ export default function PilihPanel({
   const { data, isLoading } = useSWR(
     swrKey,
     () => mode === "create"
-      ? api.get("/ujian/dosen/0/available-soal", {
+      ? api.get(`${apiPath}/0/available-soal`, {
           params: {
             mata_kuliah_id: matkulId,
             exclude_ids:    excludeIds?.join(",") || undefined,
@@ -49,7 +50,7 @@ export default function PilihPanel({
             per_page:       20,
           },
         }).then(r => r.data)
-      : api.get(`/ujian/dosen/${ujianId}/available-soal`, {
+      : api.get(`${apiPath}/${ujianId}/available-soal`, {
           params: { bab_id: babId || undefined, search: debouncedSearch || undefined, page, per_page: 20 },
         }).then(r => r.data),
     { keepPreviousData: true, revalidateOnFocus: false },
@@ -80,7 +81,7 @@ export default function PilihPanel({
     }
     setSaving(true); setError("");
     try {
-      await api.post(`/ujian/dosen/${ujianId}/soal`, { soal_ids: selected });
+      await api.post(`${apiPath}/${ujianId}/soal`, { soal_ids: selected });
       onSaved?.(); onClose();
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;

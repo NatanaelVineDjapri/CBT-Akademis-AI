@@ -8,16 +8,17 @@ import { inputCls, labelCls } from "./constants";
 import type { AvailableSoalItem, BabOption, BankSoalOption, LocalSoalItem } from "./types";
 
 export default function AcakPanel({
-  mode, ujianId, matkulId, excludeIds, babs, onSaved, onAdd, onClose,
+  mode, ujianId, matkulId, excludeIds, babs, onSaved, onAdd, onClose, apiPath = "/ujian/dosen",
 }: {
   mode: "create" | "edit";
   ujianId?: string;
-  matkulId: number;
+  matkulId?: number;
   excludeIds?: number[];
   babs: BabOption[];
   onSaved?: () => void;
   onAdd?: (items: LocalSoalItem[]) => void;
   onClose: () => void;
+  apiPath?: string;
 }) {
   const [babId, setBabId]           = useState("");
   const [bankSoalId, setBankSoalId] = useState("");
@@ -27,7 +28,7 @@ export default function AcakPanel({
   const [success, setSuccess]       = useState("");
 
   const { data: bankSoalData } = useSWR(
-    ["/bank-soal/acak", matkulId],
+    matkulId ? ["/bank-soal/acak", matkulId] : "/bank-soal/acak-all",
     () => api.get("/bank-soal", { params: { mata_kuliah_id: matkulId, per_page: 100 } }).then(r => r.data.data ?? []),
     { revalidateOnFocus: false },
   );
@@ -39,7 +40,7 @@ export default function AcakPanel({
     setLoading(true); setError(""); setSuccess("");
     try {
       if (mode === "create") {
-        const res = await api.get("/ujian/dosen/0/available-soal", {
+        const res = await api.get(`${apiPath}/0/available-soal`, {
           params: {
             mata_kuliah_id: matkulId,
             bab_id:         babId ? Number(babId) : undefined,
@@ -57,7 +58,7 @@ export default function AcakPanel({
         onAdd?.(items);
         onClose();
       } else {
-        const res = await api.post(`/ujian/dosen/${ujianId}/soal/random`, {
+        const res = await api.post(`${apiPath}/${ujianId}/soal/random`, {
           bab_id:       babId ? Number(babId) : undefined,
           bank_soal_id: bankSoalId ? Number(bankSoalId) : undefined,
           jumlah:       n,
