@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useSWR from "swr";
-import { CheckCircle, XCircle, Loader2, Search } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Wand2 } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import ConfirmModal from "@/components/ConfirmModal";
+import Pagination from "@/components/filtering/Pagination";
+import SearchInput from "@/components/filtering/SearchInput";
+import EmptyState from "@/components/EmptyState";
 import { useDebounce } from "@/hooks/useDebounce";
+import { usePerPage } from "@/hooks/usePerPage";
 import { getPmbPeserta, prosesPenerimaan } from "@/services/PmbPenerimaanServices";
-import { getProdi } from "@/services/AdminUserServices";
 import { useUser } from "@/context/UserContext";
 import type { PmbPesertaItem } from "@/types";
 
@@ -16,59 +19,72 @@ type RowStatus = "pending" | "diterima" | "ditolak";
 interface RowState {
   status: RowStatus;
   nim: string;
-  prodi_id: string;
 }
 
 export default function PenerimaanPMBPage() {
-  const { user } = useUser();
+  useUser();
   const tahunSekarang = new Date().getFullYear();
 
-  const [tahun, setTahun]     = useState(tahunSekarang);
-  const [search, setSearch]   = useState("");
-  const [rows, setRows]       = useState<Record<number, RowState>>({});
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [processing, setProcessing]   = useState(false);
-  const [result, setResult]   = useState<{ diterima: number; ditolak: number } | null>(null);
+  const [tahun, setTahun]   = useState(tahunSekarang);
+  const [search, setSearch] = useState("");
+  const [page, setPage]     = useState(1);
+  const perPage             = usePerPage(53, 1, 455);
+  const [rows, setRows]     = useState<Record<number, RowState>>({});
+  const [showConfirm, setShowConfirm]     = useState(false);
+  const [processing, setProcessing]       = useState(false);
+  const [result, setResult]               = useState<{ diterima: number; ditolak: number } | null>(null);
+  const [showAutoFill, setShowAutoFill]   = useState(false);
+  const [batasNilai, setBatasNilai]       = useState("60");
+  const [autoFillLoading, setAutoFillLoading] = useState(false);
 
   const debouncedSearch = useDebounce(search);
 
+  // Simpan semua item yang pernah dilihat lintas halaman
+  const allItemsRef = useRef<Record<number, PmbPesertaItem>>({});
+
+  useEffect(() => { setPage(1); }, [debouncedSearch, tahun, perPage]);
+
   const { data, isLoading, mutate } = useSWR(
-    ["/pmb/penerimaan/peserta", debouncedSearch, tahun],
-    ([, s, t]: [string, string, number]) => getPmbPeserta({ search: s, tahun: t, per_page: 200 }),
-    { revalidateOnFocus: false }
+    ["/pmb/penerimaan/peserta", debouncedSearch, tahun, page, perPage],
+    ([, s, t, p, pp]: [string, string, number, number, number]) =>
+      getPmbPeserta({ search: s, tahun: t, page: p, per_page: pp }),
+    { revalidateOnFocus: false, keepPreviousData: true }
   );
 
-  const { data: prodiList = [] } = useSWR(
-    user?.universitas_id ? ["/prodi/penerimaan", user.universitas_id] : null,
-    () => getProdi({ per_page: 200 }).then(r => r.data),
-    { revalidateOnFocus: false }
-  );
 
   const items: PmbPesertaItem[] = data?.data ?? [];
+  const meta = data?.meta;
 
+  // Daftarkan item baru ke ref dan rows — return prev jika tidak ada perubahan
   useEffect(() => {
+    items.forEach(item => { allItemsRef.current[item.id] = item; });
+
     setRows(prev => {
+      let changed = false;
       const next = { ...prev };
       items.forEach(item => {
         if (!next[item.id]) {
           next[item.id] = {
-            status:   "pending",
-            nim:      item.nim ?? "",
-            prodi_id: String(item.prodi_id ?? ""),
+            status: "pending",
+            nim:    item.nim ?? "",
           };
+          changed = true;
         }
       });
-      return next;
+      return changed ? next : prev;
     });
   }, [items]);
 
   const setRow = (id: number, patch: Partial<RowState>) =>
     setRows(prev => ({ ...prev, [id]: { ...prev[id], ...patch } }));
 
-  const diterimaList  = items.filter(i => rows[i.id]?.status === "diterima");
-  const ditolakList   = items.filter(i => rows[i.id]?.status === "ditolak");
-  const pendingCount  = items.filter(i => rows[i.id]?.status === "pending").length;
-  const canProses     = (diterimaList.length + ditolakList.length) > 0 && !processing;
+  // Hitung lintas semua halaman dari rows
+  const diterimaEntries = Object.entries(rows).filter(([, r]) => r.status === "diterima");
+  const ditolakEntries  = Object.entries(rows).filter(([, r]) => r.status === "ditolak");
+  const diterimaList    = diterimaEntries.map(([id]) => allItemsRef.current[Number(id)]).filter(Boolean);
+  const ditolakList     = ditolakEntries.map(([id]) => allItemsRef.current[Number(id)]).filter(Boolean);
+  const pendingCount    = (meta?.total ?? 0) - diterimaList.length - ditolakList.length;
+  const canProses       = (diterimaList.length + ditolakList.length) > 0 && !processing;
 
   const handleProses = async () => {
     setProcessing(true);
@@ -77,17 +93,44 @@ export default function PenerimaanPMBPage() {
       const res = await prosesPenerimaan({
         tahun,
         diterima: diterimaList.map(i => ({
-          user_id:  i.id,
-          nim:      rows[i.id].nim || undefined,
-          prodi_id: Number(rows[i.id].prodi_id),
+          user_id: i.id,
+          nim:     rows[i.id].nim || undefined,
         })),
         ditolak: ditolakList.map(i => i.id),
       });
       setResult({ diterima: res.total_diterima, ditolak: res.total_ditolak });
       mutate();
       setRows({});
+      allItemsRef.current = {};
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleAutoFill = async () => {
+    setAutoFillLoading(true);
+    try {
+      const allData = await getPmbPeserta({ tahun, per_page: 500 });
+      const allPeserta = allData.data;
+      allPeserta.forEach(item => { allItemsRef.current[item.id] = item; });
+
+      const threshold = Number(batasNilai);
+      setRows(prev => {
+        const next = { ...prev };
+        allPeserta.forEach(item => {
+          const nilai = item.nilai_pmb ?? null;
+          next[item.id] = {
+            nim:    item.nim ?? (next[item.id]?.nim ?? ""),
+            status: nilai !== null
+              ? (nilai >= threshold ? "diterima" : "ditolak")
+              : "pending",
+          };
+        });
+        return next;
+      });
+      setShowAutoFill(false);
+    } finally {
+      setAutoFillLoading(false);
     }
   };
 
@@ -99,7 +142,8 @@ export default function PenerimaanPMBPage() {
         <Breadcrumb />
       </div>
 
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col flex-1">
+      <div className="flex-1">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
@@ -117,15 +161,52 @@ export default function PenerimaanPMBPage() {
               {tahunOptions.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
 
+            <SearchInput value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Cari peserta..." />
+
+            {/* Auto-isi */}
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Cari peserta..."
-                className="border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] w-44"
-              />
+              <button
+                onClick={() => setShowAutoFill(v => !v)}
+                className="flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-lg cursor-pointer transition-colors"
+                style={showAutoFill
+                  ? { backgroundColor: "var(--color-primary)", color: "#fff" }
+                  : { backgroundColor: "var(--color-primary-light, #eff6ff)", color: "var(--color-primary)" }
+                }
+              >
+                <Wand2 size={14} />
+                Auto-isi
+              </button>
+              {showAutoFill && (
+                <div className="absolute right-0 top-full mt-1.5 bg-white rounded-xl z-20 w-64 border border-gray-200"
+                  style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.10)" }}>
+                  <div className="px-4 pt-3.5 pb-1">
+                    <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--color-primary)" }}>
+                      Terima jika nilai ≥
+                    </p>
+                    <p className="text-xs text-gray-400">Peserta tanpa nilai tetap pending.</p>
+                  </div>
+                  <div className="flex items-center gap-2 px-4 pb-3.5 pt-2.5 border-t border-gray-100 mt-2">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={batasNilai}
+                      onChange={e => setBatasNilai(e.target.value)}
+                      className="w-20 border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-gray-800 focus:outline-none focus:border-gray-300"
+                    />
+                    <span className="text-xs text-gray-400 font-medium">/ 100</span>
+                    <button
+                      onClick={handleAutoFill}
+                      disabled={autoFillLoading}
+                      className="ml-auto flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg text-white disabled:opacity-50 cursor-pointer"
+                      style={{ backgroundColor: "var(--color-primary)" }}
+                    >
+                      {autoFillLoading ? <Loader2 size={11} className="animate-spin" /> : null}
+                      Terapkan
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
@@ -151,7 +232,7 @@ export default function PenerimaanPMBPage() {
         )}
 
         {/* Summary pills */}
-        {items.length > 0 && (
+        {Object.keys(rows).length > 0 && (
           <div className="flex gap-3 px-5 pt-3 shrink-0">
             <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
               Pending: <b>{pendingCount}</b>
@@ -167,48 +248,44 @@ export default function PenerimaanPMBPage() {
 
         {/* Table */}
         <div className="overflow-auto flex-1">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead className="sticky top-0 bg-white z-10">
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Email</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-32">Tahun Masuk</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Nama</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-48">Email</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Tahun Masuk</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM (jika diterima)</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Prodi</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">Status</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">Prodi</th>
+                <th className="text-right text-xs text-gray-400 font-medium px-4 py-3 w-24">Nilai PMB</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Status</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                Array.from({ length: 6 }).map((_, i) => (
+                Array.from({ length: perPage }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
-                    {Array.from({ length: 7 }).map((_, j) => (
+                    {Array.from({ length: 8 }).map((_, j) => (
                       <td key={j} className="px-4 py-4"><div className="h-3 bg-gray-100 rounded w-3/4" /></td>
                     ))}
                   </tr>
                 ))
-              ) : items.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center text-sm text-gray-400 py-12">
-                    Tidak ada peserta PMB{search ? ` untuk pencarian "${search}"` : ` tahun ${tahun}`}.
-                  </td>
-                </tr>
-              ) : (
+              ) : items.length === 0 ? null : (
                 items.map((item, idx) => {
-                  const row    = rows[item.id] ?? { status: "pending", nim: "", prodi_id: "" };
+                  const row        = rows[item.id] ?? { status: "pending", nim: "", prodi_id: "" };
                   const isDiterima = row.status === "diterima";
                   const isDitolak  = row.status === "ditolak";
+                  const no         = ((meta?.current_page ?? 1) - 1) * perPage + idx + 1;
                   return (
                     <tr
                       key={item.id}
                       className={`border-b border-gray-50 transition-colors ${
-                        isDiterima ? "bg-green-50/60" : isDitolak ? "bg-red-50/40" : "hover:bg-gray-50"
+                        isDiterima ? "bg-green-50/50" : isDitolak ? "bg-red-50/30" : "hover:bg-gray-50"
                       }`}
                     >
-                      <td className="px-5 py-3 text-xs text-gray-400">{String(idx + 1).padStart(2, "0")}</td>
-                      <td className="px-4 py-3 font-medium text-gray-800">{item.nama}</td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{item.email}</td>
+                      <td className="px-5 py-3 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800 truncate">{item.nama}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500 truncate">{item.email}</td>
                       <td className="px-4 py-3 text-xs text-gray-500">{item.tahun_masuk ?? "-"}</td>
 
                       <td className="px-4 py-3">
@@ -222,18 +299,20 @@ export default function PenerimaanPMBPage() {
                         />
                       </td>
 
-                      <td className="px-4 py-3">
-                        <select
-                          value={row.prodi_id}
-                          onChange={e => setRow(item.id, { prodi_id: e.target.value })}
-                          disabled={!isDiterima}
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs disabled:bg-gray-50 disabled:text-gray-400 focus:outline-none focus:border-[var(--color-primary)]"
-                        >
-                          <option value="">Pilih prodi</option>
-                          {prodiList.map(p => (
-                            <option key={p.id} value={p.id}>{p.nama}</option>
-                          ))}
-                        </select>
+                      <td className="px-4 py-3 text-xs text-gray-700">
+                        {item.prodi?.nama ?? "-"}
+                      </td>
+
+                      <td className="px-4 py-3 text-right">
+                        {item.nilai_pmb != null ? (
+                          <span className={`text-xs font-semibold tabular-nums ${
+                            item.nilai_pmb >= 60 ? "text-green-600" : "text-red-500"
+                          }`}>
+                            {item.nilai_pmb}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
+                        )}
                       </td>
 
                       <td className="px-4 py-3">
@@ -241,7 +320,7 @@ export default function PenerimaanPMBPage() {
                           <button
                             onClick={() => setRow(item.id, { status: isDiterima ? "pending" : "diterima" })}
                             className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-                              isDiterima ? "bg-green-500 text-white" : "bg-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-600"
+                              isDiterima ? "bg-green-50 text-green-500 border border-green-200" : "bg-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-500"
                             }`}
                           >
                             <CheckCircle size={12} />
@@ -250,7 +329,7 @@ export default function PenerimaanPMBPage() {
                           <button
                             onClick={() => setRow(item.id, { status: isDitolak ? "pending" : "ditolak" })}
                             className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-                              isDitolak ? "bg-red-500 text-white" : "bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500"
+                              isDitolak ? "bg-red-50 text-red-400 border border-red-200" : "bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-400"
                             }`}
                           >
                             <XCircle size={12} />
@@ -264,8 +343,27 @@ export default function PenerimaanPMBPage() {
               )}
             </tbody>
           </table>
+
+          {!isLoading && items.length === 0 && (
+            <EmptyState
+              message={search ? `Tidak ada peserta untuk pencarian "${search}".` : `Tidak ada peserta PMB tahun ${tahun}.`}
+              flat
+            />
+          )}
         </div>
+
       </div>
+      </div>
+
+      {meta && (meta.last_page ?? 1) > 1 && (
+        <Pagination
+          currentPage={meta.current_page}
+          lastPage={meta.last_page}
+          total={meta.total}
+          perPage={meta.per_page}
+          onPageChange={setPage}
+        />
+      )}
 
       {showConfirm && (
         <ConfirmModal

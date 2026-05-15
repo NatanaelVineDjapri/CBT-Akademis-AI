@@ -18,7 +18,7 @@ export const getPmbPeserta = async (params?: {
 
 export const prosesPenerimaan = async (payload: {
   tahun: number;
-  diterima: { user_id: number; nim?: string; prodi_id: number }[];
+  diterima: { user_id: number; nim?: string; prodi_id?: number }[];
   ditolak: number[];
 }): Promise<{ message: string; total_diterima: number; total_ditolak: number }> => {
   const res = await api.post("/pmb/penerimaan/proses", payload);

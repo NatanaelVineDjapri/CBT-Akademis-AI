@@ -441,6 +441,7 @@ export interface PmbPesertaItem {
   tahun_masuk?: number;
   prodi_id?: number;
   prodi?: { id: number; nama: string };
+  nilai_pmb?: number | null;
 }
 
 export interface PmbPesertaMeta {
