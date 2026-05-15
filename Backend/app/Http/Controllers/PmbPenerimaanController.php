@@ -27,7 +27,8 @@ class PmbPenerimaanController extends Controller
         $query = User::where('role', 'peserta_mahasiswa_baru')
             ->where('universitas_id', $user->universitas_id)
             ->with('prodi:id,nama,nim_prefix')
-            ->orderBy('nama');
+            ->orderBy('created_at')
+            ->orderBy('id');
 
         $search = $request->input('search');
         $tahun  = $request->input('tahun');

@@ -858,6 +858,151 @@ class UjianController extends Controller
         ]);
     }
 
+    // ── Admin Universitas: PMB Ujian ───────────────────────────────────────────
+
+    public function indexPmb(Request $request)
+    {
+        $authUser = $request->user();
+        $search   = $request->query('search', '');
+        $perPage  = (int) $request->query('per_page', 10);
+        $now      = now();
+
+        $query = Ujian::with(['ujianSetting'])
+            ->withCount(['ujianSoal', 'pesertaUjian'])
+            ->where('created_by', $authUser->id)
+            ->where('jenis_ujian', 'pmb')
+            ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']))
+            ->orderBy('start_date', 'desc');
+
+        $paginated = $query->paginate($perPage);
+
+        $data = collect($paginated->items())->map(fn($u) => [
+            'id'             => $u->id,
+            'nama_ujian'     => $u->nama_ujian,
+            'mata_kuliah'    => null,
+            'mata_kuliah_id' => null,
+            'start_date'     => $u->start_date,
+            'end_date'       => $u->end_date,
+            'durasi_menit'   => $u->durasi_menit,
+            'jumlah_soal'    => $u->ujian_soal_count,
+            'jumlah_peserta' => $u->peserta_ujian_count,
+            'passing_grade'  => $u->ujianSetting?->passing_grade,
+            'kode_akses'     => $u->kode_akses,
+            'is_kode_aktif'  => $u->is_kode_aktif,
+            'status'         => match(true) {
+                $u->end_date && $now->gt($u->end_date)      => 'selesai',
+                $u->start_date && $now->gte($u->start_date) => 'berlangsung',
+                default                                      => 'belum_mulai',
+            },
+        ]);
+
+        return response()->json([
+            'message' => 'Daftar ujian PMB berhasil diambil!',
+            'data'    => $data,
+            'meta'    => [
+                'current_page' => $paginated->currentPage(),
+                'last_page'    => $paginated->lastPage(),
+                'per_page'     => $paginated->perPage(),
+                'total'        => $paginated->total(),
+            ],
+        ]);
+    }
+
+    public function storePmb(Request $request)
+    {
+        $authUser = $request->user();
+
+        $request->validate([
+            'nama_ujian'               => 'required|string|max:255',
+            'start_date'               => 'required|date',
+            'end_date'                 => 'required|date|after:start_date',
+            'durasi_menit'             => 'required|integer|min:1',
+            'kode_akses'               => 'nullable|string|max:50',
+            'is_kode_aktif'            => 'boolean',
+            'randomize_soal'           => 'boolean',
+            'max_attempt'              => 'integer|min:1',
+            'passing_grade'            => 'nullable|numeric|min:0|max:100',
+            'soal'                     => 'nullable|array',
+            'soal.*.soal_id'           => 'nullable|integer|exists:soal,id',
+            'soal.*.bobot'             => 'nullable|numeric|min:0',
+            'soal.*.deskripsi'         => 'nullable|string',
+            'soal.*.jenis_soal'        => 'nullable|in:pilihan_ganda,essay,checklist',
+            'soal.*.tingkat_kesulitan' => 'nullable|in:mudah,sedang,sulit',
+            'soal.*.bab_id'            => 'nullable|integer|exists:bab,id',
+            'soal.*.bank_soal_id'      => 'nullable|integer|exists:bank_soal,id',
+            'soal.*.opsi'              => 'nullable|array',
+            'soal.*.kunci'             => 'nullable',
+        ], [
+            'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai!',
+        ]);
+
+        \DB::transaction(function () use ($request, $authUser, &$ujian) {
+            $ujian = Ujian::create([
+                'created_by'  => $authUser->id,
+                'nama_ujian'  => $request->nama_ujian,
+                'jenis_ujian' => 'pmb',
+                'start_date'  => $request->start_date,
+                'end_date'    => $request->end_date,
+                'durasi_menit' => $request->durasi_menit,
+                'kode_akses'  => $request->kode_akses ?? $this->generateKodeAkses(),
+                'is_kode_aktif' => $request->boolean('is_kode_aktif', false),
+            ]);
+
+            UjianSetting::create([
+                'ujian_id'         => $ujian->id,
+                'randomize_soal'   => $request->boolean('randomize_soal', false),
+                'max_attempt'      => $request->input('max_attempt', 1),
+                'passing_grade'    => $request->input('passing_grade', 60),
+                'proctoring_aktif' => false,
+            ]);
+
+            foreach (($request->soal ?? []) as $i => $item) {
+                $soalId = $item['soal_id'] ?? null;
+
+                if (!$soalId && !empty($item['deskripsi'])) {
+                    $newSoal = Soal::create([
+                        'bank_soal_id'      => $item['bank_soal_id'] ?? null,
+                        'mata_kuliah_id'    => null,
+                        'bab_id'            => $item['bab_id'] ?? null,
+                        'deskripsi'         => $item['deskripsi'],
+                        'tingkat_kesulitan' => $item['tingkat_kesulitan'] ?? 'sedang',
+                        'ai_generated'      => false,
+                    ]);
+                    $jenisSoal = JenisSoal::create([
+                        'soal_id'    => $newSoal->id,
+                        'jenis_soal' => $item['jenis_soal'] ?? 'essay',
+                    ]);
+                    if (!empty($item['opsi']) && !empty($item['kunci'])) {
+                        $kunci = $item['kunci'];
+                        foreach ($item['opsi'] as $huruf => $teks) {
+                            OpsiJawaban::create([
+                                'jenis_soal_id' => $jenisSoal->id,
+                                'opsi'          => $huruf,
+                                'teks'          => $teks,
+                                'is_correct'    => is_array($kunci) ? in_array($huruf, $kunci) : $huruf === $kunci,
+                            ]);
+                        }
+                    }
+                    $soalId = $newSoal->id;
+                }
+
+                if ($soalId) {
+                    UjianSoal::create([
+                        'ujian_id' => $ujian->id,
+                        'soal_id'  => $soalId,
+                        'bobot'    => $item['bobot'] ?? 1.0,
+                        'urutan'   => $i + 1,
+                    ]);
+                }
+            }
+        });
+
+        return response()->json([
+            'message' => 'Ujian PMB berhasil dibuat!',
+            'data'    => ['id' => $ujian->id],
+        ], 201);
+    }
+
     // ── Dosen: CRUD Ujian ──────────────────────────────────────────────────────
 
     public function index(Request $request)

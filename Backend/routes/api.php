@@ -164,6 +164,18 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::put('/ujian/admin-universitas/hasil/{ujianId}/peserta/{pesertaId}/periksa-essay', [UjianController::class, 'periksaEssay']);
         Route::put('/ujian/admin-universitas/hasil/{ujianId}/peserta/{pesertaId}/reset-essay', [UjianController::class, 'resetEssay']);
         Route::get('/ujian/admin-universitas/hasil/{id}/export-pdf', [UjianController::class, 'exportPDF']);
+
+        Route::get('/ujian/pmb', [UjianController::class, 'indexPmb']);
+        Route::post('/ujian/pmb', [UjianController::class, 'storePmb']);
+        Route::get('/ujian/pmb/{id}', [UjianController::class, 'show']);
+        Route::put('/ujian/pmb/{id}', [UjianController::class, 'update']);
+        Route::delete('/ujian/pmb/{id}', [UjianController::class, 'destroy']);
+        Route::get('/ujian/pmb/{id}/soal', [UjianController::class, 'getSoal']);
+        Route::get('/ujian/pmb/{id}/available-soal', [UjianController::class, 'availableSoal']);
+        Route::post('/ujian/pmb/{id}/soal', [UjianController::class, 'addSoal']);
+        Route::post('/ujian/pmb/{id}/soal/random', [UjianController::class, 'addSoalRandom']);
+        Route::post('/ujian/pmb/{id}/soal/buat-baru', [UjianController::class, 'buatSoal']);
+        Route::delete('/ujian/pmb/{id}/soal/{ujianSoalId}', [UjianController::class, 'removeSoal']);
     });
 
     Route::middleware('role:dosen')->group(function () {
