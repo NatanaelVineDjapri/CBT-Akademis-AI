@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->boolean('is_manual_graded')->default(false);
             $table->float('ai_skor')->nullable();
             $table->text('ai_feedback')->nullable();
+            $table->text('dosen_feedback')->nullable();
             $table->float('final_nilai')->nullable();
             $table->timestamps();
 

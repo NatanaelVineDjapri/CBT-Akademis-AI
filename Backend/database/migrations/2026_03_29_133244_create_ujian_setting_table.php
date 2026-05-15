@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->boolean('randomize_soal')->default(false);
             $table->integer('max_attempt')->default(1);
             $table->float('passing_grade')->default(60);
+            $table->float('total_skor')->default(100);
             $table->boolean('proctoring_aktif')->default(false);
             $table->string('pembagian_durasi')->nullable();
             $table->timestamps();

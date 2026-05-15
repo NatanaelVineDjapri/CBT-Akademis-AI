@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('fakultas_id');
             $table->string('nama');
             $table->string('kode');
+            $table->string('nim_prefix', 3)->nullable();
             $table->timestamps();
 
             $table->foreign('fakultas_id')->references('id')->on('fakultas')->cascadeOnDelete();

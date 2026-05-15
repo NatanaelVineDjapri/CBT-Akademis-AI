@@ -12,6 +12,7 @@ class Prodi extends Model
         'fakultas_id',
         'nama',
         'kode',
+        'nim_prefix',
     ];
 
     // Relasi

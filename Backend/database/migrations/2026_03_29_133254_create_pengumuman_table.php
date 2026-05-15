@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('created_by');
             $table->string('judul');
             $table->text('isi');
+            $table->string('target_role')->nullable();
             $table->dateTime('expired_at')->nullable();
             $table->timestamps();
 

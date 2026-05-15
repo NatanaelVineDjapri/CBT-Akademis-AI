@@ -26,7 +26,7 @@ class PmbPenerimaanController extends Controller
         $user  = $request->user();
         $query = User::where('role', 'peserta_mahasiswa_baru')
             ->where('universitas_id', $user->universitas_id)
-            ->with('prodi:id,nama')
+            ->with('prodi:id,nama,nim_prefix')
             ->orderBy('nama');
 
         $search = $request->input('search');
@@ -60,9 +60,20 @@ class PmbPenerimaanController extends Controller
             return $user;
         });
 
+        // Hitung jumlah mahasiswa existing per prodi per tahun untuk generate NIM
+        $tahunForNim = $tahun ?? (int) date('Y');
+        $nimSequences = User::where('role', 'mahasiswa')
+            ->where('universitas_id', $user->universitas_id)
+            ->where('tahun_masuk', $tahunForNim)
+            ->whereNotNull('prodi_id')
+            ->get(['prodi_id'])
+            ->groupBy('prodi_id')
+            ->map(fn ($g) => $g->count());
+
         return response()->json([
-            'data' => $items,
-            'meta' => [
+            'data'          => $items,
+            'nim_sequences' => $nimSequences,
+            'meta'          => [
                 'total'        => $result->total(),
                 'per_page'     => $result->perPage(),
                 'current_page' => $result->currentPage(),

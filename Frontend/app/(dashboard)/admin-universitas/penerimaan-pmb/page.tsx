@@ -12,7 +12,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
 import { getPmbPeserta, prosesPenerimaan } from "@/services/PmbPenerimaanServices";
 import { useUser } from "@/context/UserContext";
-import type { PmbPesertaItem } from "@/types";
+import type { PmbPesertaItem, PmbNimSequences } from "@/types";
 
 type RowStatus = "pending" | "diterima" | "ditolak";
 
@@ -40,9 +40,15 @@ export default function PenerimaanPMBPage() {
   const debouncedSearch = useDebounce(search);
 
   // Simpan semua item yang pernah dilihat lintas halaman
-  const allItemsRef = useRef<Record<number, PmbPesertaItem>>({});
+  const allItemsRef     = useRef<Record<number, PmbPesertaItem>>({});
+  // Base count mahasiswa existing per prodi (dari API), dan counter lokal sesi ini
+  const nimSequencesRef = useRef<PmbNimSequences>({});
+  const nimAssignedRef  = useRef<Record<string, number>>({});
 
   useEffect(() => { setPage(1); }, [debouncedSearch, tahun, perPage]);
+
+  // Reset counter lokal saat tahun ganti
+  useEffect(() => { nimAssignedRef.current = {}; }, [tahun]);
 
   const { data, isLoading, mutate } = useSWR(
     ["/pmb/penerimaan/peserta", debouncedSearch, tahun, page, perPage],
@@ -54,6 +60,33 @@ export default function PenerimaanPMBPage() {
 
   const items: PmbPesertaItem[] = data?.data ?? [];
   const meta = data?.meta;
+
+  // Sync nim_sequences dari API
+  useEffect(() => {
+    if (data?.nim_sequences) nimSequencesRef.current = data.nim_sequences;
+  }, [data?.nim_sequences]);
+
+  const generateNim = (item: PmbPesertaItem): string => {
+    const prefix = item.prodi?.nim_prefix;
+    if (!prefix || !item.prodi_id) return "";
+    const key    = String(item.prodi_id);
+    const base   = nimSequencesRef.current[key] ?? 0;
+    const local  = nimAssignedRef.current[key]  ?? 0;
+    const seq    = base + local + 1;
+    return prefix + String(tahun).slice(-2) + String(seq).padStart(4, "0");
+  };
+
+  const handleToggleDiterima = (item: PmbPesertaItem) => {
+    const key = String(item.prodi_id);
+    if (rows[item.id]?.status === "diterima") {
+      nimAssignedRef.current[key] = Math.max(0, (nimAssignedRef.current[key] ?? 1) - 1);
+      setRow(item.id, { status: "pending", nim: "" });
+    } else {
+      const nim = generateNim(item);
+      if (item.prodi?.nim_prefix) nimAssignedRef.current[key] = (nimAssignedRef.current[key] ?? 0) + 1;
+      setRow(item.id, { status: "diterima", nim });
+    }
+  };
 
   // Daftarkan item baru ke ref dan rows — return prev jika tidak ada perubahan
   useEffect(() => {
@@ -114,17 +147,25 @@ export default function PenerimaanPMBPage() {
       const allPeserta = allData.data;
       allPeserta.forEach(item => { allItemsRef.current[item.id] = item; });
 
+      // Sync nim_sequences dari fetch all
+      if (allData.nim_sequences) nimSequencesRef.current = allData.nim_sequences;
+      nimAssignedRef.current = {};
+
       const threshold = Number(batasNilai);
       setRows(prev => {
         const next = { ...prev };
         allPeserta.forEach(item => {
-          const nilai = item.nilai_pmb ?? null;
-          next[item.id] = {
-            nim:    item.nim ?? (next[item.id]?.nim ?? ""),
-            status: nilai !== null
-              ? (nilai >= threshold ? "diterima" : "ditolak")
-              : "pending",
-          };
+          const nilai  = item.nilai_pmb ?? null;
+          const terima = nilai !== null && nilai >= threshold;
+          const key    = String(item.prodi_id);
+
+          if (terima) {
+            const nim = generateNim(item);
+            if (item.prodi?.nim_prefix) nimAssignedRef.current[key] = (nimAssignedRef.current[key] ?? 0) + 1;
+            next[item.id] = { status: "diterima", nim };
+          } else {
+            next[item.id] = { status: nilai !== null ? "ditolak" : "pending", nim: item.nim ?? (next[item.id]?.nim ?? "") };
+          }
         });
         return next;
       });
@@ -318,7 +359,7 @@ export default function PenerimaanPMBPage() {
                       <td className="px-4 py-3">
                         <div className="flex gap-1.5">
                           <button
-                            onClick={() => setRow(item.id, { status: isDiterima ? "pending" : "diterima" })}
+                            onClick={() => handleToggleDiterima(item)}
                             className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
                               isDiterima ? "bg-green-50 text-green-500 border border-green-200" : "bg-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-500"
                             }`}

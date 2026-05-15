@@ -440,7 +440,7 @@ export interface PmbPesertaItem {
   no_telp?: string;
   tahun_masuk?: number;
   prodi_id?: number;
-  prodi?: { id: number; nama: string };
+  prodi?: { id: number; nama: string; nim_prefix?: string };
   nilai_pmb?: number | null;
 }
 
@@ -450,6 +450,8 @@ export interface PmbPesertaMeta {
   current_page: number;
   last_page: number;
 }
+
+export type PmbNimSequences = Record<string, number>;
 
 export const months = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",

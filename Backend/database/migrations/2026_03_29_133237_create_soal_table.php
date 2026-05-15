@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('soal', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bank_soal_id');
+            $table->unsignedBigInteger('bank_soal_id')->nullable();
             $table->unsignedBigInteger('mata_kuliah_id');
             $table->unsignedBigInteger('bab_id')->nullable();
             $table->unsignedBigInteger('ai_generate_log_id')->nullable();

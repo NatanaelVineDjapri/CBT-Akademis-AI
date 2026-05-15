@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('mata_kuliah_id');
+            $table->unsignedBigInteger('bab_id')->nullable();
             $table->string('nama');
             $table->string('deskripsi')->nullable();
             $table->string('permission')->default('private'); // public, shared, private
@@ -21,6 +22,7 @@ return new class extends Migration {
 
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('mata_kuliah_id')->references('id')->on('mata_kuliah')->cascadeOnDelete();
+            $table->foreign('bab_id')->references('id')->on('bab')->nullOnDelete();
         });
     }
 

@@ -1,5 +1,5 @@
 import api from "./api";
-import type { PmbStatistik, PmbPesertaItem, PmbPesertaMeta } from "@/types";
+import type { PmbStatistik, PmbPesertaItem, PmbPesertaMeta, PmbNimSequences } from "@/types";
 
 export const getPmbStatistik = async (): Promise<PmbStatistik[]> => {
   const res = await api.get("/pmb/penerimaan/statistik");
@@ -11,7 +11,7 @@ export const getPmbPeserta = async (params?: {
   tahun?: number;
   per_page?: number;
   page?: number;
-}): Promise<{ data: PmbPesertaItem[]; meta: PmbPesertaMeta }> => {
+}): Promise<{ data: PmbPesertaItem[]; meta: PmbPesertaMeta; nim_sequences: PmbNimSequences }> => {
   const res = await api.get("/pmb/penerimaan/peserta", { params });
   return res.data;
 };

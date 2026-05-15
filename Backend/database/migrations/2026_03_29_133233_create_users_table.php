@@ -25,6 +25,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('prodi_id')->nullable();
             $table->boolean('is_temporary')->default(false);
             $table->string('foto')->nullable();
+            $table->string('google2fa_secret')->nullable();
+            $table->boolean('google2fa_enabled')->default(false);
             $table->string('status')->default('Aktif')->nullable();
             $table->dateTime('expired_at')->nullable();
             $table->timestamps();
