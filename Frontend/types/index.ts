@@ -33,8 +33,39 @@ export interface MataKuliah {
   nama: string;
   kode: string;
   prodi_id: number;
+  semester?: number | null;
+  sks?: number | null;
   prodi?: { id: number; nama: string; fakultas?: { id: number; nama: string } };
   dosen_matkul?: { id: number; user_id: number; tahun_ajaran?: string; user: { id: number; nama: string; nidn?: string } }[];
+}
+
+export interface KrsMahasiswaItem {
+  id: number;
+  nama: string;
+  nim?: string;
+  tahun_masuk?: number;
+  prodi_id?: number;
+  prodi?: string;
+  matkul_count: number;
+}
+
+export interface KrsMahasiswaDetail {
+  id: number;
+  nama: string;
+  nim?: string;
+  tahun_masuk?: number;
+  prodi_id?: number;
+  prodi?: string;
+  krs: {
+    user_mata_kuliah_id: number;
+    mata_kuliah_id: number;
+    nama: string;
+    kode: string;
+    semester: number | null;
+    sks: number | null;
+    tahun_ajaran: string;
+    is_aktif: boolean;
+  }[];
 }
 
 export interface BankSoalItem {
@@ -481,6 +512,7 @@ export const labels: Record<string, string> = {
   "hasil-ujian-pmb": "Hasil Ujian PMB",
   "penerimaan-pmb": "Penerimaan PMB",
   user: "User",
+  krs: "KRS",
   fakultas: "Fakultas",
   prodi: "Program Studi",
   institusi: "Institusi",

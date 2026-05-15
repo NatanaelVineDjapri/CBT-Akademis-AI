@@ -13,6 +13,7 @@ class Prodi extends Model
         'nama',
         'kode',
         'nim_prefix',
+        'krs_mulai_semester',
     ];
 
     // Relasi

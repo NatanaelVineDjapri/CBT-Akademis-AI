@@ -18,6 +18,7 @@ use App\Http\Controllers\PmbPenerimaanController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProctoringController;
+use App\Http\Controllers\KrsController;
 
 Route::post('/proctoring/save', [ProctoringController::class, 'save']);
 
@@ -150,6 +151,15 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::post('/', [MataKuliahController::class, 'store']);
             Route::put('/{id}', [MataKuliahController::class, 'update']);
             Route::delete('/{id}', [MataKuliahController::class, 'destroy']);
+        });
+
+        Route::prefix('krs')->group(function () {
+            Route::get('/mahasiswa', [KrsController::class, 'index']);
+            Route::get('/mahasiswa/{userId}', [KrsController::class, 'showMahasiswa']);
+            Route::post('/mahasiswa/{userId}/add', [KrsController::class, 'addMatkul']);
+            Route::delete('/mahasiswa/{userId}/matkul/{matkulId}', [KrsController::class, 'removeMatkul']);
+            Route::post('/apply-package', [KrsController::class, 'applyPackage']);
+            Route::get('/prodi/{prodiId}/semester/{semester}', [KrsController::class, 'semesterCourses']);
         });
 
         Route::prefix('pmb/penerimaan')->group(function () {

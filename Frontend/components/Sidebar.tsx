@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Megaphone,
+  ListChecks,
 } from "lucide-react";
 import { preload } from "swr";
 import { User } from "@/types";
@@ -34,6 +35,7 @@ import { getBankSoal } from "../services/BankSoalServices";
 import { getFakultas } from "../services/AdminUserServices";
 import { getUniversitas } from "../services/UniversitasService";
 import { getPmbPeserta, getPmbStatistik } from "../services/PmbPenerimaanServices";
+import { getKrsMahasiswa } from "../services/KrsServices";
 import { getAudits } from "../services/AuditService";
 import { calcPerPage } from "../hooks/usePerPage";
 
@@ -91,6 +93,11 @@ const menuByRole: Record<string, MenuItem[]> = {
       label: "Penerimaan PMB",
       href: "/admin-universitas/penerimaan-pmb",
       icon: <GraduationCap size={18} />,
+    },
+    {
+      label: "KRS",
+      href: "/admin-universitas/krs",
+      icon: <ListChecks size={18} />,
     },
     {
       label: "User",
@@ -333,6 +340,10 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                     const pp = calcPerPage(53, 1, 395);
                     preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
                       getHasilUjianAdminUniversitas({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
+                  } else if (item.href === "/admin-universitas/krs") {
+                    const pp = calcPerPage(65, 1, 360);
+                    preload(["/krs/mahasiswa", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
+                      getKrsMahasiswa({ search: s, prodi_id: p, page: pg, per_page: pp }));
                   } else if (item.href === "/admin-universitas/user") {
                     if (user.universitas_id) {
                       preload(["/fakultas", user.universitas_id], ([, univId]: [string, number]) =>

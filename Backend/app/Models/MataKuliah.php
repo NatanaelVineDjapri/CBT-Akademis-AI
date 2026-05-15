@@ -12,6 +12,8 @@ class MataKuliah extends Model
         'nama',
         'kode',
         'prodi_id',
+        'semester',
+        'sks',
     ];
 
     public function prodi()

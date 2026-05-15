@@ -17,44 +17,60 @@ class DemoSeeder extends Seeder
         $mhs2Id     = DB::table('users')->where('nim', '535240005')->value('id');
         $mhs3Id     = DB::table('users')->where('nim', '535240003')->value('id');
 
-        // Mata Kuliah (30 total)
+        // Mata Kuliah TI (30 total) — semester & sks sesuai kurikulum FTI UNTAR
+        // KRS mulai semester 4, semester 1–3 fixed package
         $allMatkul = [
-            ['nama' => 'Pemrograman Web',               'kode' => 'TI301'],
-            ['nama' => 'Basis Data',                     'kode' => 'TI302'],
-            ['nama' => 'Algoritma dan Pemrograman',      'kode' => 'TI101'],
-            ['nama' => 'Struktur Data',                  'kode' => 'TI102'],
-            ['nama' => 'Sistem Operasi',                 'kode' => 'TI201'],
-            ['nama' => 'Jaringan Komputer',              'kode' => 'TI202'],
-            ['nama' => 'Pemrograman Berorientasi Objek', 'kode' => 'TI203'],
-            ['nama' => 'Rekayasa Perangkat Lunak',       'kode' => 'TI204'],
-            ['nama' => 'Kecerdasan Buatan',              'kode' => 'TI401'],
-            ['nama' => 'Machine Learning',               'kode' => 'TI402'],
-            ['nama' => 'Pengolahan Citra Digital',       'kode' => 'TI403'],
-            ['nama' => 'Keamanan Sistem Informasi',      'kode' => 'TI404'],
-            ['nama' => 'Pemrograman Mobile',             'kode' => 'TI303'],
-            ['nama' => 'Cloud Computing',                'kode' => 'TI405'],
-            ['nama' => 'Data Mining',                    'kode' => 'TI406'],
-            ['nama' => 'Interaksi Manusia Komputer',     'kode' => 'TI304'],
-            ['nama' => 'Matematika Diskrit',             'kode' => 'TI103'],
-            ['nama' => 'Kalkulus',                       'kode' => 'TI104'],
-            ['nama' => 'Statistika dan Probabilitas',    'kode' => 'TI105'],
-            ['nama' => 'Logika Matematika',              'kode' => 'TI106'],
-            ['nama' => 'Sistem Informasi',               'kode' => 'TI205'],
-            ['nama' => 'Basis Data Lanjut',              'kode' => 'TI305'],
-            ['nama' => 'Pemrograman Fungsional',         'kode' => 'TI306'],
-            ['nama' => 'Arsitektur Komputer',            'kode' => 'TI206'],
-            ['nama' => 'Kompilator',                     'kode' => 'TI407'],
-            ['nama' => 'Grafika Komputer',               'kode' => 'TI408'],
-            ['nama' => 'Internet of Things',             'kode' => 'TI409'],
-            ['nama' => 'Big Data Analytics',             'kode' => 'TI410'],
-            ['nama' => 'DevOps',                         'kode' => 'TI411'],
-            ['nama' => 'Etika Profesi TI',               'kode' => 'TI001'],
+            // Semester 1
+            ['nama' => 'Algoritma dan Pemrograman',      'kode' => 'TI101', 'semester' => 1, 'sks' => 4],
+            ['nama' => 'Kalkulus',                       'kode' => 'TI104', 'semester' => 1, 'sks' => 4],
+            ['nama' => 'Logika Matematika',              'kode' => 'TI106', 'semester' => 1, 'sks' => 3],
+
+            // Semester 2
+            ['nama' => 'Struktur Data',                  'kode' => 'TI102', 'semester' => 2, 'sks' => 4],
+            ['nama' => 'Matematika Diskrit',             'kode' => 'TI103', 'semester' => 2, 'sks' => 3],
+            ['nama' => 'Statistika dan Probabilitas',    'kode' => 'TI105', 'semester' => 2, 'sks' => 3],
+
+            // Semester 3
+            ['nama' => 'Sistem Operasi',                 'kode' => 'TI201', 'semester' => 3, 'sks' => 3],
+            ['nama' => 'Pemrograman Berorientasi Objek', 'kode' => 'TI203', 'semester' => 3, 'sks' => 4],
+            ['nama' => 'Basis Data',                     'kode' => 'TI302', 'semester' => 3, 'sks' => 4],
+            ['nama' => 'Sistem Informasi',               'kode' => 'TI205', 'semester' => 3, 'sks' => 3],
+
+            // Semester 4 (KRS mulai dari sini untuk FTI)
+            ['nama' => 'Jaringan Komputer',              'kode' => 'TI202', 'semester' => 4, 'sks' => 3],
+            ['nama' => 'Arsitektur Komputer',            'kode' => 'TI206', 'semester' => 4, 'sks' => 3],
+            ['nama' => 'Rekayasa Perangkat Lunak',       'kode' => 'TI204', 'semester' => 4, 'sks' => 3],
+            ['nama' => 'Pemrograman Web',                'kode' => 'TI301', 'semester' => 4, 'sks' => 4],
+
+            // Semester 5
+            ['nama' => 'Pemrograman Mobile',             'kode' => 'TI303', 'semester' => 5, 'sks' => 4],
+            ['nama' => 'Interaksi Manusia Komputer',     'kode' => 'TI304', 'semester' => 5, 'sks' => 3],
+            ['nama' => 'Basis Data Lanjut',              'kode' => 'TI305', 'semester' => 5, 'sks' => 3],
+            ['nama' => 'Kecerdasan Buatan',              'kode' => 'TI401', 'semester' => 5, 'sks' => 3],
+
+            // Semester 6
+            ['nama' => 'Pemrograman Fungsional',         'kode' => 'TI306', 'semester' => 6, 'sks' => 3],
+            ['nama' => 'Machine Learning',               'kode' => 'TI402', 'semester' => 6, 'sks' => 3],
+            ['nama' => 'Pengolahan Citra Digital',       'kode' => 'TI403', 'semester' => 6, 'sks' => 3],
+            ['nama' => 'Keamanan Sistem Informasi',      'kode' => 'TI404', 'semester' => 6, 'sks' => 3],
+            ['nama' => 'Data Mining',                    'kode' => 'TI406', 'semester' => 6, 'sks' => 3],
+            ['nama' => 'Kompilator',                     'kode' => 'TI407', 'semester' => 6, 'sks' => 3],
+
+            // Semester 7
+            ['nama' => 'Cloud Computing',                'kode' => 'TI405', 'semester' => 7, 'sks' => 3],
+            ['nama' => 'Grafika Komputer',               'kode' => 'TI408', 'semester' => 7, 'sks' => 3],
+            ['nama' => 'Internet of Things',             'kode' => 'TI409', 'semester' => 7, 'sks' => 3],
+            ['nama' => 'Big Data Analytics',             'kode' => 'TI410', 'semester' => 7, 'sks' => 3],
+            ['nama' => 'DevOps',                         'kode' => 'TI411', 'semester' => 7, 'sks' => 3],
+            ['nama' => 'Etika Profesi TI',               'kode' => 'TI001', 'semester' => 7, 'sks' => 2],
         ];
 
         $insertMatkul = array_map(fn($m) => [
             'nama'       => $m['nama'],
             'kode'       => $m['kode'],
             'prodi_id'   => $prodiTI->id,
+            'semester'   => $m['semester'],
+            'sks'        => $m['sks'],
             'created_at' => now(),
             'updated_at' => now(),
         ], $allMatkul);

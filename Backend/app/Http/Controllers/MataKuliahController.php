@@ -141,21 +141,25 @@ class MataKuliahController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'kode' => 'required|string|unique:mata_kuliah,kode',
+            'nama'     => 'required|string|max:255',
+            'kode'     => 'required|string|unique:mata_kuliah,kode',
             'prodi_id' => 'required|exists:prodi,id',
+            'semester' => 'nullable|integer|min:1|max:8',
+            'sks'      => 'nullable|integer|min:1|max:6',
         ], [
-            'nama.required' => 'Nama mata kuliah wajib diisi!',
-            'kode.required' => 'Kode mata kuliah wajib diisi!',
-            'kode.unique' => 'Kode mata kuliah sudah digunakan!',
+            'nama.required'     => 'Nama mata kuliah wajib diisi!',
+            'kode.required'     => 'Kode mata kuliah wajib diisi!',
+            'kode.unique'       => 'Kode mata kuliah sudah digunakan!',
             'prodi_id.required' => 'Prodi wajib dipilih!',
-            'prodi_id.exists' => 'Prodi tidak ditemukan!',
+            'prodi_id.exists'   => 'Prodi tidak ditemukan!',
         ]);
 
         $mataKuliah = MataKuliah::create([
-            'nama' => $request->nama,
-            'kode' => $request->kode,
+            'nama'     => $request->nama,
+            'kode'     => $request->kode,
             'prodi_id' => $request->prodi_id,
+            'semester' => $request->semester,
+            'sks'      => $request->sks,
         ]);
 
         BankSoal::create([
@@ -177,18 +181,22 @@ class MataKuliahController extends Controller
         $mataKuliah = MataKuliah::findOrFail($id);
 
         $request->validate([
-            'nama' => 'sometimes|string|max:255',
-            'kode' => 'sometimes|string|unique:mata_kuliah,kode,' . $id,
+            'nama'     => 'sometimes|string|max:255',
+            'kode'     => 'sometimes|string|unique:mata_kuliah,kode,' . $id,
             'prodi_id' => 'sometimes|exists:prodi,id',
+            'semester' => 'sometimes|nullable|integer|min:1|max:8',
+            'sks'      => 'sometimes|nullable|integer|min:1|max:6',
         ], [
-            'kode.unique' => 'Kode mata kuliah sudah digunakan!',
+            'kode.unique'     => 'Kode mata kuliah sudah digunakan!',
             'prodi_id.exists' => 'Prodi tidak ditemukan!',
         ]);
 
         $mataKuliah->update([
-            'nama' => $request->nama ?? $mataKuliah->nama,
-            'kode' => $request->kode ?? $mataKuliah->kode,
+            'nama'     => $request->nama ?? $mataKuliah->nama,
+            'kode'     => $request->kode ?? $mataKuliah->kode,
             'prodi_id' => $request->prodi_id ?? $mataKuliah->prodi_id,
+            'semester' => $request->has('semester') ? $request->semester : $mataKuliah->semester,
+            'sks'      => $request->has('sks') ? $request->sks : $mataKuliah->sks,
         ]);
 
         return response()->json([
