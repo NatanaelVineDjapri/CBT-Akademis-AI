@@ -10,7 +10,7 @@ class MatkulDosenSeeder extends Seeder
     public function run(): void
     {
         // Ambil semua matkul per prodi
-        $matkuls = DB::table('matkul')
+        $matkuls = DB::table('mata_kuliah')
             ->orderBy('id')
             ->get()
             ->groupBy('prodi_id');
@@ -37,21 +37,25 @@ class MatkulDosenSeeder extends Seeder
                 $dosen2 = $dosenArray[($index + 1) % $dosenArray->count()];
 
                 $insertData[] = [
-                    'matkul_id' => $matkul->id,
-                    'dosen_id'  => $dosen1->id,
-                    'created_at'=> now(),
-                    'updated_at'=> now(),
+                    'mata_kuliah_id' => $matkul->id,
+                    'user_id'        => $dosen1->id,
+                    'tahun_ajaran'   => '2025/2026',
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
                 ];
 
-                $insertData[] = [
-                    'matkul_id' => $matkul->id,
-                    'dosen_id'  => $dosen2->id,
-                    'created_at'=> now(),
-                    'updated_at'=> now(),
-                ];
+                if ($dosen2->id !== $dosen1->id) {
+                    $insertData[] = [
+                        'mata_kuliah_id' => $matkul->id,
+                        'user_id'        => $dosen2->id,
+                        'tahun_ajaran'   => '2025/2026',
+                        'created_at'     => now(),
+                        'updated_at'     => now(),
+                    ];
+                }
             }
         }
 
-        DB::table('matkul_dosen')->insert($insertData);
+        DB::table('dosen_matkul')->insertOrIgnore($insertData);
     }
 }

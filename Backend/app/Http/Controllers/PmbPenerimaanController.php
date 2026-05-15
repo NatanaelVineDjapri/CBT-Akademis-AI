@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\PmbPenerimaan;
+use App\Models\PesertaUjian;
+use App\Models\Universitas;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -39,14 +41,27 @@ class PmbPenerimaanController extends Controller
         }
 
         if ($tahun) {
-            $query->where('tahun_masuk', $tahun);
+            $query->whereYear('created_at', $tahun);
         }
 
-        $perPage = min((int) ($request->input('per_page', 50)), 200);
+        $perPage = min((int) ($request->input('per_page', 50)), 500);
         $result  = $query->paginate($perPage);
 
+        $userIds = collect($result->items())->pluck('id');
+        $scores  = PesertaUjian::whereIn('user_id', $userIds)
+            ->whereHas('ujian', fn ($q) => $q->where('jenis_ujian', 'pmb'))
+            ->with('nilaiAkhir:peserta_ujian_id,nilai_total')
+            ->get(['id', 'user_id'])
+            ->groupBy('user_id')
+            ->map(fn ($group) => $group->max(fn ($p) => $p->nilaiAkhir?->nilai_total));
+
+        $items = collect($result->items())->map(function ($user) use ($scores) {
+            $user->nilai_pmb = $scores[$user->id] ?? null;
+            return $user;
+        });
+
         return response()->json([
-            'data' => $result->items(),
+            'data' => $items,
             'meta' => [
                 'total'        => $result->total(),
                 'per_page'     => $result->perPage(),
@@ -63,7 +78,7 @@ class PmbPenerimaanController extends Controller
             'diterima'               => 'array',
             'diterima.*.user_id'     => 'required|integer|exists:users,id',
             'diterima.*.nim'         => 'nullable|string|max:50',
-            'diterima.*.prodi_id'    => 'required|integer|exists:prodis,id',
+            'diterima.*.prodi_id'    => 'nullable|integer|exists:prodi,id',
             'ditolak'                => 'array',
             'ditolak.*'              => 'integer|exists:users,id',
         ]);
@@ -75,16 +90,29 @@ class PmbPenerimaanController extends Controller
         $totalDiterima  = \count($diterima);
         $totalPendaftar = $totalDiterima + \count($ditolak);
 
+        $univKode   = Universitas::where('id', $authUser->universitas_id)->value('kode');
+        $emailDomain = 'student.' . strtolower($univKode) . '.ac.id';
+
         foreach ($diterima as $item) {
-            User::where('id', $item['user_id'])
+            $user = User::where('id', $item['user_id'])
                 ->where('universitas_id', $authUser->universitas_id)
                 ->where('role', 'peserta_mahasiswa_baru')
-                ->update([
-                    'role'        => 'mahasiswa',
-                    'nim'         => $item['nim'] ?? null,
-                    'prodi_id'    => $item['prodi_id'],
-                    'tahun_masuk' => $tahun,
-                ]);
+                ->first();
+
+            if (!$user) continue;
+
+            $nim       = $item['nim'] ?? null;
+            $emailBaru = $nim
+                ? strtolower(preg_replace('/\s+/', '.', $user->nama)) . '.' . $nim . '@' . $emailDomain
+                : $user->email;
+
+            $user->update([
+                'role'        => 'mahasiswa',
+                'nim'         => $nim,
+                'email'       => $emailBaru,
+                'prodi_id'    => $item['prodi_id'] ?? $user->prodi_id,
+                'tahun_masuk' => $tahun,
+            ]);
         }
 
         if (!empty($ditolak)) {

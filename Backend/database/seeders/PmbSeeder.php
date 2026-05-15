@@ -57,19 +57,27 @@ class PmbSeeder extends Seeder
         $essayIds = $this->insertSoalEssay($soalEssay, $bankId, $mkPmb);
 
         // ── 100 Peserta PMB ───────────────────────────────────────────
-        $pw       = Hash::make('password123');
+        $univId   = DB::table('users')->where('id', $adminId)->value('universitas_id');
+        $prodiIds = DB::table('prodi')
+            ->join('fakultas', 'prodi.fakultas_id', '=', 'fakultas.id')
+            ->where('fakultas.universitas_id', $univId)
+            ->pluck('prodi.id')
+            ->toArray();
+
+        $pw           = Hash::make('password123');
         $pesertaUsers = [];
         for ($i = 1; $i <= 100; $i++) {
-            $no   = str_pad($i, 3, '0', STR_PAD_LEFT);
-            $uid  = DB::table('users')->insertGetId([
+            $no      = str_pad($i, 3, '0', STR_PAD_LEFT);
+            $prodiId = $prodiIds[($i - 1) % count($prodiIds)];
+            $uid     = DB::table('users')->insertGetId([
                 'nama'           => "Calon Mahasiswa PMB $no",
                 'email'          => "pmb.peserta$no@pmb.untar.ac.id",
                 'password'       => $pw,
                 'role'           => 'peserta_mahasiswa_baru',
                 'nim'            => null,
                 'nidn'           => null,
-                'universitas_id' => DB::table('users')->where('id', $adminId)->value('universitas_id'),
-                'prodi_id'       => null,
+                'universitas_id' => $univId,
+                'prodi_id'       => $prodiId,
                 'is_temporary'   => true,
                 'expired_at'     => now()->addYear(),
                 'status'         => 'aktif',

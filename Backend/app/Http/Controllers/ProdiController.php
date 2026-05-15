@@ -9,11 +9,18 @@ class ProdiController extends Controller
 {
     public function index(Request $request)
     {
+        $authUser = $request->user();
+
         $prodi = Prodi::with('fakultas.universitas')
             ->withCount([
                 'users as total_mahasiswa' => fn($q) => $q->where('role', 'mahasiswa'),
                 'users as total_dosen' => fn($q) => $q->where('role', 'dosen'),
             ])
+            ->when($authUser->role === 'admin_universitas' && $authUser->universitas_id, function ($q) use ($authUser) {
+                $q->whereHas('fakultas', function ($fq) use ($authUser) {
+                    $fq->where('universitas_id', $authUser->universitas_id);
+                });
+            })
             ->when($request->fakultas_id, fn($q) => $q->where('fakultas_id', $request->fakultas_id))
             ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
                 ->orWhere('kode', 'like', '%' . $request->search . '%'))

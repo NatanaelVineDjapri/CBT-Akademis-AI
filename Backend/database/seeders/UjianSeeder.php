@@ -24,6 +24,8 @@ class UjianSeeder extends Seeder
         $ti = DB::table('prodi')->where('kode', 'TI')->value('id');
         $si = DB::table('prodi')->where('kode', 'SI')->value('id');
 
+        $mkTI501 = DB::table('mata_kuliah')->where('nama', 'Logika Matematika')->where('prodi_id', $ti)->value('id');
+
         // ── Contoh Pengambilan Data dari getSoal5 ──────────────────
         $dataLogika = $this->getSoal5('Logika Matematika');
         $sdPG    = $dataLogika['pg'] ?? [];
@@ -2439,6 +2441,91 @@ class UjianSeeder extends Seeder
         ];
  
         return $data[$nama] ?? [];
+    }
+
+    private function insertSoalPG(array $soalList, int $bankSoalId, int $matkulId): array
+    {
+        $result = [];
+        foreach ($soalList as $s) {
+            $soalId = DB::table('soal')->insertGetId([
+                'bank_soal_id'      => $bankSoalId,
+                'mata_kuliah_id'    => $matkulId,
+                'deskripsi'         => $s['q'],
+                'tingkat_kesulitan' => 'sedang',
+                'ai_generated'      => false,
+                'created_at'        => now(), 'updated_at' => now(),
+            ]);
+            $jenisSoalId = DB::table('jenis_soal')->insertGetId([
+                'soal_id'    => $soalId,
+                'jenis_soal' => 'pilihan_ganda',
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            foreach ($s['a'] as $i => $teks) {
+                DB::table('opsi_jawaban')->insert([
+                    'jenis_soal_id' => $jenisSoalId,
+                    'opsi'          => $this->opsiLabels[$i],
+                    'teks'          => $teks,
+                    'is_correct'    => ($i === $s['correct']),
+                    'created_at'    => now(), 'updated_at' => now(),
+                ]);
+            }
+            $result[] = ['soal_id' => $soalId, 'correct' => $s['correct'], 'tipe' => 'pilihan_ganda'];
+        }
+        return $result;
+    }
+
+    private function insertSoalCB(array $soalList, int $bankSoalId, int $matkulId): array
+    {
+        $result = [];
+        foreach ($soalList as $s) {
+            $soalId = DB::table('soal')->insertGetId([
+                'bank_soal_id'      => $bankSoalId,
+                'mata_kuliah_id'    => $matkulId,
+                'deskripsi'         => $s['q'],
+                'tingkat_kesulitan' => 'sedang',
+                'ai_generated'      => false,
+                'created_at'        => now(), 'updated_at' => now(),
+            ]);
+            $jenisSoalId = DB::table('jenis_soal')->insertGetId([
+                'soal_id'    => $soalId,
+                'jenis_soal' => 'checklist',
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            foreach ($s['options'] as $i => $teks) {
+                DB::table('opsi_jawaban')->insert([
+                    'jenis_soal_id' => $jenisSoalId,
+                    'opsi'          => $this->opsiLabels[$i],
+                    'teks'          => $teks,
+                    'is_correct'    => in_array($i, $s['correct']),
+                    'created_at'    => now(), 'updated_at' => now(),
+                ]);
+            }
+            $kunci    = implode(',', array_map(fn($idx) => $this->opsiLabels[$idx], $s['correct']));
+            $result[] = ['soal_id' => $soalId, 'kunci' => $kunci, 'tipe' => 'checklist'];
+        }
+        return $result;
+    }
+
+    private function insertSoalEssay(array $soalList, int $bankSoalId, int $matkulId): array
+    {
+        $result = [];
+        foreach ($soalList as $s) {
+            $soalId = DB::table('soal')->insertGetId([
+                'bank_soal_id'      => $bankSoalId,
+                'mata_kuliah_id'    => $matkulId,
+                'deskripsi'         => $s['q'],
+                'tingkat_kesulitan' => 'sedang',
+                'ai_generated'      => false,
+                'created_at'        => now(), 'updated_at' => now(),
+            ]);
+            DB::table('jenis_soal')->insert([
+                'soal_id'    => $soalId,
+                'jenis_soal' => 'essay',
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            $result[] = ['soal_id' => $soalId, 'tipe' => 'essay'];
+        }
+        return $result;
     }
 
     private function insertBank(int $dosenId, int $mkId, string $nama, string $deskripsi): int
