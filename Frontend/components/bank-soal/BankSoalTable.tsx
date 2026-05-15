@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { Pencil, Trash2, Plus, Mail, BookOpen } from "lucide-react";
+import { Pencil, Trash2, Plus, Mail, BookOpen, CalendarDays } from "lucide-react";
+import { JENIS_BADGE } from "@/components/dosen/ujian/constants";
 import Link from "next/link";
 import { preload } from "swr";
 import api from "@/services/api";
@@ -15,6 +16,12 @@ const permissionLabel: Record<string, string> = {
   public: "Publik",
   shared: "Shared",
   private: "Private",
+};
+
+const jenisBg: Record<string, string> = {
+  pilihan_ganda: "var(--color-primary-light)",
+  essay:         "var(--color-warning-light)",
+  checklist:     "var(--akademik-prodi-bg)",
 };
 
 const permissionBadge: Record<string, { bg: string; color: string }> = {
@@ -93,28 +100,18 @@ export default function BankSoalTable({
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">
-                  #
-                </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-72">
-                  Nama Bank Soal
-                </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">
-                  Bab
-                </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">
-                  Jumlah Soal
-                </th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">
-                  Permission
-                </th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama Bank Soal</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Bab</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Jumlah Soal</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Jenis Soal</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Diperbarui</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Permission</th>
                 {canEdit && (
-                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">
-                    Actions
-                  </th>
+                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Actions</th>
                 )}
               </tr>
             </thead>
@@ -151,8 +148,27 @@ export default function BankSoalTable({
                       <td className="px-4 py-3 text-gray-500 truncate">
                         {item.bab?.nama_bab ?? "-"}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {item.soal_count ?? 0}
+                      <td className="px-4 py-3 text-gray-700 font-medium">{item.soal_count ?? 0}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {(item.jenis_soal ?? []).map(j => {
+                            const b = JENIS_BADGE[j];
+                            return b ? (
+                              <span key={j} className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ color: b.color, backgroundColor: jenisBg[j] ?? `${b.color}18` }}>
+                                {b.label}
+                              </span>
+                            ) : null;
+                          })}
+                          {!item.jenis_soal?.length && <span className="text-xs text-gray-400">-</span>}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {item.updated_at ? (
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <CalendarDays size={11} className="text-gray-400 shrink-0" />
+                            <span>{new Date(item.updated_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                          </div>
+                        ) : <span className="text-xs text-gray-400">-</span>}
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap"

@@ -49,6 +49,8 @@ export interface BankSoalItem {
   bab?: { id: number; nama_bab: string } | null;
   creator?: { id: number; nama: string; universitas?: { id: number; nama: string } };
   soal_count?: number;
+  jenis_soal?: string[];
+  updated_at?: string;
 }
 
 export interface BankSoalMeta {
@@ -418,8 +420,10 @@ export interface HasilUjianDosenItem {
   nama_ujian: string;
   mata_kuliah: string;
   jenis_ujian: string;
-  tanggal: string;
-  pukul: string;
+  start_date: string | null;
+  end_date: string | null;
+  durasi_menit: number;
+  jumlah_soal: number;
   peserta_count: number;
   avg_nilai: number | null;
   total_lulus: number;

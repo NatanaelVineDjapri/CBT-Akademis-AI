@@ -8,6 +8,7 @@ import Breadcrumb from "@/components/BreadCrumb";
 import Pagination from "@/components/filtering/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
+import SearchInput from "@/components/filtering/SearchInput";
 import { getHasilUjianDosen, getDetailUjianDosen } from "@/services/UjianServices";
 import HasilUjianTable from "@/components/ujian/HasilUjianTable";
 import type { HasilUjianDosenItem, UjianMeta } from "@/types";
@@ -55,26 +56,14 @@ export default function DosenHasilUjianPage() {
       <Breadcrumb />
 
       <div className="flex-1">
-      <div className="bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-wrap gap-3 shrink-0">
-          <div>
-            <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Hasil Ujian</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Lihat hasil dan statistik ujian yang telah selesai.</p>
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <div>
+              <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Hasil Ujian</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Lihat hasil dan statistik ujian yang telah selesai.</p>
+            </div>
+            <SearchInput value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Cari ujian..." />
           </div>
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="6" cy="6" r="4.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5"/>
-              <line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            <input
-              type="text"
-              placeholder="Cari ujian..."
-              value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1); }}
-              className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none w-52 focus:border-[var(--color-primary)] transition-colors"
-            />
-          </div>
-        </div>
 
         <HasilUjianTable
           items={items}
@@ -88,7 +77,7 @@ export default function DosenHasilUjianPage() {
           getDetailHref={id => `/dosen/hasil-ujian/${id}`}
           onRowMouseEnter={id => preload(`/ujian/dosen/hasil/${id}`, () => getDetailUjianDosen(id))}
         />
-      </div>
+        </div>
       </div>
 
       {meta && (meta.last_page ?? 1) > 1 && (

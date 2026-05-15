@@ -45,7 +45,7 @@ export default function UjianTable({ items, perPage, isLoading, meta, onEdit, on
               <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-gray-800">{item.nama_ujian}</p>
+                  <p className="font-medium" style={{ color: "var(--color-primary)" }}>{item.nama_ujian}</p>
                   {item.mata_kuliah && (
                     <div className="flex items-center gap-1 mt-0.5">
                       <BookOpen size={11} className="text-gray-400" />

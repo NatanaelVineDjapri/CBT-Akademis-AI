@@ -354,7 +354,7 @@ class UjianController extends Controller
         $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
 
         $query = Ujian::with(['mataKuliah', 'pesertaUjian.nilaiAkhir'])
-            ->withCount('pesertaUjian')
+            ->withCount(['pesertaUjian', 'ujianSoal'])
             ->where('created_by', $authUser->id)
             ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']));
 
@@ -383,8 +383,10 @@ class UjianController extends Controller
             'nama_ujian'    => $ujian->nama_ujian,
             'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
             'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
-            'tanggal'       => $ujian->start_date?->format('d/m/y'),
-            'pukul'         => $ujian->start_date?->format('H.i'),
+            'start_date'    => $ujian->start_date?->toISOString(),
+            'end_date'      => $ujian->end_date?->toISOString(),
+            'durasi_menit'  => $ujian->durasi_menit,
+            'jumlah_soal'   => $ujian->ujian_soal_count,
             'peserta_count' => $ujian->peserta_ujian_count,
             'avg_nilai'     => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->count()
                                ? round($ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->avg('nilai_total'), 1)
@@ -751,7 +753,7 @@ class UjianController extends Controller
         $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
 
         $query = Ujian::with(['mataKuliah', 'pesertaUjian.nilaiAkhir'])
-            ->withCount('pesertaUjian')
+            ->withCount(['pesertaUjian', 'ujianSoal'])
             ->where('created_by', $authUser->id)
             ->where('jenis_ujian', 'pmb')
             ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']));
@@ -781,8 +783,10 @@ class UjianController extends Controller
             'nama_ujian'    => $ujian->nama_ujian,
             'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
             'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
-            'tanggal'       => $ujian->start_date?->format('d/m/y'),
-            'pukul'         => $ujian->start_date?->format('H.i'),
+            'start_date'    => $ujian->start_date?->toISOString(),
+            'end_date'      => $ujian->end_date?->toISOString(),
+            'durasi_menit'  => $ujian->durasi_menit,
+            'jumlah_soal'   => $ujian->ujian_soal_count,
             'peserta_count' => $ujian->peserta_ujian_count,
             'avg_nilai'     => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->count()
                                ? round($ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->avg('nilai_total'), 1)

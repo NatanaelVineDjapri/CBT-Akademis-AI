@@ -19,7 +19,11 @@ class BankSoalController extends Controller
     {
         $authUser = $request->user();
 
-        $bankSoal = BankSoal::with('mataKuliah', 'bab', 'creator')->withCount('soal')
+        $bankSoal = BankSoal::with([
+                'mataKuliah', 'bab', 'creator',
+                'soal.jenisSoal',
+            ])
+            ->withCount('soal')
             ->where(function ($q) use ($authUser) {
                 $q->where('created_by', $authUser->id)
                     ->orWhereHas('sharedUsers', fn($q) => $q->where('user_id', $authUser->id));
@@ -28,9 +32,25 @@ class BankSoalController extends Controller
             ->when($request->search, fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($request->search) . '%']))
             ->paginate($request->per_page ?? 10);
 
+        $data = collect($bankSoal->items())->map(fn($item) => [
+            'id'             => $item->id,
+            'nama'           => $item->nama,
+            'deskripsi'      => $item->deskripsi,
+            'permission'     => $item->permission,
+            'created_by'     => $item->created_by,
+            'mata_kuliah_id' => $item->mata_kuliah_id,
+            'mata_kuliah'    => $item->mataKuliah,
+            'bab_id'         => $item->bab_id,
+            'bab'            => $item->bab,
+            'creator'        => $item->creator,
+            'soal_count'     => $item->soal_count,
+            'jenis_soal'     => $item->soal->flatMap(fn($s) => $s->jenisSoal->pluck('jenis_soal'))->unique()->sort()->values(),
+            'updated_at'     => $item->updated_at?->toISOString(),
+        ]);
+
         return response()->json([
             'message' => 'Data bank soal berhasil diambil!',
-            'data' => $bankSoal->items(),
+            'data' => $data,
             'meta' => [
                 'total' => $bankSoal->total(),
                 'per_page' => $bankSoal->perPage(),

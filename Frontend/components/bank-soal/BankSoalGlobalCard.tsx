@@ -28,13 +28,13 @@ export default function BankSoalGlobalCard({ item }: Props) {
     <Link
       href={`/dosen/bank-soal/global/${slug}`}
       onMouseEnter={() => preload(["/bank-soal/global", item.id], () => getBankSoalGlobalDetail(item.id))}
-      className="block rounded-2xl p-4 flex flex-col gap-3 hover:opacity-90 transition-opacity"
+      className="block rounded-2xl p-4 flex flex-col gap-2.5 hover:opacity-90 transition-opacity"
       style={{ backgroundColor: "var(--color-primary)" }}
     >
       {/* Header: icon + pill */}
       <div className="flex items-center gap-2">
-        <BookOpen size={20} className="text-white shrink-0" />
-        <div className="flex items-center rounded-full bg-white px-3 py-1 min-w-0">
+        <BookOpen size={16} className="text-white shrink-0" />
+        <div className="flex items-center rounded-full bg-white px-3 py-0.5 min-w-0">
           <span className="text-sm font-medium truncate" style={{ color: "var(--color-primary)" }}>
             {primary}
           </span>
@@ -42,11 +42,11 @@ export default function BankSoalGlobalCard({ item }: Props) {
       </div>
 
       {/* Universitas + Created by */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1">
         {secondary && (
           <div className="flex items-center gap-1.5 min-w-0">
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-              <span className="text-[9px] font-bold text-white leading-none">
+            <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <span className="text-[8px] font-bold text-white leading-none">
                 {secondary.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
               </span>
             </div>
@@ -54,7 +54,7 @@ export default function BankSoalGlobalCard({ item }: Props) {
           </div>
         )}
         <div className="flex items-center gap-1.5">
-          <UserCircle size={20} className="text-white/60 shrink-0" />
+          <UserCircle size={16} className="text-white/60 shrink-0" />
           <p className="text-xs text-white/70">
             <span className="text-white font-medium">{item.creator?.nama ?? "-"}</span>
           </p>
@@ -65,12 +65,12 @@ export default function BankSoalGlobalCard({ item }: Props) {
       <div className="border-t border-white/20" />
 
       {/* Deskripsi */}
-      <p className="text-xs text-white/80 leading-relaxed line-clamp-2 min-h-[2.5rem]">
+      <p className="text-xs text-white/80 leading-normal line-clamp-2 min-h-[2rem]">
         {item.deskripsi || "Tidak ada deskripsi."}
       </p>
 
       {/* Daftar Bab + Jumlah Soal */}
-      <div className="bg-white rounded-xl px-3 py-2 flex items-center justify-between gap-4">
+      <div className="bg-white rounded-xl px-3 py-1.5 flex items-center justify-between gap-4">
         <div className="flex flex-col gap-0.5 min-w-0">
           <span className="text-[10px] uppercase tracking-wide text-gray-400">Daftar Bab</span>
           <span className="text-xs font-medium truncate" style={{ color: "var(--color-primary)" }}>
