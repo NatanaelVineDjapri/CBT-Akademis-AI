@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { XCircle, Loader2 } from "lucide-react";
 import { me } from "@/services/AuthServices";
 import { joinBankSoalByLink } from "@/services/BankSoalServices";
+import { toSlug } from "@/utils/slug";
 
 const rolePrefix: Record<string, string> = {
   dosen: "/dosen",
@@ -14,8 +15,12 @@ const rolePrefix: Record<string, string> = {
   peserta_mahasiswa_baru: "/pmb",
 };
 
-const bankSoalPath = (role: string, id: number) =>
-  `${rolePrefix[role] ?? "/dosen"}/bank-soal/${id}`;
+const slugRoles = new Set(["dosen", "admin_universitas_pmb"]);
+
+const bankSoalPath = (role: string, id: number, nama: string) =>
+  slugRoles.has(role)
+    ? `${rolePrefix[role] ?? "/dosen"}/bank-soal/${toSlug(nama)}`
+    : `${rolePrefix[role] ?? "/dosen"}/bank-soal/${id}`;
 
 function JoinContent() {
   const router = useRouter();
@@ -28,8 +33,8 @@ function JoinContent() {
     if (!token) { setError("Link tidak valid."); return; }
 
     me()
-      .then((user) => joinBankSoalByLink(token).then((bankSoalId) => {
-        router.replace(bankSoalPath(user.role, bankSoalId));
+      .then((user) => joinBankSoalByLink(token).then(({ id, nama }) => {
+        router.replace(bankSoalPath(user.role, id, nama));
       }))
       .catch((err) => {
         if (err === null) return;

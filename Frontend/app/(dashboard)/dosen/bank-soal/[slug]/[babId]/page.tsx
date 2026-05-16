@@ -6,53 +6,68 @@ import { useDebounce } from "@/hooks/useDebounce";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
-import { getBankSoalSoal, deleteSoal } from "@/services/BankSoalServices";
-import type { SoalItem } from "@/services/BankSoalServices";
-import ConfirmModal from "@/components/ConfirmModal";
 import AddSoalModal from "@/components/soal/AddSoalModal";
-import { Plus, Sparkles } from "lucide-react";
 import GenerateAIModal from "@/components/soal/GenerateAIModal";
+import { getBankSoal, getBankSoalSoal, deleteSoal } from "@/services/BankSoalServices";
+import type { SoalItem } from "@/services/BankSoalServices";
+import { Plus, Sparkles } from "lucide-react";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string; babId: string }>;
 }
 
-export default function DaftarSoalPage({ params }: Props) {
-  const { id } = use(params);
+export default function BabSoalPage({ params }: Props) {
+  const { slug, babId } = use(params);
   const [search, setSearch] = useState("");
-  const [showGenerateAI, setShowGenerateAI] = useState(false);
   const [showAddSoal, setShowAddSoal] = useState(false);
+  const [showGenerateAI, setShowGenerateAI] = useState(false);
   const [editingSoal, setEditingSoal] = useState<SoalItem | null>(null);
-  const [deletingSoal, setDeletingSoal] = useState<SoalItem | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const debouncedSearch = useDebounce(search);
 
+  const { data: allBankSoal } = useSWR(
+    "/bank-soal/all",
+    () => getBankSoal({ per_page: 200 }),
+    { revalidateOnFocus: false }
+  );
+
+  const bankSoalId = allBankSoal?.data.find(item => toSlug(item.nama) === slug)?.id;
+
+  const swrKey = bankSoalId ? ["/bank-soal", String(bankSoalId), "soal", babId, debouncedSearch] : null;
+
   const { data, isLoading } = useSWR(
-    ["/bank-soal", id, "soal", debouncedSearch],
-    () => getBankSoalSoal(Number(id), { search: debouncedSearch }),
+    swrKey,
+    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch }),
     { revalidateOnFocus: false }
   );
 
   const bankSoal = data?.bank_soal;
-  const soalList = data?.data ?? [];
+  const allSoal = data?.data ?? [];
+  const soalList = allSoal.filter((s) => s.bab?.id === Number(babId));
   const canEdit = data?.can_edit ?? false;
+  const babNama = soalList[0]?.bab?.nama_bab
+    ?? allSoal.find((s) => s.bab?.id === Number(babId))?.bab?.nama_bab;
 
-  const handleConfirmDelete = async () => {
-    if (!deletingSoal) return;
-    setDeleting(true);
-    try {
-      await deleteSoal(deletingSoal.id);
-      mutate(["/bank-soal", id, "soal", debouncedSearch]);
-      setDeletingSoal(null);
-    } finally {
-      setDeleting(false);
-    }
+  const handleDelete = async (soal: SoalItem) => {
+    if (!confirm(`Hapus soal "${soal.deskripsi.slice(0, 50)}..."?`)) return;
+    await deleteSoal(soal.id);
+    mutate(swrKey);
+  };
+
+  const handleSaved = () => {
+    mutate(swrKey);
+    if (bankSoalId) mutate(["/bank-soal", String(bankSoalId), "bab-list"]);
   };
 
   return (
     <div className="flex flex-col h-full gap-4">
       <div className="shrink-0">
-        <Breadcrumb overrides={bankSoal ? { [id]: bankSoal.nama } : undefined} />
+        <Breadcrumb
+          overrides={{
+            [slug]: bankSoal?.nama ?? slug,
+            [babId]: babNama ?? `Bab ${babId}`,
+          }}
+        />
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1">
@@ -61,9 +76,7 @@ export default function DaftarSoalPage({ params }: Props) {
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Daftar Soal
             </h2>
-            {bankSoal?.mata_kuliah && (
-              <p className="text-xs text-gray-400 mt-0.5">{bankSoal.mata_kuliah.nama}</p>
-            )}
+            {babNama && <p className="text-xs text-gray-400 mt-0.5">{babNama}</p>}
           </div>
           <div className="flex items-center gap-2">
             <SearchInput value={search} onChange={setSearch} placeholder="Search" />
@@ -90,31 +103,37 @@ export default function DaftarSoalPage({ params }: Props) {
           </div>
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading} canEdit={canEdit} onEdit={setEditingSoal} onDelete={(s) => setDeletingSoal(s)} />
+        <SoalTable
+          soalList={soalList}
+          isLoading={isLoading || !bankSoalId}
+          canEdit={canEdit}
+          onEdit={setEditingSoal}
+          onDelete={handleDelete}
+        />
 
-        {(showAddSoal || editingSoal) && bankSoal && (
+        {showAddSoal && bankSoal && (
           <AddSoalModal
             bankSoal={bankSoal}
-            soal={editingSoal ?? undefined}
-            onClose={() => { setShowAddSoal(false); setEditingSoal(null); }}
-            onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
+            defaultBabId={Number(babId)}
+            onClose={() => setShowAddSoal(false)}
+            onSaved={handleSaved}
           />
         )}
 
-        {deletingSoal && (
-          <ConfirmModal
-            message={`Hapus soal "${deletingSoal.deskripsi.slice(0, 60)}..."?`}
-            loading={deleting}
-            onConfirm={handleConfirmDelete}
-            onCancel={() => setDeletingSoal(null)}
+        {editingSoal && bankSoal && (
+          <AddSoalModal
+            bankSoal={bankSoal}
+            defaultBabId={Number(babId)}
+            onClose={() => setEditingSoal(null)}
+            onSaved={handleSaved}
           />
         )}
 
-        {showGenerateAI && (
+        {showGenerateAI && bankSoalId && (
           <GenerateAIModal
-            bankSoalId={id}
+            bankSoalId={String(bankSoalId)}
             onClose={() => setShowGenerateAI(false)}
-            onSaved={() => mutate(["/bank-soal", id, "soal", debouncedSearch])}
+            onSaved={handleSaved}
           />
         )}
       </div>

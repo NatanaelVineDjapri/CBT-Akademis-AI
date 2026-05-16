@@ -91,7 +91,7 @@ function MatkulFormModal({
               value={nama}
               onChange={e => setNama(e.target.value)}
               placeholder="Algoritma dan Pemrograman"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[var(--color-primary)]"
             />
           </div>
           <div>
@@ -100,7 +100,7 @@ function MatkulFormModal({
               value={kode}
               onChange={e => setKode(e.target.value)}
               placeholder="TI101"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[var(--color-primary)]"
             />
           </div>
           <div>

@@ -8,6 +8,7 @@ import Breadcrumb from "@/components/BreadCrumb";
 import EmptyState from "@/components/EmptyState";
 import { getFakultas, getProdi, getAdminUsers, type ProdiItem } from "@/services/AdminUserServices";
 import { calcPerPage } from "@/hooks/usePerPage";
+import { toSlug } from "@/utils/slug";
 
 function ProdiCardSkeleton() {
   return (
@@ -26,7 +27,7 @@ function ProdiCardSkeleton() {
   );
 }
 
-function ProdiCard({ item, href, fakultasId }: { item: ProdiItem; href: string; fakultasId: string }) {
+function ProdiCard({ item, href, fakultasId }: { item: ProdiItem; href: string; fakultasId: number }) {
   return (
     <Link
       href={href}
@@ -34,10 +35,8 @@ function ProdiCard({ item, href, fakultasId }: { item: ProdiItem; href: string; 
         const pp = calcPerPage(44, 1, 500);
         preload(["/users", String(item.id), "", "", 1, pp], () =>
           getAdminUsers({ prodi_id: item.id, per_page: pp, page: 1 }));
-        preload(["/prodi/single", String(item.id)], () =>
-          getProdi({ per_page: 200 }).then(r => r.data.find(p => p.id === item.id)));
-        preload(["/fakultas/single", fakultasId], () =>
-          getFakultas({ per_page: 100 }).then(r => r.data.find(f => f.id === Number(fakultasId))));
+        preload(["/prodi", String(fakultasId)], () =>
+          getProdi({ fakultas_id: fakultasId, per_page: 100 }));
       }}
       className="group bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:border-[var(--color-primary)] hover:shadow-md transition-all block">
       <div className="flex items-center gap-3 mb-4">
@@ -71,28 +70,31 @@ function ProdiCard({ item, href, fakultasId }: { item: ProdiItem; href: string; 
   );
 }
 
-export default function AdminUserProdiPage({ params }: { params: Promise<{ fakultasId: string }> }) {
-  const { fakultasId } = use(params);
+export default function AdminUserProdiPage({ params }: { params: Promise<{ fakultasSlug: string }> }) {
+  const { fakultasSlug } = use(params);
 
-  const { data: fakultasData } = useSWR(
-    ["/fakultas/single", fakultasId],
-    () => getFakultas({ per_page: 100 }).then(r => r.data.find(f => f.id === Number(fakultasId))),
+  const { data: allFakultas } = useSWR(
+    "/fakultas/all",
+    () => getFakultas({ per_page: 100 }),
     { revalidateOnFocus: false }
   );
 
+  const fakultas = allFakultas?.data.find(f => toSlug(f.nama) === fakultasSlug);
+  const fakultasId = fakultas?.id;
+  const fakultasNama = fakultas?.nama ?? fakultasSlug;
+
   const { data } = useSWR(
-    ["/prodi", fakultasId],
-    () => getProdi({ fakultas_id: Number(fakultasId), per_page: 100 }),
+    fakultasId ? ["/prodi", String(fakultasId)] : null,
+    () => getProdi({ fakultas_id: fakultasId!, per_page: 100 }),
     { revalidateOnFocus: false }
   );
 
   const items = data?.data ?? [];
-  const fakultasNama = fakultasData?.nama ?? fakultasId;
 
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="shrink-0">
-        <Breadcrumb hrefOverrides={{ [`/admin-universitas/user/fakultas/${fakultasId}`]: fakultasNama }} />
+        <Breadcrumb hrefOverrides={{ [`/admin-universitas/user/fakultas/${fakultasSlug}`]: fakultasNama }} />
       </div>
 
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -116,8 +118,8 @@ export default function AdminUserProdiPage({ params }: { params: Promise<{ fakul
             <ProdiCard
               key={item.id}
               item={item}
-              href={`/admin-universitas/user/fakultas/${fakultasId}/prodi/${item.id}`}
-              fakultasId={fakultasId}
+              href={`/admin-universitas/user/fakultas/${fakultasSlug}/prodi/${toSlug(item.nama)}`}
+              fakultasId={fakultasId!}
             />
           ))}
         </div>

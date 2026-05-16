@@ -7,21 +7,30 @@ import { ChevronLeft } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
-import { getBankSoalSoal } from "@/services/BankSoalServices";
+import { getBankSoalGlobal, getBankSoalSoal } from "@/services/BankSoalServices";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
-  params: Promise<{ id: string; babId: string; bankSoalId: string }>;
+  params: Promise<{ id: string; babId: string; slug: string }>;
 }
 
 export default function MahasiswaBankSoalSoalPage({ params }: Props) {
-  const { babId, bankSoalId } = use(params);
+  const { id, babId, slug } = use(params);
   const router = useRouter();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
+  const { data: globalData } = useSWR(
+    ["/bank-soal/global", id, babId, ""],
+    () => getBankSoalGlobal({ mata_kuliah_id: Number(id), bab_id: Number(babId) }),
+    { revalidateOnFocus: false }
+  );
+
+  const bankSoalId = globalData?.data.find(item => toSlug(item.nama) === slug)?.id;
+
   const { data, isLoading } = useSWR(
-    ["/bank-soal", bankSoalId, "soal", debouncedSearch],
-    () => getBankSoalSoal(Number(bankSoalId), { search: debouncedSearch }),
+    bankSoalId ? ["/bank-soal", String(bankSoalId), "soal", debouncedSearch] : null,
+    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch }),
     { revalidateOnFocus: false }
   );
 
@@ -54,7 +63,7 @@ export default function MahasiswaBankSoalSoalPage({ params }: Props) {
           <SearchInput value={search} onChange={setSearch} placeholder="Search" />
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading} canEdit={false} />
+        <SoalTable soalList={soalList} isLoading={isLoading || !bankSoalId} canEdit={false} />
       </div>
     </div>
   );

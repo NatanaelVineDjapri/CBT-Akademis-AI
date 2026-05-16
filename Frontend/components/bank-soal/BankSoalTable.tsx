@@ -6,8 +6,9 @@ import { JENIS_BADGE } from "@/components/dosen/ujian/constants";
 import Link from "next/link";
 import { preload } from "swr";
 import api from "@/services/api";
-import { getBabByMataKuliah, generateBankSoalLink } from "@/services/BankSoalServices";
+import { getBankSoal, getBankSoalSoal, getBabByMataKuliah, generateBankSoalLink } from "@/services/BankSoalServices";
 import type { BankSoalItem, BankSoalMeta } from "@/types";
+import { toSlug } from "@/utils/slug";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
 import EmptyState from "@/components/EmptyState";
@@ -132,7 +133,11 @@ export default function BankSoalTable({
                       </td>
                       <td className="px-4 py-3">
                         <Link
-                          href={`${basePath}/${item.id}`}
+                          href={`${basePath}/${toSlug(item.nama)}`}
+                          onMouseEnter={() => {
+                            preload("/bank-soal/all", () => getBankSoal({ per_page: 200 }));
+                            preload(["/bank-soal", String(item.id), "soal", ""], () => getBankSoalSoal(item.id, {}));
+                          }}
                           className="font-medium hover:underline"
                           style={{ color: "var(--color-primary)" }}
                         >

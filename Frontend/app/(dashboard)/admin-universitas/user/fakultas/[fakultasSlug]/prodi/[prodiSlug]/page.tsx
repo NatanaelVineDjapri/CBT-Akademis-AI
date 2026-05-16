@@ -21,6 +21,7 @@ import {
   type AdminUserItem,
 } from "@/services/AdminUserServices";
 import { ROLE_OPTIONS, ROLE_BADGE, USER_ROLE_TABS } from "@/types";
+import { toSlug } from "@/utils/slug";
 
 function RoleBadge({ role }: { role: string }) {
   const b = ROLE_BADGE[role] ?? { label: role, bg: "#f3f4f6", color: "#6b7280" };
@@ -214,14 +215,10 @@ function ImportModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">
               File Excel <span className="text-red-400 normal-case font-normal">*</span>
             </label>
-            <div
-              onClick={() => excelRef.current?.click()}
-              className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-[var(--color-primary)] transition-colors"
-            >
+            <div onClick={() => excelRef.current?.click()}
+              className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-[var(--color-primary)] transition-colors">
               <FileSpreadsheet className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-              <p className="text-xs text-gray-500">
-                {excelFile ? excelFile.name : "Klik untuk pilih file .xlsx / .xls"}
-              </p>
+              <p className="text-xs text-gray-500">{excelFile ? excelFile.name : "Klik untuk pilih file .xlsx / .xls"}</p>
             </div>
             <input ref={excelRef} type="file" accept=".xlsx,.xls" className="hidden"
               onChange={e => setExcelFile(e.target.files?.[0] ?? null)} />
@@ -231,14 +228,10 @@ function ImportModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">
               File ZIP Foto <span className="text-gray-400 font-normal normal-case">(opsional)</span>
             </label>
-            <div
-              onClick={() => zipRef.current?.click()}
-              className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-[var(--color-primary)] transition-colors"
-            >
+            <div onClick={() => zipRef.current?.click()}
+              className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-[var(--color-primary)] transition-colors">
               <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-              <p className="text-xs text-gray-500">
-                {zipFile ? zipFile.name : "Klik untuk pilih file .zip berisi foto"}
-              </p>
+              <p className="text-xs text-gray-500">{zipFile ? zipFile.name : "Klik untuk pilih file .zip berisi foto"}</p>
             </div>
             <input ref={zipRef} type="file" accept=".zip" className="hidden"
               onChange={e => setZipFile(e.target.files?.[0] ?? null)} />
@@ -255,9 +248,7 @@ function ImportModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
                   <p className="text-xs font-semibold text-red-500 mb-2">{result.gagal.length} baris gagal:</p>
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {result.gagal.map((f, i) => (
-                      <p key={i} className="text-xs text-gray-500">
-                        Baris {f.baris} ({f.kolom}): {f.error}
-                      </p>
+                      <p key={i} className="text-xs text-gray-500">Baris {f.baris} ({f.kolom}): {f.error}</p>
                     ))}
                   </div>
                 </>
@@ -287,9 +278,9 @@ function ImportModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
 export default function AdminUserListPage({
   params,
 }: {
-  params: Promise<{ fakultasId: string; prodiId: string }>;
+  params: Promise<{ fakultasSlug: string; prodiSlug: string }>;
 }) {
-  const { fakultasId, prodiId } = use(params);
+  const { fakultasSlug, prodiSlug } = use(params);
 
   const perPage = usePerPage(44, 1, 500);
   const [search, setSearch] = useState("");
@@ -305,30 +296,35 @@ export default function AdminUserListPage({
 
   useEffect(() => { setPage(1); }, [debouncedSearch, roleTab, perPage]);
 
+  // Resolve fakultas slug → ID
+  const { data: allFakultas } = useSWR(
+    "/fakultas/all",
+    () => getFakultas({ per_page: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const fakultas = allFakultas?.data.find(f => toSlug(f.nama) === fakultasSlug);
+  const fakultasId = fakultas?.id;
+  const fakultasNama = fakultas?.nama ?? fakultasSlug;
+
+  // Resolve prodi slug → ID
+  const { data: allProdi } = useSWR(
+    fakultasId ? ["/prodi", String(fakultasId)] : null,
+    () => getProdi({ fakultas_id: fakultasId!, per_page: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const prodi = allProdi?.data.find(p => toSlug(p.nama) === prodiSlug);
+  const prodiId = prodi?.id;
+  const prodiNama = prodi?.nama ?? prodiSlug;
+
   const { data, isLoading, mutate } = useSWR(
-    ["/users", prodiId, roleTab, debouncedSearch, page, perPage],
+    prodiId ? ["/users", String(prodiId), roleTab, debouncedSearch, page, perPage] : null,
     ([, pid, role, s, p, pp]: [string, string, string, string, number, number]) =>
       getAdminUsers({ prodi_id: Number(pid), role: role || undefined, search: s, per_page: pp, page: p }),
     { keepPreviousData: true, revalidateOnFocus: false }
   );
 
-  const { data: prodiData } = useSWR(
-    ["/prodi/single", prodiId],
-    () => getProdi({ per_page: 200 }).then(r => r.data.find(p => p.id === Number(prodiId))),
-    { revalidateOnFocus: false }
-  );
-
-  const { data: fakultasData } = useSWR(
-    ["/fakultas/single", fakultasId],
-    () => getFakultas({ per_page: 100 }).then(r => r.data.find(f => f.id === Number(fakultasId))),
-    { revalidateOnFocus: false }
-  );
-
   const items = data?.data ?? [];
   const meta  = data?.meta ?? null;
-
-  const prodiNama    = prodiData?.nama    ?? prodiId;
-  const fakultasNama = fakultasData?.nama ?? fakultasId;
 
   const handleDelete = async () => {
     if (!deleteItem) return;
@@ -346,14 +342,13 @@ export default function AdminUserListPage({
     <div className="flex flex-col gap-4 h-full">
       <div className="shrink-0">
         <Breadcrumb hrefOverrides={{
-          [`/admin-universitas/user/fakultas/${fakultasId}`]: fakultasNama,
-          [`/admin-universitas/user/fakultas/${fakultasId}/prodi/${prodiId}`]: prodiNama,
+          [`/admin-universitas/user/fakultas/${fakultasSlug}`]: fakultasNama,
+          [`/admin-universitas/user/fakultas/${fakultasSlug}/prodi/${prodiSlug}`]: prodiNama,
         }} />
       </div>
 
       <div className="flex-1">
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
@@ -382,7 +377,6 @@ export default function AdminUserListPage({
           </div>
         </div>
 
-        {/* Role Tabs */}
         <div className="flex gap-1 px-5 pt-3 pb-0 border-b border-gray-100">
           {USER_ROLE_TABS.map(tab => (
             <button
@@ -399,7 +393,6 @@ export default function AdminUserListPage({
           ))}
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -414,13 +407,11 @@ export default function AdminUserListPage({
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading || !prodiId ? (
                 Array.from({ length: perPage }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
                     {Array.from({ length: 7 }).map((_, j) => (
-                      <td key={j} className="px-4 py-4">
-                        <div className="h-3 bg-gray-100 rounded w-3/4" />
-                      </td>
+                      <td key={j} className="px-4 py-4"><div className="h-3 bg-gray-100 rounded w-3/4" /></td>
                     ))}
                   </tr>
                 ))
@@ -455,7 +446,6 @@ export default function AdminUserListPage({
             <EmptyState message="Tidak ada user ditemukan." flat />
           )}
         </div>
-
       </div>
       </div>
 
@@ -469,10 +459,10 @@ export default function AdminUserListPage({
         />
       )}
 
-      {(showCreate || editItem) && (
+      {(showCreate || editItem) && prodiId && (
         <UserFormModal
           mode={editItem ? "edit" : "create"}
-          prodiId={Number(prodiId)}
+          prodiId={prodiId}
           item={editItem ?? undefined}
           onClose={() => { setShowCreate(false); setEditItem(null); }}
           onSaved={() => mutate()}

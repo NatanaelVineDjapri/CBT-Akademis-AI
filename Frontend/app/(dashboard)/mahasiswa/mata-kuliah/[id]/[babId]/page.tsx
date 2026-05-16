@@ -9,6 +9,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import SearchInput from "@/components/filtering/SearchInput";
 import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
 import { getBankSoalGlobal, getBankSoalSoal } from "@/services/BankSoalServices";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
   params: Promise<{ id: string; babId: string }>;
@@ -101,7 +102,7 @@ export default function MahasiswaBabBankSoalPage({ params }: Props) {
                     <td className="px-5 py-3 text-xs text-gray-400">{String(idx + 1).padStart(2, "0")}</td>
                     <td className="px-4 py-3">
                       <Link
-                        href={`/mahasiswa/mata-kuliah/${id}/${babId}/${bs.id}`}
+                        href={`/mahasiswa/mata-kuliah/${id}/${babId}/${toSlug(bs.nama)}`}
                         className="flex items-center gap-2 group"
                       >
                         <BookOpen size={13} className="text-gray-300 shrink-0" />

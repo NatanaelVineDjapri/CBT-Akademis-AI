@@ -8,6 +8,7 @@ import EmptyState from "@/components/EmptyState";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 import { getFakultas, getProdi, exportAdminUsers, type FakultasItem, type ProdiItem } from "@/services/AdminUserServices";
+import { toSlug } from "@/utils/slug";
 
 const COLUMN_OPTIONS = [
   { key: "nama",        label: "Nama" },
@@ -260,7 +261,7 @@ export default function AdminUserFakultasPage() {
             <FakultasCard
               key={item.id}
               item={item}
-              href={`/admin-universitas/user/fakultas/${item.id}`}
+              href={`/admin-universitas/user/fakultas/${toSlug(item.nama)}`}
             />
           ))}
         </div>

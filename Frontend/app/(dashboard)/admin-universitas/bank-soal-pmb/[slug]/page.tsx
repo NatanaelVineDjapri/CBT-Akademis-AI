@@ -6,19 +6,20 @@ import { useDebounce } from "@/hooks/useDebounce";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
-import { getBankSoalSoal, deleteSoal } from "@/services/BankSoalServices";
+import { getBankSoal, getBankSoalSoal, deleteSoal } from "@/services/BankSoalServices";
 import type { SoalItem } from "@/services/BankSoalServices";
 import ConfirmModal from "@/components/ConfirmModal";
 import AddSoalModal from "@/components/soal/AddSoalModal";
 import GenerateAIModal from "@/components/soal/GenerateAIModal";
 import { Plus, Sparkles } from "lucide-react";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default function AdminBankSoalDetailPage({ params }: Props) {
-  const { id } = use(params);
+  const { slug } = use(params);
   const [search, setSearch] = useState("");
   const [showAddSoal, setShowAddSoal] = useState(false);
   const [showGenerateAI, setShowGenerateAI] = useState(false);
@@ -27,11 +28,18 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
   const [deleting, setDeleting] = useState(false);
   const debouncedSearch = useDebounce(search);
 
-  const swrKey = ["/bank-soal", id, "soal", debouncedSearch];
+  const { data: allBankSoal } = useSWR(
+    "/bank-soal/all",
+    () => getBankSoal({ per_page: 200 }),
+    { revalidateOnFocus: false }
+  );
+
+  const bankSoalId = allBankSoal?.data.find((item: { nama: string; id: number }) => toSlug(item.nama) === slug)?.id;
+  const swrKey = bankSoalId ? ["/bank-soal", String(bankSoalId), "soal", debouncedSearch] : null;
 
   const { data, isLoading } = useSWR(
     swrKey,
-    () => getBankSoalSoal(Number(id), { search: debouncedSearch }),
+    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch }),
     { revalidateOnFocus: false }
   );
 
@@ -40,7 +48,7 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
   const canEdit = data?.can_edit ?? false;
 
   const handleConfirmDelete = async () => {
-    if (!deletingSoal) return;
+    if (!deletingSoal || !bankSoalId) return;
     setDeleting(true);
     try {
       await deleteSoal(deletingSoal.id);
@@ -54,7 +62,7 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
   return (
     <div className="flex flex-col h-full gap-4">
       <div className="shrink-0">
-        <Breadcrumb overrides={bankSoal ? { [id]: bankSoal.nama } : undefined} />
+        <Breadcrumb overrides={bankSoal ? { [slug]: bankSoal.nama } : undefined} />
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1">
@@ -94,7 +102,7 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
 
         <SoalTable
           soalList={soalList}
-          isLoading={isLoading}
+          isLoading={isLoading || !bankSoalId}
           canEdit={canEdit}
           onEdit={setEditingSoal}
           onDelete={(soal) => setDeletingSoal(soal)}
@@ -118,9 +126,9 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
           />
         )}
 
-        {showGenerateAI && (
+        {showGenerateAI && bankSoalId && (
           <GenerateAIModal
-            bankSoalId={id}
+            bankSoalId={String(bankSoalId)}
             hideBabReferensi
             onClose={() => setShowGenerateAI(false)}
             onSaved={() => mutate(swrKey)}

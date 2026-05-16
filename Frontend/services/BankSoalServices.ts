@@ -162,7 +162,7 @@ export const generateBankSoalLink = async (id: number): Promise<string> => {
   return res.data.link;
 };
 
-export const joinBankSoalByLink = async (token: string): Promise<number> => {
+export const joinBankSoalByLink = async (token: string): Promise<{ id: number; nama: string }> => {
   const res = await api.post("/bank-soal/join", { token });
-  return res.data.data.id;
+  return { id: res.data.data.id, nama: res.data.data.nama };
 };
