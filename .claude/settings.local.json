@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python -c \"import mediapipe as mp; print\\(mp.__version__\\); print\\(hasattr\\(mp, 'solutions'\\)\\)\")",
-      "Bash(D:/laragon/bin/python/python-3.10/python.exe -m uvicorn main:app --host 0.0.0.0 --port 8001)",
-      "Bash(echo \"Server started, PID=$!\")"
-    ]
-  }
-}
