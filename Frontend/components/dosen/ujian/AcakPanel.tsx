@@ -5,22 +5,20 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import api from "@/services/api";
 import { inputCls, labelCls } from "./constants";
-import type { AvailableSoalItem, BabOption, BankSoalOption, LocalSoalItem } from "./types";
+import type { AvailableSoalItem, BankSoalOption, LocalSoalItem } from "./types";
 
 export default function AcakPanel({
-  mode, ujianId, matkulId, excludeIds, babs, onSaved, onAdd, onClose, apiPath = "/ujian/dosen",
+  mode, ujianId, matkulId, excludeIds, onSaved, onAdd, onClose, apiPath = "/ujian/dosen",
 }: {
   mode: "create" | "edit";
   ujianId?: string;
   matkulId?: number;
   excludeIds?: number[];
-  babs: BabOption[];
   onSaved?: () => void;
   onAdd?: (items: LocalSoalItem[]) => void;
   onClose: () => void;
   apiPath?: string;
 }) {
-  const [babId, setBabId]           = useState("");
   const [bankSoalId, setBankSoalId] = useState("");
   const [jumlah, setJumlah]         = useState("10");
   const [loading, setLoading]       = useState(false);
@@ -43,7 +41,6 @@ export default function AcakPanel({
         const res = await api.get(`${apiPath}/0/available-soal`, {
           params: {
             mata_kuliah_id: matkulId,
-            bab_id:         babId ? Number(babId) : undefined,
             bank_soal_id:   bankSoalId ? Number(bankSoalId) : undefined,
             exclude_ids:    excludeIds?.join(",") || undefined,
             per_page:       500,
@@ -59,7 +56,6 @@ export default function AcakPanel({
         onClose();
       } else {
         const res = await api.post(`${apiPath}/${ujianId}/soal/random`, {
-          bab_id:       babId ? Number(babId) : undefined,
           bank_soal_id: bankSoalId ? Number(bankSoalId) : undefined,
           jumlah:       n,
         });
@@ -86,21 +82,12 @@ export default function AcakPanel({
             className={inputCls} placeholder="Contoh: 20" />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelCls}>Filter Bab <span className="text-gray-400 normal-case font-normal">(opsional)</span></label>
-            <select value={babId} onChange={e => setBabId(e.target.value)} className={inputCls}>
-              <option value="">Semua Bab</option>
-              {babs.map(b => <option key={b.id} value={b.id}>{b.nama_bab}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className={labelCls}>Filter Bank Soal <span className="text-gray-400 normal-case font-normal">(opsional)</span></label>
-            <select value={bankSoalId} onChange={e => setBankSoalId(e.target.value)} className={inputCls}>
-              <option value="">Semua Bank Soal</option>
-              {bankSoalOptions.map(b => <option key={b.id} value={b.id}>{b.nama}</option>)}
-            </select>
-          </div>
+        <div>
+          <label className={labelCls}>Filter Bank Soal <span className="text-gray-400 normal-case font-normal">(opsional)</span></label>
+          <select value={bankSoalId} onChange={e => setBankSoalId(e.target.value)} className={inputCls}>
+            <option value="">Semua Bank Soal</option>
+            {bankSoalOptions.map(b => <option key={b.id} value={b.id}>{b.nama}</option>)}
+          </select>
         </div>
 
         {error   && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}

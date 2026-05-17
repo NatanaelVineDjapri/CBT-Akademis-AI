@@ -60,7 +60,7 @@ export default function TambahSoalModal({
 
         {tab === "pilih" && <PilihPanel mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
         {tab === "buat"  && <BuatPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
-        {tab === "acak"  && <AcakPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} babs={babs} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
+        {tab === "acak"  && <AcakPanel  mode={mode} ujianId={ujianId} matkulId={matkulId} excludeIds={excludeIds} onSaved={onSaved} onAdd={onAdd} onClose={onClose} apiPath={apiPath} />}
       </div>
     </div>
   );

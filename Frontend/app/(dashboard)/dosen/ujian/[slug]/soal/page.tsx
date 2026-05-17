@@ -1,9 +1,11 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
+import { toSlug } from "@/utils/slug";
 import useSWR from "swr";
-import { Plus, Trash2, Loader2, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
+import ConfirmModal from "@/components/ConfirmModal";
 import SearchInput from "@/components/filtering/SearchInput";
 import EmptyState from "@/components/EmptyState";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -585,13 +587,21 @@ function TambahSoalModal({
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function DosenUjianSoalPage({ params }: { params: Promise<{ ujianId: string }> }) {
-  const { ujianId } = use(params);
-  const [showModal, setShowModal] = useState(false);
-  const [deleting, setDeleting]   = useState<number | null>(null);
+export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const [showModal, setShowModal]         = useState(false);
+  const [deleteTarget, setDeleteTarget]   = useState<UjianSoalItem | null>(null);
+  const [deleting, setDeleting]           = useState(false);
+
+  const { data: allUjian } = useSWR(
+    "/ujian/dosen/all",
+    () => api.get("/ujian/dosen", { params: { per_page: 200 } }).then(r => r.data),
+    { revalidateOnFocus: false },
+  );
+  const ujianId = String(allUjian?.data?.find((u: UjianInfo) => toSlug(u.nama_ujian) === slug)?.id ?? "");
 
   const { data, isLoading, mutate } = useSWR(
-    ["/ujian/dosen/soal", ujianId],
+    ujianId ? ["/ujian/dosen/soal", ujianId] : null,
     () => api.get(`/ujian/dosen/${ujianId}/soal`).then(r => r.data),
     { revalidateOnFocus: false },
   );
@@ -599,16 +609,17 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ ujian
   const soalList: UjianSoalItem[]   = data?.data ?? [];
   const ujian: UjianInfo | undefined = data?.ujian;
 
-  const handleDelete = async (ujianSoalId: number) => {
-    if (!confirm("Hapus soal ini dari ujian?")) return;
-    setDeleting(ujianSoalId);
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await api.delete(`/ujian/dosen/${ujianId}/soal/${ujianSoalId}`);
+      await api.delete(`/ujian/dosen/${ujianId}/soal/${deleteTarget.ujian_soal_id}`);
+      setDeleteTarget(null);
       mutate();
     } catch {
-      alert("Gagal menghapus soal.");
+      setDeleteTarget(null);
     } finally {
-      setDeleting(null);
+      setDeleting(false);
     }
   };
 
@@ -616,8 +627,7 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ ujian
     <div className="flex flex-col h-full gap-4">
       <div className="shrink-0">
         <Breadcrumb
-          overrides={{ soal: "Kelola Soal" }}
-          hrefOverrides={ujian ? { [`/dosen/ujian/${ujianId}`]: ujian.nama_ujian } : undefined}
+          overrides={{ [slug]: ujian?.nama_ujian ?? "...", soal: "Kelola Soal" }}
         />
       </div>
 
@@ -652,7 +662,7 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ ujian
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading || !ujianId ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
                     {Array.from({ length: 7 }).map((_, j) => (
@@ -688,12 +698,9 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ ujian
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500">{item.bobot}</td>
                   <td className="px-4 py-3">
-                    <button onClick={() => handleDelete(item.ujian_soal_id)}
-                      disabled={deleting === item.ujian_soal_id}
+                    <button onClick={() => setDeleteTarget(item)}
                       className="cursor-pointer transition-colors" title="Hapus dari ujian">
-                      {deleting === item.ujian_soal_id
-                        ? <Loader2 size={15} className="animate-spin text-red-400" />
-                        : <Trash2 size={15} className="text-red-400 hover:text-red-500" />}
+                      <Trash2 size={15} className="text-red-400 hover:text-red-500" />
                     </button>
                   </td>
                 </tr>
@@ -712,6 +719,16 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ ujian
           matkulId={ujian.mata_kuliah_id}
           onClose={() => setShowModal(false)}
           onSaved={() => mutate()}
+        />
+      )}
+
+      {deleteTarget && (
+        <ConfirmModal
+          title="Hapus Soal"
+          message={`Yakin ingin menghapus soal ini dari ujian?`}
+          loading={deleting}
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteTarget(null)}
         />
       )}
     </div>

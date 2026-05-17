@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { BookOpen, CalendarDays, Clock, Users, Pencil, Trash2 } from "lucide-react";
+import { toSlug } from "@/utils/slug";
 import { StatusBadge, fmt } from "@/components/dosen/ujian/constants";
 import EmptyState from "@/components/EmptyState";
 import type { UjianItem } from "@/components/dosen/ujian/types";
@@ -12,9 +14,11 @@ interface UjianTableProps {
   meta?: { current_page: number; per_page: number };
   onEdit: (item: UjianItem) => void;
   onDelete: (item: UjianItem) => void;
+  basePath?: string;
+  onRowHover?: (item: UjianItem) => void;
 }
 
-export default function UjianTable({ items, perPage, isLoading, meta, onEdit, onDelete }: UjianTableProps) {
+export default function UjianTable({ items, perPage, isLoading, meta, onEdit, onDelete, basePath, onRowHover }: UjianTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -42,10 +46,16 @@ export default function UjianTable({ items, perPage, isLoading, meta, onEdit, on
           ) : items.map((item, idx) => {
             const no = ((meta?.current_page ?? 1) - 1) * (meta?.per_page ?? perPage) + idx + 1;
             return (
-              <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <tr key={item.id} onMouseEnter={() => onRowHover?.(item)} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
                 <td className="px-4 py-3">
-                  <p className="font-medium" style={{ color: "var(--color-primary)" }}>{item.nama_ujian}</p>
+                  {basePath ? (
+                    <Link href={`${basePath}/${toSlug(item.nama_ujian)}/soal`} className="font-medium hover:underline" style={{ color: "var(--color-primary)" }}>
+                      {item.nama_ujian}
+                    </Link>
+                  ) : (
+                    <p className="font-medium" style={{ color: "var(--color-primary)" }}>{item.nama_ujian}</p>
+                  )}
                   {item.mata_kuliah && (
                     <div className="flex items-center gap-1 mt-0.5">
                       <BookOpen size={11} className="text-gray-400" />

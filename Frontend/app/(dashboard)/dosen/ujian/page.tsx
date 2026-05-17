@@ -1,6 +1,6 @@
 "use client";
 
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
@@ -105,6 +105,8 @@ export default function DosenUjianPage() {
             meta={meta}
             onEdit={openEdit}
             onDelete={setConfirmDelete}
+            basePath="/dosen/ujian"
+            onRowHover={() => preload("/ujian/dosen/all", () => api.get("/ujian/dosen", { params: { per_page: 200 } }).then(r => r.data))}
           />
         </div>
       </div>
