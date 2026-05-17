@@ -14,6 +14,7 @@ import {
 } from "@/services/UniversitasService";
 import { getFakultas } from "@/services/FakultasService";
 import { useDebounce } from "@/hooks/useDebounce";
+import { toSlug } from "@/utils/slug";
 
 const PER_PAGE = 10;
 const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] transition-colors";
@@ -202,10 +203,10 @@ export default function InstitusiPage() {
               ) : data.data.map((item, idx) => (
                 <tr
                   key={item.id}
-                  onClick={() => router.push(`/admin-akademis/institusi/${item.id}`)}
+                  onClick={() => router.push(`/admin-akademis/institusi/${toSlug(item.nama)}`)}
                   onMouseEnter={() => {
-                    router.prefetch(`/admin-akademis/institusi/${item.id}`);
-                    preload(`/universitas/${item.id}`, () => getUniversitasById(item.id));
+                    router.prefetch(`/admin-akademis/institusi/${toSlug(item.nama)}`);
+                    preload("/universitas/all", () => getUniversitas({ per_page: 200 }));
                     preload(["/fakultas", item.id, "", 1], () => getFakultas({ universitas_id: item.id, page: 1, per_page: PER_PAGE }));
                   }}
                   className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"

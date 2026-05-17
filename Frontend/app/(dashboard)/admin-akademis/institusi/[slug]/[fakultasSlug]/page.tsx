@@ -7,10 +7,11 @@ import Breadcrumb from "@/components/BreadCrumb";
 import ConfirmModal from "@/components/ConfirmModal";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
-import { getUniversitasById } from "@/services/UniversitasService";
-import { getFakultasById } from "@/services/FakultasService";
+import { getUniversitas } from "@/services/UniversitasService";
+import { getFakultas } from "@/services/FakultasService";
 import { getProdi, createProdi, updateProdi, deleteProdi, ProdiItem } from "@/services/ProdiService";
 import { useDebounce } from "@/hooks/useDebounce";
+import { toSlug } from "@/utils/slug";
 
 const PER_PAGE = 10;
 const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] transition-colors";
@@ -77,12 +78,10 @@ function ProdiModal({ fakultasId, editItem, onClose, onSaved }: {
   );
 }
 
-interface Props { params: Promise<{ id: string; fakultasId: string }>; }
+interface Props { params: Promise<{ slug: string; fakultasSlug: string }>; }
 
 export default function FakultasDetailPage({ params }: Props) {
-  const { id: idStr, fakultasId: fIdStr } = use(params);
-  const univId = Number(idStr);
-  const fakultasId = Number(fIdStr);
+  const { slug, fakultasSlug } = use(params);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -91,21 +90,27 @@ export default function FakultasDetailPage({ params }: Props) {
   const [deleting, setDeleting] = useState(false);
   const debouncedSearch = useDebounce(search);
 
-  const { data: univ } = useSWR(
-    univId ? `/universitas/${univId}` : null,
-    () => getUniversitasById(univId),
+  const { data: allUniv } = useSWR(
+    "/universitas/all",
+    () => getUniversitas({ per_page: 200 }),
     { revalidateOnFocus: false }
   );
 
-  const { data: fakultas } = useSWR(
-    fakultasId ? `/fakultas/${fakultasId}` : null,
-    () => getFakultasById(fakultasId),
+  const univ = allUniv?.data.find(u => toSlug(u.nama) === slug);
+  const univId = univ?.id;
+
+  const { data: allFakultas } = useSWR(
+    univId ? ["/fakultas/all", univId] : null,
+    () => getFakultas({ universitas_id: univId!, per_page: 200 }),
     { revalidateOnFocus: false }
   );
+
+  const fakultas = allFakultas?.data.find(f => toSlug(f.nama) === fakultasSlug);
+  const fakultasId = fakultas?.id;
 
   const { data, isLoading, mutate } = useSWR(
     fakultasId ? ["/prodi", fakultasId, debouncedSearch, page] : null,
-    () => getProdi({ fakultas_id: fakultasId, search: debouncedSearch || undefined, page, per_page: PER_PAGE }),
+    () => getProdi({ fakultas_id: fakultasId!, search: debouncedSearch || undefined, page, per_page: PER_PAGE }),
     { revalidateOnFocus: false, keepPreviousData: true }
   );
 
@@ -127,8 +132,8 @@ export default function FakultasDetailPage({ params }: Props) {
     <div className="flex flex-col gap-4">
       <Breadcrumb
         overrides={{
-          [String(univId)]: univ?.nama ?? "...",
-          [String(fakultasId)]: fakultas?.nama ?? "...",
+          [slug]: univ?.nama ?? "...",
+          [fakultasSlug]: fakultas?.nama ?? "...",
         }}
       />
 
@@ -151,7 +156,7 @@ export default function FakultasDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="overflow-x-auto flex-1">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
@@ -163,7 +168,7 @@ export default function FakultasDetailPage({ params }: Props) {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading || !fakultasId ? (
                 Array.from({ length: PER_PAGE }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
                     <td className="px-5 py-3"><div className="h-3 w-6 bg-gray-100 rounded" /></td>
@@ -230,7 +235,7 @@ export default function FakultasDetailPage({ params }: Props) {
         )}
       </div>
 
-      {showModal && (
+      {showModal && fakultasId && (
         <ProdiModal
           fakultasId={fakultasId}
           editItem={editItem}

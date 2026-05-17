@@ -8,12 +8,13 @@ import Breadcrumb from "@/components/BreadCrumb";
 import ConfirmModal from "@/components/ConfirmModal";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
-import { getUniversitasById } from "@/services/UniversitasService";
+import { getUniversitas } from "@/services/UniversitasService";
 import {
   getFakultas, getFakultasById, createFakultas, updateFakultas, deleteFakultas, FakultasItem,
 } from "@/services/FakultasService";
 import { getProdi } from "@/services/ProdiService";
 import { useDebounce } from "@/hooks/useDebounce";
+import { toSlug } from "@/utils/slug";
 
 const PER_PAGE = 10;
 const inputClass = "w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] transition-colors";
@@ -80,11 +81,10 @@ function FakultasModal({ universitasId, editItem, onClose, onSaved }: {
   );
 }
 
-interface Props { params: Promise<{ id: string }>; }
+interface Props { params: Promise<{ slug: string }>; }
 
 export default function UniversitasDetailPage({ params }: Props) {
-  const { id: idStr } = use(params);
-  const id = Number(idStr);
+  const { slug } = use(params);
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -94,15 +94,18 @@ export default function UniversitasDetailPage({ params }: Props) {
   const [deleting, setDeleting] = useState(false);
   const debouncedSearch = useDebounce(search);
 
-  const { data: univ } = useSWR(
-    id ? `/universitas/${id}` : null,
-    () => getUniversitasById(id),
+  const { data: allUniv } = useSWR(
+    "/universitas/all",
+    () => getUniversitas({ per_page: 200 }),
     { revalidateOnFocus: false }
   );
 
+  const univ = allUniv?.data.find(u => toSlug(u.nama) === slug);
+  const univId = univ?.id;
+
   const { data, isLoading, mutate } = useSWR(
-    id ? ["/fakultas", id, debouncedSearch, page] : null,
-    () => getFakultas({ universitas_id: id, search: debouncedSearch || undefined, page, per_page: PER_PAGE }),
+    univId ? ["/fakultas", univId, debouncedSearch, page] : null,
+    () => getFakultas({ universitas_id: univId!, search: debouncedSearch || undefined, page, per_page: PER_PAGE }),
     { revalidateOnFocus: false, keepPreviousData: true }
   );
 
@@ -122,7 +125,7 @@ export default function UniversitasDetailPage({ params }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Breadcrumb overrides={{ [String(id)]: univ?.nama ?? "..." }} />
+      <Breadcrumb overrides={{ [slug]: univ?.nama ?? "..." }} />
 
       <div className="bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3 shrink-0">
@@ -143,7 +146,7 @@ export default function UniversitasDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="overflow-x-auto flex-1">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
@@ -156,7 +159,7 @@ export default function UniversitasDetailPage({ params }: Props) {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading || !univId ? (
                 Array.from({ length: PER_PAGE }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
                     <td className="px-5 py-3"><div className="h-3 w-6 bg-gray-100 rounded" /></td>
@@ -174,10 +177,10 @@ export default function UniversitasDetailPage({ params }: Props) {
               ) : data.data.map((item, idx) => (
                 <tr
                   key={item.id}
-                  onClick={() => router.push(`/admin-akademis/institusi/${id}/${item.id}`)}
+                  onClick={() => router.push(`/admin-akademis/institusi/${slug}/${toSlug(item.nama)}`)}
                   onMouseEnter={() => {
-                    router.prefetch(`/admin-akademis/institusi/${id}/${item.id}`);
-                    preload(`/fakultas/${item.id}`, () => getFakultasById(item.id));
+                    router.prefetch(`/admin-akademis/institusi/${slug}/${toSlug(item.nama)}`);
+                    preload(["/fakultas/all", univId], () => getFakultas({ universitas_id: univId!, per_page: 200 }));
                     preload(["/prodi", item.id, "", 1], () => getProdi({ fakultas_id: item.id, page: 1, per_page: PER_PAGE }));
                   }}
                   className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"
@@ -234,9 +237,9 @@ export default function UniversitasDetailPage({ params }: Props) {
         )}
       </div>
 
-      {showModal && (
+      {showModal && univId && (
         <FakultasModal
-          universitasId={id}
+          universitasId={univId}
           editItem={editItem}
           onClose={() => { setShowModal(false); setEditItem(null); }}
           onSaved={() => mutate()}
