@@ -1,6 +1,19 @@
 import api from "./api";
 import * as XLSX from "xlsx";
-import { UjianMahasiswa, UjianMeta, HasilUjianDosenItem, HasilUjianDosenDetail, DetailPesertaDosen } from "../types";
+import { UjianMahasiswa, UjianMeta, HasilUjianDosenItem, HasilUjianDosenDetail, DetailPesertaDosen, UjianSession } from "../types";
+
+export const mulaiUjian = async (pesertaUjianId: number, kodeAkses?: string): Promise<UjianSession> => {
+  const res = await api.post(`/ujian/${pesertaUjianId}/mulai`, kodeAkses ? { kode_akses: kodeAkses } : {});
+  return res.data.data;
+};
+
+export const submitJawabanSoal = async (pesertaUjianId: number, ujianSoalId: number, jawaban: string): Promise<void> => {
+  await api.post("/ujian/submit-jawaban", { peserta_ujian_id: pesertaUjianId, ujian_soal_id: ujianSoalId, jawaban });
+};
+
+export const selesaikanUjian = async (pesertaUjianId: number): Promise<void> => {
+  await api.post("/ujian/selesai", { peserta_ujian_id: pesertaUjianId });
+};
 
 export const getMyUjian = async (params?: {
   search?: string;

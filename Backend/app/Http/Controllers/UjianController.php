@@ -13,7 +13,9 @@ use App\Models\Ujian;
 use App\Events\JawabanMasuk;
 use App\Models\UjianSoal;
 use App\Models\UjianSetting;
+use App\Models\UserMataKuliah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UjianController extends Controller
@@ -31,6 +33,53 @@ class UjianController extends Controller
         PesertaUjian::autoExpire();
 
         $authUser = $request->user();
+
+        // Lazy auto-enroll: daftarkan ke ujian yang belum terdaftar tapi punya KRS
+        $matkulIds = UserMataKuliah::where('user_id', $authUser->id)
+            ->where('is_aktif', true)
+            ->pluck('mata_kuliah_id');
+
+        if ($matkulIds->isNotEmpty()) {
+            $sudahTerdaftar = PesertaUjian::where('user_id', $authUser->id)->pluck('ujian_id');
+            $ujianBaru = Ujian::whereIn('mata_kuliah_id', $matkulIds)
+                ->whereNotIn('id', $sudahTerdaftar)
+                ->pluck('id');
+
+            foreach ($ujianBaru as $ujianId) {
+                PesertaUjian::firstOrCreate(
+                    ['ujian_id' => $ujianId, 'user_id' => $authUser->id],
+                    ['attempt_ke' => 1, 'status' => 'belum_mulai'],
+                );
+            }
+
+            // Lazy-create attempt berikutnya jika attempt terakhir sudah selesai dan masih ada sisa
+            $selesaiRecords = PesertaUjian::with('ujian.ujianSetting')
+                ->where('user_id', $authUser->id)
+                ->where('status', 'selesai')
+                ->whereIn('ujian_id', $sudahTerdaftar)
+                ->get()
+                ->groupBy('ujian_id')
+                ->map(fn($g) => $g->sortByDesc('attempt_ke')->first());
+
+            foreach ($selesaiRecords as $latest) {
+                $maxAttempt = $latest->ujian->ujianSetting?->max_attempt ?? 1;
+                if ($latest->attempt_ke >= $maxAttempt) continue;
+
+                $nextExists = PesertaUjian::where('ujian_id', $latest->ujian_id)
+                    ->where('user_id', $authUser->id)
+                    ->where('attempt_ke', $latest->attempt_ke + 1)
+                    ->exists();
+
+                if (!$nextExists) {
+                    PesertaUjian::create([
+                        'ujian_id'   => $latest->ujian_id,
+                        'user_id'    => $authUser->id,
+                        'attempt_ke' => $latest->attempt_ke + 1,
+                        'status'     => 'belum_mulai',
+                    ]);
+                }
+            }
+        }
         $search = $request->query('search', '');
         $status = $request->query('status', '');
         $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
@@ -45,7 +94,20 @@ class UjianController extends Controller
             ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
             ->where('peserta_ujian.user_id', $authUser->id)
             ->select('peserta_ujian.*')
-            ->when($status, fn($q) => $q->where('peserta_ujian.status', $status))
+            ->when($status === 'sedang_berlangsung', fn($q) => $q
+                ->whereIn('peserta_ujian.status', ['belum_mulai', 'sedang_berlangsung'])
+                ->whereRaw('ujian.start_date <= NOW()')
+                ->whereRaw('ujian.end_date >= NOW()')
+                ->whereExists(fn($q) => $q->select(DB::raw(1))->from('ujian_soal')->whereColumn('ujian_soal.ujian_id', 'ujian.id'))
+            )
+            ->when($status === 'belum_mulai', fn($q) => $q
+                ->where('peserta_ujian.status', 'belum_mulai')
+                ->whereRaw('ujian.start_date > NOW()')
+                ->whereExists(fn($q) => $q->select(DB::raw(1))->from('ujian_soal')->whereColumn('ujian_soal.ujian_id', 'ujian.id'))
+            )
+            ->when($status === 'selesai', fn($q) => $q
+                ->where('peserta_ujian.status', 'selesai')
+            )
             ->when(
                 $search,
                 fn($q) =>
@@ -74,6 +136,11 @@ class UjianController extends Controller
             'lulus' => $p->nilaiAkhir?->lulus,
         ]);
 
+        // Untuk tab selesai: satu kartu per ujian (attempt tertinggi saja)
+        if ($status === 'selesai') {
+            $data = $data->sortByDesc('attempt_ke')->unique('ujian_id')->values();
+        }
+
         return response()->json([
             'message' => 'Daftar ujian berhasil diambil!',
             'data' => $data,
@@ -90,13 +157,21 @@ class UjianController extends Controller
         $request->validate([
             'peserta_ujian_id' => 'required|exists:peserta_ujian,id',
             'ujian_soal_id' => 'required|exists:ujian_soal,id',
-            'jawaban' => 'required|string',
+            'jawaban' => 'nullable|string',
         ]);
 
         $peserta = PesertaUjian::with('user', 'ujian')->findOrFail($request->peserta_ujian_id);
 
         if ($peserta->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Jawaban kosong = hapus jawaban
+        if (empty($request->jawaban)) {
+            JawabanPeserta::where('peserta_ujian_id', $request->peserta_ujian_id)
+                ->where('ujian_soal_id', $request->ujian_soal_id)
+                ->delete();
+            return response()->json(['status' => 'ok', 'message' => 'Jawaban dihapus']);
         }
 
         // Auto-grade PG & checklist
@@ -204,11 +279,117 @@ class UjianController extends Controller
             ]
         );
 
+        // Siapkan attempt berikutnya jika masih ada sisa
+        $maxAttempt = $ujian->ujianSetting?->max_attempt ?? 1;
+        if ($peserta->attempt_ke < $maxAttempt) {
+            PesertaUjian::create([
+                'ujian_id'   => $peserta->ujian_id,
+                'user_id'    => $peserta->user_id,
+                'attempt_ke' => $peserta->attempt_ke + 1,
+                'status'     => 'belum_mulai',
+            ]);
+        }
+
         return response()->json([
             'message'    => 'Ujian berhasil diselesaikan.',
             'nilai_total' => $nilaiTotal,
             'lulus'      => $lulus,
             'grade'      => $grade,
+        ]);
+    }
+
+    public function mulaiUjian(Request $request, $pesertaUjianId)
+    {
+        $authUser = $request->user();
+
+        $peserta = PesertaUjian::with(['ujian.ujianSetting'])
+            ->where('id', $pesertaUjianId)
+            ->where('user_id', $authUser->id)
+            ->firstOrFail();
+
+        $ujian = $peserta->ujian;
+        $now   = now();
+
+        if (!$ujian->start_date || $now->lt($ujian->start_date)) {
+            return response()->json(['message' => 'Ujian belum dimulai.'], 422);
+        }
+        if ($ujian->end_date && $now->gt($ujian->end_date)) {
+            return response()->json(['message' => 'Ujian sudah berakhir.'], 422);
+        }
+        if ($peserta->status === 'selesai') {
+            return response()->json(['message' => 'Kamu sudah menyelesaikan ujian ini.'], 422);
+        }
+
+        if ($ujian->is_kode_aktif) {
+            $request->validate(['kode_akses' => 'required|string']);
+            if ($request->kode_akses !== $ujian->kode_akses) {
+                return response()->json(['message' => 'Kode akses salah.'], 422);
+            }
+        }
+
+        if ($peserta->status === 'belum_mulai') {
+            $peserta->update(['status' => 'sedang_berlangsung', 'mulai_at' => $now]);
+        }
+
+        return $this->buildSoalResponse($peserta->fresh(), $ujian);
+    }
+
+    public function getSoalMahasiswa(Request $request, $pesertaUjianId)
+    {
+        $authUser = $request->user();
+
+        $peserta = PesertaUjian::with(['ujian.ujianSetting'])
+            ->where('id', $pesertaUjianId)
+            ->where('user_id', $authUser->id)
+            ->firstOrFail();
+
+        if ($peserta->status !== 'sedang_berlangsung') {
+            return response()->json(['message' => 'Ujian tidak sedang berlangsung.'], 422);
+        }
+
+        return $this->buildSoalResponse($peserta, $peserta->ujian);
+    }
+
+    private function buildSoalResponse(PesertaUjian $peserta, Ujian $ujian)
+    {
+        $randomize = $ujian->ujianSetting?->randomize_soal ?? false;
+        $endAt     = $peserta->mulai_at->copy()->addMinutes($ujian->durasi_menit);
+
+        $existingJawaban = $peserta->jawabanPeserta()->pluck('jawaban', 'ujian_soal_id');
+
+        $soalList = UjianSoal::with(['soal.jenisSoal.opsiJawaban'])
+            ->where('ujian_id', $ujian->id)
+            ->orderBy('urutan')
+            ->get();
+
+        if ($randomize) {
+            $soalList = $soalList->shuffle()->values();
+        }
+
+        $soal = $soalList->map(fn($us) => [
+            'ujian_soal_id' => $us->id,
+            'urutan'        => $us->urutan,
+            'bobot'         => $us->bobot,
+            'deskripsi'     => $us->soal?->deskripsi,
+            'jenis_soal'    => $us->soal?->jenisSoal->first()?->jenis_soal,
+            'opsi'          => $us->soal?->jenisSoal->first()?->opsiJawaban
+                                ->map(fn($o) => ['opsi' => $o->opsi, 'teks' => $o->teks])
+                                ->values(),
+            'jawaban'       => $existingJawaban[$us->id] ?? null,
+        ])->values();
+
+        return response()->json([
+            'message' => 'Berhasil.',
+            'data'    => [
+                'peserta_ujian_id' => $peserta->id,
+                'ujian_id'         => $ujian->id,
+                'nama_ujian'       => $ujian->nama_ujian,
+                'durasi_menit'     => $ujian->durasi_menit,
+                'mulai_at'         => $peserta->mulai_at->toISOString(),
+                'end_at'           => $endAt->toISOString(),
+                'proctoring_aktif' => (bool) ($ujian->ujianSetting?->proctoring_aktif ?? false),
+                'soal'             => $soal,
+            ],
         ]);
     }
 
@@ -378,26 +559,30 @@ class UjianController extends Controller
 
         $paginated = $query->paginate($perPage);
 
-        $data = collect($paginated->items())->map(fn($ujian) => [
-            'id'            => $ujian->id,
-            'nama_ujian'    => $ujian->nama_ujian,
-            'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
-            'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
-            'start_date'    => $ujian->start_date?->toISOString(),
-            'end_date'      => $ujian->end_date?->toISOString(),
-            'durasi_menit'  => $ujian->durasi_menit,
-            'jumlah_soal'   => $ujian->ujian_soal_count,
-            'peserta_count' => $ujian->peserta_ujian_count,
-            'avg_nilai'     => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->count()
-                               ? round($ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->avg('nilai_total'), 1)
-                               : null,
-            'total_lulus'   => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->where('lulus', true)->count(),
-            'status'        => match(true) {
-                $ujian->end_date && $now->gt($ujian->end_date)      => 'Selesai',
-                $ujian->start_date && $now->gte($ujian->start_date) => 'berlangsung',
-                default => 'Belum_mulai',
-            },
-        ]);
+        $data = collect($paginated->items())->map(function ($ujian) use ($now) {
+            $latest = $ujian->pesertaUjian
+                ->groupBy('user_id')
+                ->map(fn($g) => $g->sortByDesc('attempt_ke')->first());
+            $nilaiList = $latest->pluck('nilaiAkhir')->filter();
+            return [
+                'id'            => $ujian->id,
+                'nama_ujian'    => $ujian->nama_ujian,
+                'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
+                'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
+                'start_date'    => $ujian->start_date?->toISOString(),
+                'end_date'      => $ujian->end_date?->toISOString(),
+                'durasi_menit'  => $ujian->durasi_menit,
+                'jumlah_soal'   => $ujian->ujian_soal_count,
+                'peserta_count' => $latest->count(),
+                'avg_nilai'     => $nilaiList->count() ? round($nilaiList->avg('nilai_total'), 1) : null,
+                'total_lulus'   => $nilaiList->where('lulus', true)->count(),
+                'status'        => match(true) {
+                    $ujian->end_date && $now->gt($ujian->end_date)      => 'Selesai',
+                    $ujian->start_date && $now->gte($ujian->start_date) => 'berlangsung',
+                    default => 'Belum_mulai',
+                },
+            ];
+        });
 
         return response()->json([
             'message' => 'Hasil ujian dosen berhasil diambil!',
@@ -436,7 +621,7 @@ class UjianController extends Controller
             'jenis_ujian'    => $ujian->jenis_ujian ?? '-',
             'tanggal'        => $ujian->start_date?->format('d/m/y'),
             'pukul'          => $ujian->start_date?->format('H.i'),
-            'total_peserta'  => $ujian->pesertaUjian->count(),
+            'total_peserta'  => $ujian->pesertaUjian->unique('user_id')->count(),
             'total_soal'     => $ujian->ujianSoal->count(),
         ];
 
@@ -712,7 +897,7 @@ class UjianController extends Controller
             'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
             'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
             'tanggal'       => $ujian->start_date ? \Carbon\Carbon::parse($ujian->start_date)->format('d M Y') : '-',
-            'total_peserta' => $pesertaList->count(),
+            'total_peserta' => $pesertaList->unique('user_id')->count(),
             'total_soal'    => $ujian->ujianSoal()->count(),
         ];
 
@@ -787,7 +972,7 @@ class UjianController extends Controller
             'end_date'      => $ujian->end_date?->toISOString(),
             'durasi_menit'  => $ujian->durasi_menit,
             'jumlah_soal'   => $ujian->ujian_soal_count,
-            'peserta_count' => $ujian->peserta_ujian_count,
+            'peserta_count' => $ujian->pesertaUjian->unique('user_id')->count(),
             'avg_nilai'     => $ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->count()
                                ? round($ujian->pesertaUjian->pluck('nilaiAkhir')->filter()->avg('nilai_total'), 1)
                                : null,
@@ -957,7 +1142,7 @@ class UjianController extends Controller
                 'randomize_soal'   => $request->boolean('randomize_soal', false),
                 'max_attempt'      => $request->input('max_attempt', 1),
                 'passing_grade'    => $request->input('passing_grade', 60),
-                'proctoring_aktif' => false,
+                'proctoring_aktif' => true,
             ]);
 
             foreach (($request->soal ?? []) as $i => $item) {
@@ -1016,8 +1201,8 @@ class UjianController extends Controller
         $perPage  = (int) $request->query('per_page', 10);
         $now      = now();
 
-        $query = Ujian::with(['mataKuliah', 'ujianSetting'])
-            ->withCount(['ujianSoal', 'pesertaUjian'])
+        $query = Ujian::with(['mataKuliah', 'ujianSetting', 'pesertaUjian' => fn($q) => $q->select(['ujian_id', 'user_id'])])
+            ->withCount('ujianSoal')
             ->where('created_by', $authUser->id)
             ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']))
             ->orderBy('start_date', 'desc');
@@ -1033,7 +1218,7 @@ class UjianController extends Controller
             'end_date'       => $u->end_date,
             'durasi_menit'   => $u->durasi_menit,
             'jumlah_soal'    => $u->ujian_soal_count,
-            'jumlah_peserta' => $u->peserta_ujian_count,
+            'jumlah_peserta' => $u->pesertaUjian->unique('user_id')->count(),
             'passing_grade'  => $u->ujianSetting?->passing_grade,
             'kode_akses'     => $u->kode_akses,
             'is_kode_aktif'  => $u->is_kode_aktif,
@@ -1103,8 +1288,20 @@ class UjianController extends Controller
                 'randomize_soal'   => $request->boolean('randomize_soal', false),
                 'max_attempt'      => $request->input('max_attempt', 1),
                 'passing_grade'    => $request->input('passing_grade', 60),
-                'proctoring_aktif' => false,
+                'proctoring_aktif' => true,
             ]);
+
+            // Auto-enroll semua mahasiswa yang punya KRS aktif untuk mata kuliah ini
+            $mahasiswaIds = UserMataKuliah::where('mata_kuliah_id', $ujian->mata_kuliah_id)
+                ->where('is_aktif', true)
+                ->pluck('user_id');
+
+            foreach ($mahasiswaIds as $userId) {
+                PesertaUjian::firstOrCreate(
+                    ['ujian_id' => $ujian->id, 'user_id' => $userId],
+                    ['attempt_ke' => 1, 'status' => 'belum_mulai'],
+                );
+            }
 
             foreach (($request->soal ?? []) as $i => $item) {
                 $soalId = $item['soal_id'] ?? null;
@@ -1169,14 +1366,15 @@ class UjianController extends Controller
                 'nama_ujian'      => $ujian->nama_ujian,
                 'mata_kuliah_id'  => $ujian->mata_kuliah_id,
                 'mata_kuliah'     => $ujian->mataKuliah?->nama,
-                'start_date'      => $ujian->start_date,
-                'end_date'        => $ujian->end_date,
+                'start_date'      => $ujian->start_date?->format('Y-m-d\TH:i'),
+                'end_date'        => $ujian->end_date?->format('Y-m-d\TH:i'),
                 'durasi_menit'    => $ujian->durasi_menit,
                 'kode_akses'      => $ujian->kode_akses,
                 'is_kode_aktif'   => $ujian->is_kode_aktif,
-                'randomize_soal'  => $ujian->ujianSetting?->randomize_soal ?? false,
-                'max_attempt'     => $ujian->ujianSetting?->max_attempt ?? 1,
-                'passing_grade'   => $ujian->ujianSetting?->passing_grade ?? 60,
+                'randomize_soal'   => $ujian->ujianSetting?->randomize_soal  ?? false,
+                'max_attempt'      => $ujian->ujianSetting?->max_attempt     ?? 1,
+                'passing_grade'    => $ujian->ujianSetting?->passing_grade   ?? 60,
+                'proctoring_aktif' => (bool) ($ujian->ujianSetting?->proctoring_aktif ?? false),
             ],
         ]);
     }
@@ -1213,9 +1411,10 @@ class UjianController extends Controller
         UjianSetting::updateOrCreate(
             ['ujian_id' => $ujian->id],
             array_filter([
-                'randomize_soal' => $request->has('randomize_soal') ? $request->boolean('randomize_soal') : null,
-                'max_attempt'    => $request->input('max_attempt'),
-                'passing_grade'  => $request->input('passing_grade'),
+                'randomize_soal'   => $request->has('randomize_soal')   ? $request->boolean('randomize_soal')   : null,
+                'proctoring_aktif' => $request->has('proctoring_aktif') ? $request->boolean('proctoring_aktif') : null,
+                'max_attempt'      => $request->input('max_attempt'),
+                'passing_grade'    => $request->input('passing_grade'),
             ], fn($v) => $v !== null)
         );
 
@@ -1529,6 +1728,60 @@ class UjianController extends Controller
             ->decrement('urutan');
 
         return response()->json(['message' => 'Soal berhasil dihapus dari ujian!']);
+    }
+
+    public function getGradeSetting(Request $request, $id)
+    {
+        $ujian = Ujian::where('created_by', $request->user()->id)->findOrFail($id);
+
+        $data = \App\Models\GradeSetting::where('ujian_id', $ujian->id)
+            ->orderBy('nilai_min', 'desc')
+            ->get(['id', 'grade', 'nilai_min', 'nilai_max']);
+
+        return response()->json(['data' => $data]);
+    }
+
+    public function saveGradeSetting(Request $request, $id)
+    {
+        $ujian = Ujian::with('ujianSetting')->where('created_by', $request->user()->id)->findOrFail($id);
+
+        $request->validate([
+            'rows'               => 'required|array',
+            'rows.*.grade'       => 'required|string|max:10',
+            'rows.*.nilai_min'   => 'required|numeric|min:0|max:100',
+            'rows.*.nilai_max'   => 'required|numeric|min:0|max:100',
+        ]);
+
+        \App\Models\GradeSetting::where('ujian_id', $ujian->id)->delete();
+
+        $gradeSettings = collect();
+        foreach ($request->rows as $row) {
+            $gs = \App\Models\GradeSetting::create([
+                'ujian_id'  => $ujian->id,
+                'grade'     => strtoupper(trim($row['grade'])),
+                'nilai_min' => (float) $row['nilai_min'],
+                'nilai_max' => (float) $row['nilai_max'],
+            ]);
+            $gradeSettings->push($gs);
+        }
+
+        // Recalculate grade & lulus untuk semua peserta yang sudah selesai
+        $passingGrade = $ujian->ujianSetting?->passing_grade;
+        $selesaiList  = NilaiAkhir::whereHas('pesertaUjian', fn($q) => $q->where('ujian_id', $ujian->id))->get();
+
+        foreach ($selesaiList as $na) {
+            $grade = null;
+            foreach ($gradeSettings->sortByDesc('nilai_min') as $gs) {
+                if ($na->nilai_total >= $gs->nilai_min && $na->nilai_total <= $gs->nilai_max) {
+                    $grade = $gs->grade;
+                    break;
+                }
+            }
+            $lulus = $passingGrade !== null ? $na->nilai_total >= $passingGrade : false;
+            $na->update(['grade' => $grade, 'lulus' => $lulus]);
+        }
+
+        return response()->json(['message' => 'Grade setting berhasil disimpan.']);
     }
 
 }

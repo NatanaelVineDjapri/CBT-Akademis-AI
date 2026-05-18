@@ -27,6 +27,7 @@ export interface UjianForm {
   max_attempt: string;
   kode_akses: string;
   is_kode_aktif: boolean;
+  proctoring_aktif: boolean;
 }
 
 export interface UjianSoalItem {
@@ -71,5 +72,5 @@ export interface BankSoalOption { id: number; nama: string }
 export const EMPTY_FORM: UjianForm = {
   nama_ujian: "", mata_kuliah_id: "", start_date: "", end_date: "",
   durasi_menit: "90", passing_grade: "60", max_attempt: "1",
-  kode_akses: "", is_kode_aktif: false,
+  kode_akses: "", is_kode_aktif: false, proctoring_aktif: true,
 };

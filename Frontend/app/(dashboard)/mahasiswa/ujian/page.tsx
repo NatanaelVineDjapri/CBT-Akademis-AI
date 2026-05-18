@@ -47,7 +47,7 @@ export default function UjianPage() {
     ["/ujian/my", currentTab.status, debouncedSearch, sortDir ?? "", page, perPage],
     ([, st, s, sd, p, pp]: [string, string, string, string, number, number]) =>
       getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: pp }),
-    { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
+    { keepPreviousData: true, revalidateOnFocus: false }
   );
 
   const [showSkeleton, setShowSkeleton] = useState(false);

@@ -57,7 +57,8 @@ export default function DosenUjianPage() {
           start_date:     d.start_date ? d.start_date.slice(0, 16) : "",
           end_date:       d.end_date   ? d.end_date.slice(0, 16)   : "",
           kode_akses:     d.kode_akses ?? "",
-          is_kode_aktif:  d.is_kode_aktif ?? false,
+          is_kode_aktif:    d.is_kode_aktif    ?? false,
+          proctoring_aktif: d.proctoring_aktif ?? false,
         },
       });
     } catch {

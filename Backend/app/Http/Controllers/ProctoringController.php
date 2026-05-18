@@ -29,7 +29,7 @@ class ProctoringController extends Controller
             'events'                    => 'required|array|min:1',
             'events.*.tipe_pelanggaran' => 'required|string',
             'events.*.risk_score'       => 'required|numeric',
-            'events.*.waktu'            => 'required|date',
+            'events.*.waktu'            => 'required|string',
         ]);
  
         $rows = array_map(fn($ev) => [

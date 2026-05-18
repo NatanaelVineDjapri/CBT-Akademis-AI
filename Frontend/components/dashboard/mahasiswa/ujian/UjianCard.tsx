@@ -9,6 +9,10 @@ import { formatDate, formatTime } from "@/utils/format";
 
 export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
   const selesai = ujian.status === "selesai";
+  const now = new Date();
+  const isActive = ujian.start_date && ujian.end_date
+    && new Date(ujian.start_date) <= now && new Date(ujian.end_date) >= now;
+  const canStart = ujian.status === "sedang_berlangsung" || (ujian.status === "belum_mulai" && !!isActive);
 
   return (
     <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col gap-2">
@@ -54,6 +58,7 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
       <div className="border-t border-gray-200" />
 
       {selesai && ujian.nilai !== null ? (
+
         <div className="flex flex-col gap-2">
           <div
             className="rounded-xl p-3 flex flex-col items-center gap-1"
@@ -69,15 +74,19 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
               >
                 {ujian.nilai}
               </p>
-              <span className="text-gray-300 mb-1">|</span>
-              <p
-                className="text-xl font-bold mb-0.5"
-                style={{
-                  color: ujian.lulus ? "var(--color-primary)" : "#ef4444",
-                }}
-              >
-                {ujian.grade}
-              </p>
+              {ujian.grade && (
+                <>
+                  <span className="text-gray-300 mb-1">|</span>
+                  <p
+                    className="text-xl font-bold mb-0.5"
+                    style={{
+                      color: ujian.lulus ? "var(--color-primary)" : "#ef4444",
+                    }}
+                  >
+                    {ujian.grade}
+                  </p>
+                </>
+              )}
             </div>
           </div>
           <Link
@@ -93,15 +102,17 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
             Lihat Detail
           </Link>
         </div>
-      ) : (
-        <button
-          disabled={ujian.status !== "sedang_berlangsung"}
-          className="w-full py-2 rounded-lg text-white text-xs font-medium disabled:opacity-40"
+      ) : canStart ? (
+        <Link
+          href={`/mahasiswa/ujian/${ujian.peserta_ujian_id}`}
+          className="w-full py-2 rounded-lg text-white text-xs font-medium text-center block"
           style={{ background: "var(--color-primary)" }}
         >
-          {ujian.status === "sedang_berlangsung"
-            ? "Mulai Ujian"
-            : "Belum Dimulai"}
+          Mulai Ujian
+        </Link>
+      ) : (
+        <button disabled className="w-full py-2 rounded-lg text-white text-xs font-medium opacity-40 cursor-not-allowed" style={{ background: "var(--color-primary)" }}>
+          Belum Dimulai
         </button>
       )}
     </div>

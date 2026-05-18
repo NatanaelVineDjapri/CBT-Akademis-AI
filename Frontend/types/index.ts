@@ -553,6 +553,32 @@ export const tips = [
   "Selalu logout setelah selesai menggunakan akun, terutama jika Anda memakai perangkat umum atau milik orang lain, untuk mencegah akses tanpa izin.",
 ];
 
+export interface OpsiItem {
+  opsi: string;
+  teks: string;
+}
+
+export interface SoalItem {
+  ujian_soal_id: number;
+  urutan: number;
+  bobot: number;
+  deskripsi: string;
+  jenis_soal: "pilihan_ganda" | "essay" | "checklist";
+  opsi: OpsiItem[] | null;
+  jawaban: string | null;
+}
+
+export interface UjianSession {
+  peserta_ujian_id: number;
+  ujian_id: number;
+  nama_ujian: string;
+  durasi_menit: number;
+  mulai_at: string;
+  end_at: string;
+  proctoring_aktif: boolean;
+  soal: SoalItem[];
+}
+
 export const quotes = [
   "Setiap langkah kecil yang kamu ambil hari ini adalah investasi untuk masa depanmu. Terus bergerak maju!",
   "Kesulitan bukan penghalang, melainkan batu loncatan menuju versi terbaik dirimu.",

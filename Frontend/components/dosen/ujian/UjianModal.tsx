@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, Loader2, X } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import api from "@/services/api";
@@ -19,15 +19,21 @@ export default function UjianModal({
   apiPath?: string;
   requiresMataKuliah?: boolean;
 }) {
+  type GradeRow = { grade: string; nilai_min: string; nilai_max: string };
+
   const [form, setForm]             = useState<UjianForm>(initial);
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState("");
   const [step2, setStep2]           = useState(false);
   const [localSoal, setLocalSoal]   = useState<LocalSoalItem[]>([]);
-  const [tab, setTab]               = useState<"detail" | "soal">("detail");
+  const [tab, setTab]               = useState<"detail" | "soal" | "grade">("detail");
   const [showTambah, setShowTambah] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [bobotChanges, setBobotChanges] = useState<Record<number, number>>({});
+  const [gradeRows, setGradeRows]   = useState<GradeRow[]>([]);
+  const [gradeLoaded, setGradeLoaded] = useState(false);
+  const [gradeSaving, setGradeSaving] = useState(false);
+  const [gradeError, setGradeError] = useState("");
 
   const isCreateStep2 = mode === "create" && step2;
   const isOnSoalView  = isCreateStep2 || (mode === "edit" && tab === "soal");
@@ -52,7 +58,8 @@ export default function UjianModal({
     durasi_menit:   Number(form.durasi_menit),
     passing_grade:  form.passing_grade ? Number(form.passing_grade) : undefined,
     max_attempt:    form.max_attempt   ? Number(form.max_attempt)   : 1,
-    is_kode_aktif:  form.is_kode_aktif,
+    is_kode_aktif:    form.is_kode_aktif,
+    proctoring_aktif: form.proctoring_aktif,
     soal_bobot: Object.entries(bobotChanges).map(([id, bobot]) => ({ id: Number(id), bobot })),
     soal: localSoal.map(s => s.soal_id !== undefined
       ? { soal_id: s.soal_id, bobot: s.bobot }
@@ -126,6 +133,47 @@ export default function UjianModal({
   const handleLocalBobot = (localId: string, val: number) =>
     setLocalSoal(prev => prev.map(s => s._localId === localId ? { ...s, bobot: val } : s));
 
+  const GRADE_COLORS: Record<string, string> = {
+    A: "var(--nilai-a)", B: "var(--nilai-b)", C: "var(--nilai-c)",
+    D: "var(--nilai-d)", E: "var(--nilai-e)",
+  };
+
+  const DEFAULT_GRADES: GradeRow[] = [
+    { grade: "A", nilai_min: "90", nilai_max: "100" },
+    { grade: "B", nilai_min: "80", nilai_max: "89" },
+    { grade: "C", nilai_min: "70", nilai_max: "79" },
+    { grade: "D", nilai_min: "60", nilai_max: "69" },
+    { grade: "E", nilai_min: "0",  nilai_max: "59" },
+  ];
+
+  useEffect(() => {
+    if (mode !== "edit" || tab !== "grade" || gradeLoaded || !form.id) return;
+    api.get(`/ujian/dosen/${form.id}/grade-setting`).then(r => {
+      const rows = r.data.data;
+      setGradeRows(rows.length > 0
+        ? rows.map((g: any) => ({ grade: g.grade, nilai_min: String(g.nilai_min), nilai_max: String(g.nilai_max) }))
+        : DEFAULT_GRADES
+      );
+      setGradeLoaded(true);
+    });
+  }, [tab, mode, gradeLoaded, form.id]);
+
+  const handleSaveGrade = async () => {
+    setGradeSaving(true); setGradeError("");
+    try {
+      await api.put(`/ujian/dosen/${form.id}/grade-setting`, { rows: gradeRows.map(r => ({
+        grade: r.grade,
+        nilai_min: parseFloat(r.nilai_min) || 0,
+        nilai_max: parseFloat(r.nilai_max) || 0,
+      }))});
+    } catch (e: any) {
+      setGradeError(e?.response?.data?.message ?? "Gagal menyimpan.");
+    } finally { setGradeSaving(false); }
+  };
+
+  const setGradeRow = (i: number, k: keyof GradeRow, v: string) =>
+    setGradeRows(prev => prev.map((r, idx) => idx === i ? { ...r, [k]: v } : r));
+
   const showDetailForm = !isCreateStep2 && (mode === "create" || tab === "detail");
   const headerTitle = mode === "create" ? (isCreateStep2 ? "Kelola Soal" : "Buat Ujian") : "Edit Ujian";
 
@@ -146,6 +194,7 @@ export default function UjianModal({
             {[
               { key: "detail" as const, label: "Detail" },
               { key: "soal"   as const, label: soalList.length > 0 ? `Soal (${soalList.length})` : "Soal" },
+              { key: "grade"  as const, label: "Grade" },
             ].map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
                 className="px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer"
@@ -231,6 +280,11 @@ export default function UjianModal({
                 <input type="checkbox" className="accent-[var(--color-primary)] w-4 h-4"
                   checked={form.is_kode_aktif} onChange={e => set("is_kode_aktif", e.target.checked)} />
                 <span className="text-sm text-gray-700">Aktifkan kode akses</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer select-none">
+                <input type="checkbox" className="accent-[var(--color-primary)] w-4 h-4"
+                  checked={form.proctoring_aktif ?? false} onChange={e => set("proctoring_aktif", e.target.checked)} />
+                <span className="text-sm text-gray-700">Aktifkan proctoring (kamera siswa)</span>
               </label>
             </div>
 
@@ -332,8 +386,57 @@ export default function UjianModal({
           </div>
         )}
 
+        {mode === "edit" && tab === "grade" && (
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="grid grid-cols-5 gap-3">
+              {gradeRows.map((row, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl py-4 px-2 flex flex-col items-center gap-2"
+                  style={{ background: GRADE_COLORS[row.grade] ?? "var(--color-primary)" }}
+                >
+                  <span className="text-2xl font-bold text-white">{row.grade}</span>
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="text-white/70 text-[10px]">Min</span>
+                      <input
+                        type="number" min={0} max={100}
+                        value={row.nilai_min}
+                        onChange={e => setGradeRow(i, "nilai_min", e.target.value)}
+                        className="w-full text-center text-sm font-semibold bg-white/30 text-white rounded-lg px-2 py-1 focus:outline-none focus:bg-white/50 placeholder-white/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      />
+                    </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="text-white/70 text-[10px]">Max</span>
+                      <input
+                        type="number" min={0} max={100}
+                        value={row.nilai_max}
+                        onChange={e => setGradeRow(i, "nilai_max", e.target.value)}
+                        className="w-full text-center text-sm font-semibold bg-white/30 text-white rounded-lg px-2 py-1 focus:outline-none focus:bg-white/50 placeholder-white/60 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {gradeError && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2 mt-3">{gradeError}</p>}
+          </div>
+        )}
+
         <div className="shrink-0 px-6 py-4 border-t border-gray-100 flex gap-3">
-          {showDetailForm ? (
+          {mode === "edit" && tab === "grade" ? (
+            <>
+              <button onClick={onClose}
+                className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">
+                Tutup
+              </button>
+              <button onClick={handleSaveGrade} disabled={gradeSaving}
+                className="flex-1 text-white text-sm font-semibold py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                style={{ backgroundColor: "var(--color-primary)" }}>
+                {gradeSaving ? <><Loader2 size={14} className="animate-spin" />Menyimpan...</> : "Simpan Grade"}
+              </button>
+            </>
+          ) : showDetailForm ? (
             <>
               <button onClick={onClose}
                 className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">

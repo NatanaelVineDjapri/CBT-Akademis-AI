@@ -30,7 +30,7 @@ class JawabanMasuk implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel
     {
-        return new Channel('ujian-channel');
+        return new Channel('ujian.' . $this->jawaban['ujian_id']);
 
     }
 

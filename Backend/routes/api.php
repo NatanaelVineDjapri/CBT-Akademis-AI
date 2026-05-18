@@ -61,6 +61,8 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
         Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
         Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
+        Route::post('/ujian/{pesertaUjianId}/mulai', [UjianController::class, 'mulaiUjian']);
+        Route::get('/ujian/{pesertaUjianId}/soal', [UjianController::class, 'getSoalMahasiswa']);
         Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']);
         Route::post('/ujian/selesai', [UjianController::class, 'selesaiUjian']);
     });
@@ -213,6 +215,9 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::post('/ujian/dosen/{id}/soal/random', [UjianController::class, 'addSoalRandom']);
         Route::post('/ujian/dosen/{id}/soal/buat-baru', [UjianController::class, 'buatSoal']);
         Route::delete('/ujian/dosen/{id}/soal/{ujianSoalId}', [UjianController::class, 'removeSoal']);
+
+        Route::get('/ujian/dosen/{id}/grade-setting', [UjianController::class, 'getGradeSetting']);
+        Route::put('/ujian/dosen/{id}/grade-setting', [UjianController::class, 'saveGradeSetting']);
     });
 
     Route::middleware('role:admin_universitas,dosen')->group(function () {
