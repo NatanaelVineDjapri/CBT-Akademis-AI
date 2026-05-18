@@ -1,9 +1,12 @@
 import api from "./api";
 
 const POIN: Record<string, number> = {
-  tab:        5,
-  fullscreen: 10,
-  copypaste:  8,
+  tab:            5,
+  fullscreen:     10,
+  copypaste:      8,
+  no_face:        10,
+  multiple_faces: 20,
+  looking_away:   5,
 };
 
 export const logPelanggaran = (pesertaUjianId: number, tipe: string): void => {

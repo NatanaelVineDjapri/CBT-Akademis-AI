@@ -79,11 +79,6 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
             if payload.get("action") == "end_session":
                 summary = detector.get_session_summary()
 
-                # Kirim ke Laravel (non-blocking)
-                asyncio.create_task(
-                    _push_to_laravel(peserta_ujian_id, summary)
-                )
-
                 await websocket.send_text(json.dumps({
                     "type":    "session_ended",
                     "summary": summary,
@@ -97,6 +92,13 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
                 result = await loop.run_in_executor(
                     None, detector.analyze_frame, payload["frame"]
                 )
+
+                # Push pelanggaran langsung ke Laravel, tidak tunggu end_session
+                if result.get("events"):
+                    asyncio.create_task(
+                        _push_to_laravel(peserta_ujian_id, {"events": result["events"]})
+                    )
+
                 await websocket.send_text(json.dumps({
                     "type": "frame_result",
                     **result,

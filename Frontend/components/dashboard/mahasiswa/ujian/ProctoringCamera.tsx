@@ -2,14 +2,29 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Video, VideoOff } from "lucide-react";
+import { logPelanggaran } from "@/services/ProctoringService";
 
-export default function ProctoringCamera() {
-  const videoRef            = useRef<HTMLVideoElement>(null);
+const WS_BASE = process.env.NEXT_PUBLIC_PROCTORING_WS_URL ?? "";
+const FRAME_INTERVAL_MS = 5000;
+
+interface Props {
+  pesertaUjianId: number;
+  onViolation?: (type: string, detail: Record<string, unknown>) => void;
+}
+
+export default function ProctoringCamera({ pesertaUjianId, onViolation }: Props) {
+  const videoRef        = useRef<HTMLVideoElement>(null);
+  const canvasRef       = useRef<HTMLCanvasElement>(null);
+  const wsRef           = useRef<WebSocket | null>(null);
+  const onViolationRef  = useRef(onViolation);
   const [active, setActive] = useState(false);
   const [denied, setDenied] = useState(false);
 
+  onViolationRef.current = onViolation;
+
   useEffect(() => {
     let stream: MediaStream | null = null;
+    let deniedIntervalId: ReturnType<typeof setInterval> | null = null;
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
       .then(s => {
@@ -20,13 +35,53 @@ export default function ProctoringCamera() {
         }
         setActive(true);
       })
-      .catch(() => setDenied(true));
+      .catch(() => {
+        setDenied(true);
+        deniedIntervalId = setInterval(() => {
+          logPelanggaran(pesertaUjianId, "no_face");
+        }, FRAME_INTERVAL_MS);
+      });
 
-    return () => { stream?.getTracks().forEach(t => t.stop()); };
-  }, []);
+    const ws = new WebSocket(`${WS_BASE}/ws/proctoring/${pesertaUjianId}`);
+    wsRef.current = ws;
+
+    ws.onmessage = (evt) => {
+      try {
+        const data = JSON.parse(evt.data as string);
+        if (data.type === "frame_result" && data.events?.length) {
+          data.events.forEach((ev: { type: string; detail: Record<string, unknown> }) => {
+            onViolationRef.current?.(ev.type, ev.detail);
+          });
+        }
+      } catch (_) {}
+    };
+
+    const intervalId = setInterval(() => {
+      const video  = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN || !video || !canvas) return;
+      if (!video.videoWidth) return;
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d")?.drawImage(video, 0, 0);
+      const frame = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      ws.send(JSON.stringify({ frame, timestamp: new Date().toISOString() }));
+    }, FRAME_INTERVAL_MS);
+
+    return () => {
+      clearInterval(intervalId);
+      if (deniedIntervalId) clearInterval(deniedIntervalId);
+      stream?.getTracks().forEach(t => t.stop());
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "end_session" }));
+      }
+      ws.close();
+    };
+  }, [pesertaUjianId]);
 
   return (
     <div className="fixed bottom-6 z-50 flex flex-col items-center gap-1.5" style={{ left: 312 }}>
+      <canvas ref={canvasRef} style={{ display: "none" }} />
       <div
         className="relative rounded-xl overflow-hidden shadow-lg border-2"
         style={{

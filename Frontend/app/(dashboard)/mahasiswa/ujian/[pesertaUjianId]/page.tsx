@@ -190,7 +190,7 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      {session.proctoring_aktif && <ProctoringCamera />}
+      {session.proctoring_aktif && <ProctoringCamera pesertaUjianId={session.peserta_ujian_id} />}
       {session.proctoring_aktif && <ProctoringMonitor pesertaUjianId={session.peserta_ujian_id} onAutoSubmit={handleAutoSelesai} />}
 
       {/* ── Header ── */}
