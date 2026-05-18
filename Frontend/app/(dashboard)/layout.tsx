@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { motion } from "motion/react";
 import { UserProvider, useUser } from "../../context/UserContext";
@@ -23,6 +24,8 @@ function getRoleLabel(user: { role: string; universitas_kode?: string }) {
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
+  const pathname = usePathname();
+  const isExamPage = /^\/mahasiswa\/ujian\/\d+/.test(pathname ?? "");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shouldAnimate] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -48,6 +51,20 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   };
 
   if (!user) return null;
+
+  if (isExamPage) return (
+    <main
+      className="h-screen overflow-y-auto p-8"
+      style={{
+        backgroundImage: "url('/images/background-dashboard.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      {children}
+    </main>
+  );
 
   return (
       <motion.div

@@ -80,13 +80,13 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation }: Props)
   }, [pesertaUjianId]);
 
   return (
-    <div className="fixed bottom-6 z-50 flex flex-col items-center gap-1.5" style={{ left: 312 }}>
+    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-center gap-1.5">
       <canvas ref={canvasRef} style={{ display: "none" }} />
       <div
         className="relative rounded-xl overflow-hidden shadow-lg border-2"
         style={{
           borderColor: denied ? "#ef4444" : active ? "var(--color-primary)" : "#d1d5db",
-          width: 220, height: 205,
+          width: 320, height: 305,
         }}
       >
         {denied ? (
