@@ -45,6 +45,86 @@ interface MenuItem {
   icon: React.ReactNode;
 }
 
+interface MenuSection {
+  label?: string;
+  items: MenuItem[];
+}
+
+const menuSectionsByRole: Record<string, MenuSection[]> = {
+  peserta_mahasiswa_baru: [
+    { items: [{ label: "Beranda", href: "/pmb", icon: <LayoutDashboard size={18} /> }] },
+    {
+      label: "Ujian",
+      items: [{ label: "Ujian", href: "/pmb/ujian", icon: <ClipboardList size={18} /> }],
+    },
+  ],
+  admin_akademis_ai: [
+    { items: [{ label: "Beranda", href: "/admin-akademis", icon: <LayoutDashboard size={18} /> }] },
+    {
+      label: "Manajemen",
+      items: [
+        { label: "Institusi", href: "/admin-akademis/institusi", icon: <Building2 size={18} /> },
+        { label: "Settings",  href: "/admin-akademis/settings",  icon: <Settings size={18} /> },
+      ],
+    },
+  ],
+  mahasiswa: [
+    {
+      items: [
+        { label: "Beranda", href: "/mahasiswa", icon: <LayoutDashboard size={18} /> },
+      ],
+    },
+    {
+      label: "Akademik",
+      items: [
+        { label: "Ujian",       href: "/mahasiswa/ujian",       icon: <ClipboardList size={18} /> },
+        { label: "Jadwal",      href: "/mahasiswa/jadwal",      icon: <Calendar size={18} /> },
+        { label: "Nilai",       href: "/mahasiswa/nilai",       icon: <Trophy size={18} /> },
+        { label: "Mata Kuliah", href: "/mahasiswa/mata-kuliah", icon: <GraduationCap size={18} /> },
+      ],
+    },
+    {
+      label: "Akun",
+      items: [
+        { label: "Profil", href: "/mahasiswa/profile", icon: <UserCircle size={18} /> },
+      ],
+    },
+  ],
+  admin_universitas: [
+    {
+      items: [
+        { label: "Beranda", href: "/admin-universitas", icon: <LayoutDashboard size={18} /> },
+      ],
+    },
+    {
+      label: "PMB",
+      items: [
+        { label: "Bank Soal PMB",  href: "/admin-universitas/bank-soal-pmb",  icon: <BookOpen size={18} /> },
+        { label: "Ujian PMB",      href: "/admin-universitas/ujian-pmb",       icon: <ClipboardList size={18} /> },
+        { label: "Hasil Ujian PMB",href: "/admin-universitas/hasil-ujian-pmb", icon: <BarChart2 size={18} /> },
+        { label: "Penerimaan PMB", href: "/admin-universitas/penerimaan-pmb",  icon: <GraduationCap size={18} /> },
+      ],
+    },
+    {
+      label: "Akademik",
+      items: [
+        { label: "Mata Kuliah", href: "/admin-universitas/mata-kuliah", icon: <BookOpen size={18} /> },
+        { label: "KRS",         href: "/admin-universitas/krs",         icon: <ListChecks size={18} /> },
+      ],
+    },
+    {
+      label: "Manajemen",
+      items: [
+        { label: "Monitoring",   href: "/admin-universitas/monitoring",   icon: <Eye size={18} /> },
+        { label: "User",         href: "/admin-universitas/user",         icon: <Users size={18} /> },
+        { label: "Pengumuman",   href: "/admin-universitas/pengumuman",   icon: <Megaphone size={18} /> },
+        { label: "Log",          href: "/admin-universitas/log",          icon: <ScrollText size={18} /> },
+        { label: "Settings",     href: "/admin-universitas/settings",     icon: <Settings size={18} /> },
+      ],
+    },
+  ],
+};
+
 const menuByRole: Record<string, MenuItem[]> = {
   admin_akademis_ai: [
     {
@@ -207,6 +287,7 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const menuSections = menuSectionsByRole[user.role] ?? null;
   const menuItems = menuByRole[user.role] ?? [];
 
   const handleLogout = async () => {
@@ -276,108 +357,119 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
         </div>
 
         {/* Menu */}
-        <nav className={`flex-1 ${collapsed ? "px-1" : "px-3"} space-y-1 overflow-y-auto`}>
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={collapsed ? item.label : undefined}
-                onMouseEnter={() => {
-                  // — admin akademis —
-                  if (item.href === "/admin-akademis/institusi") {
-                    preload(["/universitas", "", 1, 0], () => getUniversitas({ page: 1, per_page: 10 }));
-                  } else if (item.href === "/admin-akademis") {
-                    preload("/dashboard/admin-akademis", getAdminAkademisDashboard);
-                    preload("/dashboard/admin-akademis/distribusi-pengguna", getAdminAkademisDistribusiPengguna);
-                    preload("/dashboard/admin-akademis/aktivitas-ujian", getAdminAkademisAktivitasUjian);
-                    preload("/dashboard/admin-akademis/kelulusan", getAdminAkademisKelulusan);
-                    preload("/dashboard/admin-akademis/tren-nilai", getAdminAkademisTrenNilai);
-                    preload("/dashboard/admin-akademis/pertumbuhan-pengguna", getAdminAkademisPertumbuhanPengguna);
-                  // — mahasiswa —
-                  } else if (item.href === "/mahasiswa") {
-                    preload("/dashboard/mahasiswa", getMahasiswaDashboard);
-                  } else if (item.href === "/mahasiswa/ujian") {
-                    const pp = calcPerPage(245, 4, 255);
-                    preload(["/ujian/my", "sedang_berlangsung", "", "", 1, pp], ([, st, s, sd, p, perPg]: [string, string, string, string, number, number]) =>
-                      getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: perPg }));
-                  } else if (item.href === "/mahasiswa/jadwal") {
-                    preload("/jadwal", getJadwal);
-                  } else if (item.href === "/mahasiswa/nilai") {
-                    const pp = calcPerPage(53, 1, 300);
-                    preload(["/nilai", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg]: [string, string, number, number, string, string]) =>
-                      getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" as "asc" | "desc" }));
-                  } else if (item.href === "/mahasiswa/mata-kuliah") {
-                    const pp = calcPerPage(128, 4, 200);
-                    preload(["/mata-kuliah/my", "", 1, pp, ""], ([, s, p, perPg, so]: [string, string, number, number, string]) =>
-                      getMyMataKuliah({ search: s, page: p, per_page: perPg, sort: (so || undefined) as "asc" | "desc" | undefined }));
-                  // — dosen —
-                  } else if (item.href === "/dosen") {
-                    preload("/dashboard/dosen", getDosenDashboard);
-                  } else if (item.href === "/dosen/bank-soal") {
-                    preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
-                      getBankSoal({ search: s, page: p, per_page: 10 }));
-                  } else if (item.href === "/dosen/hasil-ujian") {
-                    const pp = calcPerPage(53, 1, 480);
-                    preload(["/ujian/dosen/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
-                      getHasilUjianDosen({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
-                  } else if (item.href === "/dosen/jadwal") {
-                    preload("/jadwal/dosen", getJadwalDosen);
-                  // — admin universitas —
-                  } else if (item.href === "/admin-universitas") {
-                    preload("/dashboard/admin-universitas", getAdminUniversitasDashboard);
-                    preload("/dashboard/admin-universitas/performa", getAdminUniversitasPerforma);
-                    preload("/dashboard/admin-universitas/distribusi", getAdminUniversitasDistribusi);
-                    preload("/dashboard/admin-universitas/performa-prodi", getAdminUniversitasPerformaProdi);
-                    preload("/dashboard/admin-universitas/aktivitas-ujian", getAdminUniversitasAktivitasUjian);
-                    preload("/dashboard/admin-universitas/kelulusan", getAdminUniversitasKelulusan);
-                    preload("/dashboard/admin-universitas/tren-nilai", getAdminUniversitasTrenNilai);
-                    preload("/pmb/penerimaan/statistik", getPmbStatistik);
-                  } else if (item.href === "/admin-universitas/bank-soal-pmb") {
-                    preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
-                      getBankSoal({ search: s, page: p, per_page: 10 }));
-                  } else if (item.href === "/admin-universitas/penerimaan-pmb") {
-                    preload(["/pmb/penerimaan/peserta", "", new Date().getFullYear()], ([, s, t]: [string, string, number]) =>
-                      getPmbPeserta({ search: s, tahun: t, per_page: 200 }));
-                    preload("/pmb/penerimaan/statistik", getPmbStatistik);
-                  } else if (item.href === "/admin-universitas/hasil-ujian-pmb") {
-                    const pp = calcPerPage(53, 1, 395);
-                    preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
-                      getHasilUjianAdminUniversitas({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
-                  } else if (item.href === "/admin-universitas/mata-kuliah") {
-                    const pp = calcPerPage(53, 1, 390);
-                    preload(["/mata-kuliah", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
-                      getMataKuliah({ search: s, prodi_id: p, page: pg, per_page: pp }));
-                  } else if (item.href === "/admin-universitas/krs") {
-                    const pp = calcPerPage(65, 1, 360);
-                    preload(["/krs/mahasiswa", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
-                      getKrsMahasiswa({ search: s, prodi_id: p, page: pg, per_page: pp }));
-                  } else if (item.href === "/admin-universitas/user") {
-                    if (user.universitas_id) {
-                      preload(["/fakultas", user.universitas_id], ([, univId]: [string, number]) =>
-                        getFakultas({ universitas_id: univId, per_page: 100 }));
+        <nav className={`flex-1 ${collapsed ? "px-1" : "px-3"} overflow-y-auto`}>
+          {(() => {
+            const renderItem = (item: MenuItem) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  title={collapsed ? item.label : undefined}
+                  onMouseEnter={() => {
+                    if (item.href === "/admin-akademis/institusi") {
+                      preload(["/universitas", "", 1, 0], () => getUniversitas({ page: 1, per_page: 10 }));
+                    } else if (item.href === "/admin-akademis") {
+                      preload("/dashboard/admin-akademis", getAdminAkademisDashboard);
+                      preload("/dashboard/admin-akademis/distribusi-pengguna", getAdminAkademisDistribusiPengguna);
+                      preload("/dashboard/admin-akademis/aktivitas-ujian", getAdminAkademisAktivitasUjian);
+                      preload("/dashboard/admin-akademis/kelulusan", getAdminAkademisKelulusan);
+                      preload("/dashboard/admin-akademis/tren-nilai", getAdminAkademisTrenNilai);
+                      preload("/dashboard/admin-akademis/pertumbuhan-pengguna", getAdminAkademisPertumbuhanPengguna);
+                    } else if (item.href === "/mahasiswa") {
+                      preload("/dashboard/mahasiswa", getMahasiswaDashboard);
+                    } else if (item.href === "/mahasiswa/ujian") {
+                      const pp = calcPerPage(245, 4, 255);
+                      preload(["/ujian/my", "sedang_berlangsung", "", "", 1, pp], ([, st, s, sd, p, perPg]: [string, string, string, string, number, number]) =>
+                        getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: perPg }));
+                    } else if (item.href === "/mahasiswa/jadwal") {
+                      preload("/jadwal", getJadwal);
+                    } else if (item.href === "/mahasiswa/nilai") {
+                      const pp = calcPerPage(53, 1, 300);
+                      preload(["/nilai", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg]: [string, string, number, number, string, string]) =>
+                        getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" as "asc" | "desc" }));
+                    } else if (item.href === "/mahasiswa/mata-kuliah") {
+                      const pp = calcPerPage(128, 4, 200);
+                      preload(["/mata-kuliah/my", "", 1, pp, ""], ([, s, p, perPg, so]: [string, string, number, number, string]) =>
+                        getMyMataKuliah({ search: s, page: p, per_page: perPg, sort: (so || undefined) as "asc" | "desc" | undefined }));
+                    } else if (item.href === "/dosen") {
+                      preload("/dashboard/dosen", getDosenDashboard);
+                    } else if (item.href === "/dosen/bank-soal") {
+                      preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
+                        getBankSoal({ search: s, page: p, per_page: 10 }));
+                    } else if (item.href === "/dosen/hasil-ujian") {
+                      const pp = calcPerPage(53, 1, 480);
+                      preload(["/ujian/dosen/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
+                        getHasilUjianDosen({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
+                    } else if (item.href === "/dosen/jadwal") {
+                      preload("/jadwal/dosen", getJadwalDosen);
+                    } else if (item.href === "/admin-universitas") {
+                      preload("/dashboard/admin-universitas", getAdminUniversitasDashboard);
+                      preload("/dashboard/admin-universitas/performa", getAdminUniversitasPerforma);
+                      preload("/dashboard/admin-universitas/distribusi", getAdminUniversitasDistribusi);
+                      preload("/dashboard/admin-universitas/performa-prodi", getAdminUniversitasPerformaProdi);
+                      preload("/dashboard/admin-universitas/aktivitas-ujian", getAdminUniversitasAktivitasUjian);
+                      preload("/dashboard/admin-universitas/kelulusan", getAdminUniversitasKelulusan);
+                      preload("/dashboard/admin-universitas/tren-nilai", getAdminUniversitasTrenNilai);
+                      preload("/pmb/penerimaan/statistik", getPmbStatistik);
+                    } else if (item.href === "/admin-universitas/bank-soal-pmb") {
+                      preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
+                        getBankSoal({ search: s, page: p, per_page: 10 }));
+                    } else if (item.href === "/admin-universitas/penerimaan-pmb") {
+                      preload(["/pmb/penerimaan/peserta", "", new Date().getFullYear()], ([, s, t]: [string, string, number]) =>
+                        getPmbPeserta({ search: s, tahun: t, per_page: 200 }));
+                      preload("/pmb/penerimaan/statistik", getPmbStatistik);
+                    } else if (item.href === "/admin-universitas/hasil-ujian-pmb") {
+                      const pp = calcPerPage(53, 1, 395);
+                      preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
+                        getHasilUjianAdminUniversitas({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
+                    } else if (item.href === "/admin-universitas/mata-kuliah") {
+                      const pp = calcPerPage(53, 1, 390);
+                      preload(["/mata-kuliah", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
+                        getMataKuliah({ search: s, prodi_id: p, page: pg, per_page: pp }));
+                    } else if (item.href === "/admin-universitas/krs") {
+                      const pp = calcPerPage(65, 1, 360);
+                      preload(["/krs/mahasiswa", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
+                        getKrsMahasiswa({ search: s, prodi_id: p, page: pg, per_page: pp }));
+                    } else if (item.href === "/admin-universitas/user") {
+                      if (user.universitas_id) {
+                        preload(["/fakultas", user.universitas_id], ([, univId]: [string, number]) =>
+                          getFakultas({ universitas_id: univId, per_page: 100 }));
+                      }
+                    } else if (item.href === "/admin-universitas/log") {
+                      const pp = calcPerPage(52, 1, 310);
+                      preload(["/audit", "", "", "", 1, pp], () =>
+                        getAudits({ page: 1, per_page: pp }));
+                    } else if (item.href === "/pmb") {
+                      preload("/dashboard/mahasiswa", getMahasiswaDashboard);
                     }
-                  } else if (item.href === "/admin-universitas/log") {
-                    const pp = calcPerPage(52, 1, 310);
-                    preload(["/audit", "", "", "", 1, pp], () =>
-                      getAudits({ page: 1, per_page: pp }));
-                  // — pmb —
-                  } else if (item.href === "/pmb") {
-                    preload("/dashboard/mahasiswa", getMahasiswaDashboard);
-                  }
-                }}
-                prefetch
-                className={`flex items-center rounded-lg text-sm transition-all ${
-                  collapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5"
-                } ${isActive ? "text-white font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`}
-                style={isActive ? { backgroundColor: "var(--color-primary)" } : {}}
-              >
-                {item.icon}
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+                  }}
+                  prefetch
+                  className={`flex items-center rounded-lg text-sm transition-all ${
+                    collapsed ? "justify-center px-0 py-2.5" : "gap-3 px-3 py-2.5"
+                  } ${isActive ? "text-white font-medium" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"}`}
+                  style={isActive ? { backgroundColor: "var(--color-primary)" } : {}}
+                >
+                  {item.icon}
+                  {!collapsed && <span>{item.label}</span>}
+                </Link>
+              );
+            };
+
+            if (menuSections) {
+              return menuSections.map((section, si) => (
+                <div key={si}>
+                  {section.label && !collapsed && (
+                    <p className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                      {section.label}
+                    </p>
+                  )}
+                  {section.items.map(renderItem)}
+                </div>
+              ));
+            }
+            return menuItems.map(renderItem);
+          })()}
         </nav>
 
         {/* Logout */}
