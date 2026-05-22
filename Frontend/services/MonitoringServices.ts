@@ -51,13 +51,14 @@ export interface MonitoringPesertaDetail {
   peserta: { user_id: number; nama: string | null; nim: string | null };
   ujian:   { id: number; nama_ujian: string; total_soal: number };
   attempts: {
-    attempt_ke:   number;
-    status:       string;
-    mulai_at:     string | null;
-    selesai_at:   string | null;
-    soal_dijawab: number;
-    violations:   number;
-    risk_score:   number;
+    attempt_ke:          number;
+    status:              string;
+    mulai_at:            string | null;
+    selesai_at:          string | null;
+    soal_dijawab:        number;
+    violations:          number;
+    risk_score:          number;
+    violation_breakdown: Record<string, number>;
   }[];
   violation_summary: Record<string, number>;
 }

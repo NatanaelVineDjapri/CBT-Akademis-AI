@@ -80,14 +80,14 @@ export default function DosenMonitoringPage() {
   const ujianList = data?.data ?? [];
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4 pb-6">
       <Breadcrumb />
-      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
-          <h1 className="text-xl font-bold" style={{ color: "var(--color-primary)" }}>Monitoring</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Ujian yang sedang berlangsung</p>
+          <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Monitoring</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Ujian yang sedang berlangsung.</p>
         </div>
-        <div className="p-5 bg-gray-50">
+        <div className="p-5">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 3 }).map((_, i) => (

@@ -10,7 +10,7 @@ import {
   Eye,
   BarChart2,
   Calendar,
-  Settings,
+
   Users,
   ScrollText,
   Trophy,
@@ -64,7 +64,7 @@ const menuSectionsByRole: Record<string, MenuSection[]> = {
       label: "Manajemen",
       items: [
         { label: "Institusi", href: "/admin-akademis/institusi", icon: <Building2 size={18} /> },
-        { label: "Settings",  href: "/admin-akademis/settings",  icon: <Settings size={18} /> },
+        { label: "Profil",    href: "/admin-akademis/profile",   icon: <UserCircle size={18} /> },
       ],
     },
   ],
@@ -145,7 +145,7 @@ const menuSectionsByRole: Record<string, MenuSection[]> = {
         { label: "User",         href: "/admin-universitas/user",         icon: <Users size={18} /> },
         { label: "Pengumuman",   href: "/admin-universitas/pengumuman",   icon: <Megaphone size={18} /> },
         { label: "Log",          href: "/admin-universitas/log",          icon: <ScrollText size={18} /> },
-        { label: "Settings",     href: "/admin-universitas/settings",     icon: <Settings size={18} /> },
+        { label: "Profil",        href: "/admin-universitas/profile",      icon: <UserCircle size={18} /> },
       ],
     },
   ],
@@ -164,9 +164,9 @@ const menuByRole: Record<string, MenuItem[]> = {
       icon: <Building2 size={18} />,
     },
     {
-      label: "Settings",
-      href: "/admin-akademis/settings",
-      icon: <Settings size={18} />,
+      label: "Profil",
+      href: "/admin-akademis/profile",
+      icon: <UserCircle size={18} />,
     },
   ],
   admin_universitas: [
@@ -226,9 +226,9 @@ const menuByRole: Record<string, MenuItem[]> = {
       icon: <ScrollText size={18} />,
     },
     {
-      label: "Settings",
-      href: "/admin-universitas/settings",
-      icon: <Settings size={18} />,
+      label: "Profil",
+      href: "/admin-universitas/profile",
+      icon: <UserCircle size={18} />,
     },
   ],
   dosen: [

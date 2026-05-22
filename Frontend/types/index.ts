@@ -297,6 +297,7 @@ export interface DosenDashboard {
   ujian_terbaru: DosenUjianItem[];
   ujian_berlangsung: DosenUjianItem[];
   ujian_selesai: DosenUjianItem[];
+  pelanggaran_per_matkul: { nama: string; total: number }[];
 }
 
 export interface AdminUniversitasUjianItem {

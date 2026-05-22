@@ -8,12 +8,8 @@ import UjianTerbaruCard from "@/components/dashboard/dosen/UjianTerbaruCard";
 import UjianBerlangsungCard from "@/components/dashboard/dosen/UjianBerlangsungCard";
 import UjianSelesaiCard from "@/components/dashboard/dosen/UjianSelesaiCard";
 import PerformaChart from "@/components/dashboard/dosen/PerformaChart";
-import PersentaseKelulusanCard from "@/components/dashboard/dosen/PersentaseKelulusanCard";
 import RataRataNilaiCard from "@/components/dashboard/dosen/RataRataNilaiCard";
 import GrafikPelanggaranCard from "@/components/dashboard/dosen/GrafikPelanggaranCard";
-import TotalPelanggaranCard from "@/components/dashboard/dosen/TotalPelanggaranCard";
-import JadwalCard from "@/components/dashboard/dosen/JadwalCard";
-import PengumumanCard from "@/components/dashboard/PengumumanCard";
 import BerandaDosenSkeleton from "@/components/skeleton/BerandaDosenSkeleton";
 
 export default function DashboardDosenPage() {
@@ -45,7 +41,7 @@ export default function DashboardDosenPage() {
           {/* Baris 3: Persentase Kelulusan + Rata-rata Nilai */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <RataRataNilaiCard />
-            <GrafikPelanggaranCard />
+            <GrafikPelanggaranCard data={data.pelanggaran_per_matkul} />
           </div>
 
           {/* Baris 4: Grafik Pelanggaran + Total Pelanggaran */}

@@ -1920,8 +1920,9 @@ class UjianController extends Controller
                 'mulai_at'     => $p->mulai_at?->format('H:i:s'),
                 'selesai_at'   => $p->selesai_at?->format('H:i:s'),
                 'soal_dijawab' => $p->jawabanPeserta->count(),
-                'violations'   => $logs->count(),
-                'risk_score'   => $logs->sum('risk_score'),
+                'violations'        => $logs->count(),
+                'risk_score'        => $logs->sum('risk_score'),
+                'violation_breakdown' => $logs->groupBy('tipe_pelanggaran')->map(fn($g) => $g->count()),
             ];
         }
 

@@ -1,15 +1,19 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Users, AlertTriangle, Clock } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
+import SearchInput from "@/components/filtering/SearchInput";
+import Pagination from "@/components/filtering/Pagination";
 import { getMonitoringList, getMonitoringDetail } from "@/services/MonitoringServices";
 import { getEcho } from "@/lib/echo";
 import { toSlug } from "@/utils/slug";
+import { useDebounce } from "@/hooks/useDebounce";
 
+const PER_PAGE = 20;
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "sedang_berlangsung")
@@ -36,6 +40,10 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
   const { ujianId: slug } = use(params);
   const router = useRouter();
 
+  const [search, setSearch]         = useState("");
+  const [page, setPage]             = useState(1);
+  const debouncedSearch             = useDebounce(search);
+
   const { data: listData } = useSWR("/ujian/dosen/monitoring", getMonitoringList);
   const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === slug);
   const id = ujianMeta?.id ?? null;
@@ -56,16 +64,26 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
     return () => { echo.leaveChannel(`ujian.${id}`); };
   }, [id, mutate]);
 
+  useEffect(() => { setPage(1); }, [debouncedSearch]);
+
   const ujian   = data?.ujian;
   const peserta = data?.peserta ?? [];
 
   const aktif           = peserta.filter(p => p.status === "sedang_berlangsung").length;
   const totalViolations = peserta.reduce((s, p) => s + p.violations, 0);
 
+  const q = debouncedSearch.toLowerCase();
+  const filtered = peserta.filter(p =>
+    (p.nama ?? "").toLowerCase().includes(q) ||
+    (p.nim  ?? "").toLowerCase().includes(q)
+  );
+  const lastPage = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const paged    = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4 pb-6">
       <Breadcrumb overrides={{ [slug]: ujianMeta?.nama_ujian ?? slug }} />
-      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
         {/* Header */}
         <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3 shrink-0">
@@ -73,7 +91,7 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
             <ChevronLeft size={18} className="text-gray-500" />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold truncate" style={{ color: "var(--color-primary)" }}>
+            <h1 className="text-base font-bold truncate" style={{ color: "var(--color-primary)" }}>
               {ujian?.nama_ujian ?? ujianMeta?.nama_ujian ?? "Loading..."}
             </h1>
             {(ujian?.mata_kuliah ?? ujianMeta?.mata_kuliah) && (
@@ -82,9 +100,9 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
           </div>
         </div>
 
-        {/* Stats row */}
+        {/* Stats + Search row */}
         {(ujian || ujianMeta) && (
-          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-5 flex-wrap shrink-0">
+          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-5 flex-wrap">
             <div className="flex items-center gap-1.5">
               <Users size={13} className="text-blue-400 shrink-0" />
               <span className="text-xs text-gray-400">Peserta aktif</span>
@@ -106,14 +124,17 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
                 {ujian?.durasi_menit ?? ujianMeta?.durasi_menit} menit
               </span>
             </div>
+            <div className="flex-1" />
+            <SearchInput value={search} onChange={v => setSearch(v)} placeholder="Cari nama / NIM..." />
           </div>
         )}
 
         {/* Table */}
-        <div className="flex-1 overflow-auto">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-white">
               <tr className="text-xs text-gray-400 border-b border-gray-100">
+                <th className="text-left px-5 py-3 font-medium w-12">#</th>
                 <th className="text-left px-5 py-3 font-medium">Nama</th>
                 <th className="text-left px-5 py-3 font-medium">NIM</th>
                 <th className="text-center px-4 py-3 font-medium">Status</th>
@@ -123,12 +144,17 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {peserta.length === 0 ? (
+              {paged.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-sm text-gray-400">Belum ada peserta</td>
+                  <td colSpan={7} className="text-center py-10 text-sm text-gray-400">
+                    {search ? "Tidak ada peserta ditemukan." : "Belum ada peserta"}
+                  </td>
                 </tr>
-              ) : peserta.map(p => (
+              ) : paged.map((p, idx) => (
                 <tr key={p.peserta_ujian_id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-5 py-3 text-xs text-gray-400">
+                    {String((page - 1) * PER_PAGE + idx + 1).padStart(2, "0")}
+                  </td>
                   <td className="px-5 py-3 font-medium text-gray-800">
                     <Link href={`/dosen/monitoring/${slug}/${toSlug(p.nama ?? String(p.user_id))}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
                       {p.nama ?? "-"}
@@ -153,8 +179,15 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
           </table>
         </div>
 
-
       </div>
+
+      <Pagination
+        currentPage={page}
+        lastPage={lastPage}
+        total={filtered.length}
+        perPage={PER_PAGE}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

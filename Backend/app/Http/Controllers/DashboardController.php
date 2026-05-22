@@ -12,6 +12,7 @@ use App\Models\Ujian;
 use App\Models\Universitas;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -51,6 +52,19 @@ class DashboardController extends Controller
                 'permission' => $b->permission,
             ]);
 
+        $pelanggaranPerMatkul = DB::table('proctoring_log')
+            ->join('peserta_ujian', 'proctoring_log.peserta_ujian_id', '=', 'peserta_ujian.id')
+            ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
+            ->join('mata_kuliah', 'ujian.mata_kuliah_id', '=', 'mata_kuliah.id')
+            ->where('ujian.created_by', $userId)
+            ->selectRaw('mata_kuliah.nama as nama, COUNT(*) as total')
+            ->groupBy('mata_kuliah.nama')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get()
+            ->map(fn($r) => ['nama' => $r->nama, 'total' => (int) $r->total])
+            ->values();
+
         return response()->json([
             'message' => 'Data dashboard dosen berhasil diambil!',
             'stats'   => [
@@ -60,9 +74,10 @@ class DashboardController extends Controller
                 'ujian_selesai'     => $selesai->count(),
             ],
             'bank_soal'          => $bankSoal,
-            'ujian_terbaru'      => $allUjian->take(3)->map($formatUjian)->values(),
-            'ujian_berlangsung'  => $berlangsung->take(3)->map($formatUjian)->values(),
-            'ujian_selesai'      => $selesai->take(3)->map($formatUjian)->values(),
+            'ujian_terbaru'           => $allUjian->take(3)->map($formatUjian)->values(),
+            'ujian_berlangsung'       => $berlangsung->take(3)->map($formatUjian)->values(),
+            'ujian_selesai'           => $selesai->take(3)->map($formatUjian)->values(),
+            'pelanggaran_per_matkul'  => $pelanggaranPerMatkul,
         ]);
     }
 
