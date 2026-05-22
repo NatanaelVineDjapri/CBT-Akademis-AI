@@ -1894,6 +1894,7 @@ class UjianController extends Controller
             ->with([
                 'pesertaUjian' => fn($q) => $q
                     ->where('user_id', $userId)
+                    ->where('status', '!=', 'belum_mulai')
                     ->with(['user:id,nama,nim', 'jawabanPeserta:id,peserta_ujian_id', 'proctoringLog'])
                     ->orderBy('attempt_ke'),
                 'ujianSoal:id,ujian_id',
@@ -1923,7 +1924,12 @@ class UjianController extends Controller
                 'violations'        => $logs->count(),
                 'risk_score'        => $logs->sum('risk_score'),
                 'violation_breakdown' => $logs->groupBy('tipe_pelanggaran')->map(fn($g) => $g->count()),
-                'foto_bukti'         => $logs->whereNotNull('foto_bukti')->pluck('foto_bukti')->values(),
+                'foto_bukti'         => $logs->whereNotNull('foto_bukti')->map(fn($l) => [
+                    'url'        => $l->foto_bukti,
+                    'tipe'       => $l->tipe_pelanggaran,
+                    'risk_score' => $l->risk_score,
+                    'waktu'      => $l->waktu?->utc()->format('Y-m-d H:i:s'),
+                ])->values(),
             ];
         }
 

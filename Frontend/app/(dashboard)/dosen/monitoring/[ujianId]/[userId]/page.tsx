@@ -3,6 +3,7 @@
 import { use } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ChevronLeft, CalendarDays } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import { getMonitoringList, getMonitoringDetail, getMonitoringPesertaDetail } from "@/services/MonitoringServices";
@@ -154,13 +155,13 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
                   <td className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{a.risk_score}</td>
                   <td className="px-4 py-3 text-center">
                     {a.foto_bukti?.length > 0 ? (
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        {a.foto_bukti.map((url, i) => (
-                          <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                            <img src={url} alt={`bukti-${i + 1}`} className="w-8 h-8 rounded object-cover border border-gray-200 hover:opacity-80 transition-opacity" />
-                          </a>
-                        ))}
-                      </div>
+                      <Link
+                        href={`/dosen/monitoring/${ujianSlug}/${pesertaSlug}/${a.attempt_ke}`}
+                        className="text-xs font-medium hover:underline"
+                        style={{ color: "var(--color-primary)" }}
+                      >
+                        Lihat&nbsp;({a.foto_bukti.length})
+                      </Link>
                     ) : (
                       <span className="text-xs text-gray-300">-</span>
                     )}
