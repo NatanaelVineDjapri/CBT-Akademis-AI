@@ -13,6 +13,7 @@ class ProctoringLog extends Model
         'tipe_pelanggaran',
         'risk_score',
         'waktu',
+        'foto_bukti',
     ];
 
     protected $casts = [

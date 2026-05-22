@@ -1923,6 +1923,7 @@ class UjianController extends Controller
                 'violations'        => $logs->count(),
                 'risk_score'        => $logs->sum('risk_score'),
                 'violation_breakdown' => $logs->groupBy('tipe_pelanggaran')->map(fn($g) => $g->count()),
+                'foto_bukti'         => $logs->whereNotNull('foto_bukti')->pluck('foto_bukti')->values(),
             ];
         }
 

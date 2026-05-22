@@ -112,11 +112,12 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
                 ))}
                 <th className="text-center px-4 py-3 font-medium w-20">Total</th>
                 <th className="text-center px-4 py-3 font-medium w-24">Risk Score</th>
+                <th className="text-center px-4 py-3 font-medium w-24">Bukti</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {attempts.length === 0 ? (
-                <tr><td colSpan={4 + Object.keys(summary).length + 2} className="text-center py-8 text-sm text-gray-400">Belum ada data</td></tr>
+                <tr><td colSpan={4 + Object.keys(summary).length + 3} className="text-center py-8 text-sm text-gray-400">Belum ada data</td></tr>
               ) : attempts.map(a => (
                 <tr key={a.attempt_ke} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3 text-xs text-gray-400">{String(a.attempt_ke).padStart(2, "0")}</td>
@@ -151,6 +152,19 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
                     )}
                   </td>
                   <td className="px-4 py-3 text-center text-xs font-semibold text-gray-600">{a.risk_score}</td>
+                  <td className="px-4 py-3 text-center">
+                    {a.foto_bukti?.length > 0 ? (
+                      <div className="flex flex-wrap gap-1 justify-center">
+                        {a.foto_bukti.map((url, i) => (
+                          <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                            <img src={url} alt={`bukti-${i + 1}`} className="w-8 h-8 rounded object-cover border border-gray-200 hover:opacity-80 transition-opacity" />
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-300">-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

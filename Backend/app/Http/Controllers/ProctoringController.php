@@ -24,6 +24,89 @@ class ProctoringController extends Controller
      *   ]
      * }
      */
+    public function saveBukti(Request $request)
+    {
+        $data = $request->validate([
+            'peserta_ujian_id' => 'required|integer|exists:peserta_ujian,id',
+            'tipe_pelanggaran' => 'required|string',
+            'risk_score'       => 'required|numeric',
+            'waktu'            => 'required|string',
+            'foto'             => 'nullable|image|max:5120',
+        ]);
+
+        $fotoBukti = null;
+        if ($request->hasFile('foto')) {
+            try {
+                $tmpPath  = $this->compressImage($request->file('foto')->getRealPath());
+                $uploaded = cloudinary()->uploadFile($tmpPath, [
+                    'folder'    => 'proctoring',
+                    'public_id' => $data['peserta_ujian_id'] . '_' . time(),
+                    'overwrite' => false,
+                ]);
+                @unlink($tmpPath);
+                $fotoBukti = $uploaded->getSecurePath();
+            } catch (\Throwable $e) {
+                \Log::error('[saveBukti] Cloudinary upload failed: ' . $e->getMessage());
+            }
+        }
+
+        $log = ProctoringLog::create([
+            'peserta_ujian_id' => $data['peserta_ujian_id'],
+            'tipe_pelanggaran' => $data['tipe_pelanggaran'],
+            'risk_score'       => $data['risk_score'],
+            'waktu'            => $data['waktu'],
+            'foto_bukti'       => $fotoBukti,
+        ]);
+
+        $peserta = PesertaUjian::select('id', 'ujian_id', 'user_id')->find($data['peserta_ujian_id']);
+        if ($peserta) {
+            event(new PelanggaranMasuk([
+                'ujian_id'         => $peserta->ujian_id,
+                'peserta_ujian_id' => $peserta->id,
+                'user_id'          => $peserta->user_id,
+                'events'           => [[
+                    'tipe_pelanggaran' => $data['tipe_pelanggaran'],
+                    'risk_score'       => $data['risk_score'],
+                ]],
+                'total_risk_score' => $data['risk_score'],
+            ]));
+        }
+
+        return response()->json(['message' => 'Proctoring log saved', 'id' => $log->id], 201);
+    }
+
+    private function compressImage(string $sourcePath): string
+    {
+        $info = getimagesize($sourcePath);
+        $mime = $info['mime'] ?? 'image/jpeg';
+
+        $src = match ($mime) {
+            'image/png'  => imagecreatefrompng($sourcePath),
+            'image/jpeg' => imagecreatefromjpeg($sourcePath),
+            default      => imagecreatefromjpeg($sourcePath),
+        };
+
+        $origW = imagesx($src);
+        $origH = imagesy($src);
+        $maxDim = 480;
+
+        if ($origW > $maxDim || $origH > $maxDim) {
+            $ratio = min($maxDim / $origW, $maxDim / $origH);
+            $newW  = (int) ($origW * $ratio);
+            $newH  = (int) ($origH * $ratio);
+            $dst   = imagecreatetruecolor($newW, $newH);
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+            imagedestroy($src);
+            $src = $dst;
+        }
+
+        $tmpPath = tempnam(sys_get_temp_dir(), 'proctoring_') . '.jpg';
+        imagejpeg($src, $tmpPath, 70);
+        imagedestroy($src);
+
+        return $tmpPath;
+    }
+
     public function save(Request $request)
     {
         $data = $request->validate([

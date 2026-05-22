@@ -38,8 +38,9 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
   const [saved,  setSaved]            = useState<Set<number>>(new Set());
   const [timeLeft, setTimeLeft]       = useState<number | null>(null);
   const [confirmSelesai, setConfirmSelesai] = useState(false);
-  const selesaiRef  = useRef(false);
-  const essayTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const selesaiRef      = useRef(false);
+  const essayTimers     = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const captureFrameRef = useRef<(() => Blob | null) | null>(null);
 
   const applySession = (s: UjianSession) => {
     const init: Record<number, string> = {};
@@ -190,8 +191,8 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      {session.proctoring_aktif && <ProctoringCamera pesertaUjianId={session.peserta_ujian_id} />}
-      {session.proctoring_aktif && <ProctoringMonitor pesertaUjianId={session.peserta_ujian_id} onAutoSubmit={handleAutoSelesai} />}
+      {session.proctoring_aktif && <ProctoringCamera pesertaUjianId={session.peserta_ujian_id} onCaptureReady={fn => { captureFrameRef.current = fn; }} />}
+      {session.proctoring_aktif && <ProctoringMonitor pesertaUjianId={session.peserta_ujian_id} onAutoSubmit={handleAutoSelesai} captureFrame={() => captureFrameRef.current?.()} />}
 
       {/* ── Header ── */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-4">

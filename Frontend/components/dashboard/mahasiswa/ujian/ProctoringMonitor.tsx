@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Maximize } from "lucide-react";
-import { logPelanggaran } from "@/services/ProctoringService";
+import { logPelanggaran, logPelanggaranWithFoto } from "@/services/ProctoringService";
 
 type ViolationType = "tab" | "fullscreen" | "copypaste";
 
@@ -20,9 +20,11 @@ const enterFullscreen = () =>
 export default function ProctoringMonitor({
   pesertaUjianId,
   onAutoSubmit,
+  captureFrame,
 }: {
   pesertaUjianId: number;
   onAutoSubmit: () => void;
+  captureFrame?: () => Blob | null;
 }) {
   const [warning, setWarning]   = useState<ViolationType | null>(null);
   const [needFs, setNeedFs]     = useState(!document.fullscreenElement);
@@ -31,7 +33,12 @@ export default function ProctoringMonitor({
   onAutoSubmitRef.current        = onAutoSubmit;
 
   const trigger = (type: ViolationType) => {
-    logPelanggaran(pesertaUjianId, type);
+    const foto = captureFrame?.();
+    if (foto) {
+      logPelanggaranWithFoto(pesertaUjianId, type, foto);
+    } else {
+      logPelanggaran(pesertaUjianId, type);
+    }
     if (type === "tab") {
       tabCountRef.current += 1;
       if (tabCountRef.current >= MAX_TAB_VIOLATIONS) { onAutoSubmitRef.current(); return; }

@@ -59,6 +59,7 @@ export interface MonitoringPesertaDetail {
     violations:          number;
     risk_score:          number;
     violation_breakdown: Record<string, number>;
+    foto_bukti:          string[];
   }[];
   violation_summary: Record<string, number>;
 }

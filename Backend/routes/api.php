@@ -20,7 +20,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProctoringController;
 use App\Http\Controllers\KrsController;
 
-Route::post('/proctoring/save', [ProctoringController::class, 'save']);
+Route::post('/proctoring/save',       [ProctoringController::class, 'save']);
+Route::post('/proctoring/save-bukti', [ProctoringController::class, 'saveBukti']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);

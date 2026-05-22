@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Video, VideoOff } from "lucide-react";
-import { logPelanggaran } from "@/services/ProctoringService";
+import { logPelanggaran, logPelanggaranWithFoto } from "@/services/ProctoringService";
 
 const WS_BASE = process.env.NEXT_PUBLIC_PROCTORING_WS_URL ?? "";
 const FRAME_INTERVAL_MS = 5000;
@@ -10,17 +10,42 @@ const FRAME_INTERVAL_MS = 5000;
 interface Props {
   pesertaUjianId: number;
   onViolation?: (type: string, detail: Record<string, unknown>) => void;
+  onCaptureReady?: (fn: () => Blob | null) => void;
 }
 
-export default function ProctoringCamera({ pesertaUjianId, onViolation }: Props) {
+export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptureReady }: Props) {
   const videoRef        = useRef<HTMLVideoElement>(null);
   const canvasRef       = useRef<HTMLCanvasElement>(null);
   const wsRef           = useRef<WebSocket | null>(null);
   const onViolationRef  = useRef(onViolation);
+  const lastFrameRef    = useRef<Blob | null>(null);
   const [active, setActive] = useState(false);
   const [denied, setDenied] = useState(false);
 
   onViolationRef.current = onViolation;
+
+  const snapshotToBlob = (): Blob | null => {
+    const video  = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !video.videoWidth) return null;
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d")?.drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+    const byteString = atob(dataUrl.split(",")[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+    return new Blob([ab], { type: "image/jpeg" });
+  };
+
+  // Returns the most recently cached frame — safe to call even when tab is hidden
+  const captureFrame = (): Blob | null => lastFrameRef.current;
+
+  useEffect(() => {
+    onCaptureReady?.(captureFrame);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -51,19 +76,24 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation }: Props)
         if (data.type === "frame_result" && data.events?.length) {
           data.events.forEach((ev: { type: string; detail: Record<string, unknown> }) => {
             onViolationRef.current?.(ev.type, ev.detail);
+            const foto = lastFrameRef.current;
+            if (foto) {
+              logPelanggaranWithFoto(pesertaUjianId, ev.type, foto);
+            } else {
+              logPelanggaran(pesertaUjianId, ev.type);
+            }
           });
         }
       } catch (_) {}
     };
 
     const intervalId = setInterval(() => {
+      const blob = snapshotToBlob();
+      if (blob) lastFrameRef.current = blob;
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
       const video  = videoRef.current;
       const canvas = canvasRef.current;
-      if (!ws || ws.readyState !== WebSocket.OPEN || !video || !canvas) return;
-      if (!video.videoWidth) return;
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext("2d")?.drawImage(video, 0, 0);
+      if (!video || !canvas || !video.videoWidth) return;
       const frame = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
       ws.send(JSON.stringify({ frame, timestamp: new Date().toISOString() }));
     }, FRAME_INTERVAL_MS);
@@ -77,6 +107,7 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation }: Props)
       }
       ws.close();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pesertaUjianId]);
 
   return (

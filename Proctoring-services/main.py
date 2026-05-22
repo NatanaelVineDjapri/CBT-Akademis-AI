@@ -93,12 +93,7 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
                     None, detector.analyze_frame, payload["frame"]
                 )
 
-                # Push pelanggaran langsung ke Laravel, tidak tunggu end_session
-                if result.get("events"):
-                    asyncio.create_task(
-                        _push_to_laravel(peserta_ujian_id, {"events": result["events"]})
-                    )
-
+                # Browser handles saving violations (with foto_bukti) via /proctoring/save-bukti
                 await websocket.send_text(json.dumps({
                     "type": "frame_result",
                     **result,

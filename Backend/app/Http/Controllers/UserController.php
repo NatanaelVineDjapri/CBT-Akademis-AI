@@ -350,6 +350,7 @@ class UserController extends Controller
 
         if ($origW > $maxDim || $origH > $maxDim) {
             $ratio = min($maxDim / $origW, $maxDim / $origH);
+            
             $newW  = (int) ($origW * $ratio);
             $newH  = (int) ($origH * $ratio);
             $dst   = imagecreatetruecolor($newW, $newH);
