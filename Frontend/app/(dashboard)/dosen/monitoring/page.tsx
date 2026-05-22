@@ -1,60 +1,125 @@
 "use client";
 
-import {useState, useEffect, use} from "react";
 import useSWR from "swr";
+import Link from "next/link";
+import { ShieldCheck, Clock, Users, AlertTriangle, Timer } from "lucide-react";
+import { fmt } from "@/components/dosen/ujian/constants";
 import Breadcrumb from "@/components/BreadCrumb";
-import { useDebounce } from "@/hooks/useDebounce";
-import MonitoringCard from "@/components/monitoring/MonitoringCard";
+import EmptyState from "@/components/EmptyState";
+import { getMonitoringList, type MonitoringUjian } from "@/services/MonitoringServices";
+import { toSlug } from "@/utils/slug";
 
-export default function DosenMonitoringPage() {
-    const [search, setSearch] = useState("");
-    const debouncedSearch = useDebounce(search);
-
-    //   useEffect(() => { setPage(1); }, [debouncedSearch]);
-    return (
-    <div className="flex flex-col gap-4 pb-4">
-          <div className="shrink-0">
-            <Breadcrumb />
+function UjianMonitorCard({ ujian }: { ujian: MonitoringUjian }) {
+  return (
+    <div className="rounded-2xl shadow-md overflow-hidden flex flex-col" style={{ background: "var(--color-primary)" }}>
+      <div className="p-3 flex flex-col gap-2">
+        {/* Header: icon + nama */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white">
+            <ShieldCheck className="w-5 h-5" style={{ color: "var(--color-primary)" }} />
           </div>
-    <div className="bg-gray-100 rounded-xl p-6 border border-blue-400">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-semibold text-gray-700">
-          Monitoring
-        </h2>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <p className="text-sm font-bold text-white leading-snug truncate">{ujian.nama_ujian}</p>
+            <p className="text-xs text-white/60 truncate">{ujian.mata_kuliah ?? "—"}</p>
+          </div>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Search"
-          className="px-4 py-2 rounded-full border border-gray-300 text-sm outline-none"
-        />
-      </div>
+        <div className="border-t border-white/20" />
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <MonitoringCard
-          title="Matematika A"
-          subtitle="Ujian Perkuliahan"
-          date="Sabtu, 21 Maret 2026"
-          time="10.00 - 12.00"
-        />
+        {/* Waktu & durasi */}
+        <div className="flex items-center gap-3 text-xs text-white/70">
+          <div className="flex items-center gap-1">
+            <Clock size={11} className="shrink-0" />
+            <span>{fmt(ujian.start_date)}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Timer size={11} className="shrink-0" />
+            <span>{ujian.durasi_menit} menit</span>
+          </div>
+        </div>
 
-        <MonitoringCard
-          title="Matematika B"
-          subtitle="Ujian Perkuliahan"
-          date="Sabtu, 21 Maret 2026"
-          time="10.00 - 12.00"
-        />
+        <div className="border-t border-white/20" />
 
-        <MonitoringCard
-          title="Matematika C"
-          subtitle="Ujian Perkuliahan"
-          date="Sabtu, 21 Maret 2026"
-          time="10.00 - 12.00"
-        />
+        {/* Peserta & pelanggaran */}
+        <div className="flex items-center justify-between text-xs text-white/70">
+          <div className="flex items-center gap-1">
+            <Users size={11} className="shrink-0" />
+            <span>{ujian.peserta_aktif}/{ujian.total_peserta} aktif</span>
+          </div>
+          {ujian.total_violations > 0 ? (
+            <div className="flex items-center gap-1 text-red-500 bg-white px-2 py-1 rounded-full">
+              <AlertTriangle size={11} className="shrink-0" />
+              <span className="font-medium">{ujian.total_violations} pelanggaran</span>
+            </div>
+          ) : (
+            <span className="text-white/30">Tidak ada pelanggaran</span>
+          )}
+        </div>
+
+        <div className="border-t border-white/20" />
+
+        {/* Button */}
+        <Link
+          href={`/dosen/monitoring/${toSlug(ujian.nama_ujian)}`}
+          className="w-full py-2 rounded-lg text-xs font-medium text-center block bg-white hover:bg-white/90 transition-colors"
+          style={{ color: "var(--color-primary)" }}
+        >
+          Pantau
+        </Link>
       </div>
     </div>
-    /</div>
   );
+}
 
+export default function DosenMonitoringPage() {
+  const { data, isLoading } = useSWR("/ujian/dosen/monitoring", getMonitoringList, {
+    refreshInterval: 15000,
+    revalidateOnFocus: true,
+  });
+
+  const ujianList = data?.data ?? [];
+
+  return (
+    <div className="flex flex-col gap-4 h-full">
+      <Breadcrumb />
+      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h1 className="text-xl font-bold" style={{ color: "var(--color-primary)" }}>Monitoring</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Ujian yang sedang berlangsung</p>
+        </div>
+        <div className="p-5 bg-gray-50">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+                  <div className="h-1 bg-gray-200" />
+                  <div className="p-3 flex flex-col gap-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 shrink-0" />
+                      <div className="flex-1">
+                        <div className="h-4 w-32 bg-gray-100 rounded mb-1" />
+                        <div className="h-3 w-20 bg-gray-100 rounded" />
+                      </div>
+                    </div>
+                    <div className="h-px bg-gray-100" />
+                    <div className="h-3 w-40 bg-gray-100 rounded" />
+                    <div className="h-px bg-gray-100" />
+                    <div className="h-3 w-36 bg-gray-100 rounded" />
+                    <div className="h-px bg-gray-100" />
+                    <div className="h-8 bg-gray-100 rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : ujianList.length === 0 ? (
+            <EmptyState message="Tidak ada ujian yang sedang berlangsung." />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {ujianList.map(u => <UjianMonitorCard key={u.id} ujian={u} />)}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }

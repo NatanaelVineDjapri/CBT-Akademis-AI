@@ -53,8 +53,8 @@ export default function UjianModal({
   const buildPayload = () => ({
     nama_ujian:     form.nama_ujian,
     ...(requiresMataKuliah && { mata_kuliah_id: Number(form.mata_kuliah_id) }),
-    start_date:     form.start_date,
-    end_date:       form.end_date,
+    start_date:     form.start_date ? form.start_date + ":00+07:00" : "",
+    end_date:       form.end_date   ? form.end_date   + ":00+07:00" : "",
     durasi_menit:   Number(form.durasi_menit),
     passing_grade:  form.passing_grade ? Number(form.passing_grade) : undefined,
     max_attempt:    form.max_attempt   ? Number(form.max_attempt)   : 1,

@@ -196,6 +196,10 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/mata-kuliah/dosen', [MataKuliahController::class, 'dosenMataKuliah']);
         Route::get('/jadwal/dosen', [UjianController::class, 'jadwalDosen']);
 
+        Route::get('/ujian/dosen/monitoring', [UjianController::class, 'monitoringList']);
+        Route::get('/ujian/dosen/monitoring/{id}', [UjianController::class, 'monitoringDetail']);
+        Route::get('/ujian/dosen/monitoring/{ujianId}/peserta/{userId}', [UjianController::class, 'monitoringPesertaDetail']);
+
         Route::get('/ujian/dosen/hasil', [UjianController::class, 'hasilUjianDosen']);
         Route::get('/ujian/dosen/hasil/{id}', [UjianController::class, 'detailUjianDosen']);
         Route::get('/ujian/dosen/hasil/{ujianId}/peserta/{pesertaId}', [UjianController::class, 'detailPesertaUjianDosen']);

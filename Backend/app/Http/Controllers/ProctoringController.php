@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
  
 use Illuminate\Http\Request;
 use App\Models\ProctoringLog;
+use App\Models\PesertaUjian;
+use App\Events\PelanggaranMasuk;
  
 class ProctoringController extends Controller
 {
@@ -41,12 +43,23 @@ class ProctoringController extends Controller
             'updated_at'       => now(),
         ], $data['events']);
  
-        // Insert sekaligus (lebih efisien dari looping save())
         ProctoringLog::insert($rows);
- 
+
+        // Broadcast ke monitoring dosen via Pusher
+        $peserta = PesertaUjian::select('id', 'ujian_id', 'user_id')->find($data['peserta_ujian_id']);
+        if ($peserta) {
+            event(new PelanggaranMasuk([
+                'ujian_id'        => $peserta->ujian_id,
+                'peserta_ujian_id'=> $peserta->id,
+                'user_id'         => $peserta->user_id,
+                'events'          => $data['events'],
+                'total_risk_score'=> array_sum(array_column($data['events'], 'risk_score')),
+            ]));
+        }
+
         return response()->json([
             'message' => 'Proctoring log saved',
-            'count'   => count($rows),
+            'count'   => \count($rows),
         ], 201);
     }
 }

@@ -90,6 +90,32 @@ const menuSectionsByRole: Record<string, MenuSection[]> = {
       ],
     },
   ],
+  dosen: [
+    {
+      items: [{ label: "Beranda", href: "/dosen", icon: <LayoutDashboard size={18} /> }],
+    },
+    {
+      label: "Akademik",
+      items: [
+        { label: "Bank Soal",   href: "/dosen/bank-soal",   icon: <BookOpen size={18} /> },
+        { label: "Ujian",       href: "/dosen/ujian",       icon: <ClipboardList size={18} /> },
+        { label: "Jadwal",      href: "/dosen/jadwal",      icon: <Calendar size={18} /> },
+      ],
+    },
+    {
+      label: "Evaluasi",
+      items: [
+        { label: "Monitoring",  href: "/dosen/monitoring",  icon: <Eye size={18} /> },
+        { label: "Hasil Ujian", href: "/dosen/hasil-ujian", icon: <BarChart2 size={18} /> },
+      ],
+    },
+    {
+      label: "Akun",
+      items: [
+        { label: "Profil", href: "/dosen/profile", icon: <UserCircle size={18} /> },
+      ],
+    },
+  ],
   admin_universitas: [
     {
       items: [

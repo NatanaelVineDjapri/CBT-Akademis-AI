@@ -23,11 +23,10 @@ export function StatusBadge({ status }: { status: UjianItem["status"] }) {
 
 export function fmt(dt: string | null) {
   if (!dt) return "-";
-  // Strip timezone suffix so browser treats it as local time, not UTC
-  const normalized = dt.replace(" ", "T").replace(/Z$/, "").replace(/[+-]\d{2}:\d{2}$/, "");
-  const d = new Date(normalized);
-  return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })
-    + " " + d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  const d = new Date(dt.replace(" ", "T"));
+  const opts = { timeZone: "Asia/Jakarta" } as const;
+  return d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric", ...opts })
+    + " " + d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", ...opts });
 }
 
 export const JENIS_BADGE: Record<string, { label: string; color: string }> = {

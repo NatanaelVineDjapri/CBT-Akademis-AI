@@ -15,6 +15,7 @@ import UjianTable from "@/components/ujian/UjianTable";
 import ConfirmModal from "@/components/ConfirmModal";
 import { EMPTY_FORM } from "@/components/dosen/ujian/types";
 import type { UjianItem, MataKuliahOption, UjianForm } from "@/components/dosen/ujian/types";
+import { toJakartaInput } from "@/utils/format";
 
 export default function DosenUjianPage() {
   const [search, setSearch] = useState("");
@@ -54,8 +55,8 @@ export default function DosenUjianPage() {
           durasi_menit:   String(d.durasi_menit ?? ""),
           passing_grade:  String(d.passing_grade ?? ""),
           max_attempt:    String(d.max_attempt ?? "1"),
-          start_date:     d.start_date ? d.start_date.slice(0, 16) : "",
-          end_date:       d.end_date   ? d.end_date.slice(0, 16)   : "",
+          start_date:     toJakartaInput(d.start_date),
+          end_date:       toJakartaInput(d.end_date),
           kode_akses:     d.kode_akses ?? "",
           is_kode_aktif:    d.is_kode_aktif    ?? false,
           proctoring_aktif: d.proctoring_aktif ?? false,
