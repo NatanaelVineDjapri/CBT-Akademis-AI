@@ -22,10 +22,12 @@ export default function ProctoringMonitor({
   pesertaUjianId,
   onAutoSubmit,
   captureFrame,
+  startScreenShare,
 }: {
   pesertaUjianId: number;
   onAutoSubmit: () => void;
   captureFrame?: () => Blob | null;
+  startScreenShare?: () => Promise<void>;
 }) {
   const [warning, setWarning]   = useState<ViolationType | null>(null);
   const [needFs, setNeedFs]     = useState(!document.fullscreenElement);
@@ -104,7 +106,7 @@ export default function ProctoringMonitor({
           <p className="text-sm text-gray-500">Ujian ini wajib dijalankan dalam mode fullscreen. Klik tombol di bawah untuk melanjutkan.</p>
         </div>
         <button
-          onClick={() => { enterFullscreen(); setNeedFs(false); }}
+          onClick={() => { enterFullscreen(); setNeedFs(false); startScreenShare?.(); }}
           className="w-full py-2.5 rounded-xl text-white text-sm font-semibold cursor-pointer"
           style={{ backgroundColor: "var(--color-primary)" }}
         >

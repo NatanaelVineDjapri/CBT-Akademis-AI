@@ -51,6 +51,7 @@ export interface MonitoringPesertaDetail {
   peserta: { user_id: number; nama: string | null; nim: string | null };
   ujian:   { id: number; nama_ujian: string; total_soal: number };
   attempts: {
+    peserta_ujian_id:    number;
     attempt_ke:          number;
     status:              string;
     mulai_at:            string | null;

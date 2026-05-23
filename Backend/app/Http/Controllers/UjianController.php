@@ -1850,6 +1850,11 @@ class UjianController extends Controller
             ->groupBy('user_id')
             ->map(function ($g) use ($totalSoal) {
                 $latest  = $g->sortByDesc('attempt_ke')->first();
+                // Prioritas tampilan: aktif > selesai > terbaru
+                // (mencegah attempt baru yg belum_mulai menimpa status selesai)
+                $display = $g->firstWhere('status', 'sedang_berlangsung')
+                    ?? $g->where('status', 'selesai')->sortByDesc('attempt_ke')->first()
+                    ?? $latest;
                 $allViol = collect();
                 foreach ($g as $attempt) {
                     foreach ($attempt->proctoringLog as $log) {
@@ -1857,14 +1862,14 @@ class UjianController extends Controller
                     }
                 }
                 return [
-                    'peserta_ujian_id'     => $latest->id,
-                    'user_id'              => $latest->user_id,
-                    'nama'                 => $latest->user?->nama,
-                    'nim'                  => $latest->user?->nim,
-                    'status'               => $latest->status,
+                    'peserta_ujian_id'     => $display->id,
+                    'user_id'              => $display->user_id,
+                    'nama'                 => $display->user?->nama,
+                    'nim'                  => $display->user?->nim,
+                    'status'               => $display->status,
                     'attempt_ke'           => $latest->attempt_ke,
-                    'mulai_at'             => $latest->mulai_at?->format('H:i:s'),
-                    'soal_dijawab'         => $latest->jawabanPeserta->count(),
+                    'mulai_at'             => $display->mulai_at?->format('H:i:s'),
+                    'soal_dijawab'         => $display->jawabanPeserta->count(),
                     'total_soal'           => $totalSoal,
                     'violations'           => $allViol->count(),
                     'risk_score'           => $allViol->sum('risk_score'),
@@ -1916,8 +1921,9 @@ class UjianController extends Controller
             $logs = $p->proctoringLog;
             $matchedLogs = $matchedLogs->concat($logs);
             $attemptRows[] = [
-                'attempt_ke'   => $p->attempt_ke,
-                'status'       => $p->status,
+                'peserta_ujian_id' => $p->id,
+                'attempt_ke'       => $p->attempt_ke,
+                'status'           => $p->status,
                 'mulai_at'     => $p->mulai_at?->format('H:i:s'),
                 'selesai_at'   => $p->selesai_at?->format('H:i:s'),
                 'soal_dijawab' => $p->jawabanPeserta->count(),

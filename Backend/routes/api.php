@@ -20,8 +20,11 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProctoringController;
 use App\Http\Controllers\KrsController;
 
-Route::post('/proctoring/save',       [ProctoringController::class, 'save']);
-Route::post('/proctoring/save-bukti', [ProctoringController::class, 'saveBukti']);
+Route::post('/proctoring/save',              [ProctoringController::class, 'save']);
+Route::post('/proctoring/save-bukti',        [ProctoringController::class, 'saveBukti']);
+Route::post('/proctoring/webrtc/signal',     [ProctoringController::class, 'webrtcSignal']);
+Route::post('/proctoring/webrtc/offer',      [ProctoringController::class, 'storeOffer']);
+Route::get('/proctoring/webrtc/offer/{id}',  [ProctoringController::class, 'getOffer']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);

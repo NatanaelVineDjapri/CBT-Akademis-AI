@@ -6,9 +6,46 @@ use Illuminate\Http\Request;
 use App\Models\ProctoringLog;
 use App\Models\PesertaUjian;
 use App\Events\PelanggaranMasuk;
- 
+use App\Events\WebRtcSignal;
+
 class ProctoringController extends Controller
 {
+    public function webrtcSignal(Request $request)
+    {
+        $data = $request->validate([
+            'peserta_ujian_id' => 'required|integer',
+            'type'             => 'required|string',
+            'from'             => 'required|string',
+        ]);
+
+        broadcast(new WebRtcSignal((int) $data['peserta_ujian_id'], $request->all()));
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function storeOffer(Request $request)
+    {
+        $data = $request->validate([
+            'peserta_ujian_id' => 'required|integer',
+            'sdp'              => 'required|string',
+            'type'             => 'required|in:cam,screen',
+        ]);
+
+        $key = "webrtc_offer_{$data['type']}_{$data['peserta_ujian_id']}";
+        \Cache::put($key, $data['sdp'], now()->addHours(2));
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function getOffer(Request $request, int $pesertaUjianId)
+    {
+        $type = $request->query('type', 'cam');
+        $key  = "webrtc_offer_{$type}_{$pesertaUjianId}";
+        $sdp  = \Cache::get($key);
+
+        return response()->json(['sdp' => $sdp]);
+    }
+
     /**
      *
      * Body JSON yang dikirim Python:

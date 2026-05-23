@@ -15,12 +15,20 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 const PER_PAGE = 20;
 
+const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
+  sedang_berlangsung: { label: "Aktif",       bg: "var(--color-warning-light)",  color: "var(--color-warning)"  },
+  selesai:            { label: "Selesai",     bg: "var(--color-primary-light)",  color: "var(--color-primary)"  },
+  belum_mulai:        { label: "Belum Mulai", bg: "var(--akademik-tahun-bg)",    color: "var(--akademik-tahun-icon)" },
+};
+
 function StatusBadge({ status }: { status: string }) {
-  if (status === "sedang_berlangsung")
-    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Aktif</span>;
-  if (status === "selesai")
-    return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Selesai</span>;
-  return <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Belum Mulai</span>;
+  const s = STATUS_MAP[status] ?? STATUS_MAP.belum_mulai;
+  return (
+    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap"
+      style={{ backgroundColor: s.bg, color: s.color }}>
+      {s.label}
+    </span>
+  );
 }
 
 function RiskBar({ score }: { score: number }) {
