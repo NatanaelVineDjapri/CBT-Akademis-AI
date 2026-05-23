@@ -12,7 +12,8 @@ const MESSAGES: Record<ViolationType, string> = {
   copypaste:  "Terdeteksi aksi copy/paste!",
 };
 
-const MAX_TAB_VIOLATIONS = 3;
+// set manual dlu 
+const MAX_TAB_VIOLATIONS = 300; 
 
 const enterFullscreen = () =>
   document.documentElement.requestFullscreen?.().catch(() => {});

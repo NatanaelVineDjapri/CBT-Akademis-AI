@@ -1,12 +1,12 @@
 "use client";
 
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import Link from "next/link";
 import { ShieldCheck, Clock, Users, AlertTriangle, Timer } from "lucide-react";
 import { fmt } from "@/components/dosen/ujian/constants";
 import Breadcrumb from "@/components/BreadCrumb";
 import EmptyState from "@/components/EmptyState";
-import { getMonitoringList, type MonitoringUjian } from "@/services/MonitoringServices";
+import { getMonitoringList, getMonitoringDetail, type MonitoringUjian } from "@/services/MonitoringServices";
 import { toSlug } from "@/utils/slug";
 
 function UjianMonitorCard({ ujian }: { ujian: MonitoringUjian }) {
@@ -63,6 +63,7 @@ function UjianMonitorCard({ ujian }: { ujian: MonitoringUjian }) {
           href={`/dosen/monitoring/${toSlug(ujian.nama_ujian)}`}
           className="w-full py-2 rounded-lg text-xs font-medium text-center block bg-white hover:bg-white/90 transition-colors"
           style={{ color: "var(--color-primary)" }}
+          onMouseEnter={() => preload(`/ujian/dosen/monitoring/${ujian.id}`, () => getMonitoringDetail(ujian.id))}
         >
           Pantau
         </Link>

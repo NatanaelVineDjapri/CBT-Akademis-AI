@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import Breadcrumb from "@/components/BreadCrumb";
 import { getMonitoringList, getMonitoringDetail, getMonitoringPesertaDetail } from "@/services/MonitoringServices";
 import { toSlug } from "@/utils/slug";
 import MonitoringPesertaSkeleton from "@/components/skeleton/MonitoringPesertaSkeleton";
+import { getEcho } from "@/lib/echo";
 
 const VIOLATION_LABEL: Record<string, string> = {
   tab:            "Tab",
@@ -59,11 +60,25 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
   const pesertaMeta = detailData?.peserta?.find(p => toSlug(p.nama ?? "") === pesertaSlug);
   const userId      = pesertaMeta?.user_id ?? null;
 
-  const { data } = useSWR(
+  const { data, mutate } = useSWR(
     ujianId && userId ? `/ujian/dosen/monitoring/${ujianId}/peserta/${userId}` : null,
     () => getMonitoringPesertaDetail(ujianId!, userId!),
-    { refreshInterval: 30000, revalidateOnFocus: true },
+    { revalidateOnFocus: true },
   );
+
+  useEffect(() => {
+    if (!ujianId) return;
+    const echo = getEcho();
+    if (!echo) return;
+    const channel = echo.channel(`ujian.${ujianId}`);
+    channel.listen(".pelanggaran-masuk", (e: { user_id?: number }) => {
+      if (!e.user_id || e.user_id === userId) mutate();
+    });
+    channel.listen(".jawaban-masuk", (e: { user_id?: number }) => {
+      if (!e.user_id || e.user_id === userId) mutate();
+    });
+    return () => { echo.leaveChannel(`ujian.${ujianId}`); };
+  }, [ujianId, userId, mutate]);
 
   const peserta   = data?.peserta;
   const attempts  = data?.attempts ?? [];
@@ -199,6 +214,45 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
           </table>
         </div>
       )}
+      {/* Card 3: Jawaban per Attempt */}
+      {attempts.map(a => a.jawaban?.length > 0 && (
+        <div key={a.attempt_ke} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <span className="text-sm font-semibold text-gray-700">
+              Jawaban — Attempt {String(a.attempt_ke).padStart(2, "0")}
+            </span>
+            <span className="text-xs text-gray-400">{a.jawaban.length} soal dijawab</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-xs text-gray-400 border-b border-gray-100">
+                  <th className="text-center px-4 py-3 font-medium w-16">No.</th>
+                  <th className="text-left px-4 py-3 font-medium">Jawaban</th>
+                  <th className="text-center px-4 py-3 font-medium w-24">Nilai</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {a.jawaban.map((j, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-2.5 text-center text-xs text-gray-400">{j.nomor}</td>
+                    <td className="px-4 py-2.5 text-xs text-gray-700 max-w-xs truncate">{j.jawaban ?? "-"}</td>
+                    <td className="px-4 py-2.5 text-center">
+                      {j.nilai != null ? (
+                        <span className="text-xs font-semibold" style={{ color: (j.nilai ?? 0) >= 50 ? "var(--color-primary)" : "var(--color-danger)" }}>
+                          {j.nilai}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-300">-</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
       </>}
     </div>
   );

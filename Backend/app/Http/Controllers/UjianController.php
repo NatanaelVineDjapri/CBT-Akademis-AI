@@ -1895,7 +1895,7 @@ class UjianController extends Controller
                 'pesertaUjian' => fn($q) => $q
                     ->where('user_id', $userId)
                     ->where('status', '!=', 'belum_mulai')
-                    ->with(['user:id,nama,nim', 'jawabanPeserta:id,peserta_ujian_id', 'proctoringLog'])
+                    ->with(['user:id,nama,nim', 'jawabanPeserta:id,peserta_ujian_id,ujian_soal_id,jawaban,nilai,final_nilai', 'jawabanPeserta.ujianSoal:id,urutan', 'proctoringLog'])
                     ->orderBy('attempt_ke'),
                 'ujianSoal:id,ujian_id',
             ])
@@ -1929,6 +1929,11 @@ class UjianController extends Controller
                     'tipe'       => $l->tipe_pelanggaran,
                     'risk_score' => $l->risk_score,
                     'waktu'      => $l->waktu?->utc()->format('Y-m-d H:i:s'),
+                ])->values(),
+                'jawaban' => $p->jawabanPeserta->sortBy(fn($j) => $j->ujianSoal?->urutan ?? 999)->map(fn($j) => [
+                    'nomor'   => $j->ujianSoal?->urutan ?? '-',
+                    'jawaban' => $j->jawaban,
+                    'nilai'   => $j->final_nilai ?? $j->nilai,
                 ])->values(),
             ];
         }

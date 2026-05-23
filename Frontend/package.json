@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:all": "concurrently \"next dev\" \"cd ../Backend && php artisan serve\"",
+    "dev:all": "concurrently -n \"Next,Laravel,Python\" -c \"blue,red,green\" \"next dev\" \"cd ../Backend && php artisan serve\" \"cd ../Proctoring-services && python main.py\"",
+    "cbtakademis": "npm run dev:all",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

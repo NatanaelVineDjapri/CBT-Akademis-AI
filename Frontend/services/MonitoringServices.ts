@@ -60,6 +60,7 @@ export interface MonitoringPesertaDetail {
     risk_score:          number;
     violation_breakdown: Record<string, number>;
     foto_bukti:          { url: string; tipe: string; risk_score: number; waktu: string }[];
+    jawaban:             { nomor: number | string; jawaban: string | null; nilai: number | null }[];
   }[];
   violation_summary: Record<string, number>;
 }

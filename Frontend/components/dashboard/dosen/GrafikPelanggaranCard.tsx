@@ -4,11 +4,11 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { ShieldAlert } from "lucide-react";
 
 const COLORS = [
-  { light: "var(--color-primary-light)",  color: "var(--color-primary)" },
-  { light: "var(--color-warning-light)",  color: "var(--color-warning)" },
-  { light: "var(--akademik-univ-bg)",     color: "var(--akademik-univ-icon)" },
-  { light: "var(--akademik-tahun-bg)",    color: "var(--akademik-tahun-icon)" },
-  { light: "var(--akademik-alamat-bg)",   color: "var(--akademik-alamat-icon)" },
+  "var(--color-primary)",
+  "var(--color-warning)",
+  "var(--akademik-univ-icon)",
+  "var(--akademik-tahun-icon)",
+  "var(--akademik-alamat-icon)",
 ];
 
 interface Props {
@@ -28,24 +28,13 @@ export default function GrafikPelanggaranCard({ data }: Props) {
     );
   }
 
-  const slices = data.map((d, i) => ({ ...d, ...COLORS[i % COLORS.length] }));
+  const slices = data.map((d, i) => ({ ...d, color: COLORS[i % COLORS.length] }));
   const total  = slices.reduce((s, d) => s + d.total, 0);
   const worst  = slices.reduce((a, b) => a.total > b.total ? a : b);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
-      <svg width="0" height="0" style={{ position: "absolute" }}>
-        <defs>
-          {slices.map((s, i) => (
-            <linearGradient key={i} id={`pelanggaran-grad-${i}`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" style={{ stopColor: s.light }} />
-              <stop offset="100%" style={{ stopColor: s.color }} />
-            </linearGradient>
-          ))}
-        </defs>
-      </svg>
-
-      <div className="flex items-center gap-2 mb-4">
+<div className="flex items-center gap-2 mb-4">
         <ShieldAlert size={15} style={{ color: "var(--color-primary)" }} />
         <span className="text-sm font-semibold text-gray-800">Tingkat Pelanggaran per Mata Kuliah</span>
       </div>
@@ -66,7 +55,7 @@ export default function GrafikPelanggaranCard({ data }: Props) {
                 stroke="#fff"
               >
                 {slices.map((_, i) => (
-                  <Cell key={i} fill={`url(#pelanggaran-grad-${i})`} />
+                  <Cell key={i} fill={slices[i].color} />
                 ))}
               </Pie>
               <Tooltip

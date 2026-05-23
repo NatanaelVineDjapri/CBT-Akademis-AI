@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { preload } from "swr";
 import { GraduationCap } from "lucide-react";
-import type { DashboardNilaiItem } from "@/services/DashboardServices";
+import type { DashboardNilaiItem } from "@/types";
 import { getBarColor, getInsight } from "@/utils/nilai";
 import { getNilai } from "@/services/NilaiServices";
 import { calcPerPage } from "@/hooks/usePerPage";
@@ -26,11 +26,11 @@ export default function NilaiTerbaruCard({
         <p className="text-xs text-gray-400">Belum ada riwayat nilai.</p>
       ) : (
         <div className="flex flex-col divide-y divide-gray-50">
-          {data.map((d) => {
+          {data.map((d, i) => {
             const insight = getInsight(d.nilai, d.nama);
             return (
               <div
-                key={d.nama + d.tanggal}
+                key={i}
                 className="group py-3 first:pt-0 relative"
               >
                 <div className="flex items-center justify-between mb-1">

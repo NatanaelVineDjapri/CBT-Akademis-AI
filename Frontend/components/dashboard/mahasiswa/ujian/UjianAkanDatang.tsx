@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { preload } from "swr";
 import { CalendarDays, Calendar, Clock } from "lucide-react";
-import type { DashboardUjianItem } from "@/services/DashboardServices";
+import type { DashboardUjianItem } from "@/types";
 import { formatDateShort, formatTime } from "@/utils/format";
 import { getMyUjian } from "@/services/UjianServices";
 import { calcPerPage } from "@/hooks/usePerPage";
