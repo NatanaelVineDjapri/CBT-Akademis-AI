@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { User } from "lucide-react";
-import { sendWebRtcSignal } from "@/services/ProctoringService";
+import { sendWebRtcSignal, getWebRtcOffer } from "@/services/ProctoringService";
 import { getEcho } from "@/lib/echo";
+import { ICE_SERVERS } from "@/lib/iceServers";
 
 interface Props {
   pesertaUjianId: number;
@@ -11,7 +12,6 @@ interface Props {
   nim:  string | null;
 }
 
-const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
 export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
   const videoRef    = useRef<HTMLVideoElement>(null);
@@ -67,6 +67,8 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
       });
     }
 
+    getWebRtcOffer(pesertaUjianId, "cam").then(sdp => { if (sdp && !okRef.current) connect(sdp); }).catch(() => {});
+
     const initialId = setTimeout(() => {
       if (!okRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
     }, 1000);
@@ -110,7 +112,6 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
       {connected && (
         <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/50 rounded px-1.5 py-0.5">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-[9px] text-white font-medium">LIVE</span>
         </div>
       )}
     </div>

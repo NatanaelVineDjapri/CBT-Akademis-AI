@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { Video, VideoOff, Monitor } from "lucide-react";
 import { logPelanggaran, logPelanggaranWithFoto, sendWebRtcSignal, storeWebRtcOffer } from "@/services/ProctoringService";
 import { getEcho } from "@/lib/echo";
+import { ICE_SERVERS } from "@/lib/iceServers";
 
 const WS_BASE = process.env.NEXT_PUBLIC_PROCTORING_WS_URL ?? "";
 const FRAME_INTERVAL_MS = 5000;
 const ICE_TIMEOUT = 500;
-const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
 interface Props {
   pesertaUjianId: number;
@@ -226,12 +226,18 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptur
         sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "screen-offer", from: "student", sdp: btoa(fixSdp(spc.localDescription!.sdp)) }).catch(() => {});
 
       } else if (msg.type === "answer" && msg.sdp) {
-        if (pcRef.current?.signalingState === "have-local-offer")
-          pcRef.current.setRemoteDescription({ type: "answer", sdp: fixSdp(decodeSdp(msg.sdp)) }).catch(() => {});
+        const sdp = fixSdp(decodeSdp(msg.sdp));
+        const target = pcRef.current?.signalingState === "have-local-offer" ? pcRef.current
+                     : prewarmPcRef.current?.signalingState === "have-local-offer" ? prewarmPcRef.current
+                     : null;
+        target?.setRemoteDescription({ type: "answer", sdp }).catch(() => {});
 
       } else if (msg.type === "screen-answer" && msg.sdp) {
-        if (screenPcRef.current?.signalingState === "have-local-offer")
-          screenPcRef.current.setRemoteDescription({ type: "answer", sdp: fixSdp(decodeSdp(msg.sdp)) }).catch(() => {});
+        const sdp = fixSdp(decodeSdp(msg.sdp));
+        const target = screenPcRef.current?.signalingState === "have-local-offer" ? screenPcRef.current
+                     : screenPrewarmPcRef.current?.signalingState === "have-local-offer" ? screenPrewarmPcRef.current
+                     : null;
+        target?.setRemoteDescription({ type: "answer", sdp }).catch(() => {});
       }
     });
 

@@ -11,6 +11,7 @@ import Pagination from "@/components/filtering/Pagination";
 import { getMonitoringList, getMonitoringDetail } from "@/services/MonitoringServices";
 import { getEcho } from "@/lib/echo";
 import { toSlug } from "@/utils/slug";
+import { useMonitoringConnection } from "@/contexts/MonitoringConnectionContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const PER_PAGE = 20;
@@ -73,6 +74,15 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
   }, [id, mutate]);
 
   useEffect(() => { setPage(1); }, [debouncedSearch]);
+
+  const { preConnect } = useMonitoringConnection();
+
+  useEffect(() => {
+    if (!data) return;
+    data.peserta
+      .filter(p => p.status === "sedang_berlangsung")
+      .forEach(p => preConnect(p.peserta_ujian_id));
+  }, [data, preConnect]);
 
   const ujian   = data?.ujian;
   const peserta = data?.peserta ?? [];
@@ -174,7 +184,7 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
                     {String((page - 1) * PER_PAGE + idx + 1).padStart(2, "0")}
                   </td>
                   <td className="px-5 py-3 font-medium text-gray-800">
-                    <Link href={`/dosen/monitoring/${slug}/${toSlug(p.nama ?? String(p.user_id))}?pid=${p.peserta_ujian_id}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
+                    <Link href={`/dosen/monitoring/${slug}/${toSlug(p.nama ?? String(p.user_id))}?pid=${p.peserta_ujian_id}&uid=${p.user_id}&eid=${id}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
                       {p.nama ?? "-"}
                     </Link>
                   </td>

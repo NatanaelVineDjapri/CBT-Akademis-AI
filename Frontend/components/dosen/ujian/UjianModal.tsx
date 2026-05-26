@@ -9,6 +9,21 @@ import { JENIS_BADGE, KESULITAN_BADGE, inputCls, labelCls } from "./constants";
 import TambahSoalModal from "./TambahSoalModal";
 import type { LocalSoalItem, MataKuliahOption, UjianForm, UjianSoalItem } from "./types";
 
+type GradeRow = { grade: string; nilai_min: string; nilai_max: string };
+
+const DEFAULT_GRADES: GradeRow[] = [
+  { grade: "A", nilai_min: "90", nilai_max: "100" },
+  { grade: "B", nilai_min: "80", nilai_max: "89" },
+  { grade: "C", nilai_min: "70", nilai_max: "79" },
+  { grade: "D", nilai_min: "60", nilai_max: "69" },
+  { grade: "E", nilai_min: "0",  nilai_max: "59" },
+];
+
+const GRADE_COLORS: Record<string, string> = {
+  A: "var(--nilai-a)", B: "var(--nilai-b)", C: "var(--nilai-c)",
+  D: "var(--nilai-d)", E: "var(--nilai-e)",
+};
+
 export default function UjianModal({
   mode, initial, matkulList, onClose, apiPath = "/ujian/dosen", requiresMataKuliah = true,
 }: {
@@ -19,7 +34,6 @@ export default function UjianModal({
   apiPath?: string;
   requiresMataKuliah?: boolean;
 }) {
-  type GradeRow = { grade: string; nilai_min: string; nilai_max: string };
 
   const [form, setForm]             = useState<UjianForm>(initial);
   const [saving, setSaving]         = useState(false);
@@ -30,7 +44,7 @@ export default function UjianModal({
   const [showTambah, setShowTambah] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [bobotChanges, setBobotChanges] = useState<Record<number, number>>({});
-  const [gradeRows, setGradeRows]   = useState<GradeRow[]>([]);
+  const [gradeRows, setGradeRows]   = useState<GradeRow[]>(mode === "create" ? DEFAULT_GRADES : []);
   const [gradeLoaded, setGradeLoaded] = useState(false);
   const [gradeSaving, setGradeSaving] = useState(false);
   const [gradeError, setGradeError] = useState("");
@@ -92,7 +106,17 @@ export default function UjianModal({
   const handleCreateFinal = async () => {
     setSaving(true); setError("");
     try {
-      await api.post(apiPath, buildPayload());
+      const res = await api.post(apiPath, buildPayload());
+      const newId = res.data?.data?.id ?? res.data?.id;
+      if (newId && gradeRows.length > 0) {
+        await api.put(`/ujian/dosen/${newId}/grade-setting`, {
+          rows: gradeRows.map(r => ({
+            grade: r.grade,
+            nilai_min: parseFloat(r.nilai_min) || 0,
+            nilai_max: parseFloat(r.nilai_max) || 0,
+          })),
+        }).catch(() => {});
+      }
       onClose();
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Gagal menyimpan.");
@@ -132,19 +156,6 @@ export default function UjianModal({
 
   const handleLocalBobot = (localId: string, val: number) =>
     setLocalSoal(prev => prev.map(s => s._localId === localId ? { ...s, bobot: val } : s));
-
-  const GRADE_COLORS: Record<string, string> = {
-    A: "var(--nilai-a)", B: "var(--nilai-b)", C: "var(--nilai-c)",
-    D: "var(--nilai-d)", E: "var(--nilai-e)",
-  };
-
-  const DEFAULT_GRADES: GradeRow[] = [
-    { grade: "A", nilai_min: "90", nilai_max: "100" },
-    { grade: "B", nilai_min: "80", nilai_max: "89" },
-    { grade: "C", nilai_min: "70", nilai_max: "79" },
-    { grade: "D", nilai_min: "60", nilai_max: "69" },
-    { grade: "E", nilai_min: "0",  nilai_max: "59" },
-  ];
 
   useEffect(() => {
     if (mode !== "edit" || tab !== "grade" || gradeLoaded || !form.id) return;
@@ -207,14 +218,6 @@ export default function UjianModal({
           </div>
         )}
 
-        {isCreateStep2 && (
-          <div className="px-6 py-2.5 bg-blue-50 border-b border-blue-100 shrink-0">
-            <p className="text-xs text-blue-700">
-              Tambahkan soal ke ujian ini. Klik <strong>Simpan Ujian</strong> jika sudah selesai.
-            </p>
-          </div>
-        )}
-
         {showDetailForm && (
           <div className="overflow-y-auto flex-1 p-6 space-y-4">
             <div>
@@ -272,6 +275,34 @@ export default function UjianModal({
                 <label className={labelCls}>Kode Akses</label>
                 <input readOnly value={form.kode_akses}
                   className={inputCls + " bg-gray-50 cursor-text select-all"} />
+              </div>
+            )}
+
+            {mode === "create" && (
+              <div>
+                <label className={labelCls}>Setting Grade <span className="text-red-400">*</span></label>
+                <div className="grid grid-cols-5 gap-2 mt-1">
+                  {gradeRows.map((row, i) => (
+                    <div key={i} className="rounded-xl py-3 px-1.5 flex flex-col items-center gap-1.5"
+                      style={{ background: GRADE_COLORS[row.grade] ?? "var(--color-primary)" }}>
+                      <span className="text-lg font-bold text-white">{row.grade}</span>
+                      <div className="flex flex-col gap-1 w-full">
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-white/70 text-[9px]">Min</span>
+                          <input type="number" min={0} max={100} value={row.nilai_min}
+                            onChange={e => setGradeRow(i, "nilai_min", e.target.value)}
+                            className="w-full text-center text-xs font-semibold bg-white/30 text-white rounded px-1 py-0.5 focus:outline-none focus:bg-white/50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                        </div>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-white/70 text-[9px]">Max</span>
+                          <input type="number" min={0} max={100} value={row.nilai_max}
+                            onChange={e => setGradeRow(i, "nilai_max", e.target.value)}
+                            className="w-full text-center text-xs font-semibold bg-white/30 text-white rounded px-1 py-0.5 focus:outline-none focus:bg-white/50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

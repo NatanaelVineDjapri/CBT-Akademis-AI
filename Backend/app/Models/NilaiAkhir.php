@@ -29,4 +29,22 @@ class NilaiAkhir extends Model implements Auditable
     {
         return $this->belongsTo(PesertaUjian::class);
     }
+
+    /**
+     * Ambil 1 nilai terbaik (nilai_total tertinggi) per ujian untuk user tertentu.
+     * Jika nilai sama, ambil yang paling baru (graded_at desc).
+     * Hasil sudah di-eager load ujian & mataKuliah.
+     *
+     * @return \Illuminate\Support\Collection<static>
+     */
+    public static function bestPerUjian(int $userId): \Illuminate\Support\Collection
+    {
+        return static::with(['pesertaUjian.ujian.mataKuliah'])
+            ->whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))
+            ->orderByDesc('nilai_total')
+            ->orderByDesc('graded_at')
+            ->get()
+            ->unique(fn($n) => $n->pesertaUjian?->ujian_id)
+            ->values();
+    }
 }

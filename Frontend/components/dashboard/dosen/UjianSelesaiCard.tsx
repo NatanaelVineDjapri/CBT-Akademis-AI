@@ -10,7 +10,7 @@ import { calcPerPage } from "@/hooks/usePerPage";
 
 export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 h-full flex flex-col">
       <div className="flex items-center gap-2 mb-4">
         <CheckCircle size={16} className="text-gray-500" />
         <span className="text-sm font-medium text-gray-800">Ujian Selesai</span>
@@ -19,11 +19,11 @@ export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
       {data.length === 0 ? (
         <p className="text-xs text-gray-400">Belum ada ujian selesai </p>
       ) : (
-        <div className="flex flex-col divide-y divide-gray-100">
+        <div className="flex flex-col flex-1 justify-between gap-3">
           {data.map((ujian) => (
             <div
               key={ujian.id}
-              className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div

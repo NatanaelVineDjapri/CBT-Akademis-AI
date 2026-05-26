@@ -44,7 +44,7 @@ export default function BerandaMahasiswaPage() {
           <PengumumanCard />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
             <div className="flex flex-col gap-4">
-              <UjianSegeraCard data={data.ujian_segera ?? null} />
+              <UjianSegeraCard data={data.ujian_segera ?? []} />
               <UjianAkanDatangCard data={data.ujian_akan_datang ?? []} />
               <UjianPerBulanChart data={data.ujian_per_bulan ?? []} />
             </div>

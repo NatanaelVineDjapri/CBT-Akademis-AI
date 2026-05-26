@@ -52,6 +52,28 @@ class DashboardController extends Controller
                 'permission' => $b->permission,
             ]);
 
+        $gradeMap = NilaiAkhir::whereHas('pesertaUjian.ujian', fn($q) => $q->where('created_by', $userId))
+            ->whereNotNull('nilai_total')
+            ->selectRaw("
+                CASE
+                    WHEN grade IS NOT NULL THEN grade
+                    WHEN nilai_total >= 90 THEN 'A'
+                    WHEN nilai_total >= 80 THEN 'B'
+                    WHEN nilai_total >= 70 THEN 'C'
+                    WHEN nilai_total >= 60 THEN 'D'
+                    ELSE 'E'
+                END as g,
+                COUNT(*) as jumlah
+            ")
+            ->groupByRaw('g')
+            ->pluck('jumlah', 'g');
+
+        $distribusiNilai = collect(['A', 'B', 'C', 'D', 'E'])->map(fn($g) => [
+            'grade'  => $g,
+            'jumlah' => (int) ($gradeMap[$g] ?? 0),
+        ])->values();
+
+
         $pelanggaranPerMatkul = DB::table('proctoring_log')
             ->join('peserta_ujian', 'proctoring_log.peserta_ujian_id', '=', 'peserta_ujian.id')
             ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
@@ -78,6 +100,7 @@ class DashboardController extends Controller
             'ujian_berlangsung'       => $berlangsung->take(3)->map($formatUjian)->values(),
             'ujian_selesai'           => $selesai->take(3)->map($formatUjian)->values(),
             'pelanggaran_per_matkul'  => $pelanggaranPerMatkul,
+            'distribusi_nilai'        => $distribusiNilai,
         ]);
     }
 
@@ -540,6 +563,7 @@ class DashboardController extends Controller
         PesertaUjian::autoExpire();
 
         $userId = $request->user()->id;
+        $now    = now();
 
         // Stats
         $ujianSelesai   = PesertaUjian::where('user_id', $userId)->where('status', 'selesai')->count();
@@ -547,28 +571,37 @@ class DashboardController extends Controller
         $rataRata       = NilaiAkhir::whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))->avg('nilai_total');
         $tertinggi      = NilaiAkhir::whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))->max('nilai_total');
 
-        // Ujian segera berlangsung
-        $segera = PesertaUjian::with(['ujian.mataKuliah'])
-            ->where('user_id', $userId)
-            ->where('status', 'sedang_berlangsung')
+        // Ujian sedang berlangsung: sudah mulai ATAU window buka tapi belum diklik mulai
+        $ujianSegera = PesertaUjian::with(['ujian.mataKuliah'])
+            ->where('peserta_ujian.user_id', $userId)
             ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
+            ->where(function ($q) use ($now) {
+                $q->where('peserta_ujian.status', 'sedang_berlangsung')
+                  ->orWhere(function ($q2) use ($now) {
+                      $q2->where('peserta_ujian.status', 'belum_mulai')
+                         ->where('ujian.start_date', '<=', $now)
+                         ->where('ujian.end_date', '>=', $now);
+                  });
+            })
+            ->orderByRaw("CASE WHEN peserta_ujian.status = 'sedang_berlangsung' THEN 0 ELSE 1 END")
             ->orderBy('ujian.start_date')
             ->select('peserta_ujian.*')
-            ->first();
+            ->get()
+            ->map(fn($p) => [
+                'peserta_ujian_id' => $p->id,
+                'ujian_id'         => $p->ujian->id,
+                'nama'             => $p->ujian->nama_ujian,
+                'mata_kuliah'      => $p->ujian->mataKuliah?->nama ?? '-',
+                'start_date'       => $p->ujian->start_date,
+                'end_date'         => $p->ujian->end_date,
+            ]);
 
-        $ujianSegera = $segera ? [
-            'peserta_ujian_id' => $segera->id,
-            'ujian_id'         => $segera->ujian->id,
-            'nama'             => $segera->ujian->nama_ujian,
-            'mata_kuliah'      => $segera->ujian->mataKuliah?->nama ?? '-',
-            'start_date'       => $segera->ujian->start_date,
-            'end_date'         => $segera->ujian->end_date,
-        ] : null;
-        // 
+        // Akan datang: belum_mulai dan window belum dibuka
         $akanDatangList = PesertaUjian::with(['ujian.mataKuliah'])
             ->where('peserta_ujian.user_id', $userId)
             ->where('peserta_ujian.status', 'belum_mulai')
             ->join('ujian', 'peserta_ujian.ujian_id', '=', 'ujian.id')
+            ->where('ujian.start_date', '>', $now)
             ->orderBy('ujian.start_date')
             ->limit(3)
             ->select('peserta_ujian.*')
@@ -582,19 +615,18 @@ class DashboardController extends Controller
                 'end_date'         => $p->ujian->end_date,
             ]);
 
-        // Nilai terbaru (5 terakhir) 
-        $nilaiTerbaru = NilaiAkhir::with(['pesertaUjian.ujian.mataKuliah'])
-            ->whereHas('pesertaUjian', fn($q) => $q->where('user_id', $userId))
-            ->orderBy('graded_at', 'desc')
-            ->limit(5)
-            ->get()
+        // Nilai terbaru: 1 per ujian (nilai tertinggi), 5 ujian terbaru
+        $nilaiTerbaru = NilaiAkhir::bestPerUjian($userId)
+            ->sortByDesc('graded_at')
+            ->take(5)
+            ->values()
             ->map(fn($n) => [
-                'nama'       => $n->pesertaUjian->ujian->nama_ujian ?? '-',
+                'nama'        => $n->pesertaUjian->ujian->nama_ujian ?? '-',
                 'mata_kuliah' => $n->pesertaUjian->ujian->mataKuliah?->nama ?? '-',
-                'tanggal'    => $n->graded_at?->format('d M Y'),
-                'nilai'      => $n->nilai_total,
-                'grade'      => $n->grade,
-                'lulus'      => $n->lulus,
+                'tanggal'     => $n->graded_at?->format('d M Y'),
+                'nilai'       => $n->nilai_total,
+                'grade'       => $n->grade,
+                'lulus'       => $n->lulus,
             ]);
 
         // Ujian per bulan (6 bulan terakhir)
@@ -645,7 +677,7 @@ class DashboardController extends Controller
                 'rata_rata_nilai'  => round($rataRata ?? 0, 1),
                 'nilai_tertinggi'  => $tertinggi ?? 0,
             ],
-            'ujian_segera'      => $ujianSegera,
+            'ujian_segera'      => $ujianSegera->values(),
             'ujian_akan_datang' => $akanDatangList,
             'nilai_terbaru'     => $nilaiTerbaru,
             'ujian_per_bulan'   => $ujianPerBulan,

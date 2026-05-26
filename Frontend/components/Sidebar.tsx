@@ -411,7 +411,7 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                     } else if (item.href === "/mahasiswa/jadwal") {
                       preload("/jadwal", getJadwal);
                     } else if (item.href === "/mahasiswa/nilai") {
-                      const pp = calcPerPage(53, 1, 300);
+                      const pp = calcPerPage(53, 1, 350);
                       preload(["/nilai", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg]: [string, string, number, number, string, string]) =>
                         getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" as "asc" | "desc" }));
                     } else if (item.href === "/mahasiswa/mata-kuliah") {

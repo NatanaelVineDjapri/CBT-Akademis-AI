@@ -6,7 +6,7 @@ import type { DosenUjianItem } from "@/types";
 
 export default function UjianTerbaruCard({ data }: { data: DosenUjianItem[] }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ClipboardList size={16} className="text-gray-500" />
@@ -27,7 +27,7 @@ export default function UjianTerbaruCard({ data }: { data: DosenUjianItem[] }) {
 <p className="text-xs text-gray-400">
           Tidak ada ujian terbaru.
         </p>      ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col flex-1 justify-between gap-3">
           {data.map((ujian) => (
             <div
               key={ujian.id}

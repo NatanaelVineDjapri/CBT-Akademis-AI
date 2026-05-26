@@ -7,8 +7,10 @@ import Link from "next/link";
 import { ChevronLeft, CalendarDays } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import { getMonitoringList, getMonitoringDetail, getMonitoringPesertaDetail } from "@/services/MonitoringServices";
-import { sendWebRtcSignal } from "@/services/ProctoringService";
+import { sendWebRtcSignal, getWebRtcOffer } from "@/services/ProctoringService";
+import { ICE_SERVERS } from "@/lib/iceServers";
 import { toSlug } from "@/utils/slug";
+import { useMonitoringConnection } from "@/contexts/MonitoringConnectionContext";
 import MonitoringPesertaSkeleton from "@/components/skeleton/MonitoringPesertaSkeleton";
 import { getEcho } from "@/lib/echo";
 
@@ -52,22 +54,27 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
   const searchParams = useSearchParams();
   const pidFromUrl   = searchParams.get("pid") ? Number(searchParams.get("pid")) : null;
 
+  const uidFromUrl = searchParams.get("uid") ? Number(searchParams.get("uid")) : null;
+  const eidFromUrl = searchParams.get("eid") ? Number(searchParams.get("eid")) : null;
+
   const { data: listData } = useSWR("/ujian/dosen/monitoring", getMonitoringList);
   const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === ujianSlug);
-  const ujianId   = ujianMeta?.id ?? null;
+  const ujianId   = ujianMeta?.id ?? eidFromUrl;
 
   const { data: detailData } = useSWR(
     ujianId ? `/ujian/dosen/monitoring/${ujianId}` : null,
     () => getMonitoringDetail(ujianId!),
   );
   const pesertaMeta = detailData?.peserta?.find(p => toSlug(p.nama ?? "") === pesertaSlug);
-  const userId      = pesertaMeta?.user_id ?? null;
+  const userId      = pesertaMeta?.user_id ?? uidFromUrl;
 
   const { data, mutate } = useSWR(
     ujianId && userId ? `/ujian/dosen/monitoring/${ujianId}/peserta/${userId}` : null,
     () => getMonitoringPesertaDetail(ujianId!, userId!),
     { revalidateOnFocus: true, refreshInterval: 10000 },
   );
+
+  const { onCam, onScreen } = useMonitoringConnection();
 
   // Live view state — auto-set from active attempt
   const [liveId, setLiveId]               = useState<number | null>(pidFromUrl);
@@ -77,6 +84,8 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
   const screenVideoRef                    = useRef<HTMLVideoElement>(null);
   const pcRef                             = useRef<RTCPeerConnection | null>(null);
   const screenPcRef                       = useRef<RTCPeerConnection | null>(null);
+  const camOkRef                          = useRef(false);
+  const screenOkRef                       = useRef(false);
 
   useEffect(() => {
     if (!data) return;
@@ -98,16 +107,33 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
     return () => { echo.leaveChannel(`ujian.${ujianId}`); };
   }, [ujianId, userId, mutate]);
 
+  // Subscribe ke pre-established stream dari context (list page pre-connect)
+  useEffect(() => {
+    if (!liveId) return;
+    const unsubCam = onCam(liveId, (stream) => {
+      if (liveVideoRef.current && !camOkRef.current) {
+        liveVideoRef.current.srcObject = stream;
+        liveVideoRef.current.play().catch(() => {});
+      }
+    });
+    const unsubScreen = onScreen(liveId, (stream) => {
+      if (screenVideoRef.current && !screenOkRef.current) {
+        screenVideoRef.current.srcObject = stream;
+        screenVideoRef.current.play().catch(() => {});
+      }
+    });
+    return () => { unsubCam(); unsubScreen(); };
+  }, [liveId, onCam, onScreen]);
+
   // WebRTC receiver — auto-connect saat liveId tersedia
   useEffect(() => {
     if (!liveId) return;
     const echo = getEcho();
     if (!echo) return;
 
-    const camOkRef    = { current: false };
-    const screenOkRef = { current: false };
+    camOkRef.current    = false;
+    screenOkRef.current = false;
 
-    const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
     const decodeSdp   = (s: string) => { try { return atob(s); } catch { return s; } };
     const fixSdp      = (sdp: string) =>
       window.location.hostname !== "localhost" ? sdp :
@@ -128,12 +154,10 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
           const s = e.streams?.[0] ?? new MediaStream([e.track]);
           liveVideoRef.current.srcObject = s;
           liveVideoRef.current.play().catch(() => {});
-          setHasStream(true);
-          camOkRef.current = true;
         }
       };
       pc.onconnectionstatechange = () => {
-        if (pc.connectionState === "failed" && camOkRef.current) {
+        if ((pc.connectionState === "failed" || pc.connectionState === "disconnected") && camOkRef.current) {
           camOkRef.current = false;
           setHasStream(false);
           if (liveVideoRef.current) liveVideoRef.current.srcObject = null;
@@ -156,12 +180,10 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
           const s = e.streams?.[0] ?? new MediaStream([e.track]);
           screenVideoRef.current.srcObject = s;
           screenVideoRef.current.play().catch(() => {});
-          setHasScreenStream(true);
-          screenOkRef.current = true;
         }
       };
       spc.onconnectionstatechange = () => {
-        if (spc.connectionState === "failed" && screenOkRef.current) {
+        if ((spc.connectionState === "failed" || spc.connectionState === "disconnected") && screenOkRef.current) {
           screenOkRef.current = false;
           setHasScreenStream(false);
           if (screenVideoRef.current) screenVideoRef.current.srcObject = null;
@@ -185,6 +207,9 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
       if (!camOkRef.current)    sendWebRtcSignal({ peserta_ujian_id: liveId, type: "watch-request",        from: "dosen" }).catch(() => {});
       if (!screenOkRef.current) sendWebRtcSignal({ peserta_ujian_id: liveId, type: "watch-screen-request", from: "dosen" }).catch(() => {});
     };
+    getWebRtcOffer(liveId, "cam").then(sdp => { if (sdp && !camOkRef.current) answerCam(sdp); }).catch(() => {});
+    getWebRtcOffer(liveId, "screen").then(sdp => { if (sdp && !screenOkRef.current) answerScreen(sdp); }).catch(() => {});
+
     const initialId = setTimeout(sendRequests, 1000);
     const retryId   = setInterval(() => {
       if (camOkRef.current && screenOkRef.current) return;
@@ -230,6 +255,7 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
           <div className="relative bg-gray-900 rounded-b-2xl overflow-hidden" style={{ minHeight: 320 }}>
             {/* Screen share — always in DOM so autoplay works */}
             <video ref={screenVideoRef} autoPlay playsInline muted
+              onPlaying={() => { screenOkRef.current = true; setHasScreenStream(true); }}
               className="w-full object-contain rounded-b-2xl"
               style={{ display: "block", maxHeight: 480, minHeight: 320 }} />
             {!hasScreenStream && (
@@ -243,6 +269,7 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
             <div className="absolute bottom-3 right-3 rounded-xl overflow-hidden border-2 shadow-lg"
               style={{ width: 180, height: 120, borderColor: "var(--color-primary)" }}>
               <video ref={liveVideoRef} autoPlay playsInline muted
+                onPlaying={() => { camOkRef.current = true; setHasStream(true); }}
                 className="w-full h-full object-cover scale-x-[-1]" />
               {!hasStream && (
                 <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">

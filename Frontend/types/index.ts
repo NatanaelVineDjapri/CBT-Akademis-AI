@@ -140,8 +140,18 @@ export interface UjianMeta {
   total: number;
 }
 
+export interface NilaiAttempt {
+  id: number;
+  nilai: number;
+  grade: string;
+  lulus: boolean;
+  tanggal: string;
+  pukul: string;
+}
+
 export interface Nilai {
   id: number;
+  ujian_id?: number;
   nama_ujian: string;
   mata_kuliah?: string;
   tanggal: string;
@@ -149,6 +159,8 @@ export interface Nilai {
   nilai: number;
   grade: string;
   lulus: boolean;
+  attempt_count: number;
+  attempts: NilaiAttempt[];
 }
 
 export interface NilaiMeta {
@@ -263,7 +275,7 @@ export interface DashboardPerkembanganItem {
 
 export interface MahasiswaDashboard {
   stats: DashboardStats;
-  ujian_segera: DashboardUjianItem | null;
+  ujian_segera: DashboardUjianItem[];
   ujian_akan_datang: DashboardUjianItem[];
   nilai_terbaru: DashboardNilaiItem[];
   ujian_per_bulan: DashboardBulananItem[];
@@ -298,6 +310,7 @@ export interface DosenDashboard {
   ujian_berlangsung: DosenUjianItem[];
   ujian_selesai: DosenUjianItem[];
   pelanggaran_per_matkul: { nama: string; total: number }[];
+  distribusi_nilai: { grade: string; jumlah: number }[];
 }
 
 export interface AdminUniversitasUjianItem {

@@ -52,7 +52,7 @@ export const getMyMataKuliahDetail = async (id: number | string): Promise<MataKu
 
 export const getDosenMataKuliah = async (): Promise<{ id: number; nama: string; kode: string }[]> => {
   const res = await api.get("/mata-kuliah/dosen");
-  return res.data.data;
+  return Array.isArray(res.data.data) ? res.data.data : [];
 };
 
 export const getMataKuliahBabSoal = async (

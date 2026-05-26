@@ -102,7 +102,7 @@ export default function GrafikPelanggaranCard({ data }: Props) {
       </div>
 
       <div
-        className="mt-auto pt-4 flex items-center gap-2 px-3 py-2.5 rounded-xl"
+        className="mt-16 flex items-center gap-2 px-3 py-2.5 rounded-xl"
         style={{ backgroundColor: "var(--color-warning-light)" }}
       >
         <ShieldAlert size={13} style={{ color: "var(--color-warning)" }} className="flex-shrink-0" />

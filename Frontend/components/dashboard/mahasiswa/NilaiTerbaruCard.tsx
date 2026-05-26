@@ -86,7 +86,7 @@ export default function NilaiTerbaruCard({
         className="w-full text-white text-xs font-medium py-2.5 rounded-xl transition-colors text-center block"
         style={{ backgroundColor: "var(--color-primary)" }}
         onMouseEnter={() => {
-          const pp = calcPerPage(53, 1, 300);
+          const pp = calcPerPage(53, 1, 350);
           preload(["/nilai", "", 1, pp, "tanggal", "desc"],
             ([, s, p, perPg]: [string, string, number, number, string, string]) =>
               getNilai({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" }));

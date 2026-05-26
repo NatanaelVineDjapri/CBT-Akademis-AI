@@ -6,7 +6,7 @@ import type { DosenBankSoalItem } from "@/types";
 
 export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <BookOpen size={16} className="text-gray-500" />
@@ -31,7 +31,7 @@ export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
       {data.length === 0 ? (
         <p className="text-xs text-gray-400">Belum ada Bank Soal terbaru </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col flex-1 justify-between gap-3">
           {data.map((soal) => (
             <div
               key={soal.id}
