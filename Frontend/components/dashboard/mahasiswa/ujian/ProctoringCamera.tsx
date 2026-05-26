@@ -180,78 +180,58 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptur
     if (!echo) return;
     const ch = echo.channel(`proctoring-signal.${pesertaUjianId}`);
 
+    // Fix mDNS obfuscation in full SDP string (localhost only)
+    const fixSdp = (sdp: string) =>
+      window.location.hostname !== "localhost" ? sdp :
+      sdp.replace(/[\w-]+\.local/g, "127.0.0.1");
+
+    // Wait for ICE gathering to complete or timeout
+    const waitIceGather = (pc: RTCPeerConnection, ms: number) => new Promise<void>(resolve => {
+      if (pc.iceGatheringState === "complete") { resolve(); return; }
+      const t = setTimeout(resolve, ms);
+      pc.onicegatheringstatechange = () => { if (pc.iceGatheringState === "complete") { clearTimeout(t); resolve(); } };
+    });
+
     ch.listen(".webrtc-signal", async (msg: { type: string; from: string; sdp?: string }) => {
       if (msg.from !== "dosen") return;
 
       if (msg.type === "watch-request") {
+        if (!streamRef.current) return;
         pcRef.current?.close();
-        let pc: RTCPeerConnection;
-        let sdp: string;
-
-        if (prewarmPcRef.current?.localDescription) {
-          // Gunakan pre-warmed PC langsung — nol delay
-          pc  = prewarmPcRef.current;
-          prewarmPcRef.current = null;
-          sdp = btoa(pc.localDescription!.sdp);
-          prewarmCam(); // mulai prewarm berikutnya di background
-        } else {
-          // Fallback: buat fresh PC
-          pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-          streamRef.current?.getTracks().forEach(t => pc.addTrack(t, streamRef.current!));
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-          await waitIce(pc);
-          sdp = btoa(pc.localDescription!.sdp);
-          storeWebRtcOffer(pesertaUjianId, sdp, "cam").catch(() => {});
-        }
+        const stream = streamRef.current;
+        const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+        pc.oniceconnectionstatechange = () => {
+          if (pc.iceConnectionState === "failed" && pcRef.current === pc) { pc.close(); pcRef.current = null; }
+        };
+        stream.getTracks().forEach(t => pc.addTrack(t, stream));
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await waitIceGather(pc, 2000);
         pcRef.current = pc;
-        sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "offer", from: "student", sdp }).catch(() => {});
+        sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "offer", from: "student", sdp: btoa(fixSdp(pc.localDescription!.sdp)) }).catch(() => {});
 
       } else if (msg.type === "watch-screen-request") {
         if (!screenStreamRef.current) return;
         screenPcRef.current?.close();
-        let spc: RTCPeerConnection;
-        let sdp: string;
-
-        if (screenPrewarmPcRef.current?.localDescription) {
-          spc = screenPrewarmPcRef.current;
-          screenPrewarmPcRef.current = null;
-          sdp = btoa(spc.localDescription!.sdp);
-          prewarmScreen();
-        } else {
-          spc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-          screenStreamRef.current.getTracks().forEach(t => spc.addTrack(t, screenStreamRef.current!));
-          const offer = await spc.createOffer();
-          await spc.setLocalDescription(offer);
-          await waitIce(spc);
-          sdp = btoa(spc.localDescription!.sdp);
-          storeWebRtcOffer(pesertaUjianId, sdp, "screen").catch(() => {});
-        }
+        const screenStream = screenStreamRef.current;
+        const spc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+        spc.oniceconnectionstatechange = () => {
+          if (spc.iceConnectionState === "failed" && screenPcRef.current === spc) { spc.close(); screenPcRef.current = null; }
+        };
+        screenStream.getTracks().forEach(t => spc.addTrack(t, screenStream));
+        const screenOffer = await spc.createOffer();
+        await spc.setLocalDescription(screenOffer);
+        await waitIceGather(spc, 2000);
         screenPcRef.current = spc;
-        sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "screen-offer", from: "student", sdp }).catch(() => {});
+        sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "screen-offer", from: "student", sdp: btoa(fixSdp(spc.localDescription!.sdp)) }).catch(() => {});
 
       } else if (msg.type === "answer" && msg.sdp) {
-        const sdp = decodeSdp(msg.sdp);
-        // answer bisa untuk pcRef (via watch-request) atau prewarmPcRef (via backend cache)
-        const target = pcRef.current ?? prewarmPcRef.current;
-        if (target) {
-          if (target === prewarmPcRef.current) {
-            pcRef.current = target;
-            prewarmPcRef.current = null;
-          }
-          await target.setRemoteDescription({ type: "answer", sdp });
-        }
+        if (pcRef.current?.signalingState === "have-local-offer")
+          pcRef.current.setRemoteDescription({ type: "answer", sdp: fixSdp(decodeSdp(msg.sdp)) }).catch(() => {});
 
       } else if (msg.type === "screen-answer" && msg.sdp) {
-        const sdp = decodeSdp(msg.sdp);
-        const target = screenPcRef.current ?? screenPrewarmPcRef.current;
-        if (target) {
-          if (target === screenPrewarmPcRef.current) {
-            screenPcRef.current = target;
-            screenPrewarmPcRef.current = null;
-          }
-          await target.setRemoteDescription({ type: "answer", sdp });
-        }
+        if (screenPcRef.current?.signalingState === "have-local-offer")
+          screenPcRef.current.setRemoteDescription({ type: "answer", sdp: fixSdp(decodeSdp(msg.sdp)) }).catch(() => {});
       }
     });
 

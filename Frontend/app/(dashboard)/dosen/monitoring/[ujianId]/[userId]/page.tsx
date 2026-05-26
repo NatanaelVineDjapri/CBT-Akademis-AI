@@ -2,12 +2,12 @@
 
 import { use, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, CalendarDays } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import { getMonitoringList, getMonitoringDetail, getMonitoringPesertaDetail } from "@/services/MonitoringServices";
-import { sendWebRtcSignal, getWebRtcOffer } from "@/services/ProctoringService";
+import { sendWebRtcSignal } from "@/services/ProctoringService";
 import { toSlug } from "@/utils/slug";
 import MonitoringPesertaSkeleton from "@/components/skeleton/MonitoringPesertaSkeleton";
 import { getEcho } from "@/lib/echo";
@@ -48,7 +48,9 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function MonitoringPesertaPage({ params }: { params: Promise<{ ujianId: string; userId: string }> }) {
   const { ujianId: ujianSlug, userId: pesertaSlug } = use(params);
-  const router = useRouter();
+  const router       = useRouter();
+  const searchParams = useSearchParams();
+  const pidFromUrl   = searchParams.get("pid") ? Number(searchParams.get("pid")) : null;
 
   const { data: listData } = useSWR("/ujian/dosen/monitoring", getMonitoringList);
   const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === ujianSlug);
@@ -64,11 +66,11 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
   const { data, mutate } = useSWR(
     ujianId && userId ? `/ujian/dosen/monitoring/${ujianId}/peserta/${userId}` : null,
     () => getMonitoringPesertaDetail(ujianId!, userId!),
-    { revalidateOnFocus: true },
+    { revalidateOnFocus: true, refreshInterval: 10000 },
   );
 
   // Live view state — auto-set from active attempt
-  const [liveId, setLiveId]               = useState<number | null>(null);
+  const [liveId, setLiveId]               = useState<number | null>(pidFromUrl);
   const [hasStream, setHasStream]         = useState(false);
   const [hasScreenStream, setHasScreenStream] = useState(false);
   const liveVideoRef                      = useRef<HTMLVideoElement>(null);
@@ -77,8 +79,9 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
   const screenPcRef                       = useRef<RTCPeerConnection | null>(null);
 
   useEffect(() => {
-    const active = data?.attempts?.find(a => a.status === "sedang_berlangsung");
-    setLiveId(active?.peserta_ujian_id ?? null);
+    if (!data) return;
+    const active = data.attempts?.find(a => a.status === "sedang_berlangsung");
+    if (active?.peserta_ujian_id) setLiveId(active.peserta_ujian_id);
   }, [data]);
 
   useEffect(() => {
@@ -106,30 +109,41 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
 
     const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
     const decodeSdp   = (s: string) => { try { return atob(s); } catch { return s; } };
-    const waitIce     = (pc: RTCPeerConnection) => new Promise<void>(resolve => {
+    const fixSdp      = (sdp: string) =>
+      window.location.hostname !== "localhost" ? sdp :
+      sdp.replace(/[\w-]+\.local/g, "127.0.0.1");
+    const waitIceGather = (pc: RTCPeerConnection, ms: number) => new Promise<void>(resolve => {
       if (pc.iceGatheringState === "complete") { resolve(); return; }
-      const t = setTimeout(resolve, 500);
+      const t = setTimeout(resolve, ms);
       pc.onicegatheringstatechange = () => { if (pc.iceGatheringState === "complete") { clearTimeout(t); resolve(); } };
     });
 
-    // Buat answer dari offer SDP (baik dari backend cache maupun Pusher)
     const answerCam = async (offerSdp: string) => {
       if (camOkRef.current) return;
       pcRef.current?.close();
       const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
       pcRef.current = pc;
       pc.ontrack = (e) => {
-        if (liveVideoRef.current && e.streams[0]) {
-          liveVideoRef.current.srcObject = e.streams[0];
+        if (liveVideoRef.current) {
+          const s = e.streams?.[0] ?? new MediaStream([e.track]);
+          liveVideoRef.current.srcObject = s;
+          liveVideoRef.current.play().catch(() => {});
           setHasStream(true);
           camOkRef.current = true;
         }
       };
-      await pc.setRemoteDescription({ type: "offer", sdp: decodeSdp(offerSdp) });
+      pc.onconnectionstatechange = () => {
+        if (pc.connectionState === "failed" && camOkRef.current) {
+          camOkRef.current = false;
+          setHasStream(false);
+          if (liveVideoRef.current) liveVideoRef.current.srcObject = null;
+        }
+      };
+      await pc.setRemoteDescription({ type: "offer", sdp: fixSdp(decodeSdp(offerSdp)) });
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      await waitIce(pc);
-      sendWebRtcSignal({ peserta_ujian_id: liveId, type: "answer", from: "dosen", sdp: btoa(pc.localDescription!.sdp) }).catch(() => {});
+      await waitIceGather(pc, 2000);
+      sendWebRtcSignal({ peserta_ujian_id: liveId, type: "answer", from: "dosen", sdp: btoa(fixSdp(pc.localDescription!.sdp)) }).catch(() => {});
     };
 
     const answerScreen = async (offerSdp: string) => {
@@ -138,20 +152,28 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
       const spc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
       screenPcRef.current = spc;
       spc.ontrack = (e) => {
-        if (screenVideoRef.current && e.streams[0]) {
-          screenVideoRef.current.srcObject = e.streams[0];
+        if (screenVideoRef.current) {
+          const s = e.streams?.[0] ?? new MediaStream([e.track]);
+          screenVideoRef.current.srcObject = s;
+          screenVideoRef.current.play().catch(() => {});
           setHasScreenStream(true);
           screenOkRef.current = true;
         }
       };
-      await spc.setRemoteDescription({ type: "offer", sdp: decodeSdp(offerSdp) });
+      spc.onconnectionstatechange = () => {
+        if (spc.connectionState === "failed" && screenOkRef.current) {
+          screenOkRef.current = false;
+          setHasScreenStream(false);
+          if (screenVideoRef.current) screenVideoRef.current.srcObject = null;
+        }
+      };
+      await spc.setRemoteDescription({ type: "offer", sdp: fixSdp(decodeSdp(offerSdp)) });
       const answer = await spc.createAnswer();
       await spc.setLocalDescription(answer);
-      await waitIce(spc);
-      sendWebRtcSignal({ peserta_ujian_id: liveId, type: "screen-answer", from: "dosen", sdp: btoa(spc.localDescription!.sdp) }).catch(() => {});
+      await waitIceGather(spc, 2000);
+      sendWebRtcSignal({ peserta_ujian_id: liveId, type: "screen-answer", from: "dosen", sdp: btoa(fixSdp(spc.localDescription!.sdp)) }).catch(() => {});
     };
 
-    // Pusher listener — fallback kalau cache tidak ada / expired
     const ch = echo.channel(`proctoring-signal.${liveId}`);
     ch.listen(".webrtc-signal", async (msg: { type: string; from: string; sdp?: string }) => {
       if (msg.from !== "student") return;
@@ -159,28 +181,15 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
       if (msg.type === "screen-offer" && msg.sdp) answerScreen(msg.sdp);
     });
 
-    // Fast path: fetch pre-warmed offer dari backend (student sudah buat saat kamera ready)
-    const tryCache = async () => {
-      const [camSdp, screenSdp] = await Promise.all([
-        getWebRtcOffer(liveId, "cam").catch(() => null),
-        getWebRtcOffer(liveId, "screen").catch(() => null),
-      ]);
-      if (camSdp)    answerCam(camSdp);
-      if (screenSdp) answerScreen(screenSdp);
-    };
-    tryCache();
-
-    // Slow path fallback: kirim watch-request via Pusher (jika cache kosong / gagal)
     const sendRequests = () => {
       if (!camOkRef.current)    sendWebRtcSignal({ peserta_ujian_id: liveId, type: "watch-request",        from: "dosen" }).catch(() => {});
       if (!screenOkRef.current) sendWebRtcSignal({ peserta_ujian_id: liveId, type: "watch-screen-request", from: "dosen" }).catch(() => {});
     };
-    // Delay 3 detik supaya fast path sempat selesai dulu sebelum fallback masuk
-    const initialId = setTimeout(sendRequests, 3000);
+    const initialId = setTimeout(sendRequests, 1000);
     const retryId   = setInterval(() => {
       if (camOkRef.current && screenOkRef.current) return;
       sendRequests();
-    }, 5000);
+    }, 4000);
 
     return () => {
       clearTimeout(initialId);
@@ -219,23 +228,27 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
             <span className="text-sm font-semibold text-gray-700">Live Camera</span>
           </div>
           <div className="relative bg-gray-900 rounded-b-2xl overflow-hidden" style={{ minHeight: 320 }}>
-            {/* Screen share — full area */}
+            {/* Screen share — always in DOM so autoplay works */}
+            <video ref={screenVideoRef} autoPlay playsInline muted
+              className="w-full object-contain rounded-b-2xl"
+              style={{ display: "block", maxHeight: 480, minHeight: 320 }} />
             {!hasScreenStream && (
-              <div className="flex flex-col items-center justify-center gap-2 py-16">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-900">
                 <span className="w-2 h-2 rounded-full bg-gray-600 animate-pulse" />
                 <span className="text-xs text-gray-500">Menunggu layar...</span>
               </div>
             )}
-            <video ref={screenVideoRef} autoPlay playsInline
-              className="w-full object-contain rounded-b-2xl"
-              style={{ display: hasScreenStream ? "block" : "none", maxHeight: 480 }} />
 
-            {/* Webcam — PiP overlay pojok kanan bawah */}
+            {/* Webcam — PiP always in DOM */}
             <div className="absolute bottom-3 right-3 rounded-xl overflow-hidden border-2 shadow-lg"
-              style={{ width: 180, borderColor: "var(--color-primary)", display: hasStream ? "block" : "none" }}>
-              <video ref={liveVideoRef} autoPlay playsInline
-                className="w-full object-cover scale-x-[-1]"
-                style={{ height: 120 }} />
+              style={{ width: 180, height: 120, borderColor: "var(--color-primary)" }}>
+              <video ref={liveVideoRef} autoPlay playsInline muted
+                className="w-full h-full object-cover scale-x-[-1]" />
+              {!hasStream && (
+                <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+                  <span className="text-[9px] text-gray-500 animate-pulse">cam...</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

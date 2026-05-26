@@ -106,7 +106,7 @@ export default function ProctoringMonitor({
           <p className="text-sm text-gray-500">Ujian ini wajib dijalankan dalam mode fullscreen. Klik tombol di bawah untuk melanjutkan.</p>
         </div>
         <button
-          onClick={() => { enterFullscreen(); setNeedFs(false); startScreenShare?.(); }}
+          onClick={async () => { await startScreenShare?.(); enterFullscreen(); setNeedFs(false); }}
           className="w-full py-2.5 rounded-xl text-white text-sm font-semibold cursor-pointer"
           style={{ backgroundColor: "var(--color-primary)" }}
         >

@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Users, AlertTriangle, Clock } from "lucide-react";
+import { ChevronLeft, Users, AlertTriangle, Clock, MonitorPlay } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -133,6 +133,16 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
               </span>
             </div>
             <div className="flex-1" />
+            {aktif > 0 && (
+              <Link
+                href={`/dosen/monitoring/${slug}/live-view`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                <MonitorPlay size={13} />
+                Live View
+              </Link>
+            )}
             <SearchInput value={search} onChange={v => setSearch(v)} placeholder="Cari nama / NIM..." />
           </div>
         )}
@@ -164,7 +174,7 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
                     {String((page - 1) * PER_PAGE + idx + 1).padStart(2, "0")}
                   </td>
                   <td className="px-5 py-3 font-medium text-gray-800">
-                    <Link href={`/dosen/monitoring/${slug}/${toSlug(p.nama ?? String(p.user_id))}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
+                    <Link href={`/dosen/monitoring/${slug}/${toSlug(p.nama ?? String(p.user_id))}?pid=${p.peserta_ujian_id}`} className="hover:underline" style={{ color: "var(--color-primary)" }}>
                       {p.nama ?? "-"}
                     </Link>
                   </td>
