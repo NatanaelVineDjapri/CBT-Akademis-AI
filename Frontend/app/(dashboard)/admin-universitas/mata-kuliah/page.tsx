@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useSWR, { mutate } from "swr";
-import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
@@ -22,6 +22,23 @@ import type { MataKuliah } from "@/types";
 
 const SEMESTER_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const SKS_OPTIONS = [1, 2, 3, 4, 5, 6];
+
+type MatkulSortBy = "nama" | "kode" | "semester" | "sks";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort }: {
+  label: string; col: MatkulSortBy; sortBy: MatkulSortBy; sortDir: SortDir;
+  onSort: (col: MatkulSortBy) => void;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap"
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
 
 function MatkulFormModal({
   prodiList,
@@ -165,14 +182,24 @@ function MatkulFormModal({
 export default function MataKuliahPage() {
   const { user } = useUser();
   const perPage = usePerPage(53, 1, 320);
-  const [search, setSearch] = useState("");
+  const [search, setSearch]   = useState("");
   const [prodiId, setProdiId] = useState<number | undefined>();
-  const [page, setPage] = useState(1);
+  const [page, setPage]       = useState(1);
+  const [sortBy, setSortBy]   = useState<MatkulSortBy>("nama");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [formModal, setFormModal] = useState<{ open: boolean; item?: MataKuliah | null }>({ open: false });
   const [deleteModal, setDeleteModal] = useState<MataKuliah | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const debouncedSearch = useDebounce(search);
+
+  const handleSort = (col: MatkulSortBy) => {
+    const newDir: SortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
+
   useEffect(() => { setPage(1); }, [debouncedSearch, prodiId, perPage]);
 
   const { data: prodiData } = useSWR(
@@ -182,13 +209,13 @@ export default function MataKuliahPage() {
   );
 
   const { data } = useSWR(
-    ["/mata-kuliah", debouncedSearch, prodiId, page, perPage],
-    ([, s, p, pg]) => getMataKuliah({ search: s as string, prodi_id: p as number | undefined, page: pg as number, per_page: perPage }),
+    ["/mata-kuliah", debouncedSearch, prodiId, page, perPage, sortBy, sortDir],
+    ([, s, p, pg]) => getMataKuliah({ search: s as string, prodi_id: p as number | undefined, page: pg as number, per_page: perPage, sort_by: sortBy, sort_dir: sortDir }),
     { keepPreviousData: true, revalidateOnFocus: false }
   );
 
   const prodis = prodiData?.data ?? [];
-  const swrKey = ["/mata-kuliah", debouncedSearch, prodiId, page, perPage];
+  const swrKey = ["/mata-kuliah", debouncedSearch, prodiId, page, perPage, sortBy, sortDir];
 
   const handleSaved = () => {
     setFormModal({ open: false });
@@ -246,11 +273,11 @@ export default function MataKuliahPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Kode</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama</th>
+                <ColHeader label="Kode" col="kode" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Program Studi</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Semester</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">SKS</th>
+                <ColHeader label="Semester" col="semester" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="SKS" col="sks" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Aksi</th>
               </tr>
             </thead>

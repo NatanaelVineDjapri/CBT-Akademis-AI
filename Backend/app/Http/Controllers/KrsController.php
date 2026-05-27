@@ -15,6 +15,11 @@ class KrsController extends Controller
     {
         $auth = $request->user();
 
+        $sortByInput = $request->sort_by;
+        $sortDir     = in_array($request->sort_dir, ['asc', 'desc']) ? $request->sort_dir : 'asc';
+        $sortColMap  = ['nama' => 'nama', 'tahun_masuk' => 'tahun_masuk', 'matkul_count' => 'mata_kuliah_count'];
+        $sortCol     = $sortColMap[$sortByInput] ?? 'nama';
+
         $users = User::with('prodi')
             ->withCount('mataKuliah')
             ->where('role', 'mahasiswa')
@@ -27,7 +32,10 @@ class KrsController extends Controller
                     ->orWhereRaw('LOWER(nim) LIKE ?', [$term])
                 );
             })
-            ->orderBy('nama')
+            ->when($sortCol === 'nama',
+                fn($q) => $q->orderByRaw("LOWER(nama) {$sortDir}"),
+                fn($q) => $q->orderByRaw("{$sortCol} {$sortDir} NULLS LAST")
+            )
             ->paginate($request->per_page ?? 20);
 
         return response()->json([

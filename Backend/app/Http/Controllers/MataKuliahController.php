@@ -13,6 +13,9 @@ class MataKuliahController extends Controller
     {
         $authUser = $request->user();
 
+        $sortBy  = in_array($request->sort_by, ['nama', 'kode', 'semester', 'sks']) ? $request->sort_by : 'nama';
+        $sortDir = in_array($request->sort_dir, ['asc', 'desc']) ? $request->sort_dir : 'asc';
+
         $mataKuliah = MataKuliah::with('prodi.fakultas', 'dosenMatkul.user')
             ->where(fn($q) => $q
                 ->whereHas('prodi.fakultas.universitas', fn($q2) => $q2->where('id', $authUser->universitas_id))
@@ -26,7 +29,10 @@ class MataKuliahController extends Controller
                     ->orWhereRaw('LOWER(kode) LIKE ?', [$term])
                 );
             })
-            ->orderByRaw('LOWER(nama)')
+            ->when(in_array($sortBy, ['nama', 'kode']),
+                fn($q) => $q->orderByRaw("LOWER({$sortBy}) {$sortDir}"),
+                fn($q) => $q->orderByRaw("{$sortBy} {$sortDir} NULLS LAST")
+            )
             ->paginate($request->per_page ?? 10);
 
         return response()->json([

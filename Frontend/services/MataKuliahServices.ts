@@ -7,6 +7,8 @@ export const getMataKuliah = async (params?: {
   per_page?: number;
   search?: string;
   prodi_id?: number;
+  sort_by?: string;
+  sort_dir?: string;
 }): Promise<{ data: MataKuliah[]; meta: MataKuliahMeta }> => {
   const res = await api.get("/mata-kuliah", { params });
   return { data: res.data.data, meta: res.data.meta };

@@ -6,6 +6,8 @@ export const getKrsMahasiswa = async (params?: {
   per_page?: number;
   prodi_id?: number;
   search?: string;
+  sort_by?: string;
+  sort_dir?: string;
 }): Promise<{ data: KrsMahasiswaItem[]; meta: { total: number; per_page: number; current_page: number; last_page: number } }> => {
   const res = await api.get("/krs/mahasiswa", { params });
   return { data: res.data.data, meta: res.data.meta };

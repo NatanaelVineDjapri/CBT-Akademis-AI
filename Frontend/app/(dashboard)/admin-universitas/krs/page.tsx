@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useSWR, { mutate } from "swr";
-import { Plus, Trash2, Package, X, Loader2, BookOpen, GraduationCap } from "lucide-react";
+import { Plus, Trash2, Package, X, Loader2, BookOpen, GraduationCap, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -20,6 +20,23 @@ import {
 } from "@/services/KrsServices";
 import { getProdi } from "@/services/AdminUserServices";
 import type { KrsMahasiswaDetail, MataKuliah } from "@/types";
+
+type KrsSortBy = "nama" | "tahun_masuk" | "matkul_count";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort }: {
+  label: string; col: KrsSortBy; sortBy: KrsSortBy; sortDir: SortDir;
+  onSort: (col: KrsSortBy) => void;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap"
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
 
 const TAHUN_AJARAN_OPTIONS = [
   "2021/2022", "2022/2023", "2023/2024", "2024/2025", "2025/2026", "2026/2027",
@@ -374,13 +391,23 @@ function ApplyPackageModal({
 export default function KrsPage() {
   const { user } = useUser();
   const perPage = usePerPage(65, 1, 360);
-  const [search, setSearch] = useState("");
+  const [search, setSearch]   = useState("");
   const [prodiId, setProdiId] = useState<number | undefined>();
-  const [page, setPage] = useState(1);
+  const [page, setPage]       = useState(1);
+  const [sortBy, setSortBy]   = useState<KrsSortBy>("nama");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [packageModal, setPackageModal] = useState<{ prodiId: number; prodiNama: string } | null>(null);
 
   const debouncedSearch = useDebounce(search);
+
+  const handleSort = (col: KrsSortBy) => {
+    const newDir: SortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
+
   useEffect(() => { setPage(1); }, [debouncedSearch, prodiId, perPage]);
 
   const { data: prodiData } = useSWR(
@@ -390,8 +417,8 @@ export default function KrsPage() {
   );
 
   const { data } = useSWR(
-    ["/krs/mahasiswa", debouncedSearch, prodiId, page, perPage],
-    ([, s, p, pg]) => getKrsMahasiswa({ search: s as string, prodi_id: p as number | undefined, page: pg as number, per_page: perPage }),
+    ["/krs/mahasiswa", debouncedSearch, prodiId, page, perPage, sortBy, sortDir],
+    ([, s, p, pg]) => getKrsMahasiswa({ search: s as string, prodi_id: p as number | undefined, page: pg as number, per_page: perPage, sort_by: sortBy, sort_dir: sortDir }),
     { keepPreviousData: true, revalidateOnFocus: false }
   );
 
@@ -439,10 +466,10 @@ export default function KrsPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Mahasiswa</th>
+                <ColHeader label="Mahasiswa" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Program Studi</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Angkatan</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Matkul Terdaftar</th>
+                <ColHeader label="Angkatan" col="tahun_masuk" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Matkul Terdaftar" col="matkul_count" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Aksi</th>
               </tr>
             </thead>

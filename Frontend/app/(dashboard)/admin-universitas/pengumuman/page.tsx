@@ -2,9 +2,12 @@
 
 import useSWR from "swr";
 import { useState } from "react";
-import { Plus, Trash2, Pencil, X, Search, Megaphone } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
 import { getPengumuman, createPengumuman, updatePengumuman, deletePengumuman, type Pengumuman } from "@/services/PengumumanService";
 import BreadCrumb from "@/components/BreadCrumb";
+import SearchInput from "@/components/filtering/SearchInput";
+import ConfirmModal from "@/components/ConfirmModal";
+import EmptyState from "@/components/EmptyState";
 
 const roleOptions = [
   { value: "", label: "Semua Pengguna" },
@@ -25,20 +28,23 @@ const emptyForm: FormState = { judul: "", isi: "", target_role: "", expired_at: 
 
 export default function PengumumanPage() {
   const { data, isLoading, mutate } = useSWR("/pengumuman", getPengumuman, { revalidateOnFocus: false });
-  const [search, setSearch] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editItem, setEditItem] = useState<Pengumuman | null>(null);
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [loading, setLoading] = useState(false);
+  const [search, setSearch]           = useState("");
+  const [roleFilter, setRoleFilter]   = useState("");
+  const [showModal, setShowModal]     = useState(false);
+  const [editItem, setEditItem]       = useState<Pengumuman | null>(null);
+  const [form, setForm]               = useState<FormState>(emptyForm);
+  const [saving, setSaving]           = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<Pengumuman | null>(null);
+  const [deleting, setDeleting]       = useState(false);
 
   const openAdd = () => { setEditItem(null); setForm(emptyForm); setShowModal(true); };
   const openEdit = (item: Pengumuman) => {
     setEditItem(item);
     setForm({
-      judul: item.judul,
-      isi: item.isi,
+      judul:       item.judul,
+      isi:         item.isi,
       target_role: item.target_role ?? "",
-      expired_at: item.expired_at ? item.expired_at.slice(0, 16) : "",
+      expired_at:  item.expired_at ? item.expired_at.slice(0, 16) : "",
     });
     setShowModal(true);
   };
@@ -47,7 +53,7 @@ export default function PengumumanPage() {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!form.judul.trim() || !form.isi.trim()) return;
-    setLoading(true);
+    setSaving(true);
     try {
       if (editItem) {
         await updatePengumuman(editItem.id, { judul: form.judul, isi: form.isi, target_role: form.target_role || undefined, expired_at: form.expired_at || undefined });
@@ -57,155 +63,171 @@ export default function PengumumanPage() {
       await mutate();
       closeModal();
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    await deletePengumuman(id);
-    mutate();
+  const handleDelete = async () => {
+    if (!confirmDelete) return;
+    setDeleting(true);
+    try {
+      await deletePengumuman(confirmDelete.id);
+      setConfirmDelete(null);
+      mutate();
+    } finally {
+      setDeleting(false);
+    }
   };
 
-  const filtered = (data ?? []).filter(item =>
-    item.judul.toLowerCase().includes(search.toLowerCase()) ||
-    item.isi.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = (data ?? []).filter(item => {
+    const matchSearch = item.judul.toLowerCase().includes(search.toLowerCase()) || item.isi.toLowerCase().includes(search.toLowerCase());
+    const matchRole   = !roleFilter || item.target_role === roleFilter;
+    return matchSearch && matchRole;
+  });
 
   return (
-    <div className="flex flex-col gap-4">
-      <BreadCrumb />
+    <div className="flex flex-col gap-4 h-full">
+      <div className="shrink-0"><BreadCrumb /></div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-4">
-          <div className="flex items-center gap-2">
-            <Megaphone size={15} className="text-gray-400" />
-            <span className="text-sm font-semibold text-gray-800">Daftar Pengumuman</span>
+      <div className="flex-1">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Pengumuman</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Kelola pengumuman yang tampil ke pengguna.</p>
           </div>
           <div className="flex items-center gap-2">
+            <select
+              value={roleFilter}
+              onChange={e => setRoleFilter(e.target.value)}
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)]"
+            >
+              {roleOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <SearchInput value={search} onChange={setSearch} placeholder="Cari pengumuman..." />
             <button
               onClick={openAdd}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
-              <Plus size={13} /> Tambah
+              <Plus size={15} /> Tambah
             </button>
-            <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Cari pengumuman..."
-                className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none w-48 focus:border-[var(--color-primary)] transition-colors"
-              />
-            </div>
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-8">#</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5">Judul & Isi</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-28">Target</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-28">Tanggal</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 px-5 w-28">Expired</th>
-                <th className="pb-2.5 px-5 w-20" />
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Judul & Isi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Target</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Tanggal</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Expired</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i} className="border-b border-gray-100">
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-gray-50 animate-pulse">
                     {Array.from({ length: 6 }).map((_, j) => (
-                      <td key={j} className="py-3.5 px-5"><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
+                      <td key={j} className="px-4 py-4"><div className="h-3 bg-gray-100 rounded w-3/4" /></td>
                     ))}
                   </tr>
                 ))
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-xs text-gray-400">
-                    {search ? "Tidak ada hasil pencarian." : "Belum ada pengumuman."}
+              ) : filtered.map((item, idx) => (
+                <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td className="px-5 py-3 text-xs text-gray-400">{String(idx + 1).padStart(2, "0")}</td>
+                  <td className="px-4 py-3 max-w-xs">
+                    <p className="font-medium text-gray-800 truncate">{item.judul}</p>
+                    <p className="text-xs text-gray-400 truncate mt-0.5">{item.isi}</p>
+                  </td>
+                  <td className="px-4 py-3"><RoleBadge role={item.target_role} /></td>
+                  <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                    {item.expired_at
+                      ? new Date(item.expired_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+                      : <span className="text-gray-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => openEdit(item)} className="cursor-pointer transition-colors" title="Edit">
+                        <Pencil size={15} className="text-green-500 hover:text-green-600" />
+                      </button>
+                      <button onClick={() => setConfirmDelete(item)} className="cursor-pointer transition-colors" title="Hapus">
+                        <Trash2 size={15} className="text-red-400 hover:text-red-500" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
-              ) : filtered.map((item, idx) => {
-                const isLast = idx === filtered.length - 1;
-                return (
-                  <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${!isLast ? "border-b border-gray-100" : ""}`}>
-                    <td className="py-3.5 px-5 text-xs text-gray-400">{idx + 1}</td>
-                    <td className="py-3.5 px-5 max-w-xs">
-                      <p className="text-sm font-medium text-gray-800 truncate">{item.judul}</p>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">{item.isi}</p>
-                    </td>
-                    <td className="py-3.5 px-5"><RoleBadge role={item.target_role} /></td>
-                    <td className="py-3.5 px-5 text-xs text-gray-500 whitespace-nowrap">
-                      {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
-                    </td>
-                    <td className="py-3.5 px-5 text-xs text-gray-500 whitespace-nowrap">
-                      {item.expired_at
-                        ? new Date(item.expired_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
-                        : <span className="text-gray-300">—</span>}
-                    </td>
-                    <td className="py-3.5 px-5">
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-green-500 hover:text-green-600 transition-colors cursor-pointer">
-                          <Pencil size={14} />
-                        </button>
-                        <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg text-red-400 hover:text-red-500 transition-colors cursor-pointer">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              ))}
             </tbody>
           </table>
+          {!isLoading && filtered.length === 0 && (
+            <EmptyState message={search || roleFilter ? "Tidak ada hasil pencarian." : "Belum ada pengumuman."} flat />
+          )}
         </div>
       </div>
+      </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--color-primary)" }}>
+            <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
               <h3 className="text-base font-bold text-white">{editItem ? "Edit Pengumuman" : "Tambah Pengumuman"}</h3>
               <button onClick={closeModal} className="text-white/70 hover:text-white cursor-pointer"><X className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Judul</label>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Judul</label>
                 <input value={form.judul} onChange={e => setForm(f => ({ ...f, judul: e.target.value }))} placeholder="Judul pengumuman"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Isi</label>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Isi</label>
                 <textarea value={form.isi} onChange={e => setForm(f => ({ ...f, isi: e.target.value }))} placeholder="Tulis isi pengumuman..." rows={4}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 resize-none outline-none focus:border-[var(--color-primary)] transition-colors" />
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 resize-none outline-none focus:border-[var(--color-primary)] transition-colors" />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Target Pengguna</label>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Target Pengguna</label>
                 <select value={form.target_role} onChange={e => setForm(f => ({ ...f, target_role: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors bg-white">
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[var(--color-primary)] transition-colors bg-white">
                   {roleOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Expired At <span className="text-gray-400">(opsional)</span></label>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Expired At <span className="text-gray-400 font-normal">(opsional)</span></label>
                 <input type="datetime-local" value={form.expired_at} onChange={e => setForm(f => ({ ...f, expired_at: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
-              </div>
-              <div className="flex gap-3 pt-1">
-                <button type="button" onClick={closeModal} className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-semibold cursor-pointer hover:bg-gray-50">Batal</button>
-                <button type="submit" disabled={loading} className="flex-1 text-white py-2.5 rounded-lg text-sm font-semibold cursor-pointer disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)" }}>
-                  {loading ? "Menyimpan..." : editItem ? "Simpan Perubahan" : "Unggah"}
-                </button>
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
               </div>
             </form>
+            <div className="px-5 pb-5 flex gap-3 shrink-0">
+              <button type="button" onClick={closeModal}
+                className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">
+                Batal
+              </button>
+              <button onClick={handleSubmit as unknown as React.MouseEventHandler} disabled={saving}
+                className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                style={{ backgroundColor: "var(--color-primary)" }}>
+                {saving ? <><Loader2 size={14} className="animate-spin" />Menyimpan...</> : editItem ? "Simpan Perubahan" : "Unggah"}
+              </button>
+            </div>
           </div>
         </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmModal
+          title="Hapus Pengumuman"
+          message={`Yakin ingin menghapus pengumuman "${confirmDelete.judul}"? Tindakan ini tidak bisa dibatalkan.`}
+          confirmLabel="Ya, Hapus"
+          loading={deleting}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmDelete(null)}
+        />
       )}
     </div>
   );
