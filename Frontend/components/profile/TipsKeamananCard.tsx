@@ -5,7 +5,7 @@ import { tips } from "@/types";
 
 export default function TipsKeamananCard() {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm h-[305px]">
+    <div className="bg-white rounded-2xl p-6 shadow-sm">
       <h2 className="text-lg font-bold mb-3" style={{ color: "var(--color-primary)" }}>
         Tips Keamanan
       </h2>

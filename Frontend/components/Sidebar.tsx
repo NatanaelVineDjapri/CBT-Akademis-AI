@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   BookOpen,
+  Share2,
   ClipboardList,
   Eye,
   BarChart2,
@@ -81,6 +82,7 @@ const menuSectionsByRole: Record<string, MenuSection[]> = {
         { label: "Jadwal",      href: "/mahasiswa/jadwal",      icon: <Calendar size={18} /> },
         { label: "Nilai",       href: "/mahasiswa/nilai",       icon: <Trophy size={18} /> },
         { label: "Mata Kuliah", href: "/mahasiswa/mata-kuliah", icon: <GraduationCap size={18} /> },
+        { label: "Shared",      href: "/mahasiswa/bank-soal",   icon: <Share2 size={18} /> },
       ],
     },
     {
@@ -273,6 +275,11 @@ const menuByRole: Record<string, MenuItem[]> = {
       label: "Mata Kuliah",
       href: "/mahasiswa/mata-kuliah",
       icon: <GraduationCap size={18} />,
+    },
+    {
+      label: "Shared",
+      href: "/mahasiswa/bank-soal",
+      icon: <Share2 size={18} />,
     },
     {
       label: "Profil",

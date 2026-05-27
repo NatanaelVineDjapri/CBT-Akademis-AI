@@ -562,9 +562,11 @@ export const USER_ROLE_TABS = [
 ];
 
 export const tips = [
-  "Jangan pernah membagikan password Anda kepada siapapun, termasuk pihak yang mengaku dari layanan resmi, karena hal ini bisa membahayakan keamanan akun Anda.",
+  "Jangan pernah membagikan password Anda kepada siapapun, termasuk pihak yang mengaku dari layanan resmi.",
   "Gunakan kombinasi huruf besar, huruf kecil, angka, dan simbol agar password lebih kuat dan tidak mudah ditebak oleh orang lain.",
   "Selalu logout setelah selesai menggunakan akun, terutama jika Anda memakai perangkat umum atau milik orang lain, untuk mencegah akses tanpa izin.",
+  "Aktifkan verifikasi dua langkah jika tersedia untuk menambahkan lapisan keamanan ekstra pada akun Anda.",
+  "Hindari mengakses akun melalui jaringan Wi-Fi publik yang tidak terenkripsi, karena data Anda bisa disadap oleh pihak yang tidak bertanggung jawab.",
 ];
 
 export interface OpsiItem {

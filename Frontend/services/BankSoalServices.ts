@@ -15,8 +15,20 @@ export const getBankSoal = async (params?: {
   return { data: res.data.data, meta: res.data.meta };
 };
 
-export const getBankSoalMy = async (): Promise<{ data: { id: number; nama: string }[] }> => {
-  const res = await api.get("/bank-soal/my");
+export interface BankSoalMyItem {
+  id: number;
+  nama: string;
+  soal_count: number;
+  mata_kuliah: string | null;
+  creator: string | null;
+}
+
+export const getBankSoalMy = async (params?: {
+  search?: string;
+  sort_by?: "nama" | "soal_count";
+  sort_dir?: "asc" | "desc";
+}): Promise<{ data: BankSoalMyItem[] }> => {
+  const res = await api.get("/bank-soal/my", { params });
   return res.data;
 };
 

@@ -63,10 +63,28 @@ class BankSoalController extends Controller
     public function myList(Request $request)
     {
         $authUser = $request->user();
-        $data = BankSoal::where(function ($q) use ($authUser) {
-            $q->where('created_by', $authUser->id)
-              ->orWhereHas('sharedUsers', fn($q) => $q->where('user_id', $authUser->id));
-        })->select('id', 'nama')->get();
+        $sortBy  = $request->query('sort_by', 'nama');
+        $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'asc';
+
+        $query = BankSoal::with(['creator', 'mataKuliah'])->withCount('soal')
+            ->where(function ($q) use ($authUser) {
+                $q->where('created_by', $authUser->id)
+                  ->orWhereHas('sharedUsers', fn($q) => $q->where('user_id', $authUser->id));
+            })
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($request->search) . '%']));
+
+        match ($sortBy) {
+            'soal_count' => $query->orderBy('soal_count', $sortDir),
+            default      => $query->orderByRaw('LOWER(nama) ' . $sortDir),
+        };
+
+        $data = $query->get()->map(fn($item) => [
+            'id'          => $item->id,
+            'nama'        => $item->nama,
+            'soal_count'  => $item->soal_count,
+            'mata_kuliah' => $item->mataKuliah?->nama,
+            'creator'     => $item->creator?->nama,
+        ]);
 
         return response()->json(['data' => $data]);
     }
