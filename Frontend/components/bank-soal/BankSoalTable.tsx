@@ -101,10 +101,20 @@ export default function BankSoalTable({
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col className="w-56" />
+              <col className="w-40" />
+              <col className="w-28" />
+              <col className="w-40" />
+              <col className="w-32" />
+              <col className="w-28" />
+              {canEdit && <col className="w-24" />}
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama Bank Soal</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Bab</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Jumlah Soal</th>
@@ -112,7 +122,7 @@ export default function BankSoalTable({
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Diperbarui</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Permission</th>
                 {canEdit && (
-                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Actions</th>
+                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Actions</th>
                 )}
               </tr>
             </thead>
@@ -169,9 +179,12 @@ export default function BankSoalTable({
                       </td>
                       <td className="px-4 py-3">
                         {item.updated_at ? (
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <CalendarDays size={11} className="text-gray-400 shrink-0" />
-                            <span>{new Date(item.updated_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                          <div className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                              <CalendarDays size={11} className="text-gray-400 shrink-0" />
+                              <span>{new Date(item.updated_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                            </div>
+                            <span className="text-xs text-gray-400 pl-4">{new Date(item.updated_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}</span>
                           </div>
                         ) : <span className="text-xs text-gray-400">-</span>}
                       </td>

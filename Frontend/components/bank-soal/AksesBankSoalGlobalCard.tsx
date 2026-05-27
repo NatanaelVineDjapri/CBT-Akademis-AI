@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { preload } from "swr";
+import { getBankSoalGlobal } from "@/services/BankSoalServices";
+import { calcPerPage } from "@/hooks/usePerPage";
 
 interface Props {
   href?: string;
@@ -18,6 +21,11 @@ export default function AksesBankSoalGlobalCard({ href = "/bank-soal/global" }: 
         href={href}
         className="bg-white text-sm font-medium px-6 py-1.5 rounded-full hover:opacity-90 transition-opacity"
         style={{ color: "var(--color-primary)" }}
+        onMouseEnter={() => {
+          const pp = calcPerPage(290, 4, 240);
+          preload(["/bank-soal/global", "", 1, pp], ([, s, p, perPg]: [string, string, number, number]) =>
+            getBankSoalGlobal({ search: s, page: p, per_page: perPg }));
+        }}
       >
         Telusuri
       </Link>

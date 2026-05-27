@@ -3,31 +3,26 @@
 import { BookOpen, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { preload } from "swr";
-import { getBankSoalGlobalDetail } from "@/services/BankSoalServices";
+import { getBankSoalGlobal, getBankSoalGlobalDetail } from "@/services/BankSoalServices";
 import type { BankSoalItem } from "@/types";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
   item: BankSoalItem;
-}
-
-function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
 }
 
 export default function BankSoalGlobalCard({ item }: Props) {
   const babs = item.mata_kuliah?.bab ?? [];
   const primary = item.nama;
   const secondary = item.creator?.universitas?.nama ?? "";
-  const slug = `${toSlug(item.nama)}-${item.id}`;
 
   return (
     <Link
-      href={`/dosen/bank-soal/global/${slug}`}
-      onMouseEnter={() => preload(["/bank-soal/global", item.id], () => getBankSoalGlobalDetail(item.id))}
+      href={`/dosen/bank-soal/global/${toSlug(item.nama)}`}
+      onMouseEnter={() => {
+        preload("/bank-soal/global/all", () => getBankSoalGlobal({ per_page: 200 }));
+        preload(["/bank-soal/global", item.id], () => getBankSoalGlobalDetail(item.id));
+      }}
       className="block rounded-2xl p-4 flex flex-col gap-2.5 hover:opacity-90 transition-opacity"
       style={{ backgroundColor: "var(--color-primary)" }}
     >

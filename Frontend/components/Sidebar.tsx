@@ -421,8 +421,9 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                     } else if (item.href === "/dosen") {
                       preload("/dashboard/dosen", getDosenDashboard);
                     } else if (item.href === "/dosen/bank-soal") {
-                      preload(["/bank-soal", "", 1], ([, s, p]: [string, string, number]) =>
-                        getBankSoal({ search: s, page: p, per_page: 10 }));
+                      const pp = calcPerPage(57, 1, 530);
+                      preload(["/bank-soal", "", 1, pp], ([, s, p, perPg]: [string, string, number, number]) =>
+                        getBankSoal({ search: s, page: p, per_page: perPg }));
                     } else if (item.href === "/dosen/hasil-ujian") {
                       const pp = calcPerPage(53, 1, 480);
                       preload(["/ujian/dosen/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
@@ -450,7 +451,7 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                       preload(["/ujian/admin-universitas/hasil", "", 1, pp, "tanggal", "desc"], ([, s, p, perPg, sb, sd]: [string, string, number, number, string, string]) =>
                         getHasilUjianAdminUniversitas({ search: s, page: p, per_page: perPg, sort_by: sb, sort_dir: sd as "asc" | "desc" }));
                     } else if (item.href === "/admin-universitas/mata-kuliah") {
-                      const pp = calcPerPage(53, 1, 390);
+                      const pp = calcPerPage(53, 1, 320);
                       preload(["/mata-kuliah", "", undefined, 1, pp], ([, s, p, pg]: [string, string, number | undefined, number, number]) =>
                         getMataKuliah({ search: s, prodi_id: p, page: pg, per_page: pp }));
                     } else if (item.href === "/admin-universitas/krs") {

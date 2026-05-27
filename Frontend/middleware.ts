@@ -43,6 +43,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  if (hasSession && isAuthRoute) {
+    const role = await getRoleFromSession(request)
+    if (role && roleRoutes[role]) {
+      return NextResponse.redirect(new URL(roleRoutes[role], request.url))
+    }
+  }
+
   const isRoleProtectedPath = rolePrefixes.some(p => pathname.startsWith(p))
 
   if (hasSession && isRoleProtectedPath) {

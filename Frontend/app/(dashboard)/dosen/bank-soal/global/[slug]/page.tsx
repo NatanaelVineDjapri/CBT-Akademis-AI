@@ -5,24 +5,27 @@ import useSWR from "swr";
 import Link from "next/link";
 import { BookOpen, UserCircle, ChevronRight, Layers } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
-import { getBankSoalGlobalDetail } from "@/services/BankSoalServices";
+import { getBankSoalGlobal, getBankSoalGlobalDetail } from "@/services/BankSoalServices";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-function extractId(slug: string): number {
-  const parts = slug.split("-");
-  return Number(parts[parts.length - 1]);
-}
-
 export default function BankSoalGlobalDetailPage({ params }: Props) {
   const { slug } = use(params);
-  const id = extractId(slug);
+
+  const { data: allGlobal } = useSWR(
+    "/bank-soal/global/all",
+    () => getBankSoalGlobal({ per_page: 200 }),
+    { revalidateOnFocus: false, revalidateIfStale: false }
+  );
+
+  const bankSoalId = allGlobal?.data.find(item => toSlug(item.nama) === slug)?.id;
 
   const { data, isLoading } = useSWR(
-    ["/bank-soal/global", id],
-    () => getBankSoalGlobalDetail(id),
+    bankSoalId ? ["/bank-soal/global", bankSoalId] : null,
+    () => getBankSoalGlobalDetail(bankSoalId!),
     { revalidateOnFocus: false }
   );
 
@@ -41,7 +44,7 @@ export default function BankSoalGlobalDetailPage({ params }: Props) {
         className="rounded-2xl p-5 flex flex-col gap-3 shrink-0"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
-        {isLoading ? (
+        {isLoading || !bankSoalId ? (
           <div className="animate-pulse flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded bg-white/30" />
@@ -108,7 +111,7 @@ export default function BankSoalGlobalDetailPage({ params }: Props) {
         </div>
 
         <div className="p-5 overflow-y-auto flex-1">
-          {isLoading ? (
+          {isLoading || !bankSoalId ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="animate-pulse rounded-xl px-4 py-3 flex items-center justify-between"
@@ -164,7 +167,7 @@ export default function BankSoalGlobalDetailPage({ params }: Props) {
                 return hassoal ? (
                   <Link
                     key={bab.id}
-                    href={`/dosen/bank-soal/global/${slug}/${bab.id}`}
+                    href={`/dosen/bank-soal/global/${slug}/${toSlug(bab.nama_bab)}`}
                     className="flex items-center justify-between px-4 py-3 rounded-xl hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, white)" }}
                   >

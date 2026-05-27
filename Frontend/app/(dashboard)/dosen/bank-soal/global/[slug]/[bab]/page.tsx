@@ -6,34 +6,38 @@ import { useDebounce } from "@/hooks/useDebounce";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
-import { getBankSoalSoal } from "@/services/BankSoalServices";
+import { getBankSoalGlobal, getBankSoalSoal } from "@/services/BankSoalServices";
+import { toSlug } from "@/utils/slug";
 
 interface Props {
-  params: Promise<{ slug: string; babId: string }>;
-}
-
-function extractId(slug: string): number {
-  const parts = slug.split("-");
-  return Number(parts[parts.length - 1]);
+  params: Promise<{ slug: string; bab: string }>;
 }
 
 export default function GlobalBabSoalPage({ params }: Props) {
-  const { slug, babId } = use(params);
-  const bankSoalId = extractId(slug);
+  const { slug, bab } = use(params);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
+  const { data: allGlobal } = useSWR(
+    "/bank-soal/global/all",
+    () => getBankSoalGlobal({ per_page: 200 }),
+    { revalidateOnFocus: false, revalidateIfStale: false }
+  );
+
+  const bankSoalItem = allGlobal?.data.find(item => toSlug(item.nama) === slug);
+  const bankSoalId = bankSoalItem?.id;
+
   const { data, isLoading } = useSWR(
-    ["/bank-soal", bankSoalId, "soal", babId, debouncedSearch],
-    () => getBankSoalSoal(bankSoalId, { search: debouncedSearch }),
+    bankSoalId ? ["/bank-soal", bankSoalId, "soal", bab, debouncedSearch] : null,
+    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch }),
     { revalidateOnFocus: false }
   );
 
-  const bankSoal = data?.bank_soal;
+  const bankSoal = data?.bank_soal ?? bankSoalItem;
   const allSoal = data?.data ?? [];
-  const soalList = allSoal.filter((s) => s.bab?.id === Number(babId));
+  const soalList = allSoal.filter((s) => toSlug(s.bab?.nama_bab ?? "") === bab);
   const babNama = soalList[0]?.bab?.nama_bab
-    ?? allSoal.find((s) => s.bab?.id === Number(babId))?.bab?.nama_bab;
+    ?? allSoal.find((s) => toSlug(s.bab?.nama_bab ?? "") === bab)?.bab?.nama_bab;
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -41,7 +45,7 @@ export default function GlobalBabSoalPage({ params }: Props) {
         <Breadcrumb
           overrides={{
             [slug]: bankSoal?.nama ?? slug,
-            [babId]: babNama ?? `Bab ${babId}`,
+            [bab]: babNama ?? bab,
           }}
         />
       </div>
@@ -60,7 +64,7 @@ export default function GlobalBabSoalPage({ params }: Props) {
           <SearchInput value={search} onChange={setSearch} placeholder="Search" />
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading} />
+        <SoalTable soalList={soalList} isLoading={isLoading || !bankSoalId} />
       </div>
     </div>
   );
