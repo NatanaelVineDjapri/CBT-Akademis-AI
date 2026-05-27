@@ -23,14 +23,23 @@ import type { BankSoalItem } from "@/types";
 export default function DosenBankSoalPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<"nama" | "soal_count" | "updated_at" | "permission">("updated_at");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const debouncedSearch = useDebounce(search);
   const perPage = usePerPage(57, 1, 530);
+
+  const handleSort = (col: typeof sortBy) => {
+    const newDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : (col === "updated_at" ? "desc" : "asc");
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
 
   useEffect(() => { setPage(1); }, [debouncedSearch, perPage]);
 
   const { data, mutate } = useSWR(
-    ["/bank-soal", debouncedSearch, page, perPage],
-    ([, s, p]: [string, string, number]) => getBankSoal({ search: s, page: p, per_page: perPage }),
+    ["/bank-soal", debouncedSearch, page, perPage, sortBy, sortDir],
+    () => getBankSoal({ search: debouncedSearch, page, per_page: perPage, sort_by: sortBy, sort_dir: sortDir }),
     { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
   );
 
@@ -82,6 +91,9 @@ export default function DosenBankSoalPage() {
             onShare={(item, link) => { setShareItem(item); setShareLink(link); }}
             canEdit={true}
             onTambah={() => setShowCreate(true)}
+            sortBy={sortBy}
+            sortDir={sortDir}
+            onSort={handleSort}
           />
         )}
       </div>

@@ -4,7 +4,7 @@ import { use, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, CalendarDays } from "lucide-react";
+import { ChevronLeft, CalendarDays, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import { getMonitoringList, getMonitoringDetail, getMonitoringPesertaDetail } from "@/services/MonitoringServices";
 import { sendWebRtcSignal, getWebRtcOffer } from "@/services/ProctoringService";
@@ -13,6 +13,23 @@ import { toSlug } from "@/utils/slug";
 import { useMonitoringConnection } from "@/contexts/MonitoringConnectionContext";
 import MonitoringPesertaSkeleton from "@/components/skeleton/MonitoringPesertaSkeleton";
 import { getEcho } from "@/lib/echo";
+
+type SortDir = "asc" | "desc";
+
+function ColHeader<T extends string>({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: T; sortBy: T; sortDir: SortDir; onSort: (col: T) => void; className?: string;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`text-center px-4 py-3 font-medium cursor-pointer select-none whitespace-nowrap ${className ?? ""}`} onClick={() => onSort(col)}>
+      <span className="flex items-center justify-center gap-1">
+        {label}
+        <Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} />
+      </span>
+    </th>
+  );
+}
 
 const VIOLATION_LABEL: Record<string, string> = {
   tab:            "Tab",
@@ -75,6 +92,21 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
   );
 
   const { onCam, onScreen } = useMonitoringConnection();
+
+  const [attemptSortBy, setAttemptSortBy] = useState<"violations" | "risk_score">("violations");
+  const [attemptSortDir, setAttemptSortDir] = useState<SortDir>("desc");
+  const [pelanggaranSortDir, setPelanggaranSortDir] = useState<SortDir>("desc");
+  const [jawabanSortBy, setJawabanSortBy] = useState<"nomor" | "nilai">("nomor");
+  const [jawabanSortDir, setJawabanSortDir] = useState<SortDir>("asc");
+
+  const handleAttemptSort = (col: "violations" | "risk_score") => {
+    const newDir: SortDir = col === attemptSortBy ? (attemptSortDir === "asc" ? "desc" : "asc") : "desc";
+    setAttemptSortBy(col); setAttemptSortDir(newDir);
+  };
+  const handleJawabanSort = (col: "nomor" | "nilai") => {
+    const newDir: SortDir = col === jawabanSortBy ? (jawabanSortDir === "asc" ? "desc" : "asc") : (col === "nilai" ? "desc" : "asc");
+    setJawabanSortBy(col); setJawabanSortDir(newDir);
+  };
 
   // Live view state — auto-set from active attempt
   const [liveId, setLiveId]               = useState<number | null>(pidFromUrl);
@@ -311,15 +343,18 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
                     {VIOLATION_LABEL[type] ?? type}
                   </th>
                 ))}
-                <th className="text-center px-4 py-3 font-medium w-20">Total</th>
-                <th className="text-center px-4 py-3 font-medium w-24">Risk Score</th>
+                <ColHeader label="Total" col="violations" sortBy={attemptSortBy} sortDir={attemptSortDir} onSort={handleAttemptSort} className="w-20" />
+                <ColHeader label="Risk Score" col="risk_score" sortBy={attemptSortBy} sortDir={attemptSortDir} onSort={handleAttemptSort} className="w-24" />
                 <th className="text-center px-4 py-3 font-medium w-24">Bukti</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {attempts.length === 0 ? (
                 <tr><td colSpan={4 + Object.keys(summary).length + 4} className="text-center py-8 text-sm text-gray-400">Belum ada data</td></tr>
-              ) : attempts.map(a => (
+              ) : [...attempts].sort((a, b) => {
+                  const cmp = attemptSortBy === "violations" ? a.violations - b.violations : a.risk_score - b.risk_score;
+                  return attemptSortDir === "asc" ? cmp : -cmp;
+                }).map(a => (
                 <tr key={a.attempt_ke} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3 text-xs text-gray-400">{String(a.attempt_ke).padStart(2, "0")}</td>
                   <td className="px-4 py-3 text-center"><StatusBadge status={a.status} /></td>
@@ -383,11 +418,16 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
             <thead>
               <tr className="text-xs text-gray-400 border-b border-gray-100">
                 <th className="text-left px-5 py-3 font-medium">Jenis Pelanggaran</th>
-                <th className="text-center px-5 py-3 font-medium w-32">Jumlah</th>
+                <th className="text-center px-5 py-3 font-medium w-32 cursor-pointer select-none" onClick={() => setPelanggaranSortDir(d => d === "asc" ? "desc" : "asc")}>
+                  <span className="flex items-center justify-center gap-1">
+                    Jumlah
+                    {pelanggaranSortDir === "desc" ? <ArrowDown size={11} className="text-gray-500" /> : <ArrowUp size={11} className="text-gray-500" />}
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {Object.entries(summary).map(([type, count]) => (
+              {Object.entries(summary as Record<string, number>).sort(([, a], [, b]) => pelanggaranSortDir === "desc" ? b - a : a - b).map(([type, count]) => (
                 <tr key={type} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3 text-gray-700">{VIOLATION_LABEL_FULL[type] ?? type}</td>
                   <td className="px-5 py-3 text-center w-32">
@@ -412,13 +452,16 @@ export default function MonitoringPesertaPage({ params }: { params: Promise<{ uj
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-gray-400 border-b border-gray-100">
-                  <th className="text-center px-4 py-3 font-medium w-16">No.</th>
+                  <ColHeader label="No." col="nomor" sortBy={jawabanSortBy} sortDir={jawabanSortDir} onSort={handleJawabanSort} className="w-16" />
                   <th className="text-left px-4 py-3 font-medium">Jawaban</th>
-                  <th className="text-center px-4 py-3 font-medium w-24">Nilai</th>
+                  <ColHeader label="Nilai" col="nilai" sortBy={jawabanSortBy} sortDir={jawabanSortDir} onSort={handleJawabanSort} className="w-24" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {a.jawaban.map((j, i) => (
+                {[...a.jawaban].sort((x, y) => {
+                  const cmp = jawabanSortBy === "nilai" ? (x.nilai ?? 0) - (y.nilai ?? 0) : Number(x.nomor) - Number(y.nomor);
+                  return jawabanSortDir === "asc" ? cmp : -cmp;
+                }).map((j, i) => (
                   <tr key={i} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-2.5 text-center text-xs text-gray-400">{j.nomor}</td>
                     <td className="px-4 py-2.5 text-xs text-gray-700 max-w-xs truncate">{j.jawaban ?? "-"}</td>

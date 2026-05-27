@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Pencil, Trash2, Plus, Mail, BookOpen, CalendarDays } from "lucide-react";
+import { Pencil, Trash2, Plus, Mail, BookOpen, CalendarDays, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { JENIS_BADGE } from "@/components/dosen/ujian/constants";
 import Link from "next/link";
 import { preload } from "swr";
@@ -12,6 +12,28 @@ import { toSlug } from "@/utils/slug";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
 import EmptyState from "@/components/EmptyState";
+
+type SortBy = "nama" | "soal_count" | "updated_at" | "permission";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: SortBy; sortBy?: SortBy; sortDir?: SortDir;
+  onSort?: (col: SortBy) => void; className?: string;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th
+      className={`text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap ${className ?? ""}`}
+      onClick={() => onSort?.(col)}
+    >
+      <span className="flex items-center gap-1">
+        {label}
+        <Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} />
+      </span>
+    </th>
+  );
+}
 
 const permissionLabel: Record<string, string> = {
   public: "Publik",
@@ -44,6 +66,9 @@ interface Props {
   createHref?: string;
   onTambah?: () => void;
   basePath?: string;
+  sortBy?: SortBy;
+  sortDir?: SortDir;
+  onSort?: (col: SortBy) => void;
 }
 
 export default function BankSoalTable({
@@ -59,6 +84,9 @@ export default function BankSoalTable({
   createHref,
   onTambah,
   basePath = "/dosen/bank-soal",
+  sortBy,
+  sortDir,
+  onSort,
 }: Props) {
   const linkCache = useRef<Map<number, string>>(new Map());
 
@@ -115,12 +143,12 @@ export default function BankSoalTable({
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama Bank Soal</th>
+                <ColHeader label="Nama Bank Soal" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Bab</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Jumlah Soal</th>
+                <ColHeader label="Jumlah Soal" col="soal_count" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Jenis Soal</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Diperbarui</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Permission</th>
+                <ColHeader label="Diperbarui" col="updated_at" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+                <ColHeader label="Permission" col="permission" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
                 {canEdit && (
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Actions</th>
                 )}

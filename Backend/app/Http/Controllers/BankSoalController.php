@@ -18,8 +18,10 @@ class BankSoalController extends Controller
     public function index(Request $request)
     {
         $authUser = $request->user();
+        $sortKey = $request->query('sort_by', 'updated_at');
+        $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
 
-        $bankSoal = BankSoal::with([
+        $query = BankSoal::with([
                 'mataKuliah', 'bab', 'creator',
                 'soal.jenisSoal',
             ])
@@ -29,8 +31,16 @@ class BankSoalController extends Controller
                     ->orWhereHas('sharedUsers', fn($q) => $q->where('user_id', $authUser->id));
             })
             ->when($request->mata_kuliah_id, fn($q) => $q->where('mata_kuliah_id', $request->mata_kuliah_id))
-            ->when($request->search, fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($request->search) . '%']))
-            ->paginate($request->per_page ?? 10);
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($request->search) . '%']));
+
+        match ($sortKey) {
+            'nama'       => $query->orderByRaw('LOWER(nama) ' . $sortDir),
+            'soal_count' => $query->orderBy('soal_count', $sortDir),
+            'permission' => $query->orderByRaw("CASE permission WHEN 'public' THEN 1 WHEN 'shared' THEN 2 WHEN 'private' THEN 3 ELSE 4 END " . $sortDir),
+            default      => $query->orderBy('updated_at', $sortDir)->orderBy('id', 'desc'),
+        };
+
+        $bankSoal = $query->paginate($request->per_page ?? 10);
 
         $data = collect($bankSoal->items())->map(fn($item) => [
             'id'             => $item->id,

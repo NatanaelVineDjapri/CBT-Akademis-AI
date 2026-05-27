@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Users, AlertTriangle, Clock, MonitorPlay } from "lucide-react";
+import { ChevronLeft, Users, AlertTriangle, Clock, MonitorPlay, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -15,6 +15,24 @@ import { useMonitoringConnection } from "@/contexts/MonitoringConnectionContext"
 import { useDebounce } from "@/hooks/useDebounce";
 
 const PER_PAGE = 20;
+
+type SortBy = "nama" | "nim" | "violations" | "risk_score";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort, center }: {
+  label: string; col: SortBy; sortBy: SortBy; sortDir: SortDir; onSort: (col: SortBy) => void; center?: boolean;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`px-4 py-3 font-medium cursor-pointer select-none whitespace-nowrap ${center ? "text-center" : "text-left px-5"}`} onClick={() => onSort(col)}>
+      <span className={`flex items-center gap-1 ${center ? "justify-center" : ""}`}>
+        {label}
+        <Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} />
+      </span>
+    </th>
+  );
+}
 
 const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
   sedang_berlangsung: { label: "Aktif",       bg: "var(--color-warning-light)",  color: "var(--color-warning)"  },
@@ -51,7 +69,16 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
 
   const [search, setSearch]         = useState("");
   const [page, setPage]             = useState(1);
+  const [sortBy, setSortBy]         = useState<SortBy>("risk_score");
+  const [sortDir, setSortDir]       = useState<SortDir>("desc");
   const debouncedSearch             = useDebounce(search);
+
+  const handleSort = (col: SortBy) => {
+    const newDir: SortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : (col === "violations" || col === "risk_score" ? "desc" : "asc");
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
 
   const { data: listData } = useSWR("/ujian/dosen/monitoring", getMonitoringList);
   const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === slug);
@@ -95,8 +122,16 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
     (p.nama ?? "").toLowerCase().includes(q) ||
     (p.nim  ?? "").toLowerCase().includes(q)
   );
-  const lastPage = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const paged    = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const sorted = [...filtered].sort((a, b) => {
+    let cmp = 0;
+    if (sortBy === "nama") cmp = (a.nama ?? "").localeCompare(b.nama ?? "", "id");
+    else if (sortBy === "nim") cmp = (a.nim ?? "").localeCompare(b.nim ?? "", "id");
+    else if (sortBy === "violations") cmp = a.violations - b.violations;
+    else cmp = a.risk_score - b.risk_score;
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+  const lastPage = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
+  const paged    = sorted.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
     <div className="flex flex-col gap-4 pb-6">
@@ -163,12 +198,12 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
             <thead className="sticky top-0 bg-white">
               <tr className="text-xs text-gray-400 border-b border-gray-100">
                 <th className="text-left px-5 py-3 font-medium w-12">#</th>
-                <th className="text-left px-5 py-3 font-medium">Nama</th>
-                <th className="text-left px-5 py-3 font-medium">NIM</th>
+                <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="NIM" col="nim" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-center px-4 py-3 font-medium">Status</th>
                 <th className="text-center px-4 py-3 font-medium">Progress</th>
-                <th className="text-center px-4 py-3 font-medium">Pelanggaran</th>
-                <th className="px-5 py-3 font-medium">Risk Score</th>
+                <ColHeader label="Pelanggaran" col="violations" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} center />
+                <ColHeader label="Risk Score" col="risk_score" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -212,7 +247,7 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
       <Pagination
         currentPage={page}
         lastPage={lastPage}
-        total={filtered.length}
+        total={sorted.length}
         perPage={PER_PAGE}
         onPageChange={setPage}
       />

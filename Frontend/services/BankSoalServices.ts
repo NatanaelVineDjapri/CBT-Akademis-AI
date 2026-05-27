@@ -10,6 +10,8 @@ export const getBankSoal = async (params?: {
   search?: string;
   page?: number;
   per_page?: number;
+  sort_by?: "nama" | "soal_count" | "updated_at" | "permission";
+  sort_dir?: "asc" | "desc";
 }): Promise<BankSoalResponse> => {
   const res = await api.get("/bank-soal", { params });
   return { data: res.data.data, meta: res.data.meta };
