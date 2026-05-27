@@ -9,10 +9,12 @@ import NilaiDetailSkeleton from "@/components/skeleton/NilaiDetailSkeleton";
 import JawabanPilihanGanda from "@/components/dashboard/mahasiswa/JawabanPilihanGanda";
 import JawabanCheckBox from "@/components/dashboard/mahasiswa/JawabanCheckbox";
 import {
+  getHasilUjianAdminUniversitas,
   getDetailPesertaAdminUniversitas,
   periksaEssayAdminUniversitas,
   resetEssayAdminUniversitas,
 } from "@/services/UjianServices";
+import { toSlug } from "@/utils/slug";
 import type { JawabanEssay } from "@/types";
 
 function JawabanEssayCard({
@@ -218,13 +220,18 @@ function JawabanEssayCard({
 export default function AdminDetailPesertaPMBPage({
   params,
 }: {
-  params: Promise<{ id: string; pesertaId: string }>;
+  params: Promise<{ slug: string; pesertaId: string }>;
 }) {
-  const { id, pesertaId } = use(params);
+  const { slug, pesertaId } = use(params);
+
+  const { data: listData } = useSWR("/ujian/admin-universitas/hasil/all", () => getHasilUjianAdminUniversitas({ per_page: 200 }));
+  const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === slug);
+  const ujianId = ujianMeta?.id ?? null;
+  const ujianIdStr = ujianId ? String(ujianId) : null;
 
   const { data, isLoading, mutate } = useSWR(
-    `/ujian/admin-universitas/hasil/${id}/peserta/${pesertaId}`,
-    () => getDetailPesertaAdminUniversitas(id, pesertaId),
+    ujianIdStr ? `/ujian/admin-universitas/hasil/${ujianIdStr}/peserta/${pesertaId}` : null,
+    () => getDetailPesertaAdminUniversitas(ujianIdStr!, pesertaId),
     { revalidateOnFocus: false }
   );
 
@@ -233,7 +240,7 @@ export default function AdminDetailPesertaPMBPage({
       <div className="shrink-0">
         <Breadcrumb
           overrides={
-            data ? { [id]: data.info.nama_ujian, [pesertaId]: data.info.nama_peserta } : undefined
+            data ? { [slug]: data.info.nama_ujian, [pesertaId]: data.info.nama_peserta } : undefined
           }
         />
       </div>
@@ -272,7 +279,7 @@ export default function AdminDetailPesertaPMBPage({
           {data.jawaban.essay.length > 0 && (
             <JawabanEssayCard
               data={data.jawaban.essay}
-              ujianId={id}
+              ujianId={ujianIdStr!}
               pesertaId={pesertaId}
               onSaved={() => mutate()}
             />

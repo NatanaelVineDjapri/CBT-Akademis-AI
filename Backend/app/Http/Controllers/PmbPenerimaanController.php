@@ -23,12 +23,13 @@ class PmbPenerimaanController extends Controller
 
     public function index(Request $request)
     {
-        $user  = $request->user();
+        $user    = $request->user();
+        $sortBy  = $request->input('sort_by', 'created_at');
+        $sortDir = in_array($request->input('sort_dir'), ['asc', 'desc']) ? $request->input('sort_dir') : 'asc';
+
         $query = User::where('role', 'peserta_mahasiswa_baru')
             ->where('universitas_id', $user->universitas_id)
-            ->with('prodi:id,nama,nim_prefix')
-            ->orderBy('created_at')
-            ->orderBy('id');
+            ->with('prodi:id,nama,nim_prefix');
 
         $search = $request->input('search');
         $tahun  = $request->input('tahun');
@@ -43,6 +44,22 @@ class PmbPenerimaanController extends Controller
 
         if ($tahun) {
             $query->whereYear('created_at', $tahun);
+        }
+
+        if ($sortBy === 'nilai_pmb') {
+            $subQuery = \DB::table('peserta_ujian')
+                ->join('nilai_akhirs', 'nilai_akhirs.peserta_ujian_id', '=', 'peserta_ujian.id')
+                ->join('ujian', 'ujian.id', '=', 'peserta_ujian.ujian_id')
+                ->where('ujian.jenis_ujian', 'pmb')
+                ->groupBy('peserta_ujian.user_id')
+                ->selectRaw('peserta_ujian.user_id, MAX(nilai_akhirs.nilai_total) as max_nilai');
+
+            $query->leftJoinSub($subQuery, 'pmb_scores', 'users.id', '=', 'pmb_scores.user_id')
+                  ->orderByRaw("pmb_scores.max_nilai {$sortDir} NULLS LAST")
+                  ->orderBy('users.id')
+                  ->select('users.*');
+        } else {
+            $query->orderBy('users.nama', $sortDir)->orderBy('users.id');
         }
 
         $perPage = min((int) ($request->input('per_page', 50)), 500);

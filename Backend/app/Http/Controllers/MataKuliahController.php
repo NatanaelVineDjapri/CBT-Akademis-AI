@@ -14,10 +14,19 @@ class MataKuliahController extends Controller
         $authUser = $request->user();
 
         $mataKuliah = MataKuliah::with('prodi.fakultas', 'dosenMatkul.user')
-            ->whereHas('prodi.fakultas.universitas', fn($q) => $q->where('id', $authUser->universitas_id))
+            ->where(fn($q) => $q
+                ->whereHas('prodi.fakultas.universitas', fn($q2) => $q2->where('id', $authUser->universitas_id))
+                ->orWhere('universitas_id', $authUser->universitas_id)
+            )
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
-            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('kode', 'like', '%' . $request->search . '%'))
+            ->when($request->search, function ($q) use ($request) {
+                $term = '%' . strtolower($request->search) . '%';
+                $q->where(fn($q2) => $q2
+                    ->whereRaw('LOWER(nama) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(kode) LIKE ?', [$term])
+                );
+            })
+            ->orderByRaw('LOWER(nama)')
             ->paginate($request->per_page ?? 10);
 
         return response()->json([
@@ -143,23 +152,28 @@ class MataKuliahController extends Controller
         $request->validate([
             'nama'     => 'required|string|max:255',
             'kode'     => 'required|string|unique:mata_kuliah,kode',
-            'prodi_id' => 'required|exists:prodi,id',
+            'prodi_id' => 'nullable|exists:prodi,id',
             'semester' => 'nullable|integer|min:1|max:8',
             'sks'      => 'nullable|integer|min:1|max:6',
         ], [
-            'nama.required'     => 'Nama mata kuliah wajib diisi!',
-            'kode.required'     => 'Kode mata kuliah wajib diisi!',
-            'kode.unique'       => 'Kode mata kuliah sudah digunakan!',
-            'prodi_id.required' => 'Prodi wajib dipilih!',
-            'prodi_id.exists'   => 'Prodi tidak ditemukan!',
+            'nama.required'   => 'Nama mata kuliah wajib diisi!',
+            'kode.required'   => 'Kode mata kuliah wajib diisi!',
+            'kode.unique'     => 'Kode mata kuliah sudah digunakan!',
+            'prodi_id.exists' => 'Prodi tidak ditemukan!',
         ]);
 
+        $prodiId = $request->prodi_id;
+        $universitasId = $prodiId
+            ? \App\Models\Prodi::find($prodiId)?->fakultas?->universitas_id
+            : $request->user()->universitas_id;
+
         $mataKuliah = MataKuliah::create([
-            'nama'     => $request->nama,
-            'kode'     => $request->kode,
-            'prodi_id' => $request->prodi_id,
-            'semester' => $request->semester,
-            'sks'      => $request->sks,
+            'nama'           => $request->nama,
+            'kode'           => $request->kode,
+            'prodi_id'       => $prodiId,
+            'universitas_id' => $universitasId,
+            'semester'       => $request->semester,
+            'sks'            => $request->sks,
         ]);
 
         BankSoal::create([

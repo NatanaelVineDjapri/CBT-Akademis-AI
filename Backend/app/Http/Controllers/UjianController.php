@@ -1128,14 +1128,21 @@ class UjianController extends Controller
         $authUser = $request->user();
         $search   = $request->query('search', '');
         $perPage  = (int) $request->query('per_page', 10);
+        $sortBy   = $request->query('sort_by', 'start_date');
+        $sortDir  = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';
         $now      = now();
+
+        $allowedSort = ['nama_ujian', 'start_date', 'jumlah_soal', 'jumlah_peserta'];
+        if (!in_array($sortBy, $allowedSort)) $sortBy = 'start_date';
 
         $query = Ujian::with(['ujianSetting'])
             ->withCount(['ujianSoal', 'pesertaUjian'])
             ->where('created_by', $authUser->id)
             ->where('jenis_ujian', 'pmb')
             ->when($search, fn($q) => $q->whereRaw('LOWER(nama_ujian) LIKE ?', ['%' . strtolower($search) . '%']))
-            ->orderBy('start_date', 'desc');
+            ->when($sortBy === 'jumlah_soal', fn($q) => $q->orderBy('ujian_soal_count', $sortDir))
+            ->when($sortBy === 'jumlah_peserta', fn($q) => $q->orderBy('peserta_ujian_count', $sortDir))
+            ->when(!in_array($sortBy, ['jumlah_soal', 'jumlah_peserta']), fn($q) => $q->orderBy($sortBy, $sortDir));
 
         $paginated = $query->paginate($perPage);
 
@@ -1564,9 +1571,9 @@ class UjianController extends Controller
     {
         $authUser = $request->user();
 
-        // Create mode: mata_kuliah_id passed directly, skip ujian lookup
-        if ($request->has('mata_kuliah_id')) {
-            $matkulId   = (int) $request->query('mata_kuliah_id');
+        // Create mode (id=0): mata_kuliah_id passed directly or PMB (no mata_kuliah_id)
+        if ($request->has('mata_kuliah_id') || $id == 0) {
+            $matkulId   = $request->has('mata_kuliah_id') ? (int) $request->query('mata_kuliah_id') : null;
             $excludeIds = $request->query('exclude_ids')
                 ? array_map('intval', explode(',', $request->query('exclude_ids')))
                 : [];
@@ -1577,7 +1584,7 @@ class UjianController extends Controller
         }
 
         $query = Soal::with(['jenisSoal', 'bab:id,nama_bab', 'bankSoal:id,nama'])
-            ->where('mata_kuliah_id', $matkulId)
+            ->when($matkulId !== null, fn($q) => $q->where('mata_kuliah_id', $matkulId))
             ->whereNotIn('id', $excludeIds)
             ->whereHas('bankSoal', fn($bq) => $bq
                 ->where('created_by', $authUser->id)
@@ -1669,7 +1676,7 @@ class UjianController extends Controller
 
         $existingSoalIds = UjianSoal::where('ujian_id', $ujian->id)->pluck('soal_id');
 
-        $query = Soal::where('mata_kuliah_id', $ujian->mata_kuliah_id)
+        $query = Soal::when($ujian->mata_kuliah_id !== null, fn($q) => $q->where('mata_kuliah_id', $ujian->mata_kuliah_id))
             ->whereNotIn('id', $existingSoalIds)
             ->whereHas('bankSoal', fn($bq) => $bq
                 ->where('created_by', $authUser->id)

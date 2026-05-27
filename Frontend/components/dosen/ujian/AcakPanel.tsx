@@ -27,7 +27,7 @@ export default function AcakPanel({
 
   const { data: bankSoalData } = useSWR(
     matkulId ? ["/bank-soal/acak", matkulId] : "/bank-soal/acak-all",
-    () => api.get("/bank-soal", { params: { mata_kuliah_id: matkulId, per_page: 100 } }).then(r => r.data.data ?? []),
+    () => api.get("/bank-soal", { params: { ...(matkulId ? { mata_kuliah_id: matkulId } : {}), per_page: 100 } }).then(r => r.data.data ?? []),
     { revalidateOnFocus: false },
   );
   const bankSoalOptions: BankSoalOption[] = bankSoalData ?? [];

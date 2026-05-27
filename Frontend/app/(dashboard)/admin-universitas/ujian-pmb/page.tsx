@@ -10,7 +10,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
 import api from "@/services/api";
 import UjianModal from "@/components/dosen/ujian/UjianModal";
-import UjianTable from "@/components/ujian/UjianTable";
+import UjianTable, { type UjianSortBy, type UjianSortDir } from "@/components/ujian/UjianTable";
 import ConfirmModal from "@/components/ConfirmModal";
 import { EMPTY_FORM } from "@/components/dosen/ujian/types";
 import type { UjianItem, UjianForm } from "@/components/dosen/ujian/types";
@@ -21,17 +21,26 @@ const API_PATH = "/ujian/pmb";
 export default function AdminUjianPmbPage() {
   const [search, setSearch]               = useState("");
   const [page, setPage]                   = useState(1);
+  const [sortBy, setSortBy]               = useState<UjianSortBy>("start_date");
+  const [sortDir, setSortDir]             = useState<UjianSortDir>("desc");
   const [modal, setModal]                 = useState<{ mode: "create" | "edit"; form: UjianForm } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<UjianItem | null>(null);
   const [deleting, setDeleting]           = useState(false);
   const debouncedSearch                   = useDebounce(search);
   const perPage                           = usePerPage(53, 1, 450);
 
+  const handleSort = (col: UjianSortBy) => {
+    const newDir: UjianSortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : (col === "start_date" ? "desc" : "asc");
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
+
   useEffect(() => { setPage(1); }, [debouncedSearch, perPage]);
 
   const { data, isLoading, mutate } = useSWR(
-    [API_PATH, page, debouncedSearch, perPage],
-    () => api.get(API_PATH, { params: { page, per_page: perPage, search: debouncedSearch } }).then(r => r.data),
+    [API_PATH, page, debouncedSearch, perPage, sortBy, sortDir],
+    () => api.get(API_PATH, { params: { page, per_page: perPage, search: debouncedSearch, sort_by: sortBy, sort_dir: sortDir } }).then(r => r.data),
     { keepPreviousData: true, revalidateOnFocus: false }
   );
 
@@ -104,6 +113,9 @@ export default function AdminUjianPmbPage() {
             meta={meta}
             onEdit={openEdit}
             onDelete={setConfirmDelete}
+            sortBy={sortBy}
+            sortDir={sortDir}
+            onSort={handleSort}
           />
         </div>
       </div>

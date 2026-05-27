@@ -9,6 +9,7 @@ import Pagination from "@/components/filtering/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
 import { getHasilUjianAdminUniversitas, getDetailUjianAdminUniversitas } from "@/services/UjianServices";
+import { toSlug } from "@/utils/slug";
 import HasilUjianTable from "@/components/ujian/HasilUjianTable";
 import type { HasilUjianDosenItem, UjianMeta } from "@/types";
 import type { SortBy, SortDir } from "@/components/ujian/HasilUjianTable";
@@ -85,7 +86,7 @@ export default function AdminHasilUjianPMBPage() {
           sortBy={sortBy}
           sortDir={sortDir}
           onSort={handleSort}
-          getDetailHref={id => `/admin-universitas/hasil-ujian-pmb/${id}`}
+          getDetailHref={(_, nama) => `/admin-universitas/hasil-ujian-pmb/${toSlug(nama)}`}
           onRowMouseEnter={id => preload(`/ujian/admin-universitas/hasil/${id}`, () => getDetailUjianAdminUniversitas(id))}
           emptyMessage="Belum ada data ujian PMB."
         />

@@ -25,7 +25,7 @@ export const getMyMataKuliah = async (params?: {
 export const createMataKuliah = async (payload: {
   nama: string;
   kode: string;
-  prodi_id: number;
+  prodi_id: number | null;
   semester?: number | null;
   sks?: number | null;
 }): Promise<MataKuliah> => {
@@ -35,7 +35,7 @@ export const createMataKuliah = async (payload: {
 
 export const updateMataKuliah = async (
   id: number,
-  payload: Partial<{ nama: string; kode: string; prodi_id: number; semester: number | null; sks: number | null }>
+  payload: Partial<{ nama: string; kode: string; prodi_id: number | null; semester: number | null; sks: number | null }>
 ): Promise<MataKuliah> => {
   const res = await api.put(`/mata-kuliah/${id}`, payload);
   return res.data.data;

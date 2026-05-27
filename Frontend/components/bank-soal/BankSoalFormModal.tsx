@@ -68,10 +68,7 @@ export default function BankSoalFormModal({
       setError("Mata kuliah wajib dipilih.");
       return;
     }
-    if (!babId) {
-      setError("Bab wajib dipilih.");
-      return;
-    }
+
     setLoading(true);
     setError("");
     try {
@@ -138,13 +135,13 @@ export default function BankSoalFormModal({
           </div>
 
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Bab <span className="text-red-400">*</span></label>
+            <label className="text-sm text-gray-600 mb-1 block">Bab</label>
             {!mataKuliahId ? (
               <div className={inputClass + " text-gray-400 bg-gray-50"}>Pilih mata kuliah terlebih dahulu.</div>
             ) : loadingBab ? (
               <div className={inputClass + " text-gray-400 bg-gray-50"}>Memuat bab...</div>
             ) : babOptions.length === 0 ? (
-              <div className={inputClass + " text-gray-400 bg-gray-50"}>Tidak ada bab untuk mata kuliah ini.</div>
+              <div className={inputClass + " text-gray-400 bg-gray-50"}>Tidak ada bab (opsional).</div>
             ) : (
               <select
                 value={babId ?? ""}

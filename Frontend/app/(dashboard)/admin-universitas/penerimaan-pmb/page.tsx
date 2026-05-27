@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import useSWR from "swr";
-import { CheckCircle, XCircle, Loader2, Wand2 } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Wand2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import ConfirmModal from "@/components/ConfirmModal";
 import Pagination from "@/components/filtering/Pagination";
@@ -15,6 +15,22 @@ import { useUser } from "@/context/UserContext";
 import type { PmbPesertaItem, PmbNimSequences } from "@/types";
 
 type RowStatus = "pending" | "diterima" | "ditolak";
+type PesertaSortBy = "nama" | "nilai_pmb";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: PesertaSortBy; sortBy: PesertaSortBy; sortDir: SortDir;
+  onSort: (col: PesertaSortBy) => void; className?: string;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap ${className ?? ""}`}
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
 
 interface RowState {
   status: RowStatus;
@@ -25,10 +41,19 @@ export default function PenerimaanPMBPage() {
   useUser();
   const tahunSekarang = new Date().getFullYear();
 
-  const [tahun, setTahun]   = useState(tahunSekarang);
-  const [search, setSearch] = useState("");
-  const [page, setPage]     = useState(1);
-  const perPage             = usePerPage(53, 1, 455);
+  const [tahun, setTahun]     = useState(tahunSekarang);
+  const [search, setSearch]   = useState("");
+  const [page, setPage]       = useState(1);
+  const [sortBy, setSortBy]   = useState<PesertaSortBy>("nama");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const perPage               = usePerPage(53, 1, 455);
+
+  const handleSort = (col: PesertaSortBy) => {
+    const newDir: SortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : (col === "nilai_pmb" ? "desc" : "asc");
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
   const [rows, setRows]     = useState<Record<number, RowState>>({});
   const [showConfirm, setShowConfirm]     = useState(false);
   const [processing, setProcessing]       = useState(false);
@@ -45,15 +70,15 @@ export default function PenerimaanPMBPage() {
   const nimSequencesRef = useRef<PmbNimSequences>({});
   const nimAssignedRef  = useRef<Record<string, number>>({});
 
-  useEffect(() => { setPage(1); }, [debouncedSearch, tahun, perPage]);
+  useEffect(() => { setPage(1); }, [debouncedSearch, tahun, perPage, sortBy, sortDir]);
 
   // Reset counter lokal saat tahun ganti
   useEffect(() => { nimAssignedRef.current = {}; }, [tahun]);
 
   const { data, isLoading, mutate } = useSWR(
-    ["/pmb/penerimaan/peserta", debouncedSearch, tahun, page, perPage],
-    ([, s, t, p, pp]: [string, string, number, number, number]) =>
-      getPmbPeserta({ search: s, tahun: t, page: p, per_page: pp }),
+    ["/pmb/penerimaan/peserta", debouncedSearch, tahun, page, perPage, sortBy, sortDir],
+    ([, s, t, p, pp, sb, sd]: [string, string, number, number, number, string, string]) =>
+      getPmbPeserta({ search: s, tahun: t, page: p, per_page: pp, sort_by: sb, sort_dir: sd }),
     { revalidateOnFocus: false, keepPreviousData: true }
   );
 
@@ -299,12 +324,12 @@ export default function PenerimaanPMBPage() {
             <thead className="sticky top-0 bg-white z-10">
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Nama</th>
+                <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-44" />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-48">Email</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Tahun Masuk</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">Prodi</th>
-                <th className="text-right text-xs text-gray-400 font-medium px-4 py-3 w-24">Nilai PMB</th>
+                <ColHeader label="Nilai PMB" col="nilai_pmb" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-24" />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Status</th>
               </tr>
             </thead>

@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, CalendarDays, Clock, Users, Pencil, Trash2 } from "lucide-react";
+import { BookOpen, CalendarDays, Clock, Users, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toSlug } from "@/utils/slug";
 import { StatusBadge, fmt } from "@/components/dosen/ujian/constants";
 import EmptyState from "@/components/EmptyState";
 import type { UjianItem } from "@/components/dosen/ujian/types";
+
+export type UjianSortBy = "nama_ujian" | "start_date" | "jumlah_soal" | "jumlah_peserta";
+export type UjianSortDir = "asc" | "desc";
 
 interface UjianTableProps {
   items: UjianItem[];
@@ -16,20 +19,38 @@ interface UjianTableProps {
   onDelete: (item: UjianItem) => void;
   basePath?: string;
   onRowHover?: (item: UjianItem) => void;
+  sortBy?: UjianSortBy;
+  sortDir?: UjianSortDir;
+  onSort?: (col: UjianSortBy) => void;
 }
 
-export default function UjianTable({ items, perPage, isLoading, meta, onEdit, onDelete, basePath, onRowHover }: UjianTableProps) {
+function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: UjianSortBy;
+  sortBy?: UjianSortBy; sortDir?: UjianSortDir;
+  onSort?: (col: UjianSortBy) => void; className?: string;
+}) {
+  if (!onSort) return <th className={`text-left text-xs text-gray-400 font-medium px-4 py-3 whitespace-nowrap ${className ?? ""}`}>{label}</th>;
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap ${className ?? ""}`} onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
+
+export default function UjianTable({ items, perPage, isLoading, meta, onEdit, onDelete, basePath, onRowHover, sortBy, sortDir, onSort }: UjianTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100">
             <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
-            <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama Ujian</th>
-            <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Jadwal</th>
+            <ColHeader label="Nama Ujian" col="nama_ujian" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+            <ColHeader label="Jadwal" col="start_date" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
             <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Durasi</th>
-            <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Soal</th>
-            <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Peserta</th>
+            <ColHeader label="Soal" col="jumlah_soal" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+            <ColHeader label="Peserta" col="jumlah_peserta" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
             <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Status</th>
             <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-16">Aksi</th>
           </tr>

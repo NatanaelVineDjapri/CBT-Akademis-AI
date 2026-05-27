@@ -11,6 +11,8 @@ export const getPmbPeserta = async (params?: {
   tahun?: number;
   per_page?: number;
   page?: number;
+  sort_by?: string;
+  sort_dir?: string;
 }): Promise<{ data: PmbPesertaItem[]; meta: PmbPesertaMeta; nim_sequences: PmbNimSequences }> => {
   const res = await api.get("/pmb/penerimaan/peserta", { params });
   return res.data;

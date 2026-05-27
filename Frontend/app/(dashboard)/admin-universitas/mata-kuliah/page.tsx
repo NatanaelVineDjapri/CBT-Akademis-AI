@@ -43,8 +43,8 @@ function MatkulFormModal({
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
-    if (!nama.trim() || !kode.trim() || !prodiId) {
-      setError("Nama, kode, dan prodi wajib diisi.");
+    if (!nama.trim() || !kode.trim()) {
+      setError("Nama dan kode wajib diisi.");
       return;
     }
     setLoading(true);
@@ -53,7 +53,7 @@ function MatkulFormModal({
       const payload = {
         nama: nama.trim(),
         kode: kode.trim(),
-        prodi_id: prodiId as number,
+        prodi_id: prodiId !== "" ? (prodiId as number) : null,
         semester: semester !== "" ? (semester as number) : null,
         sks: sks !== "" ? (sks as number) : null,
       };

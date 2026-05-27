@@ -31,8 +31,8 @@ export default function BuatPanel({
   const [error, setError]                       = useState("");
 
   const { data: bankSoalData } = useSWR(
-    simpanKeBankSoal && matkulId ? ["/bank-soal/matkul", matkulId] : null,
-    () => api.get("/bank-soal", { params: { mata_kuliah_id: matkulId, per_page: 100 } }).then(r => r.data.data ?? []),
+    simpanKeBankSoal ? ["/bank-soal/buat-panel", matkulId ?? "all"] : null,
+    () => api.get("/bank-soal", { params: { ...(matkulId ? { mata_kuliah_id: matkulId } : {}), per_page: 100 } }).then(r => r.data.data ?? []),
     { revalidateOnFocus: false },
   );
   const bankSoalOptions: BankSoalOption[] = bankSoalData ?? [];

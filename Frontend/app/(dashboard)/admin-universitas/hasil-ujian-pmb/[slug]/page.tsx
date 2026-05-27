@@ -10,14 +10,17 @@ import SearchInput from "@/components/filtering/SearchInput";
 import EmptyState from "@/components/EmptyState";
 import { preload } from "swr";
 import {
+  getHasilUjianAdminUniversitas,
   getDetailUjianAdminUniversitas,
   getDetailPesertaAdminUniversitas,
   exportHasilUjianPMBPDF,
   exportHasilUjianExcel,
 } from "@/services/UjianServices";
+import { toSlug } from "@/utils/slug";
 import DaftarSiswaTableSkeleton from "@/components/skeleton/DaftarSiswaTableSkeleton";
 import DistribusiJawabanTableSkeleton from "@/components/skeleton/DistribusiJawabanTableSkeleton";
-import type { HasilUjianPeserta, HasilUjianDistribusiItem } from "@/types";
+import AttemptOverlay from "@/components/ujian/AttemptOverlay";
+import type { HasilUjianPeserta, HasilUjianDistribusiItem, NilaiAttempt } from "@/types";
 
 type PesertaSortBy = "nama" | "nilai";
 type SortDir = "asc" | "desc";
@@ -57,12 +60,17 @@ function ColHeader({ label, col, sortBy, sortDir, onSort }: {
   );
 }
 
-export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+
+  const { data: listData } = useSWR("/ujian/admin-universitas/hasil/all", () => getHasilUjianAdminUniversitas({ per_page: 200 }));
+  const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === slug);
+  const ujianId = ujianMeta?.id ?? null;
+  const ujianIdStr = ujianId ? String(ujianId) : null;
 
   const { data } = useSWR(
-    `/ujian/admin-universitas/hasil/${id}`,
-    () => getDetailUjianAdminUniversitas(id),
+    ujianIdStr ? `/ujian/admin-universitas/hasil/${ujianIdStr}` : null,
+    () => getDetailUjianAdminUniversitas(ujianIdStr!),
     { revalidateOnFocus: false, revalidateIfStale: false }
   );
 
@@ -71,11 +79,13 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
   const [pesertaSortDir, setPesertaSortDir] = useState<SortDir>("asc");
   const [distribusiSearch, setDistribusiSearch] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [modal, setModal] = useState<{ nama: string; attempts: NilaiAttempt[] } | null>(null);
 
   const handleExportPDF = async () => {
+    if (!ujianIdStr) return;
     setDownloading(true);
     try {
-      await exportHasilUjianPMBPDF(id);
+      await exportHasilUjianPMBPDF(ujianIdStr);
     } finally {
       setDownloading(false);
     }
@@ -113,7 +123,7 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="shrink-0">
-        <Breadcrumb overrides={data ? { [id]: data.info.nama_ujian } : undefined} />
+        <Breadcrumb overrides={data ? { [slug]: data.info.nama_ujian } : undefined} />
       </div>
 
       {/* Daftar Peserta */}
@@ -160,6 +170,7 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
               <col />
               <col className="w-36" />
               <col className="w-28" />
+              <col className="w-24" />
             </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
@@ -167,11 +178,12 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
                 <ColHeader label="Nama Peserta" col="nama" sortBy={pesertaSortBy} sortDir={pesertaSortDir} onSort={handlePesertaSort} />
                 <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">Status</th>
                 <ColHeader label="Nilai" col="nilai" sortBy={pesertaSortBy} sortDir={pesertaSortDir} onSort={handlePesertaSort} />
+                <th className="text-left text-xs text-gray-400 font-bold px-4 py-3">Attempt</th>
               </tr>
             </thead>
             <tbody>
               {!data ? (
-                <DaftarSiswaTableSkeleton count={5} />
+                <DaftarSiswaTableSkeleton count={5} cols={5} />
               ) : pesertaFiltered.length === 0 ? null : (
                 pesertaFiltered.map((p, idx) => (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
@@ -179,14 +191,10 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
                     <td className="px-4 py-4 font-medium text-gray-800 truncate">
                       {p.nilai !== null ? (
                         <Link
-                          href={`/admin-universitas/hasil-ujian-pmb/${id}/${p.id}`}
+                          href={`/admin-universitas/hasil-ujian-pmb/${slug}/${p.id}`}
                           className="hover:underline"
                           style={{ color: "var(--color-primary)" }}
-                          onMouseEnter={() =>
-                            preload(`/ujian/admin-universitas/hasil/${id}/peserta/${p.id}`, () =>
-                              getDetailPesertaAdminUniversitas(id, p.id)
-                            )
-                          }
+                          onMouseEnter={() => ujianIdStr && preload(`/ujian/admin-universitas/hasil/${ujianIdStr}/peserta/${p.id}`, () => getDetailPesertaAdminUniversitas(ujianIdStr, p.id))}
                         >
                           {p.nama}
                         </Link>
@@ -201,6 +209,19 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
                         </span>
                       ) : (
                         <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      {(p.attempt_count ?? 1) > 1 ? (
+                        <button
+                          onClick={() => setModal({ nama: p.nama, attempts: p.attempts })}
+                          className="text-xs font-semibold px-2.5 py-1 rounded-full transition-colors hover:opacity-80"
+                          style={{ backgroundColor: "var(--color-primary-light)", color: "var(--color-primary)" }}
+                        >
+                          {p.attempt_count}x
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-300">1x</span>
                       )}
                     </td>
                   </tr>
@@ -270,6 +291,15 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
           )}
         </div>
       </div>
+
+      {modal && (
+        <AttemptOverlay
+          nama={modal.nama}
+          attempts={modal.attempts}
+          onClose={() => setModal(null)}
+          getDetailHref={id => `/admin-universitas/hasil-ujian-pmb/${slug}/${id}`}
+        />
+      )}
     </div>
   );
 }

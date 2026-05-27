@@ -7,7 +7,9 @@ import BankSoalTable from "@/components/bank-soal/BankSoalTable";
 import BankSoalSkeleton from "@/components/skeleton/BankSoalSkeleton";
 import BankSoalFormModal from "@/components/bank-soal/BankSoalFormModal";
 import BankSoalDeleteModal from "@/components/bank-soal/BankSoalDeleteModal";
+import ShareByEmailModal from "@/components/bank-soal/ShareByEmailModal";
 import { useDebounce } from "@/hooks/useDebounce";
+import { usePerPage } from "@/hooks/usePerPage";
 import {
   getBankSoal,
   createBankSoal,
@@ -20,19 +22,29 @@ import type { BankSoalItem } from "@/types";
 export default function AdminBankSoalPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<"nama" | "soal_count" | "updated_at" | "permission">("updated_at");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const debouncedSearch = useDebounce(search);
+  const perPage = usePerPage(57, 1, 530);
 
-  useEffect(() => { setPage(1); }, [debouncedSearch]);
+  const handleSort = (col: typeof sortBy) => {
+    const newDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : (col === "updated_at" ? "desc" : "asc");
+    setSortBy(col);
+    setSortDir(newDir);
+    setPage(1);
+  };
+
+  useEffect(() => { setPage(1); }, [debouncedSearch, perPage]);
 
   const { data, mutate } = useSWR(
-    ["/bank-soal", debouncedSearch, page],
-    ([, s, p]: [string, string, number]) => getBankSoal({ search: s, page: p, per_page: 10 }),
+    ["/bank-soal", debouncedSearch, page, perPage, sortBy, sortDir],
+    () => getBankSoal({ search: debouncedSearch, page, per_page: perPage, sort_by: sortBy, sort_dir: sortDir }),
     { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
   );
 
   const { data: mkData } = useSWR(
-    "/mata-kuliah",
-    () => getMataKuliah({ per_page: 100 }),
+    "/mata-kuliah/all",
+    () => getMataKuliah({ per_page: 500 }),
     { revalidateOnFocus: false }
   );
   const mataKuliahOptions = mkData?.data ?? [];
@@ -40,6 +52,8 @@ export default function AdminBankSoalPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [editItem, setEditItem] = useState<BankSoalItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<BankSoalItem | null>(null);
+  const [shareItem, setShareItem] = useState<BankSoalItem | null>(null);
+  const [shareLink, setShareLink] = useState<string | undefined>();
 
   const handleCreate = async (formData: Parameters<typeof createBankSoal>[0]) => {
     await createBankSoal(formData);
@@ -73,7 +87,11 @@ export default function AdminBankSoalPage() {
           onPageChange={setPage}
           onEdit={(item) => setEditItem(item)}
           onDelete={(item) => setDeleteItem(item)}
+          onShare={(item, link) => { setShareItem(item); setShareLink(link); }}
           canEdit={true}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          onSort={handleSort}
           onTambah={() => setShowCreate(true)}
           basePath="/admin-universitas/bank-soal-pmb"
         />
@@ -103,6 +121,14 @@ export default function AdminBankSoalPage() {
           item={deleteItem}
           onClose={() => setDeleteItem(null)}
           onConfirm={handleDelete}
+        />
+      )}
+
+      {shareItem && (
+        <ShareByEmailModal
+          item={shareItem}
+          onClose={() => { setShareItem(null); setShareLink(undefined); }}
+          initialLink={shareLink}
         />
       )}
     </div>
