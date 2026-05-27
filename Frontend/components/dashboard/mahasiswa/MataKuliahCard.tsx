@@ -4,7 +4,8 @@ import { preload } from "swr";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import type { MataKuliah } from "@/types";
-import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
+import { getMyMataKuliah, getMyMataKuliahDetail } from "@/services/MataKuliahServices";
+import { toSlug } from "@/utils/slug";
 
 export default function MataKuliahCard({ mk }: { mk: MataKuliah }) {
   const dosenNama = mk.dosen_matkul?.[0]?.user?.nama ?? "-";
@@ -30,10 +31,13 @@ export default function MataKuliahCard({ mk }: { mk: MataKuliah }) {
         </div>
       </div>
       <Link
-        href={`/mahasiswa/mata-kuliah/${mk.id}`}
+        href={`/mahasiswa/mata-kuliah/${toSlug(mk.nama)}`}
         className="mt-auto w-full py-2 rounded-lg text-white text-xs font-medium text-center"
         style={{ background: "var(--color-primary)" }}
-        onMouseEnter={() => preload(`/mata-kuliah/my/${mk.id}`, () => getMyMataKuliahDetail(String(mk.id)))}
+        onMouseEnter={() => {
+          preload("/mata-kuliah/my/all", () => getMyMataKuliah({ per_page: 200 }));
+          preload(`/mata-kuliah/my/${mk.id}`, () => getMyMataKuliahDetail(String(mk.id)));
+        }}
       >
         Telusuri Bank Soal Terkait
       </Link>

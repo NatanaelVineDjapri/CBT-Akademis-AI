@@ -71,6 +71,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::post('/ujian/selesai', [UjianController::class, 'selesaiUjian']);
     });
     Route::prefix('bank-soal')->group(function () {
+        Route::get('/my', [BankSoalController::class, 'myList']);
         Route::get('/global', [BankSoalController::class, 'global']);
         Route::get('/global/{id}', [BankSoalController::class, 'showGlobal']);
         Route::get('/{id}/soal', [BankSoalController::class, 'soal']);

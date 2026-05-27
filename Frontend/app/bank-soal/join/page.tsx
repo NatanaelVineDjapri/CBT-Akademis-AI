@@ -15,7 +15,7 @@ const rolePrefix: Record<string, string> = {
   peserta_mahasiswa_baru: "/pmb",
 };
 
-const slugRoles = new Set(["dosen", "admin_universitas_pmb"]);
+const slugRoles = new Set(["dosen", "admin_universitas_pmb", "mahasiswa"]);
 
 const bankSoalPath = (role: string, id: number, nama: string) =>
   slugRoles.has(role)

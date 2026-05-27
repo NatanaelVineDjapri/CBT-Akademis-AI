@@ -7,7 +7,7 @@ import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
 import { getBankSoal, getBankSoalSoal, deleteSoal } from "@/services/BankSoalServices";
-import type { SoalItem } from "@/services/BankSoalServices";
+import type { SoalItem, SoalSortBy, SoalSortDir } from "@/services/BankSoalServices";
 import ConfirmModal from "@/components/ConfirmModal";
 import AddSoalModal from "@/components/soal/AddSoalModal";
 import { Plus, Sparkles } from "lucide-react";
@@ -21,12 +21,20 @@ interface Props {
 export default function DaftarSoalPage({ params }: Props) {
   const { slug } = use(params);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SoalSortBy>("deskripsi");
+  const [sortDir, setSortDir] = useState<SoalSortDir>("asc");
   const [showGenerateAI, setShowGenerateAI] = useState(false);
   const [showAddSoal, setShowAddSoal] = useState(false);
   const [editingSoal, setEditingSoal] = useState<SoalItem | null>(null);
   const [deletingSoal, setDeletingSoal] = useState<SoalItem | null>(null);
   const [deleting, setDeleting] = useState(false);
   const debouncedSearch = useDebounce(search);
+
+  const handleSort = (col: SoalSortBy) => {
+    const newDir: SoalSortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(col);
+    setSortDir(newDir);
+  };
 
   const { data: allBankSoal } = useSWR(
     "/bank-soal/all",
@@ -36,9 +44,11 @@ export default function DaftarSoalPage({ params }: Props) {
 
   const bankSoalId = allBankSoal?.data.find(item => toSlug(item.nama) === slug)?.id;
 
+  const swrKey = bankSoalId ? ["/bank-soal", String(bankSoalId), "soal", debouncedSearch, sortBy, sortDir] : null;
+
   const { data, isLoading } = useSWR(
-    bankSoalId ? ["/bank-soal", String(bankSoalId), "soal", debouncedSearch] : null,
-    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch }),
+    swrKey,
+    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch, sort_by: sortBy, sort_dir: sortDir }),
     { revalidateOnFocus: false }
   );
 
@@ -51,7 +61,7 @@ export default function DaftarSoalPage({ params }: Props) {
     setDeleting(true);
     try {
       await deleteSoal(deletingSoal.id);
-      mutate(["/bank-soal", String(bankSoalId), "soal", debouncedSearch]);
+      mutate(swrKey);
       setDeletingSoal(null);
     } finally {
       setDeleting(false);
@@ -99,14 +109,23 @@ export default function DaftarSoalPage({ params }: Props) {
           </div>
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading || !bankSoalId} canEdit={canEdit} onEdit={setEditingSoal} onDelete={(s) => setDeletingSoal(s)} />
+        <SoalTable
+          soalList={soalList}
+          isLoading={isLoading || !bankSoalId}
+          canEdit={canEdit}
+          onEdit={setEditingSoal}
+          onDelete={(s) => setDeletingSoal(s)}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          onSort={handleSort}
+        />
 
         {(showAddSoal || editingSoal) && bankSoal && (
           <AddSoalModal
             bankSoal={bankSoal}
             soal={editingSoal ?? undefined}
             onClose={() => { setShowAddSoal(false); setEditingSoal(null); }}
-            onSaved={() => mutate(["/bank-soal", String(bankSoalId), "soal", debouncedSearch])}
+            onSaved={() => mutate(swrKey)}
           />
         )}
 
@@ -123,7 +142,7 @@ export default function DaftarSoalPage({ params }: Props) {
           <GenerateAIModal
             bankSoalId={String(bankSoalId)}
             onClose={() => setShowGenerateAI(false)}
-            onSaved={() => mutate(["/bank-soal", String(bankSoalId), "soal", debouncedSearch])}
+            onSaved={() => mutate(swrKey)}
           />
         )}
       </div>

@@ -7,6 +7,7 @@ import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import SoalTable from "@/components/soal/SoalTable";
 import { getBankSoalGlobal, getBankSoalSoal } from "@/services/BankSoalServices";
+import type { SoalSortBy, SoalSortDir } from "@/services/BankSoalServices";
 import { toSlug } from "@/utils/slug";
 
 interface Props {
@@ -16,7 +17,15 @@ interface Props {
 export default function GlobalBabSoalPage({ params }: Props) {
   const { slug, bab } = use(params);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SoalSortBy>("deskripsi");
+  const [sortDir, setSortDir] = useState<SoalSortDir>("asc");
   const debouncedSearch = useDebounce(search);
+
+  const handleSort = (col: SoalSortBy) => {
+    const newDir: SoalSortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : "asc";
+    setSortBy(col);
+    setSortDir(newDir);
+  };
 
   const { data: allGlobal } = useSWR(
     "/bank-soal/global/all",
@@ -28,8 +37,8 @@ export default function GlobalBabSoalPage({ params }: Props) {
   const bankSoalId = bankSoalItem?.id;
 
   const { data, isLoading } = useSWR(
-    bankSoalId ? ["/bank-soal", bankSoalId, "soal", bab, debouncedSearch] : null,
-    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch }),
+    bankSoalId ? ["/bank-soal", bankSoalId, "soal", bab, debouncedSearch, sortBy, sortDir] : null,
+    () => getBankSoalSoal(bankSoalId!, { search: debouncedSearch, sort_by: sortBy, sort_dir: sortDir }),
     { revalidateOnFocus: false }
   );
 
@@ -64,7 +73,13 @@ export default function GlobalBabSoalPage({ params }: Props) {
           <SearchInput value={search} onChange={setSearch} placeholder="Search" />
         </div>
 
-        <SoalTable soalList={soalList} isLoading={isLoading || !bankSoalId} />
+        <SoalTable
+          soalList={soalList}
+          isLoading={isLoading || !bankSoalId}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          onSort={handleSort}
+        />
       </div>
     </div>
   );

@@ -7,33 +7,43 @@ import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useDebounce } from "@/hooks/useDebounce";
 import SearchInput from "@/components/filtering/SearchInput";
-import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
+import { getMyMataKuliah, getMyMataKuliahDetail } from "@/services/MataKuliahServices";
 import { getBankSoalGlobal, getBankSoalSoal } from "@/services/BankSoalServices";
 import { toSlug } from "@/utils/slug";
 
 interface Props {
-  params: Promise<{ id: string; babId: string }>;
+  params: Promise<{ matkul: string; bab: string }>;
 }
 
 export default function MahasiswaBabBankSoalPage({ params }: Props) {
-  const { id, babId } = use(params);
+  const { matkul, bab } = use(params);
   const router = useRouter();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
 
-  const { data: matkul } = useSWR(
-    `/mata-kuliah/my/${id}`,
-    () => getMyMataKuliahDetail(id),
+  const { data: allMatkul } = useSWR(
+    "/mata-kuliah/my/all",
+    () => getMyMataKuliah({ per_page: 200 }),
+    { revalidateOnFocus: false, revalidateIfStale: false }
+  );
+
+  const matkulId = allMatkul?.data.find(m => toSlug(m.nama) === matkul)?.id;
+
+  const { data: matkulDetail } = useSWR(
+    matkulId ? `/mata-kuliah/my/${matkulId}` : null,
+    () => getMyMataKuliahDetail(matkulId!),
     { revalidateOnFocus: false }
   );
+
+  const babItem = matkulDetail?.bab.find(b => toSlug(b.nama_bab) === bab);
+  const babId = babItem?.id;
 
   const { data, isLoading } = useSWR(
-    ["/bank-soal/global", id, babId, debouncedSearch],
-    () => getBankSoalGlobal({ mata_kuliah_id: Number(id), bab_id: Number(babId), search: debouncedSearch }),
+    matkulId && babId ? ["/bank-soal/global", matkulId, babId, debouncedSearch] : null,
+    () => getBankSoalGlobal({ mata_kuliah_id: matkulId, bab_id: babId, search: debouncedSearch }),
     { revalidateOnFocus: false }
   );
 
-  const bab = matkul?.bab.find((b) => String(b.id) === babId);
   const bankSoalList = data?.data ?? [];
 
   return (
@@ -47,10 +57,10 @@ export default function MahasiswaBabBankSoalPage({ params }: Props) {
           <ChevronLeft size={16} /> Kembali
         </button>
         <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
-          {bab?.nama_bab ?? "Daftar Bank Soal"}
+          {babItem?.nama_bab ?? "Daftar Bank Soal"}
         </h1>
-        {matkul && (
-          <p className="text-sm text-gray-500 mt-1">{matkul.nama}</p>
+        {matkulDetail && (
+          <p className="text-sm text-gray-500 mt-1">{matkulDetail.nama}</p>
         )}
       </div>
 
@@ -74,7 +84,7 @@ export default function MahasiswaBabBankSoalPage({ params }: Props) {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading || !babId ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <tr key={i} className="border-b border-gray-50 animate-pulse">
                     <td className="px-5 py-3"><div className="h-3 w-6 bg-gray-100 rounded" /></td>
@@ -102,7 +112,7 @@ export default function MahasiswaBabBankSoalPage({ params }: Props) {
                     <td className="px-5 py-3 text-xs text-gray-400">{String(idx + 1).padStart(2, "0")}</td>
                     <td className="px-4 py-3">
                       <Link
-                        href={`/mahasiswa/mata-kuliah/${id}/${babId}/${toSlug(bs.nama)}`}
+                        href={`/mahasiswa/mata-kuliah/${matkul}/${bab}/${toSlug(bs.nama)}`}
                         className="flex items-center gap-2 group"
                       >
                         <BookOpen size={13} className="text-gray-300 shrink-0" />

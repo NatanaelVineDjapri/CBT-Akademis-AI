@@ -60,6 +60,17 @@ class BankSoalController extends Controller
         ], 200);
     }
 
+    public function myList(Request $request)
+    {
+        $authUser = $request->user();
+        $data = BankSoal::where(function ($q) use ($authUser) {
+            $q->where('created_by', $authUser->id)
+              ->orWhereHas('sharedUsers', fn($q) => $q->where('user_id', $authUser->id));
+        })->select('id', 'nama')->get();
+
+        return response()->json(['data' => $data]);
+    }
+
     public function global(Request $request)
     {
         $bankSoal = BankSoal::with(['mataKuliah.bab', 'creator.universitas'])->withCount('soal')
@@ -143,17 +154,45 @@ class BankSoalController extends Controller
                 ->where('user_id', $authUser->id)
                 ->exists());
 
-        $soal = Soal::with(['jenisSoal.opsiJawaban', 'mediaSoal', 'bab'])
+        $sortKey = $request->query('sort_by', 'created_at');
+        $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'asc';
+
+        $soalQuery = Soal::with(['jenisSoal.opsiJawaban', 'mediaSoal', 'bab'])
             ->where('bank_soal_id', $id)
-            ->when($request->search, fn($q) => $q->whereRaw('LOWER(deskripsi) LIKE ?', ['%' . strtolower($request->search) . '%']))
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->when($request->search, fn($q) => $q->whereRaw('LOWER(deskripsi) LIKE ?', ['%' . strtolower($request->search) . '%']));
+
+        match ($sortKey) {
+            'deskripsi'          => $soalQuery->orderByRaw('LOWER(deskripsi) ' . $sortDir),
+            'tingkat_kesulitan'  => $soalQuery->orderByRaw(
+                "CASE tingkat_kesulitan WHEN 'mudah' THEN 1 WHEN 'sedang' THEN 2 WHEN 'sulit' THEN 3 ELSE 4 END " . $sortDir
+            ),
+            default              => $soalQuery->orderBy('created_at', $sortDir),
+        };
+
+        $page = (int) $request->query('page', 0);
+
+        if ($page > 0) {
+            $perPage = (int) $request->query('per_page', 10);
+            $paginated = $soalQuery->paginate($perPage);
+            return response()->json([
+                'message'   => 'Data soal berhasil diambil!',
+                'can_edit'  => $canEdit,
+                'bank_soal' => $bankSoal,
+                'data'      => $paginated->items(),
+                'meta'      => [
+                    'current_page' => $paginated->currentPage(),
+                    'last_page'    => $paginated->lastPage(),
+                    'per_page'     => $paginated->perPage(),
+                    'total'        => $paginated->total(),
+                ],
+            ], 200);
+        }
 
         return response()->json([
-            'message' => 'Data soal berhasil diambil!',
-            'can_edit' => $canEdit,
+            'message'   => 'Data soal berhasil diambil!',
+            'can_edit'  => $canEdit,
             'bank_soal' => $bankSoal,
-            'data' => $soal,
+            'data'      => $soalQuery->get(),
         ], 200);
     }
 

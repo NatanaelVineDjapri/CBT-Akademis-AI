@@ -15,6 +15,11 @@ export const getBankSoal = async (params?: {
   return { data: res.data.data, meta: res.data.meta };
 };
 
+export const getBankSoalMy = async (): Promise<{ data: { id: number; nama: string }[] }> => {
+  const res = await api.get("/bank-soal/my");
+  return res.data;
+};
+
 export const getBankSoalGlobal = async (params?: {
   search?: string;
   page?: number;
@@ -53,13 +58,30 @@ export interface SoalItem {
   media_soal: { id: number; tipe: string; url: string }[];
 }
 
+export interface SoalMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export type SoalSortBy = 'deskripsi' | 'tingkat_kesulitan';
+export type SoalSortDir = 'asc' | 'desc';
+
 export interface BankSoalSoalResponse {
   can_edit: boolean;
   bank_soal: BankSoalItem;
   data: SoalItem[];
+  meta?: SoalMeta;
 }
 
-export const getBankSoalSoal = async (id: number, params?: { search?: string }): Promise<BankSoalSoalResponse> => {
+export const getBankSoalSoal = async (id: number, params?: {
+  search?: string;
+  page?: number;
+  per_page?: number;
+  sort_by?: SoalSortBy;
+  sort_dir?: SoalSortDir;
+}): Promise<BankSoalSoalResponse> => {
   const res = await api.get(`/bank-soal/${id}/soal`, { params });
   return res.data;
 };

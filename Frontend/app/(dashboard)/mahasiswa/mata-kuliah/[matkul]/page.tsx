@@ -5,18 +5,27 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BookOpen, ChevronLeft, ChevronRight, GraduationCap, Layers } from "lucide-react";
 import Link from "next/link";
-import { getMyMataKuliahDetail } from "@/services/MataKuliahServices";
+import { getMyMataKuliah, getMyMataKuliahDetail } from "@/services/MataKuliahServices";
 import { getBankSoalGlobal } from "@/services/BankSoalServices";
 import SearchInput from "@/components/filtering/SearchInput";
+import { toSlug } from "@/utils/slug";
 
 export default function MataKuliahDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { matkul } = useParams<{ matkul: string }>();
   const router = useRouter();
   const [search, setSearch] = useState("");
 
+  const { data: allMatkul } = useSWR(
+    "/mata-kuliah/my/all",
+    () => getMyMataKuliah({ per_page: 200 }),
+    { revalidateOnFocus: false, revalidateIfStale: false }
+  );
+
+  const matkulId = allMatkul?.data.find(m => toSlug(m.nama) === matkul)?.id;
+
   const { data, isLoading } = useSWR(
-    id ? `/mata-kuliah/my/${id}` : null,
-    () => getMyMataKuliahDetail(id),
+    matkulId ? `/mata-kuliah/my/${matkulId}` : null,
+    () => getMyMataKuliahDetail(matkulId!),
     { revalidateOnFocus: false }
   );
 
@@ -41,7 +50,7 @@ export default function MataKuliahDetailPage() {
       </div>
 
       {/* Info Card */}
-      {isLoading ? (
+      {isLoading || !matkulId ? (
         <div className="animate-pulse bg-white rounded-2xl border border-gray-100 p-5 h-24" />
       ) : data && (
         <div className="bg-white rounded-2xl border border-gray-100 p-5 flex items-start gap-4">
@@ -72,7 +81,7 @@ export default function MataKuliahDetailPage() {
         </div>
 
         <div className="p-5">
-          {isLoading ? (
+          {isLoading || !matkulId ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="animate-pulse rounded-xl px-4 py-3 flex items-center justify-between"
@@ -130,12 +139,12 @@ export default function MataKuliahDetailPage() {
                 return hasSoal ? (
                   <Link
                     key={bab.id}
-                    href={`/mahasiswa/mata-kuliah/${id}/${bab.id}`}
+                    href={`/mahasiswa/mata-kuliah/${matkul}/${toSlug(bab.nama_bab)}`}
                     className="flex items-center justify-between px-4 py-3 rounded-xl hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, white)" }}
-                    onMouseEnter={() => preload(
-                      ["/bank-soal/global", id, String(bab.id), ""],
-                      () => getBankSoalGlobal({ mata_kuliah_id: Number(id), bab_id: bab.id })
+                    onMouseEnter={() => matkulId && preload(
+                      ["/bank-soal/global", matkulId, bab.id, ""],
+                      () => getBankSoalGlobal({ mata_kuliah_id: matkulId, bab_id: bab.id })
                     )}
                   >
                     {inner}

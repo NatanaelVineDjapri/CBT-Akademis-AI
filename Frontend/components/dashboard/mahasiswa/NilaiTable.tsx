@@ -3,7 +3,7 @@
 import { useState, Fragment } from "react";
 import Link from "next/link";
 import { preload } from "swr";
-import { ArrowUpDown, ArrowUp, ArrowDown, BookOpen, X } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, BookOpen, X, CalendarDays, Clock } from "lucide-react";
 import { getNilaiDetail } from "@/services/NilaiServices";
 import type { Nilai, NilaiAttempt, NilaiMeta } from "@/types";
 import NilaiTableSkeleton from "@/components/skeleton/NilaiTableSkeleton";
@@ -151,7 +151,7 @@ export default function NilaiTable({
               </tr>
             </thead>
             <tbody>
-              {showSkeleton ? (
+              {(showSkeleton || !nilaiList.length && meta === null) ? (
                 <NilaiTableSkeleton count={perPage} />
               ) : nilaiList.map((item, idx) => {
                 const no = ((meta?.current_page ?? 1) - 1) * perPage + idx + 1;
@@ -178,11 +178,17 @@ export default function NilaiTable({
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-xs text-gray-700">{item.tanggal}</p>
-                        <p className="text-xs text-gray-400">{item.pukul}</p>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <CalendarDays size={11} className="text-gray-400 shrink-0" />
+                          <span>{item.tanggal}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5 pl-3.5">
+                          <Clock size={10} className="shrink-0" />
+                          <span>{item.pukul}</span>
+                        </div>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-gray-800">{item.nilai ?? "-"}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 font-semibold whitespace-nowrap" style={{ color: item.nilai != null ? getBarColor(item.nilai) : "#9ca3af" }}>{item.nilai ?? "-"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <span className="text-sm font-bold"
                           style={{ color: item.lulus ? "var(--color-primary)" : "#ef4444" }}>
                           {item.grade ?? "-"}
@@ -209,7 +215,7 @@ export default function NilaiTable({
             </tbody>
           </table>
 
-          {!showSkeleton && nilaiList.length === 0 && (
+          {!showSkeleton && meta !== null && nilaiList.length === 0 && (
             <EmptyState message="Belum ada riwayat nilai." flat />
           )}
         </div>
