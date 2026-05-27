@@ -47,4 +47,26 @@ class NilaiAkhir extends Model implements Auditable
             ->unique(fn($n) => $n->pesertaUjian?->ujian_id)
             ->values();
     }
+
+    /**
+     * Ambil nilai terbaik per student untuk ujian tertentu (kebalikan bestPerUjian).
+     * Grouped by user_id: ['best' => NilaiAkhir, 'attempts' => Collection<NilaiAkhir>]
+     *
+     * @return \Illuminate\Support\Collection<int, array{best: static, attempts: \Illuminate\Support\Collection<int, static>}>
+     */
+    public static function bestPerStudent(int $ujianId): \Illuminate\Support\Collection
+    {
+        $all = static::with(['pesertaUjian.user'])
+            ->whereHas('pesertaUjian', fn($q) => $q->where('ujian_id', $ujianId))
+            ->orderByDesc('nilai_total')
+            ->orderByDesc('graded_at')
+            ->get();
+
+        return $all
+            ->groupBy(fn($n) => $n->pesertaUjian?->user_id)
+            ->map(fn($attempts) => [
+                'best'     => $attempts->first(),
+                'attempts' => $attempts->values(),
+            ]);
+    }
 }

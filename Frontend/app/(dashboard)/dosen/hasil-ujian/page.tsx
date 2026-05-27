@@ -10,6 +10,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { usePerPage } from "@/hooks/usePerPage";
 import SearchInput from "@/components/filtering/SearchInput";
 import { getHasilUjianDosen, getDetailUjianDosen } from "@/services/UjianServices";
+import { toSlug } from "@/utils/slug";
 import HasilUjianTable from "@/components/ujian/HasilUjianTable";
 import type { HasilUjianDosenItem, UjianMeta } from "@/types";
 import type { SortBy, SortDir } from "@/components/ujian/HasilUjianTable";
@@ -74,7 +75,7 @@ export default function DosenHasilUjianPage() {
           sortBy={sortBy}
           sortDir={sortDir}
           onSort={handleSort}
-          getDetailHref={id => `/dosen/hasil-ujian/${id}`}
+          getDetailHref={(_, nama) => `/dosen/hasil-ujian/${toSlug(nama)}`}
           onRowMouseEnter={id => preload(`/ujian/dosen/hasil/${id}`, () => getDetailUjianDosen(id))}
         />
         </div>

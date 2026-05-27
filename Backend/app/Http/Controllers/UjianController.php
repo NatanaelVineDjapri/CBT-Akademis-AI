@@ -625,21 +625,55 @@ class UjianController extends Controller
             'total_soal'     => $ujian->ujianSoal->count(),
         ];
 
-        $peserta = $ujian->pesertaUjian->map(fn($p) => [
-            'id'     => $p->id,
-            'nama'   => $p->user->nama,
-            'nim'    => $p->user->nim,
-            'status' => $p->nilaiAkhir
-                ? ($p->needs_review ? 'Perlu Pengecekan' : 'Selesai')
-                : match(true) {
-                    $p->status === 'sedang_berlangsung' => 'Berlangsung',
-                    $p->mulai_at === null                => 'Belum Mulai',
-                    default                              => 'Belum Selesai',
+        // Best + all attempts per student
+        $bestByUser = NilaiAkhir::bestPerStudent((int) $id);
+
+        // Grouped by user_id for incomplete student detection and needs_review lookup
+        $puByUser = $ujian->pesertaUjian->groupBy('user_id');
+
+        $peserta = $puByUser->map(function ($puAttempts, $userId) use ($bestByUser) {
+            if (isset($bestByUser[$userId])) {
+                $best     = $bestByUser[$userId]['best'];
+                $allNilai = $bestByUser[$userId]['attempts'];
+                $bestPu   = $puAttempts->firstWhere('id', $best->peserta_ujian_id);
+
+                return [
+                    'id'            => $best->peserta_ujian_id,
+                    'nama'          => $best->pesertaUjian->user->nama,
+                    'nim'           => $best->pesertaUjian->user->nim,
+                    'status'        => $bestPu?->needs_review ? 'Perlu Pengecekan' : 'Selesai',
+                    'nilai'         => $best->nilai_total,
+                    'grade'         => $best->grade,
+                    'lulus'         => $best->lulus,
+                    'attempt_count' => $allNilai->count(),
+                    'attempts'      => $allNilai->map(fn($n) => [
+                        'id'      => $n->peserta_ujian_id,
+                        'nilai'   => $n->nilai_total,
+                        'grade'   => $n->grade ?? '-',
+                        'lulus'   => $n->lulus,
+                        'tanggal' => $n->pesertaUjian->mulai_at?->format('d/m/y'),
+                        'pukul'   => $n->pesertaUjian->mulai_at?->format('H.i'),
+                    ])->values(),
+                ];
+            }
+
+            $latest = $puAttempts->sortByDesc('mulai_at')->first();
+            return [
+                'id'            => $latest->id,
+                'nama'          => $latest->user->nama,
+                'nim'           => $latest->user->nim,
+                'status'        => match(true) {
+                    $latest->status === 'sedang_berlangsung' => 'Berlangsung',
+                    $latest->mulai_at === null                => 'Belum Mulai',
+                    default                                   => 'Belum Selesai',
                 },
-            'nilai'  => $p->nilaiAkhir?->nilai_total,
-            'grade'  => $p->nilaiAkhir?->grade,
-            'lulus'  => $p->nilaiAkhir?->lulus,
-        ])->values();
+                'nilai'         => null,
+                'grade'         => null,
+                'lulus'         => null,
+                'attempt_count' => $puAttempts->count(),
+                'attempts'      => [],
+            ];
+        })->values();
 
         $distribusi = $ujian->ujianSoal
             ->sortBy('urutan')
@@ -888,26 +922,40 @@ class UjianController extends Controller
             ->where('created_by', $authUser->id)
             ->firstOrFail();
 
-        $pesertaList = PesertaUjian::with(['user', 'nilaiAkhir'])
+        $bestByUser = NilaiAkhir::bestPerStudent((int) $id);
+
+        // Students who never completed any attempt
+        $completedUserIds = $bestByUser->keys();
+        $incompleteList = PesertaUjian::with('user')
             ->where('ujian_id', $id)
-            ->get();
+            ->whereNotIn('user_id', $completedUserIds->toArray())
+            ->get()
+            ->unique('user_id');
 
         $info = [
             'nama_ujian'    => $ujian->nama_ujian,
             'mata_kuliah'   => $ujian->mataKuliah?->nama ?? '-',
             'jenis_ujian'   => $ujian->jenis_ujian ?? '-',
             'tanggal'       => $ujian->start_date ? \Carbon\Carbon::parse($ujian->start_date)->format('d M Y') : '-',
-            'total_peserta' => $pesertaList->unique('user_id')->count(),
+            'total_peserta' => $bestByUser->count() + $incompleteList->count(),
             'total_soal'    => $ujian->ujianSoal()->count(),
         ];
 
-        $peserta = $pesertaList->map(fn($p) => [
-            'nim'   => $p->user?->nim ?? '-',
-            'nama'  => $p->user?->nama ?? '-',
-            'nilai' => $p->nilaiAkhir?->nilai_total !== null ? round($p->nilaiAkhir->nilai_total, 1) : null,
-            'grade' => $p->nilaiAkhir?->grade,
-            'lulus' => $p->nilaiAkhir?->lulus,
-        ])->sortBy('nama')->values();
+        $peserta = $bestByUser->map(fn($g) => [
+            'nim'   => $g['best']->pesertaUjian->user?->nim ?? '-',
+            'nama'  => $g['best']->pesertaUjian->user?->nama ?? '-',
+            'nilai' => round($g['best']->nilai_total, 1),
+            'grade' => $g['best']->grade,
+            'lulus' => $g['best']->lulus,
+        ])->merge(
+            $incompleteList->map(fn($p) => [
+                'nim'   => $p->user?->nim ?? '-',
+                'nama'  => $p->user?->nama ?? '-',
+                'nilai' => null,
+                'grade' => null,
+                'lulus' => null,
+            ])
+        )->sortBy('nama')->values();
 
         $nilaiList = $peserta->whereNotNull('nilai')->pluck('nilai');
         $totalLulus = $peserta->where('lulus', true)->count();

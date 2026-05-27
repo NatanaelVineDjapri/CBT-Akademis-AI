@@ -421,6 +421,8 @@ export interface HasilUjianPeserta {
   nilai: number | null;
   grade: string | null;
   lulus: boolean | null;
+  attempt_count: number;
+  attempts: NilaiAttempt[];
 }
 
 export interface HasilUjianDistribusiItem {

@@ -55,7 +55,7 @@ interface HasilUjianTableProps {
   sortBy: SortBy;
   sortDir: SortDir;
   onSort: (col: SortBy) => void;
-  getDetailHref: (id: number) => string;
+  getDetailHref: (id: number, nama: string) => string;
   onRowMouseEnter: (id: number) => void;
   emptyMessage?: string;
 }
@@ -91,7 +91,7 @@ export default function HasilUjianTable({
                 <td className="px-5 py-3 text-xs text-gray-400">{String(no).padStart(2, "0")}</td>
                 <td className="px-4 py-3">
                   <Link
-                    href={getDetailHref(item.id)}
+                    href={getDetailHref(item.id, item.nama_ujian)}
                     className="font-medium hover:underline"
                     style={{ color: "var(--color-primary)" }}
                     onMouseEnter={() => onRowMouseEnter(item.id)}

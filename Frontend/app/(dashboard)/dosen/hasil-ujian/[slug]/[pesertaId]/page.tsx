@@ -8,7 +8,8 @@ import SearchInput from "@/components/filtering/SearchInput";
 import NilaiDetailSkeleton from "@/components/skeleton/NilaiDetailSkeleton";
 import JawabanPilihanGanda from "@/components/dashboard/mahasiswa/JawabanPilihanGanda";
 import JawabanCheckBox from "@/components/dashboard/mahasiswa/JawabanCheckbox";
-import { getDetailPesertaDosen, periksaEssay, resetEssay } from "@/services/UjianServices";
+import { getHasilUjianDosen, getDetailPesertaDosen, periksaEssay, resetEssay } from "@/services/UjianServices";
+import { toSlug } from "@/utils/slug";
 import type { JawabanEssay } from "@/types";
 
 function JawabanEssayCard({
@@ -214,19 +215,23 @@ function JawabanEssayCard({
   );
 }
 
-export default function DetailPesertaDosenPage({ params }: { params: Promise<{ id: string; pesertaId: string }> }) {
-  const { id, pesertaId } = use(params);
+export default function DetailPesertaDosenPage({ params }: { params: Promise<{ slug: string; pesertaId: string }> }) {
+  const { slug, pesertaId } = use(params);
+
+  const { data: listData } = useSWR("/ujian/dosen/hasil/all", () => getHasilUjianDosen({ per_page: 200 }));
+  const ujianMeta = listData?.data?.find(u => toSlug(u.nama_ujian) === slug);
+  const ujianIdStr = ujianMeta?.id ? String(ujianMeta.id) : null;
 
   const { data, isLoading, mutate } = useSWR(
-    `/ujian/dosen/hasil/${id}/peserta/${pesertaId}`,
-    () => getDetailPesertaDosen(id, pesertaId),
+    ujianIdStr ? `/ujian/dosen/hasil/${ujianIdStr}/peserta/${pesertaId}` : null,
+    () => getDetailPesertaDosen(ujianIdStr!, pesertaId),
     { revalidateOnFocus: false }
   );
 
   return (
     <div className="flex flex-col gap-4 pb-4">
       <div className="shrink-0">
-        <Breadcrumb overrides={data ? { [id]: data.info.nama_ujian, [pesertaId]: data.info.nama_peserta } : undefined} />
+        <Breadcrumb overrides={data ? { [slug]: data.info.nama_ujian, [pesertaId]: data.info.nama_peserta } : undefined} />
       </div>
 
       {isLoading ? <NilaiDetailSkeleton /> : !data ? null : (
@@ -260,10 +265,10 @@ export default function DetailPesertaDosenPage({ params }: { params: Promise<{ i
           {data.jawaban.checklist.length > 0 && (
             <JawabanCheckBox data={data.jawaban.checklist} />
           )}
-          {data.jawaban.essay.length > 0 && (
+          {data.jawaban.essay.length > 0 && ujianIdStr && (
             <JawabanEssayCard
               data={data.jawaban.essay}
-              ujianId={id}
+              ujianId={ujianIdStr}
               pesertaId={pesertaId}
               onSaved={() => mutate()}
             />
