@@ -82,8 +82,8 @@ export default function UjianPesertaPage() {
         }}
       >
         {[
-          { key: "akanDatang", label: "Akan Datang" },
-          { key: "selesai", label: "Selesai" },
+          { key: "akanDatang" as keyof typeof ujianData, label: "Akan Datang" },
+          { key: "selesai" as keyof typeof ujianData, label: "Selesai" },
         ].map(({ key, label }) => (
           <button
             key={key}
