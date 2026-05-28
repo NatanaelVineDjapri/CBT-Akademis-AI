@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Megaphone,
   ListChecks,
+  Wrench,
 } from "lucide-react";
 import { preload } from "swr";
 import { User } from "@/types";
@@ -64,8 +65,10 @@ const menuSectionsByRole: Record<string, MenuSection[]> = {
     {
       label: "Manajemen",
       items: [
-        { label: "Institusi", href: "/admin-akademis/institusi", icon: <Building2 size={18} /> },
-        { label: "Profil",    href: "/admin-akademis/profile",   icon: <UserCircle size={18} /> },
+        { label: "Institusi",    href: "/admin-akademis/institusi",   icon: <Building2 size={18} /> },
+        { label: "Pengumuman",   href: "/admin-akademis/pengumuman",  icon: <Megaphone size={18} /> },
+        { label: "Maintenance",  href: "/admin-akademis/maintenance", icon: <Wrench size={18} /> },
+        { label: "Profil",       href: "/admin-akademis/profile",     icon: <UserCircle size={18} /> },
       ],
     },
   ],

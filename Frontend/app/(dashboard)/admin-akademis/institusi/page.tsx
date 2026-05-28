@@ -171,16 +171,25 @@ export default function InstitusiPage() {
         </div>
 
         <div className="overflow-x-auto flex-1">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col className="w-56" />
+              <col />
+              <col className="w-24" />
+              <col className="w-24" />
+              <col className="w-20" />
+              <col className="w-24" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Universitas</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Alamat</th>
                 <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Fakultas</th>
                 <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Mahasiswa</th>
                 <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Dosen</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Aksi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -209,7 +218,7 @@ export default function InstitusiPage() {
                     preload("/universitas/all", () => getUniversitas({ per_page: 200 }));
                     preload(["/fakultas", item.id, "", 1], () => getFakultas({ universitas_id: item.id, page: 1, per_page: PER_PAGE }));
                   }}
-                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer group"
                 >
                   <td className="px-5 py-3 text-xs text-gray-400">
                     {String((page - 1) * PER_PAGE + idx + 1).padStart(2, "0")}
@@ -224,7 +233,7 @@ export default function InstitusiPage() {
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-800 leading-tight truncate">{item.nama}</p>
+                        <p className="text-sm font-medium text-gray-800 group-hover:text-[var(--color-primary)] leading-tight truncate transition-colors">{item.nama}</p>
                         <p className="text-xs text-gray-400">{item.kode}</p>
                       </div>
                     </div>

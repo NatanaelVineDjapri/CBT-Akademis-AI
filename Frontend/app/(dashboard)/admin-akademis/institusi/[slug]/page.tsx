@@ -147,15 +147,23 @@ export default function UniversitasDetailPage({ params }: Props) {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col />
+              <col className="w-24" />
+              <col className="w-24" />
+              <col className="w-20" />
+              <col className="w-24" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Fakultas</th>
                 <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Prodi</th>
                 <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Mahasiswa</th>
                 <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Dosen</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Aksi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>

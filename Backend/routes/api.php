@@ -81,6 +81,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
     Route::middleware('role:admin_akademis_ai')->group(function () {
         Route::get('/settings/maintenance', [SettingsController::class, 'getMaintenanceStatus']);
         Route::post('/settings/maintenance', [SettingsController::class, 'toggleMaintenance']);
+        Route::get('/settings/maintenance/logs', [SettingsController::class, 'getMaintenanceLogs']);
 
         Route::get('/dashboard/admin-akademis', [DashboardController::class, 'adminAkademis']);
         Route::get('/dashboard/admin-akademis/distribusi-pengguna', [DashboardController::class, 'adminAkademisDistribusiPengguna']);
