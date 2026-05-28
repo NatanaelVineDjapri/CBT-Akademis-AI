@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { GraduationCap } from "lucide-react";
 import { getAdminUniversitasDistribusi } from "@/services/DashboardServices";
 
@@ -10,33 +10,6 @@ const COLORS = [
   "#22c55e", "#f59e0b", "#a855f7", "#ef4444",
   "#06b6d4", "#f97316", "#84cc16", "#ec4899", "#6366f1",
 ];
-
-function CustomTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
-  return (
-    <div className="bg-white border border-gray-100 rounded-xl px-3 py-2 shadow-sm text-xs">
-      <p className="font-semibold text-gray-700">{d.nama}</p>
-      <p className="text-gray-500 mt-0.5">
-        <span style={{ color: payload[0].color }} className="font-bold">{d.total}</span> mahasiswa
-      </p>
-    </div>
-  );
-}
-
-function CustomLegend({ payload }: any) {
-  return (
-    <ul className="flex flex-col gap-1.5 justify-center">
-      {payload.map((entry: any) => (
-        <li key={entry.value} className="flex items-center gap-2 text-xs text-gray-600">
-          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
-          <span className="text-gray-600">{entry.value}</span>
-          <span className="font-semibold text-gray-800 ml-auto">{entry.payload.total}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 export default function DistribusiMahasiswa() {
   const { data, isLoading } = useSWR(
@@ -56,58 +29,98 @@ export default function DistribusiMahasiswa() {
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <GraduationCap size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Distribusi Mahasiswa per Fakultas</span>
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
+        <div className="flex items-center gap-2 mb-4">
+          <GraduationCap size={15} style={{ color: "var(--color-primary)" }} />
+          <span className="text-sm font-semibold text-gray-800">Distribusi Mahasiswa per Fakultas</span>
         </div>
-        <p className="text-xs text-gray-400">Belum ada data mahasiswa.</p>
+        <p className="text-sm text-gray-400 text-center py-8">Belum ada data mahasiswa.</p>
       </div>
     );
   }
 
-  const total = data.reduce((s, d) => s + d.total, 0);
+  const slices = data.map((d, i) => ({ ...d, color: COLORS[i % COLORS.length] }));
+  const total  = slices.reduce((s, d) => s + d.total, 0);
+  const largest = slices.reduce((a, b) => a.total > b.total ? a : b);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <GraduationCap size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Distribusi Mahasiswa per Fakultas</span>
-        </div>
-        <span className="text-xs text-gray-400">{total} total</span>
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
+      <div className="flex items-center gap-2 mb-4">
+        <GraduationCap size={15} style={{ color: "var(--color-primary)" }} />
+        <span className="text-sm font-semibold text-gray-800">Distribusi Mahasiswa per Fakultas</span>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="h-[180px] w-[180px] shrink-0">
+        <div className="relative w-44 h-44 flex-shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={slices}
                 dataKey="total"
                 nameKey="nama"
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={80}
-                paddingAngle={2}
+                innerRadius={52}
+                outerRadius={85}
+                strokeWidth={2}
+                stroke="#fff"
               >
-                {data.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                {slices.map((_, i) => (
+                  <Cell key={i} fill={slices[i].color} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const d = payload[0];
+                  return (
+                    <div className="bg-white border border-gray-100 rounded-xl px-3 py-2 shadow-md text-xs">
+                      <p className="font-semibold text-gray-800">{d.name}</p>
+                      <p className="text-gray-500">
+                        {d.value} mahasiswa · {Math.round(((d.value as number) / total) * 100)}%
+                      </p>
+                    </div>
+                  );
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-xl font-bold text-gray-800">{total}</span>
+            <span className="text-[10px] text-gray-400">total</span>
+          </div>
         </div>
 
-        <div className="flex-1 min-w-0 overflow-y-auto max-h-[180px]">
-          <CustomLegend payload={data.map((d, i) => ({
-            value: d.nama,
-            color: COLORS[i % COLORS.length],
-            payload: d,
-          }))} />
+        <div className="flex-1 flex flex-col gap-2.5 overflow-y-auto max-h-44 pr-1 scrollbar-thin">
+          {slices.map((d) => {
+            const pct = Math.round((d.total / total) * 100);
+            return (
+              <div key={d.nama}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
+                    <span className="text-xs text-gray-600 line-clamp-1">{d.nama}</span>
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 ml-2 shrink-0">{pct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: d.color }} />
+                </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
+
+      <div
+        className="mt-4 flex items-center gap-2 px-3 py-2.5 rounded-xl"
+        style={{ backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, white)" }}
+      >
+        <GraduationCap size={13} style={{ color: "var(--color-primary)" }} className="flex-shrink-0" />
+        <p className="text-xs text-gray-600">
+          <span className="font-semibold">{largest.nama}</span> memiliki mahasiswa terbanyak dengan{" "}
+          <span className="font-semibold" style={{ color: "var(--color-primary)" }}>{largest.total} mahasiswa</span>
+        </p>
       </div>
     </div>
   );

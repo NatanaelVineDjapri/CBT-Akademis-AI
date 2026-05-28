@@ -12,7 +12,7 @@ import NilaiTable, { type SortBy, type SortDir } from "../../../../components/da
 export default function NilaiPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const perPage = usePerPage(53, 1, 350);
+  const perPage = usePerPage(53, 1, 450);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>((searchParams.get("sort_by") as SortBy) ?? "tanggal");
   const [sortDir, setSortDir] = useState<SortDir>((searchParams.get("sort_dir") as SortDir) ?? "desc");

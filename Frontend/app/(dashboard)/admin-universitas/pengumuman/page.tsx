@@ -50,8 +50,7 @@ export default function PengumumanPage() {
   };
   const closeModal = () => { setShowModal(false); setEditItem(null); };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!form.judul.trim() || !form.isi.trim()) return;
     setSaving(true);
     try {
@@ -180,7 +179,7 @@ export default function PengumumanPage() {
               <h3 className="text-base font-bold text-white">{editItem ? "Edit Pengumuman" : "Tambah Pengumuman"}</h3>
               <button onClick={closeModal} className="text-white/70 hover:text-white cursor-pointer"><X className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
+            <form onSubmit={e => { e.preventDefault(); handleSubmit(); }} className="p-5 space-y-4 overflow-y-auto flex-1">
               <div>
                 <label className="text-xs font-medium text-gray-500 block mb-1">Judul</label>
                 <input value={form.judul} onChange={e => setForm(f => ({ ...f, judul: e.target.value }))} placeholder="Judul pengumuman"
@@ -209,7 +208,7 @@ export default function PengumumanPage() {
                 className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">
                 Batal
               </button>
-              <button onClick={handleSubmit as unknown as React.MouseEventHandler} disabled={saving}
+              <button onClick={handleSubmit} disabled={saving}
                 className="flex-1 text-white text-sm font-medium py-2.5 rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 style={{ backgroundColor: "var(--color-primary)" }}>
                 {saving ? <><Loader2 size={14} className="animate-spin" />Menyimpan...</> : editItem ? "Simpan Perubahan" : "Unggah"}

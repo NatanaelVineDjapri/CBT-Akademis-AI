@@ -8,6 +8,7 @@ import StatCard from "@/components/dashboard/admin-universitas/StatCard";
 import UjianBerlangsungCard from "@/components/dashboard/admin-universitas/UjianBerlangsungCard";
 import BankSoalCard from "@/components/dashboard/admin-universitas/BankSoalCard";
 import UjianTerbaruCard from "@/components/dashboard/admin-universitas/UjianTerbaruCard";
+import UjianSelesaiCard from "@/components/dashboard/admin-universitas/UjianSelesaiCard";
 import PengumumanCard from "@/components/dashboard/admin-universitas/PengumumanCard";
 import DashboardSkeleton from "@/components/dashboard/admin-universitas/DashboardSkeleton";
 import StatistikPMBChart from "@/components/dashboard/admin-universitas/StatistikPMBChart";
@@ -43,8 +44,10 @@ export default function AdminUniversitasDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <UjianBerlangsungCard data={data.ujian_berlangsung} />
             <BankSoalCard data={data.bank_soal} />
+            <UjianBerlangsungCard data={data.ujian_berlangsung} />
+            <UjianTerbaruCard data={data.ujian_terbaru} />
+            <UjianSelesaiCard data={data.ujian_selesai} />
           </div>
         </>
       )}
@@ -66,12 +69,7 @@ export default function AdminUniversitasDashboardPage() {
         <TrenNilai />
       </div>
 
-      {data && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <UjianTerbaruCard data={data.ujian_terbaru} />
-          <PengumumanCard data={data.pengumuman} />
-        </div>
-      )}
+      {data && <PengumumanCard data={data.pengumuman} />}
     </div>
   );
 }

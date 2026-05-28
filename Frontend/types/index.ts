@@ -362,6 +362,7 @@ export interface AdminUniversitasDashboard {
   ujian_berlangsung: AdminUniversitasUjianItem[];
   bank_soal: AdminUniversitasBankSoalItem[];
   ujian_terbaru: AdminUniversitasUjianItem[];
+  ujian_selesai: AdminUniversitasUjianItem[];
   pengumuman: AdminUniversitasPengumumanItem[];
 }
 

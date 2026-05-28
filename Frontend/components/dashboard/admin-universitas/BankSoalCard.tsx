@@ -4,7 +4,7 @@ import type { AdminUniversitasDashboard } from "@/types";
 
 export default function BankSoalCard({ data }: { data: AdminUniversitasDashboard['bank_soal'] }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <BookOpen size={16} className="text-gray-500" />
@@ -13,21 +13,24 @@ export default function BankSoalCard({ data }: { data: AdminUniversitasDashboard
         {data.length > 0 && (
           <Link
             href="/admin-universitas/bank-soal"
-            className="text-xs border rounded-lg px-3 py-1"
+            className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80"
             style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
           >
             Lihat Semua
           </Link>
         )}
       </div>
+
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">Belum ada bank soal.</p>
+        <p className="text-xs text-gray-400 flex-1">Belum ada bank soal.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {data.map((b) => (
-            <div key={b.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+            <div key={b.id}
+              className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--color-primary)" }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: "var(--color-primary)" }}>
                   <BookOpen size={15} className="text-white" />
                 </div>
                 <div>
@@ -40,6 +43,13 @@ export default function BankSoalCard({ data }: { data: AdminUniversitasDashboard
                   </div>
                 </div>
               </div>
+              <Link
+                href="/admin-universitas/bank-soal"
+                className="text-xs text-white rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                Lihat Detail
+              </Link>
             </div>
           ))}
         </div>

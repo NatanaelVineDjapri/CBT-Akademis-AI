@@ -235,6 +235,15 @@ class DashboardController extends Controller
             ->get()
             ->map($formatUjian);
 
+        $ujianSelesai = Ujian::with('mataKuliah')
+            ->where('created_by', $user->id)
+            ->where('jenis_ujian', 'pmb')
+            ->where('end_date', '<', $now)
+            ->orderByDesc('end_date')
+            ->limit(3)
+            ->get()
+            ->map($formatUjian);
+
         $pengumuman = Pengumuman::where('created_by', $user->id)
             ->where(fn($q) => $q->whereNull('expired_at')->orWhere('expired_at', '>', $now))
             ->orderByDesc('created_at')
@@ -258,6 +267,7 @@ class DashboardController extends Controller
             'ujian_berlangsung' => $ujianBerlangsung,
             'bank_soal'         => $bankSoal,
             'ujian_terbaru'     => $ujianTerbaru,
+            'ujian_selesai'     => $ujianSelesai,
             'pengumuman'        => $pengumuman,
         ]);
     }
