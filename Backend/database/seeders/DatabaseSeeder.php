@@ -25,6 +25,11 @@ use Database\Seeders\Universitas\Binus\FakultasSeeder    as BinusFakultasSeeder;
 use Database\Seeders\Universitas\Binus\ProdiSeeder       as BinusProdiSeeder;
 use Database\Seeders\Universitas\Binus\UserSeeder        as BinusUserSeeder;
 use Database\Seeders\Universitas\Binus\MahasiswaSeeder   as BinusMahasiswaSeeder;
+use Database\Seeders\Universitas\Umn\UniversitasSeeder  as UmnUniversitasSeeder;
+use Database\Seeders\Universitas\Umn\FakultasSeeder     as UmnFakultasSeeder;
+use Database\Seeders\Universitas\Umn\ProdiSeeder        as UmnProdiSeeder;
+use Database\Seeders\Universitas\Umn\UserSeeder         as UmnUserSeeder;
+use Database\Seeders\Universitas\Umn\MahasiswaSeeder    as UmnMahasiswaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -42,14 +47,19 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UniversitasSeeder::class,
             BinusUniversitasSeeder::class,
+            UmnUniversitasSeeder::class,
             FakultasSeeder::class,
             BinusFakultasSeeder::class,
+            UmnFakultasSeeder::class,
             ProdiSeeder::class,
             BinusProdiSeeder::class,
+            UmnProdiSeeder::class,
             UserSeeder::class,
             BinusUserSeeder::class,
+            UmnUserSeeder::class,
             MahasiswaSeeder::class,
             BinusMahasiswaSeeder::class,
+            UmnMahasiswaSeeder::class,
             DemoSeeder::class,
             UjianSeeder::class,
             NilaiSeeder::class,
