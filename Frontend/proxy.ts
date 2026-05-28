@@ -31,7 +31,7 @@ async function getRoleFromSession(request: NextRequest): Promise<string | null> 
   }
 }
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const authRoutes = ['/login', '/forgot-password', '/reset-password']
