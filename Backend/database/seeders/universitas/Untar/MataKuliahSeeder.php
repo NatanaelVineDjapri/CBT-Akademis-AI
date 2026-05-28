@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

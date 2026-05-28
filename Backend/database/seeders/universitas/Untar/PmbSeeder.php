@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +16,7 @@ class PmbSeeder extends Seeder
         $adminId = DB::table('users')->where('email', 'admin@untar.ac.id')->value('id');
         $tiId    = DB::table('prodi')->where('kode', 'TI')->value('id');
 
-        // ── Mata Kuliah PMB ───────────────────────────────────────────
+        // â”€â”€ Mata Kuliah PMB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $mkPmb = DB::table('mata_kuliah')->insertGetId([
             'nama'       => 'Seleksi Penerimaan Mahasiswa Baru',
             'kode'       => 'PMB-TPA',
@@ -24,7 +24,7 @@ class PmbSeeder extends Seeder
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        // ── Bank Soal (created_by admin universitas) ──────────────────
+        // â”€â”€ Bank Soal (created_by admin universitas) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $bankId = DB::table('bank_soal')->insertGetId([
             'created_by'     => $adminId,
             'mata_kuliah_id' => $mkPmb,
@@ -34,17 +34,17 @@ class PmbSeeder extends Seeder
             'created_at'     => now(), 'updated_at' => now(),
         ]);
 
-        // ── Soal TPA (10 PG + 2 Essay) ────────────────────────────────
+        // â”€â”€ Soal TPA (10 PG + 2 Essay) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $soalPG = [
             ['q' => 'Jika 3x + 5 = 20, maka nilai x adalah?', 'a' => ['3', '4', '5', '6'], 'correct' => 2],
             ['q' => 'Pola bilangan: 2, 6, 12, 20, 30, ... nilai berikutnya adalah?', 'a' => ['38', '40', '42', '44'], 'correct' => 2],
             ['q' => 'Antonim kata "Konkret" adalah?', 'a' => ['Nyata', 'Abstrak', 'Jelas', 'Pasti'], 'correct' => 1],
             ['q' => 'Sinonim kata "Proliferasi" adalah?', 'a' => ['Penurunan', 'Penyebaran luas', 'Penggabungan', 'Pemisahan'], 'correct' => 1],
-            ['q' => 'Luas persegi dengan diagonal 10√2 cm adalah?', 'a' => ['50 cm²', '100 cm²', '200 cm²', '400 cm²'], 'correct' => 1],
+            ['q' => 'Luas persegi dengan diagonal 10âˆš2 cm adalah?', 'a' => ['50 cmÂ²', '100 cmÂ²', '200 cmÂ²', '400 cmÂ²'], 'correct' => 1],
             ['q' => 'Rata-rata dari 7, 8, 9, 10, 11 adalah?', 'a' => ['8', '8,5', '9', '9,5'], 'correct' => 2],
             ['q' => 'Indonesia merdeka pada tanggal?', 'a' => ['17 Agustus 1944', '17 Agustus 1945', '17 Agustus 1946', '17 Agustus 1947'], 'correct' => 1],
-            ['q' => 'Kecepatan cahaya di ruang hampa sekitar?', 'a' => ['3 × 10⁵ km/s', '3 × 10⁶ km/s', '3 × 10⁷ km/s', '3 × 10⁸ m/s'], 'correct' => 3],
-            ['q' => 'Jika a = 3 dan b = 4, nilai a² + b² adalah?', 'a' => ['14', '24', '25', '49'], 'correct' => 2],
+            ['q' => 'Kecepatan cahaya di ruang hampa sekitar?', 'a' => ['3 Ã— 10âµ km/s', '3 Ã— 10â¶ km/s', '3 Ã— 10â· km/s', '3 Ã— 10â¸ m/s'], 'correct' => 3],
+            ['q' => 'Jika a = 3 dan b = 4, nilai aÂ² + bÂ² adalah?', 'a' => ['14', '24', '25', '49'], 'correct' => 2],
             ['q' => 'Deret geometri dengan rasio 2 dan suku pertama 3: suku ke-5 adalah?', 'a' => ['24', '36', '48', '56'], 'correct' => 2],
         ];
 
@@ -56,7 +56,7 @@ class PmbSeeder extends Seeder
         $pgIds    = $this->insertSoalPG($soalPG, $bankId, $mkPmb);
         $essayIds = $this->insertSoalEssay($soalEssay, $bankId, $mkPmb);
 
-        // ── 100 Peserta PMB ───────────────────────────────────────────
+        // â”€â”€ 100 Peserta PMB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $univId   = DB::table('users')->where('id', $adminId)->value('universitas_id');
         $prodiIds = DB::table('prodi')
             ->join('fakultas', 'prodi.fakultas_id', '=', 'fakultas.id')
@@ -86,7 +86,7 @@ class PmbSeeder extends Seeder
             $pesertaUsers[] = $uid;
         }
 
-        // ── 5 Gelombang PMB (selesai) + 1 Aktif ──────────────────────
+        // â”€â”€ 5 Gelombang PMB (selesai) + 1 Aktif â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $gradeRanges = [['A', 85, 100], ['B', 75, 84], ['C', 60, 74], ['D', 45, 59], ['E', 0, 44]];
 
         $gelombang = [
@@ -134,7 +134,7 @@ class PmbSeeder extends Seeder
             }
         }
 
-        // ── 1 Ujian PMB aktif (akan datang) ──────────────────────────
+        // â”€â”€ 1 Ujian PMB aktif (akan datang) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $nextStart = Carbon::create(2026, 5, 10, 8, 0);
         DB::table('ujian')->insertGetId([
             'created_by'     => $adminId,
@@ -149,7 +149,7 @@ class PmbSeeder extends Seeder
             'created_at'     => now(), 'updated_at' => now(),
         ]);
 
-        // ── Pengumuman PMB ────────────────────────────────────────────
+        // â”€â”€ Pengumuman PMB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         DB::table('pengumuman')->insert([
             [
                 'created_by' => $adminId,
@@ -168,7 +168,7 @@ class PmbSeeder extends Seeder
         ]);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private function insertSoalPG(array $soalList, int $bankId, int $mkId): array
     {
@@ -258,7 +258,7 @@ class PmbSeeder extends Seeder
 
     private function getComponentScores(float $total, int $pgCount): array
     {
-        // bobot: 10 PG × 8 = 80, 2 essay × 20 = 40 (total max 120 tapi dinormalisasi ke 100)
+        // bobot: 10 PG Ã— 8 = 80, 2 essay Ã— 20 = 40 (total max 120 tapi dinormalisasi ke 100)
         // Sederhanakan: PG contributes total*0.8, essay total*0.2
         $pgScore    = $total * 0.8;
         $pgCorrect  = (int) min($pgCount, round($pgScore / 8));
@@ -340,3 +340,4 @@ class PmbSeeder extends Seeder
         ]);
     }
 }
+
