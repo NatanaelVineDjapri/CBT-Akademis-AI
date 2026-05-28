@@ -37,17 +37,20 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     return false;
   });
   const [collapsed, setCollapsed] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("sidebar-collapsed") === "true") setCollapsed(true);
   }, []);
 
   const toggleCollapsed = () => {
+    setIsTransitioning(true);
     setCollapsed(prev => {
       const next = !prev;
       localStorage.setItem("sidebar-collapsed", String(next));
       return next;
     });
+    setTimeout(() => setIsTransitioning(false), 310);
   };
 
   if (!user) return null;
@@ -74,7 +77,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} collapsed={collapsed} onToggle={toggleCollapsed} />
-        <div className={`${collapsed ? "w-16" : "w-[280px]"} shrink-0 hidden lg:block transition-all duration-300`} />
+        <div className={`${collapsed ? "w-16" : "w-[280px]"} shrink-0 hidden lg:block`} />
         <div className="flex-1 min-w-0 flex flex-col">
           {user.role !== "mahasiswa" && (
             <div
@@ -111,7 +114,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             </div>
           )}
           <main
-            className="flex-1 overflow-y-auto p-8"
+            className={`flex-1 overflow-y-auto p-8${isTransitioning ? " pointer-events-none" : ""}`}
             style={{
               backgroundImage: "url('/images/background-dashboard.png')",
               backgroundSize: "cover",
