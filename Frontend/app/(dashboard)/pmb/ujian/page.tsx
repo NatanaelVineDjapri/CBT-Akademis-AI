@@ -45,9 +45,9 @@ const ujianData = {
 };
 
 export default function UjianPesertaPage() {
-  const [activeTab, setActiveTab] = useState("akanDatang");
+  const [activeTab, setActiveTab] = useState<keyof typeof ujianData>("akanDatang");
 
-  const items = ujianData[activeTab];
+  const items: any[] = ujianData[activeTab];
 
   return (
     <div
