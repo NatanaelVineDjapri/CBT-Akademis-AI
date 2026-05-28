@@ -68,3 +68,12 @@ export interface MonitoringPesertaDetail {
 
 export const getMonitoringPesertaDetail = (ujianId: number, userId: number): Promise<MonitoringPesertaDetail> =>
   api.get(`/ujian/dosen/monitoring/${ujianId}/peserta/${userId}`).then(r => r.data);
+
+export const getAdminMonitoringList = (): Promise<{ data: MonitoringUjian[] }> =>
+  api.get("/ujian/admin-universitas/monitoring").then(r => r.data);
+
+export const getAdminMonitoringDetail = (ujianId: number): Promise<MonitoringDetail> =>
+  api.get(`/ujian/admin-universitas/monitoring/${ujianId}`).then(r => r.data);
+
+export const getAdminMonitoringPesertaDetail = (ujianId: number, userId: number): Promise<MonitoringPesertaDetail> =>
+  api.get(`/ujian/admin-universitas/monitoring/${ujianId}/peserta/${userId}`).then(r => r.data);

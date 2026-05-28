@@ -175,6 +175,10 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::post('/proses', [PmbPenerimaanController::class, 'proses']);
         });
 
+        Route::get('/ujian/admin-universitas/monitoring', [UjianController::class, 'adminMonitoringList']);
+        Route::get('/ujian/admin-universitas/monitoring/{id}', [UjianController::class, 'adminMonitoringDetail']);
+        Route::get('/ujian/admin-universitas/monitoring/{ujianId}/peserta/{userId}', [UjianController::class, 'adminMonitoringPesertaDetail']);
+
         Route::get('/ujian/admin-universitas/hasil', [UjianController::class, 'hasilUjianAdminUniversitas']);
         Route::get('/ujian/admin-universitas/hasil/{id}', [UjianController::class, 'detailUjianDosen']);
         Route::get('/ujian/admin-universitas/hasil/{ujianId}/peserta/{pesertaId}', [UjianController::class, 'detailPesertaUjianDosen']);

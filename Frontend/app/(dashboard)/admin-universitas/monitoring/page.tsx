@@ -1,99 +1,125 @@
 "use client";
-import { useState } from "react";
 
-const data = [
-  { id: "01", nama: "PMB versi A", ujian: "Ujian PMB", hari: "Sabtu, 21 Maret 2026", waktu: "10.00 - 12.00" },
-  { id: "02", nama: "PMB versi B", ujian: "Ujian PMB", hari: "Sabtu, 21 Maret 2026", waktu: "10.00 - 12.00" },
-];
+import useSWR, { preload } from "swr";
+import Link from "next/link";
+import { ShieldCheck, Clock, Users, AlertTriangle, Timer } from "lucide-react";
+import Breadcrumb from "@/components/BreadCrumb";
+import EmptyState from "@/components/EmptyState";
+import { getAdminMonitoringList, getAdminMonitoringDetail, type MonitoringUjian } from "@/services/MonitoringServices";
+import { toSlug } from "@/utils/slug";
 
-const BookmarkIcon = () => (
-  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-  </svg>
-);
+function fmt(s: string | null) {
+  if (!s) return "-";
+  const d = new Date(s);
+  return d.toLocaleString("id-ID", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+}
 
-const SearchIcon = () => (
-  <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-  </svg>
-);
-
-export default function MonitoringPage() {
-  const [search, setSearch] = useState("");
-
-  const filtered = data.filter((r) =>
-    r.nama.toLowerCase().includes(search.toLowerCase())
-  );
-
+function UjianMonitorCard({ ujian }: { ujian: MonitoringUjian }) {
   return (
-    <div style={{ fontFamily: "sans-serif" }}>
-      <p style={{ fontSize: 20  , color: "var(--color-primary)", marginBottom: "1.25rem" }}>
-        Home &gt; Monitoring
-      </p>
-      <div style={{ background: "#fff", borderRadius: 12, padding: "1.5rem" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem" }}>
-          <span style={{ fontSize: 20, fontWeight: 600, color: "var(--color-primary)" }}>Monitoring</span>
-          <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}>
-              <SearchIcon />
-            </span>
-            <input
-              type="text"
-              placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                padding: "8px 16px 8px 36px",
-                border: "1px solid #e5e7eb",
-                borderRadius: 999,
-                fontSize: 14,
-                width: 260,
-                outline: "none",
-                color: "#000",
-              }}
-            />
+    <div className="rounded-2xl shadow-md overflow-hidden flex flex-col" style={{ background: "var(--color-primary)" }}>
+      <div className="p-3 flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white">
+            <ShieldCheck className="w-5 h-5" style={{ color: "var(--color-primary)" }} />
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <p className="text-sm font-bold text-white leading-snug truncate">{ujian.nama_ujian}</p>
+            <p className="text-xs text-white/60 truncate">{ujian.mata_kuliah ?? "—"}</p>
           </div>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-          {filtered.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                background: "linear-gradient(135deg, #0d8fa8 0%, var(--color-primary) 60%, #076b88 100%)",
-                borderRadius: 12,
-                padding: "1rem 1.25rem 1.25rem",
-                width: 280,
-                position: "relative",
-                color: "#fff",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.75rem" }}>
-                <BookmarkIcon />
-                <span style={{ fontSize: 15, fontWeight: 600 }}>{item.nama}</span>
-              </div>
 
-              <p style={{ fontSize: 14, fontWeight: 400, margin: "0 0 4px" }}>{item.ujian}</p>
-              <p style={{ fontSize: 14, fontWeight: 700, margin: "0 0 4px" }}>{item.hari}</p>
-              <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>{item.waktu}</p>
+        <div className="border-t border-white/20" />
 
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
-                <button
-                  style={{
-                    background: "#fff",
-                    color: "var(--color-primary)",
-                    border: "none",
-                    borderRadius: 999,
-                    padding: "6px 20px",
-                    fontSize: 14,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                  }}
-                >
-                  Pantau
-                </button>
-              </div>
+        <div className="flex items-center gap-3 text-xs text-white/70">
+          <div className="flex items-center gap-1">
+            <Clock size={11} className="shrink-0" />
+            <span>{fmt(ujian.start_date)}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Timer size={11} className="shrink-0" />
+            <span>{ujian.durasi_menit} menit</span>
+          </div>
+        </div>
+
+        <div className="border-t border-white/20" />
+
+        <div className="flex items-center justify-between text-xs text-white/70">
+          <div className="flex items-center gap-1">
+            <Users size={11} className="shrink-0" />
+            <span>{ujian.peserta_aktif}/{ujian.total_peserta} aktif</span>
+          </div>
+          {ujian.total_violations > 0 ? (
+            <div className="flex items-center gap-1 text-red-500 bg-white px-2 py-1 rounded-full">
+              <AlertTriangle size={11} className="shrink-0" />
+              <span className="font-medium">{ujian.total_violations} pelanggaran</span>
             </div>
-          ))}
+          ) : (
+            <span className="text-white/30">Tidak ada pelanggaran</span>
+          )}
+        </div>
+
+        <div className="border-t border-white/20" />
+
+        <Link
+          href={`/admin-universitas/monitoring/${toSlug(ujian.nama_ujian)}`}
+          className="w-full py-2 rounded-lg text-xs font-medium text-center block bg-white hover:bg-white/90 transition-colors"
+          style={{ color: "var(--color-primary)" }}
+          onMouseEnter={() => preload(`/ujian/admin-universitas/monitoring/${ujian.id}`, () => getAdminMonitoringDetail(ujian.id))}
+        >
+          Pantau
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminMonitoringPage() {
+  const { data, isLoading } = useSWR("/ujian/admin-universitas/monitoring", getAdminMonitoringList, {
+    refreshInterval: 15000,
+    revalidateOnFocus: true,
+  });
+
+  const ujianList = data?.data ?? [];
+
+  return (
+    <div className="flex flex-col gap-4 pb-6">
+      <Breadcrumb />
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Monitoring</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Ujian yang sedang berlangsung.</p>
+        </div>
+        <div className="p-5">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+                  <div className="h-1 bg-gray-200" />
+                  <div className="p-3 flex flex-col gap-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 shrink-0" />
+                      <div className="flex-1">
+                        <div className="h-4 w-32 bg-gray-100 rounded mb-1" />
+                        <div className="h-3 w-20 bg-gray-100 rounded" />
+                      </div>
+                    </div>
+                    <div className="h-px bg-gray-100" />
+                    <div className="h-3 w-40 bg-gray-100 rounded" />
+                    <div className="h-px bg-gray-100" />
+                    <div className="h-3 w-36 bg-gray-100 rounded" />
+                    <div className="h-px bg-gray-100" />
+                    <div className="h-8 bg-gray-100 rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : ujianList.length === 0 ? (
+            <EmptyState message="Tidak ada ujian yang sedang berlangsung." />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {ujianList.map(u => <UjianMonitorCard key={u.id} ujian={u} />)}
+            </div>
+          )}
         </div>
       </div>
     </div>

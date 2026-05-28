@@ -2045,4 +2045,188 @@ class UjianController extends Controller
         ]);
     }
 
+    // ── Admin Universitas: Monitoring ─────────────────────────────────────────
+
+    public function adminMonitoringList(Request $request)
+    {
+        $now   = now();
+        $admin = $request->user();
+
+        $ujianList = Ujian::whereHas('creator', fn($q) => $q->where('universitas_id', $admin->universitas_id))
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->with([
+                'mataKuliah:id,nama',
+                'pesertaUjian:id,ujian_id,user_id,attempt_ke,status',
+                'pesertaUjian.proctoringLog',
+            ])
+            ->get();
+
+        $data = $ujianList->map(function ($ujian) {
+            $latestPerUser = $ujian->pesertaUjian
+                ->groupBy('user_id')
+                ->map(fn($g) => $g->sortByDesc('attempt_ke')->first());
+
+            $totalViolations = 0;
+            $totalRisk       = 0;
+            foreach ($ujian->pesertaUjian as $p) {
+                foreach ($p->proctoringLog as $log) {
+                    $totalViolations++;
+                    $totalRisk += $log->risk_score;
+                }
+            }
+
+            return [
+                'id'               => $ujian->id,
+                'nama_ujian'       => $ujian->nama_ujian,
+                'mata_kuliah'      => $ujian->mataKuliah?->nama,
+                'start_date'       => $ujian->start_date?->format('Y-m-d H:i'),
+                'end_date'         => $ujian->end_date?->format('Y-m-d H:i'),
+                'durasi_menit'     => $ujian->durasi_menit,
+                'peserta_aktif'    => $latestPerUser->where('status', 'sedang_berlangsung')->count(),
+                'total_peserta'    => $latestPerUser->count(),
+                'total_violations' => $totalViolations,
+                'total_risk_score' => $totalRisk,
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
+    public function adminMonitoringDetail(Request $request, $ujianId)
+    {
+        $admin = $request->user();
+
+        $ujian = Ujian::whereHas('creator', fn($q) => $q->where('universitas_id', $admin->universitas_id))
+            ->with([
+                'mataKuliah:id,nama',
+                'ujianSoal:id,ujian_id',
+                'pesertaUjian:id,ujian_id,user_id,attempt_ke,status,mulai_at',
+                'pesertaUjian.user:id,nama,nim',
+                'pesertaUjian.jawabanPeserta:id,peserta_ujian_id',
+                'pesertaUjian.proctoringLog',
+            ])
+            ->findOrFail($ujianId);
+
+        $totalSoal = $ujian->ujianSoal->count();
+
+        $peserta = $ujian->pesertaUjian
+            ->groupBy('user_id')
+            ->map(function ($g) use ($totalSoal) {
+                $latest  = $g->sortByDesc('attempt_ke')->first();
+                $display = $g->firstWhere('status', 'sedang_berlangsung')
+                    ?? $g->where('status', 'selesai')->sortByDesc('attempt_ke')->first()
+                    ?? $latest;
+                $allViol = collect();
+                foreach ($g as $attempt) {
+                    foreach ($attempt->proctoringLog as $log) {
+                        $allViol->push($log);
+                    }
+                }
+                return [
+                    'peserta_ujian_id'    => $display->id,
+                    'user_id'             => $display->user_id,
+                    'nama'                => $display->user?->nama,
+                    'nim'                 => $display->user?->nim,
+                    'status'              => $display->status,
+                    'attempt_ke'          => $latest->attempt_ke,
+                    'mulai_at'            => $display->mulai_at?->format('H:i:s'),
+                    'soal_dijawab'        => $display->jawabanPeserta->count(),
+                    'total_soal'          => $totalSoal,
+                    'violations'          => $allViol->count(),
+                    'risk_score'          => $allViol->sum('risk_score'),
+                    'violation_breakdown' => $allViol->groupBy('tipe_pelanggaran')->map(fn($g) => $g->count()),
+                ];
+            })
+            ->sortByDesc('risk_score')
+            ->values();
+
+        return response()->json([
+            'ujian'   => [
+                'id'           => $ujian->id,
+                'nama_ujian'   => $ujian->nama_ujian,
+                'mata_kuliah'  => $ujian->mataKuliah?->nama,
+                'start_date'   => $ujian->start_date?->format('Y-m-d H:i'),
+                'end_date'     => $ujian->end_date?->format('Y-m-d H:i'),
+                'durasi_menit' => $ujian->durasi_menit,
+                'total_soal'   => $totalSoal,
+            ],
+            'peserta' => $peserta,
+        ]);
+    }
+
+    public function adminMonitoringPesertaDetail(Request $request, $ujianId, $userId)
+    {
+        $admin = $request->user();
+
+        $ujian = Ujian::whereHas('creator', fn($q) => $q->where('universitas_id', $admin->universitas_id))
+            ->with([
+                'pesertaUjian' => fn($q) => $q
+                    ->where('user_id', $userId)
+                    ->where('status', '!=', 'belum_mulai')
+                    ->with(['user:id,nama,nim', 'jawabanPeserta:id,peserta_ujian_id,ujian_soal_id,jawaban,nilai,final_nilai', 'jawabanPeserta.ujianSoal:id,urutan', 'proctoringLog'])
+                    ->orderBy('attempt_ke'),
+                'ujianSoal:id,ujian_id',
+            ])
+            ->findOrFail($ujianId);
+
+        $attempts = $ujian->pesertaUjian;
+
+        if ($attempts->isEmpty()) {
+            return response()->json(['message' => 'Peserta tidak ditemukan.'], 404);
+        }
+
+        $user      = $attempts->first()->user;
+        $totalSoal = $ujian->ujianSoal->count();
+
+        $matchedLogs = collect();
+        $attemptRows = [];
+        foreach ($attempts as $p) {
+            $logs = $p->proctoringLog;
+            $matchedLogs = $matchedLogs->concat($logs);
+            $attemptRows[] = [
+                'peserta_ujian_id'    => $p->id,
+                'attempt_ke'          => $p->attempt_ke,
+                'status'              => $p->status,
+                'mulai_at'            => $p->mulai_at?->format('H:i:s'),
+                'selesai_at'          => $p->selesai_at?->format('H:i:s'),
+                'soal_dijawab'        => $p->jawabanPeserta->count(),
+                'violations'          => $logs->count(),
+                'risk_score'          => $logs->sum('risk_score'),
+                'violation_breakdown' => $logs->groupBy('tipe_pelanggaran')->map(fn($g) => $g->count()),
+                'foto_bukti'          => $logs->whereNotNull('foto_bukti')->map(fn($l) => [
+                    'url'        => $l->foto_bukti,
+                    'tipe'       => $l->tipe_pelanggaran,
+                    'risk_score' => $l->risk_score,
+                    'waktu'      => $l->waktu?->utc()->format('Y-m-d H:i:s'),
+                ])->values(),
+                'jawaban' => $p->jawabanPeserta->sortBy(fn($j) => $j->ujianSoal?->urutan ?? 999)->map(fn($j) => [
+                    'nomor'   => $j->ujianSoal?->urutan ?? '-',
+                    'jawaban' => $j->jawaban,
+                    'nilai'   => $j->final_nilai ?? $j->nilai,
+                ])->values(),
+            ];
+        }
+
+        $summary = $matchedLogs->groupBy('tipe_pelanggaran')
+            ->map(fn($g) => $g->count())
+            ->sortByDesc(fn($v) => $v)
+            ->toArray();
+
+        return response()->json([
+            'peserta' => [
+                'user_id' => (int) $userId,
+                'nama'    => $user?->nama,
+                'nim'     => $user?->nim,
+            ],
+            'ujian' => [
+                'id'         => $ujian->id,
+                'nama_ujian' => $ujian->nama_ujian,
+                'total_soal' => $totalSoal,
+            ],
+            'attempts'          => $attemptRows,
+            'violation_summary' => $summary,
+        ]);
+    }
+
 }
