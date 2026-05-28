@@ -10,7 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { DashboardPerkembanganItem } from "@/services/DashboardServices";
+import type { DashboardPerkembanganItem } from "@/types";
 import PerkembanganNilaiTooltip from "./PerkembanganNilaiTooltip";
 
 export default function PerkembanganNilaiChart({
