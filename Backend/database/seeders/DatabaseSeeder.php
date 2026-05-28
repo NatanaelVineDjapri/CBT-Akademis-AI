@@ -5,6 +5,21 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Database\Seeders\Universitas\Untar\UniversitasSeeder;
+use Database\Seeders\Universitas\Untar\FakultasSeeder;
+use Database\Seeders\Universitas\Untar\ProdiSeeder;
+use Database\Seeders\Universitas\Untar\UserSeeder;
+use Database\Seeders\Universitas\Untar\MahasiswaSeeder;
+use Database\Seeders\Universitas\Untar\DemoSeeder;
+use Database\Seeders\Universitas\Untar\UjianSeeder;
+use Database\Seeders\Universitas\Untar\NilaiSeeder;
+use Database\Seeders\Universitas\Untar\UjianAktifSeeder;
+use Database\Seeders\Universitas\Untar\UjianDenganSoalSeeder;
+use Database\Seeders\Universitas\Untar\BankSoalBabSeeder;
+use Database\Seeders\Universitas\Untar\SimulasiEssaySeeder;
+use Database\Seeders\Universitas\Untar\PmbSeeder;
+use Database\Seeders\Universitas\Untar\MataKuliahSeeder;
+use Database\Seeders\Universitas\Untar\MatkulDosenSeeder;
 
 class DatabaseSeeder extends Seeder
 {

@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ class UjianSeeder extends Seeder
 
     public function run(): void
     {
-        // ── Inisialisasi Data User & Prodi ─────────────────────────
+        // â”€â”€ Inisialisasi Data User & Prodi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $irvanId  = DB::table('users')->where('email', 'irvan.lewenusa@untar.ac.id')->value('id');
         $desiId   = DB::table('users')->where('email', 'desi.arisandi@untar.ac.id')->value('id');
         $bagusId  = DB::table('users')->where('email', 'bagus.mulyawan@untar.ac.id')->value('id');
@@ -26,16 +26,16 @@ class UjianSeeder extends Seeder
 
         $mkTI501 = DB::table('mata_kuliah')->where('nama', 'Logika Matematika')->where('prodi_id', $ti)->value('id');
 
-        // ── Contoh Pengambilan Data dari getSoal5 ──────────────────
+        // â”€â”€ Contoh Pengambilan Data dari getSoal5 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $dataLogika = $this->getSoal5('Logika Matematika');
         $sdPG    = $dataLogika['pg'] ?? [];
         $sdCB    = $dataLogika['cb'] ?? [];
         $sdEssay = $dataLogika['essay'] ?? [];
 
-        // ── Buat Bank Soal ─────────────────────────────────────────
+        // â”€â”€ Buat Bank Soal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $bankSD = $this->insertBank($irvanId, $mkTI501, 'Bank Soal Logika Matematika', 'Soal UTS Logika Matematika');
 
-        // ── Insert Soal ────────────────────────────────────────────
+        // â”€â”€ Insert Soal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $sdPGIds    = $this->insertSoalPG($sdPG, $bankSD, $mkTI501);
         $sdCBIds    = $this->insertSoalCB($sdCB, $bankSD, $mkTI501);
         $sdEssayIds = $this->insertSoalEssay($sdEssay, $bankSD, $mkTI501);
@@ -52,21 +52,21 @@ class UjianSeeder extends Seeder
              'Logika Matematika' => [
                 'pg' => [
                     ['q' => 'Negasi dari "Semua mahasiswa lulus" adalah?', 'a' => ['Semua tidak lulus', 'Ada yang tidak lulus', 'Tidak ada yang lulus', 'Semua lulus ujian'], 'correct' => 1],
-                    ['q' => '"p → q" bernilai FALSE hanya ketika?', 'a' => ['p=T q=T', 'p=F q=F', 'p=T q=F', 'p=F q=T'], 'correct' => 2],
+                    ['q' => '"p â†’ q" bernilai FALSE hanya ketika?', 'a' => ['p=T q=T', 'p=F q=F', 'p=T q=F', 'p=F q=T'], 'correct' => 2],
                     ['q' => 'Formula yang selalu bernilai TRUE disebut?', 'a' => ['Kontradiksi', 'Kontingensi', 'Tautologi', 'Proposisi'], 'correct' => 2],
-                    ['q' => '¬(p ∧ q) ekuivalen dengan (De Morgan)?', 'a' => ['¬p ∧ ¬q', '¬p ∨ ¬q', 'p ∨ ¬q', '¬p ∧ q'], 'correct' => 1],
-                    ['q' => 'Jika "p→q" benar dan "p" benar, maka (Modus Ponens)?', 'a' => ['p salah', 'q benar', 'q salah', 'p→q salah'], 'correct' => 1],
+                    ['q' => 'Â¬(p âˆ§ q) ekuivalen dengan (De Morgan)?', 'a' => ['Â¬p âˆ§ Â¬q', 'Â¬p âˆ¨ Â¬q', 'p âˆ¨ Â¬q', 'Â¬p âˆ§ q'], 'correct' => 1],
+                    ['q' => 'Jika "pâ†’q" benar dan "p" benar, maka (Modus Ponens)?', 'a' => ['p salah', 'q benar', 'q salah', 'pâ†’q salah'], 'correct' => 1],
                 ],
                 'cb' => [
-                    ['q' => 'Manakah konektor logika yang valid?', 'options' => ['AND (∧)', 'PLUS (+)', 'OR (∨)', 'DIVIDE (÷)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah konektor logika yang valid?', 'options' => ['AND (âˆ§)', 'PLUS (+)', 'OR (âˆ¨)', 'DIVIDE (Ã·)'], 'correct' => [0, 2]],
                     ['q' => 'Manakah aturan inferensi logika yang valid?', 'options' => ['Modus Ponens', 'Spekulasi', 'Modus Tollens', 'Asumsi bebas'], 'correct' => [0, 2]],
                     ['q' => 'Manakah yang merupakan hukum ekuivalensi logika?', 'options' => ['De Morgan Law', 'Hukum Newton', 'Distributive Law', 'Hukum Ohm'], 'correct' => [0, 2]],
-                    ['q' => 'Manakah quantifier logika predikat yang valid?', 'options' => ['Universal (∀)', 'Biner (∑)', 'Eksistensial (∃)', 'Linear (∫)'], 'correct' => [0, 2]],
-                    ['q' => 'Manakah yang merupakan contoh tautologi?', 'options' => ['p ∨ ¬p', 'p ∧ q', 'p → p', '¬p ∧ p'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah quantifier logika predikat yang valid?', 'options' => ['Universal (âˆ€)', 'Biner (âˆ‘)', 'Eksistensial (âˆƒ)', 'Linear (âˆ«)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah yang merupakan contoh tautologi?', 'options' => ['p âˆ¨ Â¬p', 'p âˆ§ q', 'p â†’ p', 'Â¬p âˆ§ p'], 'correct' => [0, 2]],
                 ],
                 'essay' => [
                     ['q' => 'Jelaskan konsep proposisi dan buat tabel kebenaran untuk operator AND, OR, dan IMPLICATION!'],
-                    ['q' => 'Apa yang dimaksud dengan tautologi? Buktikan bahwa (p → q) ↔ (¬q → ¬p) adalah tautologi!'],
+                    ['q' => 'Apa yang dimaksud dengan tautologi? Buktikan bahwa (p â†’ q) â†” (Â¬q â†’ Â¬p) adalah tautologi!'],
                     ['q' => 'Jelaskan hukum De Morgan dan tunjukkan bagaimana hukum ini digunakan dalam penyederhanaan ekspresi!'],
                     ['q' => 'Apa perbedaan antara logika proposisional dan logika predikat? Berikan contoh pernyataan yang membutuhkan logika predikat!'],
                     ['q' => 'Bagaimana aljabar Boolean berkaitan dengan logika matematika? Berikan contoh penerapan dalam desain rangkaian digital!'],
@@ -659,11 +659,11 @@ class UjianSeeder extends Seeder
                     ['q' => 'Consolidasi primer tanah berkaitan dengan?', 'a' => ['Deformasi plastis tanah pasir', 'Keluarnya air pori dari tanah lempung', 'Pemadatan mekanis', 'Erosi tanah'], 'correct' => 1],
                     ['q' => 'Nilai N-SPT digunakan untuk menentukan?', 'a' => ['Kadar air tanah', 'Kepadatan/konsistensi lapisan tanah', 'Batas plastis', 'Berat jenis tanah'], 'correct' => 1],
                     ['q' => 'Tanah yang memiliki permeabilitas tinggi adalah?', 'a' => ['Lempung', 'Lanau', 'Pasir kasar', 'Gambut'], 'correct' => 2],
-                    ['q' => 'Tegangan efektif tanah dihitung dengan rumus?', 'a' => ['σ = γ × z', "σ' = σ - u", 'σ = cu × Nc', 'σ = q × Nq'], 'correct' => 1],
+                    ['q' => 'Tegangan efektif tanah dihitung dengan rumus?', 'a' => ['Ïƒ = Î³ Ã— z', "Ïƒ' = Ïƒ - u", 'Ïƒ = cu Ã— Nc', 'Ïƒ = q Ã— Nq'], 'correct' => 1],
                 ],
                 'cb' => [
                     ['q' => 'Manakah yang termasuk klasifikasi tanah berdasarkan USCS?', 'options' => ['GW (Well-graded Gravel)', 'RB (Red Brick)', 'CL (Clay Low plasticity)', 'WS (Wet Sand)'], 'correct' => [0, 2]],
-                    ['q' => 'Manakah parameter kuat geser tanah?', 'options' => ['Kohesi (c)', 'Berat jenis (Gs)', 'Sudut geser dalam (φ)', 'Kadar air (w)'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah parameter kuat geser tanah?', 'options' => ['Kohesi (c)', 'Berat jenis (Gs)', 'Sudut geser dalam (Ï†)', 'Kadar air (w)'], 'correct' => [0, 2]],
                     ['q' => 'Manakah uji laboratorium mekanika tanah?', 'options' => ['Triaxial test', 'Tensile test baja', 'Direct shear test', 'Bending test beton'], 'correct' => [0, 2]],
                     ['q' => 'Manakah yang termasuk masalah stabilitas lereng?', 'options' => ['Slip circle failure', 'Bending failure', 'Translational failure', 'Tensile failure'], 'correct' => [0, 2]],
                     ['q' => 'Manakah parameter konsolidasi tanah?', 'options' => ['Cc (Compression index)', 'Modulus elastis baja', 'Cv (Coefficient of consolidation)', 'Kuat tekan beton'], 'correct' => [0, 2]],
@@ -730,7 +730,7 @@ class UjianSeeder extends Seeder
                     ['q' => 'Metode penjadwalan yang menggambarkan urutan dan durasi aktivitas secara visual?', 'a' => ['WBS', 'Gantt Chart', 'Flowchart', 'Mindmap'], 'correct' => 1],
                     ['q' => 'Nilai Earned Value (EV) dalam proyek konstruksi merepresentasikan?', 'a' => ['Biaya aktual', 'Nilai pekerjaan yang telah diselesaikan', 'Anggaran rencana', 'Laba proyek'], 'correct' => 1],
                     ['q' => 'K3 (Keselamatan dan Kesehatan Kerja) di proyek konstruksi diatur oleh?', 'a' => ['Menteri Keuangan', 'Permenaker dan SNI terkait K3', 'Departemen Perdagangan', 'Bank Indonesia'], 'correct' => 1],
-                    ['q' => 'RAB (Rencana Anggaran Biaya) disusun berdasarkan?', 'a' => ['Perkiraan kasar', 'Volume pekerjaan × harga satuan', 'Harga pasar bebas', 'Negosiasi saja'], 'correct' => 1],
+                    ['q' => 'RAB (Rencana Anggaran Biaya) disusun berdasarkan?', 'a' => ['Perkiraan kasar', 'Volume pekerjaan Ã— harga satuan', 'Harga pasar bebas', 'Negosiasi saja'], 'correct' => 1],
                     ['q' => 'Metode CPM (Critical Path Method) mengidentifikasi?', 'a' => ['Aktivitas termudah', 'Jalur terpanjang yang menentukan durasi proyek', 'Aktivitas paling mahal', 'Tim terbaik'], 'correct' => 1],
                 ],
                 'cb' => [
@@ -911,7 +911,7 @@ class UjianSeeder extends Seeder
                 ],
                 'essay' => [
                     ['q' => 'Jelaskan konsep faktor keamanan dalam desain elemen mesin! Bagaimana menentukan nilainya?'],
-                    ['q' => 'Apa yang dimaksud kegagalan fatigue? Jelaskan diagram Wöhler (S-N curve)!'],
+                    ['q' => 'Apa yang dimaksud kegagalan fatigue? Jelaskan diagram WÃ¶hler (S-N curve)!'],
                     ['q' => 'Jelaskan cara mendesain poros terhadap beban puntir dan lentur kombinasi!'],
                     ['q' => 'Apa perbedaan roda gigi spur, helical, dan bevel? Jelaskan kelebihan masing-masing!'],
                     ['q' => 'Jelaskan prinsip pemilihan bantalan (bearing selection) berdasarkan beban dan kecepatan!'],
@@ -947,7 +947,7 @@ class UjianSeeder extends Seeder
                     ['q' => 'Frekuensi natural sistem pegas-massa bergantung pada?', 'a' => ['Amplitudo getaran', 'Kekakuan pegas (k) dan massa (m)', 'Gaya eksternal', 'Redaman saja'], 'correct' => 1],
                     ['q' => 'Resonansi terjadi ketika frekuensi eksitasi?', 'a' => ['Lebih rendah dari frekuensi natural', 'Sama dengan frekuensi natural', 'Lebih tinggi dari frekuensi natural', 'Nol'], 'correct' => 1],
                     ['q' => 'Getaran bebas tanpa redaman (undamped free vibration) memiliki sifat?', 'a' => ['Amplitudo berkurang terus', 'Amplitudo tetap konstan', 'Getaran berhenti sendiri', 'Frekuensi berubah'], 'correct' => 1],
-                    ['q' => 'Rasio redaman kritis (ζ) = 1 menunjukkan sistem?', 'a' => ['Underdamped', 'Critically damped', 'Overdamped', 'Undamped'], 'correct' => 1],
+                    ['q' => 'Rasio redaman kritis (Î¶) = 1 menunjukkan sistem?', 'a' => ['Underdamped', 'Critically damped', 'Overdamped', 'Undamped'], 'correct' => 1],
                     ['q' => 'Vibration isolation digunakan untuk?', 'a' => ['Memperkuat getaran', 'Mengurangi transmisi getaran ke struktur pendukung', 'Meningkatkan frekuensi', 'Menambah massa'], 'correct' => 1],
                 ],
                 'cb' => [
@@ -969,8 +969,8 @@ class UjianSeeder extends Seeder
             // TEKNIK ELEKTRO (TE)
             'Rangkaian Listrik' => [
                 'pg' => [
-                    ['q' => 'Hukum Kirchhoff Tegangan (KVL) menyatakan?', 'a' => ['Jumlah arus masuk = keluar di suatu node', 'Jumlah tegangan pada loop tertutup = 0', 'Tegangan berbanding lurus arus', 'Daya = tegangan × arus'], 'correct' => 1],
-                    ['q' => 'Impedansi kapasitor (Xc) pada rangkaian AC?', 'a' => ['Xc = ωL', 'Xc = 1/(ωC)', 'Xc = R', 'Xc = ω/C'], 'correct' => 1],
+                    ['q' => 'Hukum Kirchhoff Tegangan (KVL) menyatakan?', 'a' => ['Jumlah arus masuk = keluar di suatu node', 'Jumlah tegangan pada loop tertutup = 0', 'Tegangan berbanding lurus arus', 'Daya = tegangan Ã— arus'], 'correct' => 1],
+                    ['q' => 'Impedansi kapasitor (Xc) pada rangkaian AC?', 'a' => ['Xc = Ï‰L', 'Xc = 1/(Ï‰C)', 'Xc = R', 'Xc = Ï‰/C'], 'correct' => 1],
                     ['q' => 'Teorema Thevenin menyederhanakan rangkaian menjadi?', 'a' => ['Sumber arus dan tahanan paralel', 'Sumber tegangan dan tahanan seri', 'Sumber daya dan kapasitor', 'Induktor dan kapasitor'], 'correct' => 1],
                     ['q' => 'Faktor daya (power factor) yang ideal pada beban listrik?', 'a' => ['0', '0.5', '1 (unity)', '-1'], 'correct' => 2],
                     ['q' => 'Resonansi seri LC terjadi ketika?', 'a' => ['XL > XC', 'XL = XC sehingga impedansi minimum', 'XC > XL', 'R = 0'], 'correct' => 1],
@@ -1018,7 +1018,7 @@ class UjianSeeder extends Seeder
             'Sistem Tenaga Listrik' => [
                 'pg' => [
                     ['q' => 'Transformator daya digunakan untuk?', 'a' => ['Menyimpan energi', 'Mengubah level tegangan AC', 'Mengubah AC ke DC', 'Menghasilkan daya'], 'correct' => 1],
-                    ['q' => 'Tegangan transmisi listrik dibuat tinggi untuk?', 'a' => ['Keamanan', 'Mengurangi rugi-rugi daya pada saluran (I²R)', 'Mempercepat transmisi', 'Mengurangi material kabel'], 'correct' => 1],
+                    ['q' => 'Tegangan transmisi listrik dibuat tinggi untuk?', 'a' => ['Keamanan', 'Mengurangi rugi-rugi daya pada saluran (IÂ²R)', 'Mempercepat transmisi', 'Mengurangi material kabel'], 'correct' => 1],
                     ['q' => 'Generator sinkron dalam pembangkit listrik bekerja berdasarkan?', 'a' => ['Efek Hall', 'Hukum Faraday (induksi elektromagnetik)', 'Hukum Ohm', 'Efek fotolistrik'], 'correct' => 1],
                     ['q' => 'Sistem proteksi tenaga listrik menggunakan?', 'a' => ['Hanya sekering', 'Relay proteksi untuk mendeteksi dan mengamankan gangguan', 'Hanya MCB', 'Tidak perlu proteksi'], 'correct' => 1],
                     ['q' => 'Faktor beban (load factor) dalam sistem tenaga listrik adalah?', 'a' => ['Daya maksimum saja', 'Rasio beban rata-rata terhadap beban puncak', 'Tegangan nominal', 'Frekuensi sistem'], 'correct' => 1],
@@ -1131,7 +1131,7 @@ class UjianSeeder extends Seeder
                     ['q' => 'Jelaskan komponen-komponen masalah Linear Programming (LP) beserta contoh formulasinya!'],
                     ['q' => 'Jelaskan metode grafis untuk menyelesaikan LP dengan dua variabel! Bagaimana menentukan solusi optimal?'],
                     ['q' => 'Apa yang dimaksud analisis sensitivitas dalam LP? Mengapa penting dalam pengambilan keputusan?'],
-                    ['q' => 'Jelaskan model antrian M/M/1! Apa yang dimaksud dengan intensitas lalu lintas (ρ)?'],
+                    ['q' => 'Jelaskan model antrian M/M/1! Apa yang dimaksud dengan intensitas lalu lintas (Ï)?'],
                     ['q' => 'Bagaimana riset operasi diaplikasikan dalam manajemen rantai pasok? Berikan contoh kasus!'],
                 ],
             ],
@@ -1149,7 +1149,7 @@ class UjianSeeder extends Seeder
                     ['q' => 'Manakah metode analisis postur kerja?', 'options' => ['RULA (Rapid Upper Limb Assessment)', 'SWOT Analysis', 'REBA (Rapid Entire Body Assessment)', 'BCG Matrix'], 'correct' => [0, 2]],
                     ['q' => 'Manakah faktor risiko musculoskeletal disorders (MSDs)?', 'options' => ['Postur canggung', 'Pencahayaan baik', 'Repetisi tinggi', 'Suhu nyaman'], 'correct' => [0, 2]],
                     ['q' => 'Manakah yang termasuk prinsip desain ergonomis?', 'options' => ['Sesuai dengan antropometri pengguna', 'Desain untuk kenyamanan perancang', 'Meminimalkan kelelahan', 'Estetika diutamakan saja'], 'correct' => [0, 2]],
-                    ['q' => 'Manakah kondisi lingkungan kerja yang optimal?', 'options' => ['Suhu 20-26°C', 'Suhu 40°C', 'Pencahayaan 300-500 lux', 'Kebisingan 100 dB'], 'correct' => [0, 2]],
+                    ['q' => 'Manakah kondisi lingkungan kerja yang optimal?', 'options' => ['Suhu 20-26Â°C', 'Suhu 40Â°C', 'Pencahayaan 300-500 lux', 'Kebisingan 100 dB'], 'correct' => [0, 2]],
                 ],
                 'essay' => [
                     ['q' => 'Jelaskan konsep ergonomi dan mengapa penting dalam perancangan sistem kerja!'],
@@ -1211,7 +1211,7 @@ class UjianSeeder extends Seeder
             'Sistem Produksi' => [
                 'pg' => [
                     ['q' => 'Tata letak pabrik (plant layout) bertipe product layout cocok untuk?', 'a' => ['Produksi beragam dalam jumlah kecil', 'Produksi massal dengan aliran proses tetap', 'Produksi custom order', 'Produksi proyek'], 'correct' => 1],
-                    ['q' => 'OEE (Overall Equipment Effectiveness) mengukur?', 'a' => ['Kapasitas mesin maksimal', 'Efektivitas penggunaan mesin (availability × performance × quality)', 'Biaya perawatan mesin', 'Umur mesin'], 'correct' => 1],
+                    ['q' => 'OEE (Overall Equipment Effectiveness) mengukur?', 'a' => ['Kapasitas mesin maksimal', 'Efektivitas penggunaan mesin (availability Ã— performance Ã— quality)', 'Biaya perawatan mesin', 'Umur mesin'], 'correct' => 1],
                     ['q' => 'Konsep 5S dalam sistem produksi (Seiri, Seiton, Seiso, Seiketsu, Shitsuke) berasal dari?', 'a' => ['Amerika Serikat', 'Jerman', 'Jepang', 'China'], 'correct' => 2],
                     ['q' => 'Bottleneck dalam sistem produksi adalah?', 'a' => ['Mesin tercepat', 'Proses/stasiun kerja yang membatasi kapasitas produksi keseluruhan', 'Produk terlaris', 'Bahan baku utama'], 'correct' => 1],
                     ['q' => 'Preventive maintenance dilakukan untuk?', 'a' => ['Memperbaiki mesin yang rusak', 'Mencegah kerusakan dengan perawatan terjadwal sebelum terjadi', 'Menambah kapasitas', 'Mengganti mesin lama'], 'correct' => 1],
@@ -1309,7 +1309,7 @@ class UjianSeeder extends Seeder
                 'pg' => [
                     ['q' => 'Program arsitektur (architectural program) berisi?', 'a' => ['Kode komputer', 'Kebutuhan ruang dan hubungan antar fungsi bangunan', 'Anggaran biaya', 'Jadwal konstruksi'], 'correct' => 1],
                     ['q' => 'Sirkulasi dalam arsitektur berkaitan dengan?', 'a' => ['Sistem MEP', 'Alur pergerakan manusia dan barang dalam bangunan', 'Struktur bangunan', 'Pencahayaan'], 'correct' => 1],
-                    ['q' => 'Denah (floor plan) dalam gambar arsitektur merupakan?', 'a' => ['Tampak depan bangunan', 'Potongan horizontal bangunan setinggi ±1.2m', 'Potongan vertikal', 'Perspektif 3D'], 'correct' => 1],
+                    ['q' => 'Denah (floor plan) dalam gambar arsitektur merupakan?', 'a' => ['Tampak depan bangunan', 'Potongan horizontal bangunan setinggi Â±1.2m', 'Potongan vertikal', 'Perspektif 3D'], 'correct' => 1],
                     ['q' => 'Zoning dalam perencanaan arsitektur bertujuan untuk?', 'a' => ['Menentukan warna bangunan', 'Mengelompokkan area berdasarkan fungsi dan privasi', 'Menghitung luas bangunan', 'Menentukan material'], 'correct' => 1],
                     ['q' => 'Skala 1:100 dalam gambar arsitektur berarti?', 'a' => ['1 cm gambar = 100 m nyata', '1 cm gambar = 100 cm (1 m) nyata', '100 cm gambar = 1 cm nyata', '1 mm gambar = 100 mm nyata'], 'correct' => 1],
                 ],
@@ -1382,7 +1382,7 @@ class UjianSeeder extends Seeder
                     ['q' => 'Sistem plumbing dalam bangunan mencakup?', 'a' => ['Listrik saja', 'Air bersih, air kotor, dan drainase', 'AC saja', 'Pencahayaan'], 'correct' => 1],
                     ['q' => 'HVAC singkatan dari?', 'a' => ['High Voltage Air Conditioning', 'Heating, Ventilation, and Air Conditioning', 'Humidity Ventilation and Cooling', 'Heat Value Air Control'], 'correct' => 1],
                     ['q' => 'Sistem fire protection pasif dalam bangunan meliputi?', 'a' => ['Sprinkler saja', 'Kompartemenisasi api melalui dinding dan pintu tahan api', 'Alarm kebakaran saja', 'Hydrant saja'], 'correct' => 1],
-                    ['q' => 'Iluminansi (illuminance) dalam pencahayaan diukur dalam satuan?', 'a' => ['Watt', 'Lumen', 'Lux (lm/m²)', 'Candela'], 'correct' => 2],
+                    ['q' => 'Iluminansi (illuminance) dalam pencahayaan diukur dalam satuan?', 'a' => ['Watt', 'Lumen', 'Lux (lm/mÂ²)', 'Candela'], 'correct' => 2],
                     ['q' => 'Tata udara (air conditioning) pada bangunan bertingkat umumnya menggunakan sistem?', 'a' => ['Window AC unit per ruang saja', 'Chilled water system atau VRF', 'Kipas angin saja', 'Ventilasi alami saja'], 'correct' => 1],
                 ],
                 'cb' => [
@@ -1623,7 +1623,7 @@ class UjianSeeder extends Seeder
                 'pg' => [
                     ['q' => 'Tujuan utama audit laporan keuangan adalah?', 'a' => ['Mendeteksi semua kecurangan', 'Memberikan opini atas kewajaran penyajian laporan keuangan', 'Menyusun laporan keuangan', 'Mengelola risiko bisnis'], 'correct' => 1],
                     ['q' => 'Opini Wajar Tanpa Pengecualian (WTP/Unqualified) berarti?', 'a' => ['Ada kesalahan material', 'Laporan keuangan disajikan wajar sesuai standar', 'Audit tidak lengkap', 'Ada pembatasan ruang lingkup'], 'correct' => 1],
-                    ['q' => 'Risiko audit (audit risk) merupakan kombinasi dari?', 'a' => ['Risiko bisnis saja', 'Inherent risk × Control risk × Detection risk', 'Fraud risk saja', 'Business risk × Legal risk'], 'correct' => 1],
+                    ['q' => 'Risiko audit (audit risk) merupakan kombinasi dari?', 'a' => ['Risiko bisnis saja', 'Inherent risk Ã— Control risk Ã— Detection risk', 'Fraud risk saja', 'Business risk Ã— Legal risk'], 'correct' => 1],
                     ['q' => 'Materialitas dalam audit digunakan untuk?', 'a' => ['Menentukan biaya audit', 'Menentukan ambang batas salah saji yang signifikan bagi pengguna', 'Mengatur tim audit', 'Membuat laporan'], 'correct' => 1],
                     ['q' => 'Internal control dalam audit mencakup?', 'a' => ['Kontrol keuangan saja', 'Control environment, risk assessment, control activities, information, monitoring', 'Kontrol operasional saja', 'Hanya pengendalian fisik'], 'correct' => 1],
                 ],

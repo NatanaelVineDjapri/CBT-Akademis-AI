@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +19,7 @@ class UjianDenganSoalSeeder extends Seeder
         $matkulBD  = DB::table('mata_kuliah')->where('kode', 'TI302')->first();
         $matkulAP  = DB::table('mata_kuliah')->where('kode', 'TI101')->first();
 
-        // ── Bank Soal ─────────────────────────────────────────────
+        // â”€â”€ Bank Soal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $bankPW = DB::table('bank_soal')->insertGetId([
             'created_by'     => $dosenId,
             'mata_kuliah_id' => $matkulPW->id,
@@ -47,7 +47,7 @@ class UjianDenganSoalSeeder extends Seeder
             'created_at'     => now(), 'updated_at' => now(),
         ]);
 
-        // ── Soal ──────────────────────────────────────────────────
+        // â”€â”€ Soal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $soalPW = [
             ['q' => 'Apa fungsi dari tag <head> dalam HTML?', 'a' => ['Menampilkan konten halaman', 'Menyimpan metadata dan resource halaman', 'Membuat header visual halaman', 'Menentukan ukuran halaman'], 'correct' => 1],
             ['q' => 'Dalam CSS, properti "display: flex" digunakan untuk?', 'a' => ['Menyembunyikan elemen', 'Mengatur tata letak elemen dalam satu dimensi', 'Membuat elemen menjadi blok', 'Mengatur posisi absolut'], 'correct' => 1],
@@ -67,9 +67,9 @@ class UjianDenganSoalSeeder extends Seeder
 
         // Soal PG untuk Algoritma
         $soalAPpg = [
-            ['q' => 'Kompleksitas waktu algoritma Binary Search adalah?', 'a' => ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'], 'correct' => 2],
+            ['q' => 'Kompleksitas waktu algoritma Binary Search adalah?', 'a' => ['O(n)', 'O(nÂ²)', 'O(log n)', 'O(1)'], 'correct' => 2],
             ['q' => 'Struktur data Stack menggunakan prinsip?', 'a' => ['FIFO', 'LIFO', 'Random Access', 'Priority Based'], 'correct' => 1],
-            ['q' => 'Dalam algoritma Bubble Sort, berapa kali iterasi yang diperlukan untuk array berukuran n?', 'a' => ['n', 'n/2', 'n-1', 'n²'], 'correct' => 2],
+            ['q' => 'Dalam algoritma Bubble Sort, berapa kali iterasi yang diperlukan untuk array berukuran n?', 'a' => ['n', 'n/2', 'n-1', 'nÂ²'], 'correct' => 2],
             ['q' => 'Rekursi adalah teknik di mana fungsi?', 'a' => ['Memanggil fungsi lain', 'Memanggil dirinya sendiri', 'Dijalankan secara paralel', 'Mengembalikan void'], 'correct' => 1],
         ];
 
@@ -92,7 +92,7 @@ class UjianDenganSoalSeeder extends Seeder
         $soalAPpgIds = $this->insertSoalPG($soalAPpg, $bankAP, $matkulAP->id);
         $soalAPcbIds = $this->insertSoalCB($soalAPcb, $bankAP, $matkulAP->id);
 
-        // ── Ujian ─────────────────────────────────────────────────
+        // â”€â”€ Ujian â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $tanggal1 = Carbon::create(2026, 3, 15, 9, 0, 0);
         $tanggal2 = Carbon::create(2026, 3, 20, 13, 0, 0);
         $tanggal3 = Carbon::create(2026, 4, 2, 8, 0, 0);
@@ -143,7 +143,7 @@ class UjianDenganSoalSeeder extends Seeder
             ['ujian_id' => $ujian3Id, 'randomize_soal' => false, 'max_attempt' => 1, 'passing_grade' => 65, 'proctoring_aktif' => false, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Grade Setting — tiap ujian bisa beda range
+        // Grade Setting â€” tiap ujian bisa beda range
         $this->insertGradeSetting($ujian1Id, [
             ['A', 85, 100], ['B', 75, 84], ['C', 65, 74], ['D', 55, 64], ['E', 0, 54],
         ]);
@@ -154,7 +154,7 @@ class UjianDenganSoalSeeder extends Seeder
             ['A', 88, 100], ['B', 75, 87], ['C', 65, 74], ['D', 50, 64], ['E', 0, 49],
         ]);
 
-        // ── Ujian Soal (link soal ke ujian) ───────────────────────
+        // â”€â”€ Ujian Soal (link soal ke ujian) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $ujianSoalPW = $this->insertUjianSoal($ujian1Id, $soalPWIds);
         $ujianSoalBD = $this->insertUjianSoal($ujian2Id, $soalBDIds);
 
@@ -164,8 +164,8 @@ class UjianDenganSoalSeeder extends Seeder
             $this->insertUjianSoalCB($ujian3Id, $soalAPcbIds, count($soalAPpgIds))
         );
 
-        // ── Hasil Ujian Natanael ───────────────────────────────────
-        // Ujian 1 (PW): benar 5/6 = 83.3 → grade B, lulus
+        // â”€â”€ Hasil Ujian Natanael â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Ujian 1 (PW): benar 5/6 = 83.3 â†’ grade B, lulus
         $this->buatHasil(
             $natanaelId, $ujian1Id, $ujianSoalPW, $soalPWIds,
             [1, 1, 2, 2, 2, 3], // jawaban (semua PG)
@@ -173,7 +173,7 @@ class UjianDenganSoalSeeder extends Seeder
             $tanggal1, $tanggal1->copy()->addMinutes(45)
         );
 
-        // Ujian 2 (BD): benar 3/5 = 60 → grade C, lulus
+        // Ujian 2 (BD): benar 3/5 = 60 â†’ grade C, lulus
         $this->buatHasil(
             $natanaelId, $ujian2Id, $ujianSoalBD, $soalBDIds,
             [2, 1, 0, 0, 1], // jawaban (no 4 salah)
@@ -181,19 +181,19 @@ class UjianDenganSoalSeeder extends Seeder
             $tanggal2, $tanggal2->copy()->addMinutes(50)
         );
 
-        // Ujian 3 (AP): PG 3/4 + CB 1/2 → 75 → grade B, lulus
+        // Ujian 3 (AP): PG 3/4 + CB 1/2 â†’ 75 â†’ grade B, lulus
         $this->buatHasilMix(
             $natanaelId, $ujian3Id,
             $ujianSoalAP,
             $soalAPpgIds, $soalAPcbIds,
             [2, 1, 2, 0],        // jawaban PG (no 4 salah)
-            ['A,C', 'A,C'],      // jawaban checklist (no 2 salah → harusnya A,C tapi...)
+            ['A,C', 'A,C'],      // jawaban checklist (no 2 salah â†’ harusnya A,C tapi...)
             75.0, 'B', true,
             $tanggal3, $tanggal3->copy()->addMinutes(55)
         );
     }
 
-    // ── Helpers ───────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private function insertGradeSetting(int $ujianId, array $grades): void
     {
@@ -401,3 +401,4 @@ class UjianDenganSoalSeeder extends Seeder
         ]);
     }
 }
+

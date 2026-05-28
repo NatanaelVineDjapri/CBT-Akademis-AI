@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +17,7 @@ class BankSoalBabSeeder extends Seeder
         $matkulSO  = DB::table('mata_kuliah')->where('kode', 'TI201')->first();
         $matkulJK  = DB::table('mata_kuliah')->where('kode', 'TI202')->first();
 
-        // ── Bab ──────────────────────────────────────────────────────
+        // â”€â”€ Bab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $babData = [
             $matkulPW->id => [
                 ['nama_bab' => 'Dasar HTML & CSS',         'urutan' => 1],
@@ -69,7 +69,7 @@ class BankSoalBabSeeder extends Seeder
             }
         }
 
-        // ── Bank Soal per Bab ─────────────────────────────────────────
+        // â”€â”€ Bank Soal per Bab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $bankSoalData = [
             // Pemrograman Web
             ['matkul_id' => $matkulPW->id, 'bab_urutan' => 0, 'nama' => 'Bank Soal HTML & CSS - Dasar',       'permission' => 'public'],
@@ -168,3 +168,4 @@ class BankSoalBabSeeder extends Seeder
         }
     }
 }
+
