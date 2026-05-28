@@ -20,16 +20,31 @@ use Database\Seeders\Universitas\Untar\SimulasiEssaySeeder;
 use Database\Seeders\Universitas\Untar\PmbSeeder;
 use Database\Seeders\Universitas\Untar\MataKuliahSeeder;
 use Database\Seeders\Universitas\Untar\MatkulDosenSeeder;
-use Database\Seeders\Universitas\Binus\UniversitasSeeder as BinusUniversitasSeeder;
-use Database\Seeders\Universitas\Binus\FakultasSeeder    as BinusFakultasSeeder;
-use Database\Seeders\Universitas\Binus\ProdiSeeder       as BinusProdiSeeder;
-use Database\Seeders\Universitas\Binus\UserSeeder        as BinusUserSeeder;
-use Database\Seeders\Universitas\Binus\MahasiswaSeeder   as BinusMahasiswaSeeder;
-use Database\Seeders\Universitas\Umn\UniversitasSeeder  as UmnUniversitasSeeder;
-use Database\Seeders\Universitas\Umn\FakultasSeeder     as UmnFakultasSeeder;
-use Database\Seeders\Universitas\Umn\ProdiSeeder        as UmnProdiSeeder;
-use Database\Seeders\Universitas\Umn\UserSeeder         as UmnUserSeeder;
-use Database\Seeders\Universitas\Umn\MahasiswaSeeder    as UmnMahasiswaSeeder;
+use Database\Seeders\Universitas\Binus\UniversitasSeeder   as BinusUniversitasSeeder;
+use Database\Seeders\Universitas\Binus\FakultasSeeder      as BinusFakultasSeeder;
+use Database\Seeders\Universitas\Binus\ProdiSeeder         as BinusProdiSeeder;
+use Database\Seeders\Universitas\Binus\UserSeeder          as BinusUserSeeder;
+use Database\Seeders\Universitas\Binus\MahasiswaSeeder     as BinusMahasiswaSeeder;
+use Database\Seeders\Universitas\Umn\UniversitasSeeder     as UmnUniversitasSeeder;
+use Database\Seeders\Universitas\Umn\FakultasSeeder        as UmnFakultasSeeder;
+use Database\Seeders\Universitas\Umn\ProdiSeeder           as UmnProdiSeeder;
+use Database\Seeders\Universitas\Umn\UserSeeder            as UmnUserSeeder;
+use Database\Seeders\Universitas\Umn\MahasiswaSeeder       as UmnMahasiswaSeeder;
+use Database\Seeders\Universitas\Uph\UniversitasSeeder     as UphUniversitasSeeder;
+use Database\Seeders\Universitas\Uph\FakultasSeeder        as UphFakultasSeeder;
+use Database\Seeders\Universitas\Uph\ProdiSeeder           as UphProdiSeeder;
+use Database\Seeders\Universitas\Uph\UserSeeder            as UphUserSeeder;
+use Database\Seeders\Universitas\Uph\MahasiswaSeeder       as UphMahasiswaSeeder;
+use Database\Seeders\Universitas\Trisakti\UniversitasSeeder as TrisaktiUniversitasSeeder;
+use Database\Seeders\Universitas\Trisakti\FakultasSeeder   as TrisaktiFakultasSeeder;
+use Database\Seeders\Universitas\Trisakti\ProdiSeeder      as TrisaktiProdiSeeder;
+use Database\Seeders\Universitas\Trisakti\UserSeeder       as TrisaktiUserSeeder;
+use Database\Seeders\Universitas\Trisakti\MahasiswaSeeder  as TrisaktiMahasiswaSeeder;
+use Database\Seeders\Universitas\AtmaJaya\UniversitasSeeder as AtmaJayaUniversitasSeeder;
+use Database\Seeders\Universitas\AtmaJaya\FakultasSeeder   as AtmaJayaFakultasSeeder;
+use Database\Seeders\Universitas\AtmaJaya\ProdiSeeder      as AtmaJayaProdiSeeder;
+use Database\Seeders\Universitas\AtmaJaya\UserSeeder       as AtmaJayaUserSeeder;
+use Database\Seeders\Universitas\AtmaJaya\MahasiswaSeeder  as AtmaJayaMahasiswaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -48,18 +63,33 @@ class DatabaseSeeder extends Seeder
             UniversitasSeeder::class,
             BinusUniversitasSeeder::class,
             UmnUniversitasSeeder::class,
+            UphUniversitasSeeder::class,
+            TrisaktiUniversitasSeeder::class,
+            AtmaJayaUniversitasSeeder::class,
             FakultasSeeder::class,
             BinusFakultasSeeder::class,
             UmnFakultasSeeder::class,
+            UphFakultasSeeder::class,
+            TrisaktiFakultasSeeder::class,
+            AtmaJayaFakultasSeeder::class,
             ProdiSeeder::class,
             BinusProdiSeeder::class,
             UmnProdiSeeder::class,
+            UphProdiSeeder::class,
+            TrisaktiProdiSeeder::class,
+            AtmaJayaProdiSeeder::class,
             UserSeeder::class,
             BinusUserSeeder::class,
             UmnUserSeeder::class,
+            UphUserSeeder::class,
+            TrisaktiUserSeeder::class,
+            AtmaJayaUserSeeder::class,
             MahasiswaSeeder::class,
             BinusMahasiswaSeeder::class,
             UmnMahasiswaSeeder::class,
+            UphMahasiswaSeeder::class,
+            TrisaktiMahasiswaSeeder::class,
+            AtmaJayaMahasiswaSeeder::class,
             DemoSeeder::class,
             UjianSeeder::class,
             NilaiSeeder::class,
