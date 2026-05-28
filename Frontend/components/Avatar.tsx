@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "../services/AuthServices";
+import { User } from "../types";
 
 interface Props {
   user: User;
