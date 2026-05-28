@@ -117,6 +117,19 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::put('/{id}', [PengumumanController::class, 'update']);
             Route::delete('/{id}', [PengumumanController::class, 'destroy']);
         });
+
+        Route::get('/audit/global', [AuditController::class, 'adminAkademisIndex']);
+        Route::get('/audit/global/{model}/{id}', [AuditController::class, 'show']);
+
+        Route::prefix('admin-users')->group(function () {
+            Route::get('/', [UserController::class, 'adminAkademisIndex']);
+            Route::get('/export-excel', [UserController::class, 'exportExcel']);
+            Route::post('/', [UserController::class, 'adminAkademisStore']);
+            Route::get('/{id}', [UserController::class, 'show']);
+            Route::put('/{id}', [UserController::class, 'updateByAdmin']);
+            Route::delete('/{id}', [UserController::class, 'destroy']);
+            Route::post('/import', [UserController::class, 'adminAkademisImport']);
+        });
     });
 
     Route::middleware('role:admin_akademis_ai,admin_universitas')->group(function () {

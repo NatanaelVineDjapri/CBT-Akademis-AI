@@ -21,7 +21,7 @@ class UserController extends Controller
         $sortDir = $request->sort_dir === 'desc' ? 'desc' : 'asc';
 
         $users = User::with('prodi')
-            ->when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
+            ->where('universitas_id', $authUser->universitas_id)
             ->when($request->role, fn($q) => $q->where('role', $request->role))
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
             ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
@@ -78,7 +78,7 @@ class UserController extends Controller
         }
 
         // Import Excel
-        $import = new UsersImport($fotoMap, $request->user()->universitas_id);     //tambah parameter universitas_id dri admin untuk assign ke user baru
+        $import = new UsersImport($fotoMap, $request->user()->universitas_id);
         Excel::import($import, $request->file('file_excel'));
 
         $failedRows = [];
@@ -338,6 +338,135 @@ class UserController extends Controller
             'message' => 'User berhasil dibuat!',
             'data' => $user,
         ], 201);
+    }
+
+    // ─── Admin Akademis AI ────────────────────────────────────────────────────────
+
+    public function adminAkademisIndex(Request $request)
+    {
+        $sortBy  = in_array($request->sort_by, ['nama', 'email', 'role', 'tahun_masuk']) ? $request->sort_by : 'nama';
+        $sortDir = $request->sort_dir === 'desc' ? 'desc' : 'asc';
+
+        $users = User::with(['prodi', 'universitas:id,nama,kode'])
+            ->when($request->universitas_id, fn($q) => $q->where('universitas_id', $request->universitas_id))
+            ->when($request->role, fn($q) => $q->where('role', $request->role))
+            ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
+            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%'))
+            ->when(in_array($sortBy, ['nama', 'email', 'role']),
+                fn($q) => $q->orderByRaw("LOWER({$sortBy}) {$sortDir}"),
+                fn($q) => $q->orderByRaw("{$sortBy} {$sortDir} NULLS LAST")
+            )
+            ->paginate($request->per_page ?? 10);
+
+        return response()->json([
+            'message' => 'Data user berhasil diambil!',
+            'data' => $users->items(),
+            'meta' => [
+                'total' => $users->total(),
+                'per_page' => $users->perPage(),
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+            ],
+        ], 200);
+    }
+
+    public function adminAkademisStore(Request $request)
+    {
+        $request->validate([
+            'universitas_id' => 'required|exists:universitas,id',
+            'nama'           => 'required|string|max:255',
+            'email'          => 'required|email|unique:users',
+            'password'       => 'required|min:8',
+            'role'           => 'required|in:admin_universitas,dosen,mahasiswa,peserta_mahasiswa_baru',
+            'nim'            => 'nullable|string',
+            'nidn'           => 'nullable|string',
+            'no_telp'        => 'nullable|string',
+            'alamat'         => 'nullable|string',
+            'tahun_masuk'    => 'nullable|integer',
+            'prodi_id'       => 'nullable|exists:prodi,id',
+        ], [
+            'universitas_id.required' => 'Universitas wajib dipilih!',
+            'universitas_id.exists'   => 'Universitas tidak ditemukan!',
+            'nama.required'           => 'Nama wajib diisi!',
+            'email.required'          => 'Email wajib diisi!',
+            'email.unique'            => 'Email sudah terdaftar!',
+            'password.min'            => 'Password minimal 8 karakter!',
+            'role.in'                 => 'Role tidak valid!',
+        ]);
+
+        $user = User::create([
+            'nama'           => $request->nama,
+            'email'          => $request->email,
+            'password'       => Hash::make($request->password),
+            'role'           => $request->role,
+            'nim'            => $request->nim,
+            'nidn'           => $request->nidn,
+            'no_telp'        => $request->no_telp,
+            'alamat'         => $request->alamat,
+            'tahun_masuk'    => $request->tahun_masuk,
+            'prodi_id'       => $request->prodi_id,
+            'universitas_id' => $request->universitas_id,
+            'is_temporary'   => false,
+        ]);
+
+        return response()->json([
+            'message' => 'User berhasil dibuat!',
+            'data'    => $user,
+        ], 201);
+    }
+
+    public function adminAkademisImport(Request $request)
+    {
+        $request->validate([
+            'universitas_id' => 'required|exists:universitas,id',
+            'file_excel'     => 'required|mimes:xlsx,xls|max:5120',
+            'file_zip'       => 'nullable|mimes:zip|max:51200',
+        ], [
+            'universitas_id.required' => 'Universitas wajib dipilih!',
+            'file_excel.required'     => 'File Excel wajib diupload!',
+            'file_excel.mimes'        => 'File harus berformat Excel (.xlsx/.xls)!',
+            'file_zip.mimes'          => 'File foto harus berformat ZIP!',
+        ]);
+
+        $fotoMap = [];
+
+        if ($request->hasFile('file_zip')) {
+            $zipPath     = $request->file('file_zip')->store('temp', 'local');
+            $zipFullPath = storage_path('app/' . $zipPath);
+            $extractPath = storage_path('app/public/users/');
+
+            $zip = new \ZipArchive();
+            if ($zip->open($zipFullPath) === true) {
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $filename           = $zip->getNameIndex($i);
+                    $nim                = pathinfo($filename, PATHINFO_FILENAME);
+                    $zip->extractTo($extractPath, $filename);
+                    $fotoMap[$nim]      = 'users/' . $filename;
+                }
+                $zip->close();
+            }
+
+            Storage::disk('local')->delete($zipPath);
+        }
+
+        $import = new UsersImport($fotoMap, $request->universitas_id);
+        Excel::import($import, $request->file('file_excel'));
+
+        $failedRows = [];
+        foreach ($import->failures() as $failure) {
+            $failedRows[] = [
+                'baris'  => $failure->row(),
+                'kolom'  => $failure->attribute(),
+                'error'  => $failure->errors()[0],
+                'values' => $failure->values(),
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Import selesai!',
+            'gagal'   => $failedRows,
+        ], 200);
     }
 
     private function compressImage(string $sourcePath): string

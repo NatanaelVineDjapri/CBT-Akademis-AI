@@ -529,10 +529,16 @@ export const labels: Record<string, string> = {
   "hasil-ujian-pmb": "Hasil Ujian PMB",
   "penerimaan-pmb": "Penerimaan PMB",
   user: "User",
+  users: "Users",
   krs: "KRS",
   fakultas: "Fakultas",
   prodi: "Program Studi",
   institusi: "Institusi",
+  pengumuman: "Pengumuman",
+  maintenance: "Maintenance",
+  "log": "Log",
+  "admin-akademis": "Admin Akademis",
+  "admin-universitas": "Admin Universitas",
 };
 
 export const roleLabels: Record<string, string> = {

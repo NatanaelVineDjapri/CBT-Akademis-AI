@@ -60,3 +60,25 @@ export const getAuditByModel = async (
   const res = await api.get(`/audit/${model}/${id}`);
   return res.data;
 };
+
+export interface AuditItemGlobal extends AuditItem {
+  user: (AuditUser & {
+    universitas_id?: number | null;
+    universitas_nama?: string | null;
+    universitas_kode?: string | null;
+  }) | null;
+}
+
+export const getAdminAkademisAudits = async (params?: {
+  model?: AuditModel;
+  event?: AuditEvent;
+  universitas_id?: number;
+  search?: string;
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_dir?: string;
+}): Promise<{ data: AuditItemGlobal[]; total: number; per_page: number; last_page: number; page: number }> => {
+  const res = await api.get("/audit/global", { params });
+  return res.data;
+};

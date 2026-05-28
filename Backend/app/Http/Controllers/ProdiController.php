@@ -21,6 +21,7 @@ class ProdiController extends Controller
                     $fq->where('universitas_id', $authUser->universitas_id);
                 });
             })
+            ->when($request->universitas_id, fn($q) => $q->whereHas('fakultas', fn($fq) => $fq->where('universitas_id', $request->universitas_id)))
             ->when($request->fakultas_id, fn($q) => $q->where('fakultas_id', $request->fakultas_id))
             ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
                 ->orWhere('kode', 'like', '%' . $request->search . '%'))

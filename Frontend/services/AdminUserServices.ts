@@ -34,6 +34,7 @@ export interface AdminUserItem {
   prodi_id?: number | null;
   universitas_id?: number;
   prodi?: { id: number; nama: string; kode: string } | null;
+  universitas?: { id: number; nama: string; kode: string } | null;
   created_at?: string;
 }
 
@@ -51,6 +52,7 @@ export const getFakultas = async (params?: {
 
 export const getProdi = async (params?: {
   fakultas_id?: number;
+  universitas_id?: number;
   search?: string;
   per_page?: number;
   page?: number;
@@ -61,6 +63,7 @@ export const getProdi = async (params?: {
 
 export const getAdminUsers = async (params?: {
   prodi_id?: number;
+  universitas_id?: number;
   role?: string;
   search?: string;
   per_page?: number;
@@ -82,6 +85,7 @@ export const createAdminUser = async (data: {
   no_telp?: string;
   tahun_masuk?: number | string;
   prodi_id?: number;
+  universitas_id?: number;
 }): Promise<AdminUserItem> => {
   const res = await api.post("/users", data);
   return res.data.data;
@@ -111,6 +115,7 @@ export const exportAdminUsers = async (params: {
   tahun_dari?: string;
   tahun_sampai?: string;
   prodi_id?: number;
+  universitas_id?: number;
   columns?: string[];
 }): Promise<Blob> => {
   const res = await api.get("/users/export-excel", {
@@ -122,6 +127,64 @@ export const exportAdminUsers = async (params: {
 
 export const importAdminUsers = async (data: FormData): Promise<{ gagal: { baris: number; kolom: string; error: string }[] }> => {
   const res = await api.post("/users/import", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
+// ─── Admin Akademis AI (global, all universities) ─────────────────────────────
+
+export const getAdminAkademisUsers = async (params?: {
+  universitas_id?: number;
+  role?: string;
+  search?: string;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_dir?: string;
+}): Promise<{ data: AdminUserItem[]; meta: Meta }> => {
+  const res = await api.get("/admin-users", { params });
+  return { data: res.data.data, meta: res.data.meta };
+};
+
+export const createAdminAkademisUser = async (data: {
+  universitas_id: number;
+  nama: string;
+  email: string;
+  password: string;
+  role: string;
+  nim?: string;
+  nidn?: string;
+  no_telp?: string;
+  alamat?: string;
+  tahun_masuk?: number | string;
+  prodi_id?: number;
+}): Promise<AdminUserItem> => {
+  const res = await api.post("/admin-users", data);
+  return res.data.data;
+};
+
+export const updateAdminAkademisUser = async (id: number, data: {
+  nama?: string;
+  email?: string;
+  role?: string;
+  nim?: string;
+  nidn?: string;
+  no_telp?: string;
+  alamat?: string;
+  tahun_masuk?: number | string;
+  prodi_id?: number;
+}): Promise<AdminUserItem> => {
+  const res = await api.put(`/admin-users/${id}`, data);
+  return res.data.data;
+};
+
+export const deleteAdminAkademisUser = async (id: number): Promise<void> => {
+  await api.delete(`/admin-users/${id}`);
+};
+
+export const importAdminAkademisUsers = async (data: FormData): Promise<{ gagal: { baris: number; kolom: string; error: string }[] }> => {
+  const res = await api.post("/admin-users/import", data, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;

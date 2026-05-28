@@ -108,10 +108,15 @@ class AuditController extends Controller
 
     public function index(Request $request)
     {
-        $sortBy  = in_array($request->sort_by, ['created_at', 'event', 'auditable_type']) ? $request->sort_by : 'created_at';
-        $sortDir = $request->sort_dir === 'asc' ? 'asc' : 'desc';
+        $authUser = $request->user();
+        $sortBy   = in_array($request->sort_by, ['created_at', 'event', 'auditable_type']) ? $request->sort_by : 'created_at';
+        $sortDir  = $request->sort_dir === 'asc' ? 'asc' : 'desc';
 
-        $query = Audit::with('user:id,nama,email,role')->orderBy($sortBy, $sortDir);
+        $univUserIds = \App\Models\User::where('universitas_id', $authUser->universitas_id)->pluck('id');
+
+        $query = Audit::with('user:id,nama,email,role')
+            ->whereIn('user_id', $univUserIds)
+            ->orderBy($sortBy, $sortDir);
 
         if ($request->filled('model')) {
             $modelClass = self::MODEL_MAP[$request->input('model')] ?? null;
@@ -141,6 +146,49 @@ class AuditController extends Controller
 
         return response()->json([
             'data'      => collect($paginated->items())->map(fn ($a) => $this->formatAudit($a)),
+            'total'     => $paginated->total(),
+            'per_page'  => $paginated->perPage(),
+            'last_page' => $paginated->lastPage(),
+            'page'      => $paginated->currentPage(),
+        ]);
+    }
+
+    public function adminAkademisIndex(Request $request)
+    {
+        $sortBy  = in_array($request->sort_by, ['created_at', 'event', 'auditable_type']) ? $request->sort_by : 'created_at';
+        $sortDir = $request->sort_dir === 'asc' ? 'asc' : 'desc';
+
+        $query = Audit::with(['user:id,nama,email,role,universitas_id', 'user.universitas:id,nama,kode'])->orderBy($sortBy, $sortDir);
+
+        if ($request->filled('model')) {
+            $modelClass = self::MODEL_MAP[$request->input('model')] ?? null;
+            if ($modelClass) {
+                $query->where('auditable_type', $modelClass);
+            }
+        }
+
+        if ($request->filled('event')) {
+            $query->where('event', $request->input('event'));
+        }
+
+        if ($request->filled('universitas_id')) {
+            $univUserIds = \App\Models\User::where('universitas_id', $request->input('universitas_id'))->pluck('id');
+            $query->whereIn('user_id', $univUserIds);
+        }
+
+        if ($request->filled('search')) {
+            $q = $request->input('search');
+            $query->where(function ($sub) use ($q) {
+                $sub->whereHas('user', fn ($u) => $u->where('nama', 'like', "%{$q}%"))
+                    ->orWhere('auditable_type', 'like', "%{$q}%");
+            });
+        }
+
+        $perPage   = max(1, (int) $request->input('per_page', 15));
+        $paginated = $query->paginate($perPage);
+
+        return response()->json([
+            'data'      => collect($paginated->items())->map(fn ($a) => $this->formatAuditGlobal($a)),
             'total'     => $paginated->total(),
             'per_page'  => $paginated->perPage(),
             'last_page' => $paginated->lastPage(),
@@ -187,5 +235,19 @@ class AuditController extends Controller
             'ip_address'  => $a->getAttribute('ip_address'),
             'created_at'  => $a->getAttribute('created_at')?->format('d M Y H:i:s'),
         ];
+    }
+
+    private function formatAuditGlobal(Audit $a): array
+    {
+        $base = $this->formatAudit($a);
+
+        if ($a->user) {
+            $univ = $a->user->universitas;
+            $base['user']['universitas_id']   = $a->user->getAttribute('universitas_id');
+            $base['user']['universitas_nama'] = $univ?->getAttribute('nama');
+            $base['user']['universitas_kode'] = $univ?->getAttribute('kode');
+        }
+
+        return $base;
     }
 }
