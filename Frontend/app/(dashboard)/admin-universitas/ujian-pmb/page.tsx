@@ -64,8 +64,9 @@ export default function AdminUjianPmbPage() {
           max_attempt:   String(d.max_attempt ?? "1"),
           start_date:    toJakartaInput(d.start_date),
           end_date:      toJakartaInput(d.end_date),
-          kode_akses:    d.kode_akses ?? "",
-          is_kode_aktif: d.is_kode_aktif ?? false,
+          kode_akses:       d.kode_akses ?? "",
+          is_kode_aktif:    d.is_kode_aktif    ?? false,
+          proctoring_aktif: d.proctoring_aktif ?? false,
         },
       });
     } catch {
