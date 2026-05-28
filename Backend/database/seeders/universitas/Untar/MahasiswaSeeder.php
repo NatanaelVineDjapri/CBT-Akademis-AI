@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -46,7 +46,7 @@ class MahasiswaSeeder extends Seeder
         ];
 
         // =====================================================================
-        // TI (535) — 321 mahasiswa
+        // TI (535) â€” 321 mahasiswa
         // =====================================================================
         DB::table('users')->insertOrIgnore([
             // 2021 (70)
@@ -262,7 +262,7 @@ class MahasiswaSeeder extends Seeder
             $mhs('Erlangga Setiawan','535230068', 2023, $ti),
             $mhs('Fajar Setiawan',  '535230069', 2023, $ti),
             $mhs('Fitri Setiawan',  '535230070', 2023, $ti),
-            // 2024 (71) — incl. Natanael Vine Djapri
+            // 2024 (71) â€” incl. Natanael Vine Djapri
             $mhs('Agus Rahayu',     '535240001', 2024, $ti),
             $mhs('Ayu Rahayu',      '535240002', 2024, $ti),
             $mhs('Ahmad Rahayu',    '535240003', 2024, $ti),
@@ -378,7 +378,7 @@ class MahasiswaSeeder extends Seeder
         ]);
 
         // =====================================================================
-        // SI (536) — 230 mahasiswa
+        // SI (536) â€” 230 mahasiswa
         // =====================================================================
         DB::table('users')->insertOrIgnore([
             // 2021 (60)
@@ -619,7 +619,7 @@ class MahasiswaSeeder extends Seeder
         ]);
 
         // =====================================================================
-        // TS (312) — 130 | TE (313) — 140 | TM (314) — 100 | TIN (315) — 100 | ARS (316) — 80
+        // TS (312) â€” 130 | TE (313) â€” 140 | TM (314) â€” 100 | TIN (315) â€” 100 | ARS (316) â€” 80
         // =====================================================================
         DB::table('users')->insertOrIgnore([
             // TS 2021 (30)
@@ -1195,7 +1195,7 @@ class MahasiswaSeeder extends Seeder
         ]);
 
         // =====================================================================
-        // MNJ (621) — 220 | AKT (622) — 150
+        // MNJ (621) â€” 220 | AKT (622) â€” 150
         // =====================================================================
         DB::table('users')->insertOrIgnore([
             // MNJ 2021 (44)
@@ -1581,7 +1581,7 @@ class MahasiswaSeeder extends Seeder
         ]);
 
         // =====================================================================
-        // IH (741) — 120 | KD (911) — 50 | DI (212) — 60 | DKV (213) — 60 | PSI (732) — 120 | IK (701) — 119
+        // IH (741) â€” 120 | KD (911) â€” 50 | DI (212) â€” 60 | DKV (213) â€” 60 | PSI (732) â€” 120 | IK (701) â€” 119
         // =====================================================================
         DB::table('users')->insertOrIgnore([
             // IH 2021 (30)
@@ -2139,3 +2139,4 @@ class MahasiswaSeeder extends Seeder
         ]);
     }
 }
+

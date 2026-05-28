@@ -174,8 +174,8 @@ export default function InstitusiPage() {
           <table className="w-full text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
-              <col className="w-56" />
-              <col />
+              <col className="w-72" />
+              <col className="w-60" />
               <col className="w-24" />
               <col className="w-24" />
               <col className="w-20" />
@@ -239,7 +239,7 @@ export default function InstitusiPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500">
-                    <span className="line-clamp-2">{item.alamat || "-"}</span>
+                    <span className="truncate block">{item.alamat || "-"}</span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 font-medium text-center">{item.fakultas_count ?? 0}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 font-medium text-center">{item.total_mahasiswa ?? 0}</td>

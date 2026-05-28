@@ -1,13 +1,16 @@
 "use client";
 
 import useSWR from "swr";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { getPengumuman, createPengumuman, updatePengumuman, deletePengumuman, type Pengumuman } from "@/services/PengumumanService";
 import BreadCrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
+import Pagination from "@/components/filtering/Pagination";
 import ConfirmModal from "@/components/ConfirmModal";
 import EmptyState from "@/components/EmptyState";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePerPage } from "@/hooks/usePerPage";
 
 const roleOptions = [
   { value: "", label: "Semua Pengguna" },
@@ -46,30 +49,44 @@ type FormState = { judul: string; isi: string; target_role: string; expired_at: 
 const emptyForm: FormState = { judul: "", isi: "", target_role: "", expired_at: "" };
 
 export default function PengumumanPage() {
-  const { data: response, isLoading, mutate } = useSWR(
-    ["/pengumuman", "created_at", "desc"],
-    () => getPengumuman({ sort_by: "created_at", sort_dir: "desc", per_page: 100 }),
-    { revalidateOnFocus: false }
-  );
-  const data = response?.data;
+  const perPage        = usePerPage(53, 1, 320);
   const [search, setSearch]           = useState("");
   const [roleFilter, setRoleFilter]   = useState("");
+  const [sortBy, setSortBy]           = useState<PengumumanSortBy>("created_at");
+  const [sortDir, setSortDir]         = useState<SortDir>("desc");
+  const [page, setPage]               = useState(1);
+  const debouncedSearch               = useDebounce(search);
+
   const [showModal, setShowModal]     = useState(false);
   const [editItem, setEditItem]       = useState<Pengumuman | null>(null);
   const [form, setForm]               = useState<FormState>(emptyForm);
-  const [sortBy, setSortBy]           = useState<PengumumanSortBy>("created_at");
-  const [sortDir, setSortDir]         = useState<SortDir>("desc");
   const [saving, setSaving]           = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Pengumuman | null>(null);
   const [deleting, setDeleting]       = useState(false);
 
+  useEffect(() => { setPage(1); }, [debouncedSearch, roleFilter, sortBy, sortDir]);
+
+  const { data, isLoading, mutate } = useSWR(
+    ["/pengumuman", debouncedSearch, roleFilter, sortBy, sortDir, page, perPage],
+    ([, s, rf, sb, sd, p, pp]) => getPengumuman({
+      search: s || undefined,
+      target_role: rf || undefined,
+      sort_by: sb,
+      sort_dir: sd,
+      page: p,
+      per_page: pp,
+    }),
+    { keepPreviousData: true, revalidateOnFocus: false, revalidateIfStale: false }
+  );
+
+  const rows     = data?.data ?? [];
+  const meta     = data?.meta;
+  const lastPage = meta?.last_page ?? 1;
+
   const handleSort = (col: PengumumanSortBy) => {
-    if (col === sortBy) {
-      setSortDir(d => d === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(col);
-      setSortDir(col === "judul" ? "asc" : "desc");
-    }
+    const newDir: SortDir = col === sortBy ? (sortDir === "asc" ? "desc" : "asc") : col === "judul" ? "asc" : "desc";
+    setSortBy(col);
+    setSortDir(newDir);
   };
 
   const openAdd = () => { setEditItem(null); setForm(emptyForm); setShowModal(true); };
@@ -112,29 +129,6 @@ export default function PengumumanPage() {
       setDeleting(false);
     }
   };
-
-  const filtered = (data ?? [])
-    .filter(item => {
-      const matchSearch = item.judul.toLowerCase().includes(search.toLowerCase()) || item.isi.toLowerCase().includes(search.toLowerCase());
-      const matchRole   = !roleFilter || item.target_role === roleFilter;
-      return matchSearch && matchRole;
-    })
-    .sort((a, b) => {
-      let valA: string, valB: string;
-      if (sortBy === "judul") {
-        valA = a.judul.toLowerCase();
-        valB = b.judul.toLowerCase();
-      } else if (sortBy === "expired_at") {
-        valA = a.expired_at ?? "";
-        valB = b.expired_at ?? "";
-      } else {
-        valA = a.created_at;
-        valB = b.created_at;
-      }
-      if (valA < valB) return sortDir === "asc" ? -1 : 1;
-      if (valA > valB) return sortDir === "asc" ? 1 : -1;
-      return 0;
-    });
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -195,9 +189,9 @@ export default function PengumumanPage() {
                     ))}
                   </tr>
                 ))
-              ) : filtered.map((item, idx) => (
+              ) : rows.map((item, idx) => (
                 <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 text-xs text-gray-400">{String(idx + 1).padStart(2, "0")}</td>
+                  <td className="px-5 py-3 text-xs text-gray-400">{String((page - 1) * perPage + idx + 1).padStart(2, "0")}</td>
                   <td className="px-4 py-3 max-w-xs">
                     <p className="font-medium text-gray-800 truncate">{item.judul}</p>
                     <p className="text-xs text-gray-400 truncate mt-0.5">{item.isi}</p>
@@ -225,10 +219,16 @@ export default function PengumumanPage() {
               ))}
             </tbody>
           </table>
-          {!isLoading && filtered.length === 0 && (
+          {!isLoading && rows.length === 0 && (
             <EmptyState message={search || roleFilter ? "Tidak ada hasil pencarian." : "Belum ada pengumuman."} flat />
           )}
         </div>
+
+        {lastPage > 1 && (
+          <div className="px-5 py-3 border-t border-gray-100">
+            <Pagination currentPage={page} lastPage={lastPage} total={meta?.total ?? 0} perPage={perPage} onPageChange={setPage} />
+          </div>
+        )}
       </div>
       </div>
 

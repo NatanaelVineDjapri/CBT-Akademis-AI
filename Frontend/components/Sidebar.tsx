@@ -344,8 +344,8 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
         <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={onClose} />
       )}
 
-      <div className={`${collapsed ? "w-16" : "w-[280px]"} shrink-0 fixed left-0 top-0 h-screen z-40 transition-all duration-300
-        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <div className={`${collapsed ? "w-16" : "w-[280px]"} shrink-0 fixed left-0 top-0 h-screen z-40 transition-[width] duration-300 overflow-hidden
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
 
         {/* Toggle button — outside scroll container so it doesn't get clipped */}
         <button

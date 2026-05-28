@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +17,8 @@ class DemoSeeder extends Seeder
         $mhs2Id     = DB::table('users')->where('nim', '535240005')->value('id');
         $mhs3Id     = DB::table('users')->where('nim', '535240003')->value('id');
 
-        // Mata Kuliah TI (30 total) — semester & sks sesuai kurikulum FTI UNTAR
-        // KRS mulai semester 4, semester 1–3 fixed package
+        // Mata Kuliah TI (30 total) â€” semester & sks sesuai kurikulum FTI UNTAR
+        // KRS mulai semester 4, semester 1â€“3 fixed package
         $allMatkul = [
             // Semester 1
             ['nama' => 'Algoritma dan Pemrograman',      'kode' => 'TI101', 'semester' => 1, 'sks' => 4],
@@ -96,7 +96,7 @@ class DemoSeeder extends Seeder
 
         DB::table('dosen_matkul')->insertOrIgnore($dosenMatkulInsert);
 
-        // User Mata Kuliah — Natanael dapat semua 30, mhs lain hanya 2
+        // User Mata Kuliah â€” Natanael dapat semua 30, mhs lain hanya 2
         $natanaelMatkul = array_map(fn($id) => [
             'user_id'        => $natanaelId,
             'mata_kuliah_id' => $id,
@@ -293,3 +293,4 @@ class DemoSeeder extends Seeder
         ]);
     }
 }
+

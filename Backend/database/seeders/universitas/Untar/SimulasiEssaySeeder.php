@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Universitas\Untar;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ use Carbon\Carbon;
  *  - Selesai          : ada nilai_akhir + semua essay sudah dikoreksi
  *  - Belum Mulai      : tidak ada mulai_at
  *  - Berlangsung      : status = sedang_berlangsung
- *  - Selesai (PG only): ada nilai_akhir, tidak ada essay → harus Selesai, bukan Perlu Pengecekan
+ *  - Selesai (PG only): ada nilai_akhir, tidak ada essay â†’ harus Selesai, bukan Perlu Pengecekan
  */
 class SimulasiEssaySeeder extends Seeder
 {
@@ -36,7 +36,7 @@ class SimulasiEssaySeeder extends Seeder
         // Semua peserta yang akan dipakai: [natanael, mhs1, mhs2, mhs3, mhs4]
         $pesertaList = array_merge([$natanaelId], $mahasiswaIds);
 
-        // ── Bank Soal ──────────────────────────────────────────────────
+        // â”€â”€ Bank Soal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $bankId = DB::table('bank_soal')->insertGetId([
             'created_by'     => $dosenId,
             'mata_kuliah_id' => $matkulAP->id,
@@ -45,7 +45,7 @@ class SimulasiEssaySeeder extends Seeder
             'created_at'     => now(), 'updated_at' => now(),
         ]);
 
-        // ── Soal PG (2 soal) ──────────────────────────────────────────
+        // â”€â”€ Soal PG (2 soal) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $pgSoal = [
             ['q' => 'Apa kepanjangan dari CPU?', 'a' => ['Central Processing Unit', 'Computer Personal Unit', 'Core Processing Utility', 'Central Program Unit'], 'correct' => 0],
             ['q' => 'Manakah tipe data berikut yang menyimpan bilangan desimal?', 'a' => ['int', 'char', 'float', 'bool'], 'correct' => 2],
@@ -78,7 +78,7 @@ class SimulasiEssaySeeder extends Seeder
             $pgUjianSoalIds[] = ['soal_id' => $soalId, 'correct' => $s['correct']];
         }
 
-        // ── Soal Essay (2 soal) ───────────────────────────────────────
+        // â”€â”€ Soal Essay (2 soal) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $essaySoal = [
             'Jelaskan perbedaan antara stack dan queue beserta contoh penggunaannya!',
             'Apa yang dimaksud dengan kompleksitas waktu dan ruang dalam algoritma? Berikan contoh!',
@@ -102,7 +102,7 @@ class SimulasiEssaySeeder extends Seeder
             $essayUjianSoalIds[] = $soalId;
         }
 
-        // ── Ujian (sudah selesai, 1 minggu lalu) ──────────────────────
+        // â”€â”€ Ujian (sudah selesai, 1 minggu lalu) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $tanggal = Carbon::now()->subWeek();
 
         $ujianId = DB::table('ujian')->insertGetId([
@@ -154,7 +154,7 @@ class SimulasiEssaySeeder extends Seeder
             ]);
         }
 
-        // ── SKENARIO 1: Natanael — essay belum dikoreksi → "Perlu Pengecekan" ──
+        // â”€â”€ SKENARIO 1: Natanael â€” essay belum dikoreksi â†’ "Perlu Pengecekan" â”€â”€
         $this->buatPeserta($pesertaList[0], $ujianId, $ujianSoalPG, $pgUjianSoalIds, $ujianSoalEssay, [
             'status'           => 'selesai',
             'mulai_at'         => $tanggal,
@@ -165,7 +165,7 @@ class SimulasiEssaySeeder extends Seeder
             'lulus'            => false,
         ]);
 
-        // ── SKENARIO 2: Mahasiswa 1 — essay sudah dikoreksi → "Selesai" ──────
+        // â”€â”€ SKENARIO 2: Mahasiswa 1 â€” essay sudah dikoreksi â†’ "Selesai" â”€â”€â”€â”€â”€â”€
         $this->buatPeserta($pesertaList[1], $ujianId, $ujianSoalPG, $pgUjianSoalIds, $ujianSoalEssay, [
             'status'       => 'selesai',
             'mulai_at'     => $tanggal,
@@ -176,13 +176,13 @@ class SimulasiEssaySeeder extends Seeder
             'lulus'        => true,
         ]);
 
-        // ── SKENARIO 3: Mahasiswa 2 — belum mulai → "Belum Mulai" ────────────
+        // â”€â”€ SKENARIO 3: Mahasiswa 2 â€” belum mulai â†’ "Belum Mulai" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         $this->buatPesertaBelumMulai($pesertaList[2], $ujianId);
 
-        // ── SKENARIO 4: Mahasiswa 3 — sedang berlangsung → "Berlangsung" ─────
+        // â”€â”€ SKENARIO 4: Mahasiswa 3 â€” sedang berlangsung â†’ "Berlangsung" â”€â”€â”€â”€â”€
         $this->buatPesertaBerlangsung($pesertaList[3], $ujianId, $tanggal);
 
-        // ── Ujian 2: Pure PG — harusnya "Selesai", bukan "Perlu Pengecekan" ──
+        // â”€â”€ Ujian 2: Pure PG â€” harusnya "Selesai", bukan "Perlu Pengecekan" â”€â”€
         $ujianPGId = DB::table('ujian')->insertGetId([
             'created_by'     => $dosenId,
             'mata_kuliah_id' => $matkulAP->id,
@@ -220,7 +220,7 @@ class SimulasiEssaySeeder extends Seeder
             ]);
         }
 
-        // Natanael ikut ujian pure PG → harus "Selesai" walaupun is_manual_graded = false
+        // Natanael ikut ujian pure PG â†’ harus "Selesai" walaupun is_manual_graded = false
         $pesertaPGId = DB::table('peserta_ujian')->insertGetId([
             'ujian_id'   => $ujianPGId,
             'user_id'    => $pesertaList[0],
@@ -254,7 +254,7 @@ class SimulasiEssaySeeder extends Seeder
         ]);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private function buatPeserta(int $userId, int $ujianId, array $ujianSoalPG, array $pgData, array $ujianSoalEssay, array $opts): void
     {
@@ -351,3 +351,4 @@ class SimulasiEssaySeeder extends Seeder
         }
     }
 }
+
