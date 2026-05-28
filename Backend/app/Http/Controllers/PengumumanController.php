@@ -12,17 +12,24 @@ class PengumumanController extends Controller
     {
         $authUser = $request->user();
 
+        $sortBy  = in_array($request->sort_by, ['judul', 'created_at', 'expired_at']) ? $request->sort_by : 'created_at';
+        $sortDir = $request->sort_dir === 'asc' ? 'asc' : 'desc';
+
         $pengumuman = Pengumuman::with('creator')
             ->where(function ($q) use ($authUser) {
                 if ($authUser->role === 'admin_akademis_ai') {
                     $q->where('created_by', $authUser->id);
                 } else {
-                    // Tampilkan pengumuman dari universitas sendiri ATAU pengumuman platform dari admin-akademis
                     $q->whereHas('creator', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
                       ->orWhereHas('creator', fn($q) => $q->where('role', 'admin_akademis_ai'));
                 }
             })
             ->when($request->ujian_id, fn($q) => $q->where('ujian_id', $request->ujian_id))
+            ->when($request->search, fn($q) => $q->where(function ($q) use ($request) {
+                $q->whereRaw('LOWER(judul) LIKE ?', ['%' . strtolower($request->search) . '%'])
+                  ->orWhereRaw('LOWER(isi) LIKE ?', ['%' . strtolower($request->search) . '%']);
+            }))
+            ->when($request->target_role, fn($q) => $q->where('target_role', $request->target_role))
             ->when(
                 !in_array($authUser->role, ['admin_akademis_ai', 'admin_universitas']),
                 fn($q) => $q->where(function ($q) use ($authUser) {
@@ -32,11 +39,10 @@ class PengumumanController extends Controller
             ->when(
                 in_array($authUser->role, ['dosen', 'mahasiswa', 'peserta_mahasiswa_baru']),
                 fn($q) => $q->where(function ($q) {
-                    $q->whereNull('expired_at')
-                        ->orWhere('expired_at', '>=', now());
+                    $q->whereNull('expired_at')->orWhere('expired_at', '>=', now());
                 })
             )
-            ->orderBy('created_at', 'desc')
+            ->orderBy($sortBy, $sortDir)
             ->paginate($request->per_page ?? 10);
 
         return response()->json([
