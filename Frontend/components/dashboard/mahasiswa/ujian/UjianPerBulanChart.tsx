@@ -10,7 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { DashboardBulananItem } from "@/services/DashboardServices";
+import type { DashboardBulananItem } from "@/types";
 
 export default function UjianPerBulanChart({
   data,

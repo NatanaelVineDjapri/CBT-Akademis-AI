@@ -1,6 +1,6 @@
 "use client";
 
-import type { DashboardPerkembanganItem } from "@/services/DashboardServices";
+import type { DashboardPerkembanganItem } from "@/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function PerkembanganNilaiTooltip({ active, payload, label }: any) {
