@@ -20,6 +20,11 @@ use Database\Seeders\Universitas\Untar\SimulasiEssaySeeder;
 use Database\Seeders\Universitas\Untar\PmbSeeder;
 use Database\Seeders\Universitas\Untar\MataKuliahSeeder;
 use Database\Seeders\Universitas\Untar\MatkulDosenSeeder;
+use Database\Seeders\Universitas\Binus\UniversitasSeeder as BinusUniversitasSeeder;
+use Database\Seeders\Universitas\Binus\FakultasSeeder    as BinusFakultasSeeder;
+use Database\Seeders\Universitas\Binus\ProdiSeeder       as BinusProdiSeeder;
+use Database\Seeders\Universitas\Binus\UserSeeder        as BinusUserSeeder;
+use Database\Seeders\Universitas\Binus\MahasiswaSeeder   as BinusMahasiswaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -36,10 +41,15 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UniversitasSeeder::class,
+            BinusUniversitasSeeder::class,
             FakultasSeeder::class,
+            BinusFakultasSeeder::class,
             ProdiSeeder::class,
+            BinusProdiSeeder::class,
             UserSeeder::class,
+            BinusUserSeeder::class,
             MahasiswaSeeder::class,
+            BinusMahasiswaSeeder::class,
             DemoSeeder::class,
             UjianSeeder::class,
             NilaiSeeder::class,
