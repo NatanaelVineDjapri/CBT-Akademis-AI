@@ -269,16 +269,25 @@ export default function MataKuliahPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col className="w-28" />
+              <col className="w-64" />
+              <col className="w-48" />
+              <col className="w-24" />
+              <col className="w-20" />
+              <col className="w-20" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
                 <ColHeader label="Kode" col="kode" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Program Studi</th>
                 <ColHeader label="Semester" col="semester" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <ColHeader label="SKS" col="sks" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Aksi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>

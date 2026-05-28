@@ -66,10 +66,20 @@ export default function HasilUjianTable({
 }: HasilUjianTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm table-fixed">
+        <colgroup>
+          <col className="w-12" />
+          <col className="w-56" />
+          <col className="w-40" />
+          <col className="w-24" />
+          <col className="w-20" />
+          <col className="w-24" />
+          <col className="w-24" />
+          <col className="w-28" />
+        </colgroup>
         <thead>
           <tr className="border-b border-gray-100">
-            <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+            <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
             <ColHeader label="Nama Ujian" col="nama_ujian" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
             <ColHeader label="Jadwal"     col="tanggal"    sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
             <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Durasi</th>

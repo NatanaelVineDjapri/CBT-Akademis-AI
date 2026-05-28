@@ -125,13 +125,19 @@ export default function SystemLog() {
         </div>
 
         <div className="px-7 overflow-x-auto flex-1">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse table-fixed">
+            <colgroup>
+              <col className="w-[55%]" />
+              <col className="w-[12%]" />
+              <col className="w-[10%]" />
+              <col className="w-[23%]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 pl-0.5 w-[55%]">Keterangan</th>
-                <ColHeader label="Model" col="auditable_type" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[12%]" />
-                <ColHeader label="Event" col="event" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[10%]" />
-                <ColHeader label="Waktu & Aktor" col="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[23%]" />
+                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 pl-0.5">Keterangan</th>
+                <ColHeader label="Model" col="auditable_type" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Event" col="event" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Waktu & Aktor" col="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
               </tr>
             </thead>
             <tbody>

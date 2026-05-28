@@ -321,16 +321,26 @@ export default function PenerimaanPMBPage() {
         {/* Table */}
         <div className="overflow-auto flex-1">
           <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-10" />
+              <col className="w-44" />
+              <col className="w-48" />
+              <col className="w-28" />
+              <col className="w-36" />
+              <col className="w-40" />
+              <col className="w-24" />
+              <col className="w-44" />
+            </colgroup>
             <thead className="sticky top-0 bg-white z-10">
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
-                <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-44" />
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-48">Email</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Tahun Masuk</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-40">Prodi</th>
-                <ColHeader label="Nilai PMB" col="nilai_pmb" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-24" />
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-44">Status</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
+                <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Email</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Tahun Masuk</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">NIM</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Prodi</th>
+                <ColHeader label="Nilai PMB" col="nilai_pmb" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Status</th>
               </tr>
             </thead>
             <tbody>

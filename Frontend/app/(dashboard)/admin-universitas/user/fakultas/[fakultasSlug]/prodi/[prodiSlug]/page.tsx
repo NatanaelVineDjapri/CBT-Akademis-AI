@@ -424,16 +424,25 @@ export default function AdminUserListPage({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col className="w-48" />
+              <col className="w-56" />
+              <col className="w-28" />
+              <col className="w-36" />
+              <col className="w-32" />
+              <col className="w-24" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
                 <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <ColHeader label="Email" col="email" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <ColHeader label="Role" col="role" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM / NIDN</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-32">No. Telp</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Aksi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">NIM / NIDN</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">No. Telp</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>

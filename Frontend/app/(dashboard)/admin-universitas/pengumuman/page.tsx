@@ -162,15 +162,23 @@ export default function PengumumanPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-10" />
+              <col />
+              <col className="w-28" />
+              <col className="w-28" />
+              <col className="w-28" />
+              <col className="w-20" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
                 <ColHeader label="Judul & Isi" col="judul" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Target</th>
-                <ColHeader label="Tanggal" col="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-28" />
-                <ColHeader label="Expired" col="expired_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-28" />
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Aksi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Target</th>
+                <ColHeader label="Tanggal" col="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Expired" col="expired_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
