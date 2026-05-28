@@ -4,13 +4,13 @@ import Pusher from "pusher-js";
 declare global {
   interface Window {
     Pusher: typeof Pusher;
-    Echo: Echo;
+    Echo: Echo<"pusher">;
   }
 }
 
-let echo: Echo | null = null;
+let echo: Echo<"pusher"> | null = null;
 
-export function getEcho(): Echo | null {
+export function getEcho(): Echo<"pusher"> | null {
   if (typeof window === "undefined") return null;
   if (echo) return echo;
 
