@@ -17,12 +17,19 @@ class UserController extends Controller
     {
         $authUser = $request->user();
 
+        $sortBy  = in_array($request->sort_by, ['nama', 'email', 'role', 'tahun_masuk']) ? $request->sort_by : 'nama';
+        $sortDir = $request->sort_dir === 'desc' ? 'desc' : 'asc';
+
         $users = User::with('prodi')
             ->when($authUser->role === 'admin_universitas', fn($q) => $q->where('universitas_id', $authUser->universitas_id))
             ->when($request->role, fn($q) => $q->where('role', $request->role))
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
             ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
                 ->orWhere('email', 'like', '%' . $request->search . '%'))
+            ->when(in_array($sortBy, ['nama', 'email', 'role']),
+                fn($q) => $q->orderByRaw("LOWER({$sortBy}) {$sortDir}"),
+                fn($q) => $q->orderByRaw("{$sortBy} {$sortDir} NULLS LAST")
+            )
             ->paginate($request->per_page ?? 10);
 
         return response()->json([

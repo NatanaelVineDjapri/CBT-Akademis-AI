@@ -2,7 +2,7 @@
 
 import { use, useState, useEffect, useRef } from "react";
 import useSWR from "swr";
-import { Plus, Pencil, Trash2, Upload, X, Loader2, FileSpreadsheet } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, X, Loader2, FileSpreadsheet, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -22,6 +22,24 @@ import {
 } from "@/services/AdminUserServices";
 import { ROLE_OPTIONS, ROLE_BADGE, USER_ROLE_TABS } from "@/types";
 import { toSlug } from "@/utils/slug";
+
+type UserSortBy = "nama" | "email" | "role";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort }: {
+  label: string; col: UserSortBy;
+  sortBy: UserSortBy; sortDir: SortDir;
+  onSort: (col: UserSortBy) => void;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap"
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
 
 function RoleBadge({ role }: { role: string }) {
   const b = ROLE_BADGE[role] ?? { label: role, bg: "#f3f4f6", color: "#6b7280" };
@@ -288,11 +306,23 @@ export default function AdminUserListPage({
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search);
 
+  const [sortBy, setSortBy] = useState<UserSortBy>("nama");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [showCreate, setShowCreate] = useState(false);
   const [editItem, setEditItem] = useState<AdminUserItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<AdminUserItem | null>(null);
   const [showImport, setShowImport] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const handleSort = (col: UserSortBy) => {
+    if (col === sortBy) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(col);
+      setSortDir("asc");
+    }
+    setPage(1);
+  };
 
   useEffect(() => { setPage(1); }, [debouncedSearch, roleTab, perPage]);
 
@@ -317,9 +347,9 @@ export default function AdminUserListPage({
   const prodiNama = prodi?.nama ?? prodiSlug;
 
   const { data, isLoading, mutate } = useSWR(
-    prodiId ? ["/users", String(prodiId), roleTab, debouncedSearch, page, perPage] : null,
-    ([, pid, role, s, p, pp]: [string, string, string, string, number, number]) =>
-      getAdminUsers({ prodi_id: Number(pid), role: role || undefined, search: s, per_page: pp, page: p }),
+    prodiId ? ["/users", String(prodiId), roleTab, debouncedSearch, page, perPage, sortBy, sortDir] : null,
+    ([, pid, role, s, p, pp, sb, sd]: [string, string, string, string, number, number, string, string]) =>
+      getAdminUsers({ prodi_id: Number(pid), role: role || undefined, search: s, per_page: pp, page: p, sort_by: sb, sort_dir: sd }),
     { keepPreviousData: true, revalidateOnFocus: false }
   );
 
@@ -398,9 +428,9 @@ export default function AdminUserListPage({
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Nama</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Email</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-32">Role</th>
+                <ColHeader label="Nama" col="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Email" col="email" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Role" col="role" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-36">NIM / NIDN</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-32">No. Telp</th>
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Aksi</th>

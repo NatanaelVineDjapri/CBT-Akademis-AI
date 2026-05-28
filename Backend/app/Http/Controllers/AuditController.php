@@ -108,7 +108,10 @@ class AuditController extends Controller
 
     public function index(Request $request)
     {
-        $query = Audit::with('user:id,nama,email,role')->latest();
+        $sortBy  = in_array($request->sort_by, ['created_at', 'event', 'auditable_type']) ? $request->sort_by : 'created_at';
+        $sortDir = $request->sort_dir === 'asc' ? 'asc' : 'desc';
+
+        $query = Audit::with('user:id,nama,email,role')->orderBy($sortBy, $sortDir);
 
         if ($request->filled('model')) {
             $modelClass = self::MODEL_MAP[$request->input('model')] ?? null;

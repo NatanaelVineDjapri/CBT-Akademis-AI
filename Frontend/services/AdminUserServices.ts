@@ -65,6 +65,8 @@ export const getAdminUsers = async (params?: {
   search?: string;
   per_page?: number;
   page?: number;
+  sort_by?: string;
+  sort_dir?: string;
 }): Promise<{ data: AdminUserItem[]; meta: Meta }> => {
   const res = await api.get("/users", { params });
   return { data: res.data.data, meta: res.data.meta };

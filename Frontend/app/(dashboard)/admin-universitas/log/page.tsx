@@ -2,29 +2,63 @@
 
 import { useState } from "react";
 import useSWR from "swr";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { getAudits, AuditModel, AuditEvent } from "@/services/AuditService";
 import Breadcrumb from "@/components/BreadCrumb";
 import Pagination from "@/components/filtering/Pagination";
 import { usePerPage } from "@/hooks/usePerPage";
 import { useDebounce } from "@/hooks/useDebounce";
 
+type LogSortBy = "created_at" | "event" | "auditable_type";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: LogSortBy;
+  sortBy: LogSortBy; sortDir: SortDir;
+  onSort: (col: LogSortBy) => void;
+  className?: string;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`text-left text-xs font-semibold text-gray-500 pb-2.5 cursor-pointer select-none whitespace-nowrap ${className ?? ""}`}
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
+
 export default function SystemLog() {
   const [search, setSearch]           = useState("");
   const [filterModel, setFilterModel] = useState<AuditModel | "">("");
   const [filterEvent, setFilterEvent] = useState<AuditEvent | "">("");
   const [page, setPage]               = useState(1);
+  const [sortBy, setSortBy]           = useState<LogSortBy>("created_at");
+  const [sortDir, setSortDir]         = useState<SortDir>("desc");
 
   const debouncedSearch = useDebounce(search);
   const perPage = usePerPage(52, 1, 310);
 
+  const handleSort = (col: LogSortBy) => {
+    if (col === sortBy) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(col);
+      setSortDir(col === "created_at" ? "desc" : "asc");
+    }
+    setPage(1);
+  };
+
   const { data, isLoading } = useSWR(
-    ["/audit", filterModel, filterEvent, debouncedSearch, page, perPage],
+    ["/audit", filterModel, filterEvent, debouncedSearch, page, perPage, sortBy, sortDir],
     () => getAudits({
       ...(filterModel ? { model: filterModel } : {}),
       ...(filterEvent ? { event: filterEvent } : {}),
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
       page,
       per_page: perPage,
+      sort_by: sortBy,
+      sort_dir: sortDir,
     }),
     { revalidateOnFocus: false, keepPreviousData: true }
   );
@@ -95,9 +129,9 @@ export default function SystemLog() {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 pl-0.5 w-[55%]">Keterangan</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-[12%]">Model</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-[10%]">Event</th>
-                <th className="text-left text-xs font-semibold text-gray-500 pb-2.5 w-[23%]">Waktu & Aktor</th>
+                <ColHeader label="Model" col="auditable_type" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[12%]" />
+                <ColHeader label="Event" col="event" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[10%]" />
+                <ColHeader label="Waktu & Aktor" col="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[23%]" />
               </tr>
             </thead>
             <tbody>

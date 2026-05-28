@@ -46,6 +46,8 @@ export const getAudits = async (params?: {
   search?: string;
   page?: number;
   per_page?: number;
+  sort_by?: string;
+  sort_dir?: string;
 }): Promise<AuditPaginated> => {
   const res = await api.get("/audit", { params });
   return res.data;

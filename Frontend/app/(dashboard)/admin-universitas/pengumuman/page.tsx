@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { useState } from "react";
-import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { getPengumuman, createPengumuman, updatePengumuman, deletePengumuman, type Pengumuman } from "@/services/PengumumanService";
 import BreadCrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
@@ -23,6 +23,25 @@ function RoleBadge({ role }: { role: string | null }) {
   return <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${colors[role] ?? "bg-gray-100 text-gray-500"}`}>{map[role] ?? role}</span>;
 }
 
+type PengumumanSortBy = "judul" | "created_at" | "expired_at";
+type SortDir = "asc" | "desc";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: PengumumanSortBy;
+  sortBy: PengumumanSortBy; sortDir: SortDir;
+  onSort: (col: PengumumanSortBy) => void;
+  className?: string;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap ${className ?? ""}`}
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
+
 type FormState = { judul: string; isi: string; target_role: string; expired_at: string };
 const emptyForm: FormState = { judul: "", isi: "", target_role: "", expired_at: "" };
 
@@ -33,9 +52,20 @@ export default function PengumumanPage() {
   const [showModal, setShowModal]     = useState(false);
   const [editItem, setEditItem]       = useState<Pengumuman | null>(null);
   const [form, setForm]               = useState<FormState>(emptyForm);
+  const [sortBy, setSortBy]           = useState<PengumumanSortBy>("created_at");
+  const [sortDir, setSortDir]         = useState<SortDir>("desc");
   const [saving, setSaving]           = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Pengumuman | null>(null);
   const [deleting, setDeleting]       = useState(false);
+
+  const handleSort = (col: PengumumanSortBy) => {
+    if (col === sortBy) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(col);
+      setSortDir(col === "judul" ? "asc" : "desc");
+    }
+  };
 
   const openAdd = () => { setEditItem(null); setForm(emptyForm); setShowModal(true); };
   const openEdit = (item: Pengumuman) => {
@@ -78,11 +108,28 @@ export default function PengumumanPage() {
     }
   };
 
-  const filtered = (data ?? []).filter(item => {
-    const matchSearch = item.judul.toLowerCase().includes(search.toLowerCase()) || item.isi.toLowerCase().includes(search.toLowerCase());
-    const matchRole   = !roleFilter || item.target_role === roleFilter;
-    return matchSearch && matchRole;
-  });
+  const filtered = (data ?? [])
+    .filter(item => {
+      const matchSearch = item.judul.toLowerCase().includes(search.toLowerCase()) || item.isi.toLowerCase().includes(search.toLowerCase());
+      const matchRole   = !roleFilter || item.target_role === roleFilter;
+      return matchSearch && matchRole;
+    })
+    .sort((a, b) => {
+      let valA: string, valB: string;
+      if (sortBy === "judul") {
+        valA = a.judul.toLowerCase();
+        valB = b.judul.toLowerCase();
+      } else if (sortBy === "expired_at") {
+        valA = a.expired_at ?? "";
+        valB = b.expired_at ?? "";
+      } else {
+        valA = a.created_at;
+        valB = b.created_at;
+      }
+      if (valA < valB) return sortDir === "asc" ? -1 : 1;
+      if (valA > valB) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -119,10 +166,10 @@ export default function PengumumanPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Judul & Isi</th>
+                <ColHeader label="Judul & Isi" col="judul" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Target</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Tanggal</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Expired</th>
+                <ColHeader label="Tanggal" col="created_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-28" />
+                <ColHeader label="Expired" col="expired_at" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-28" />
                 <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-20">Aksi</th>
               </tr>
             </thead>
