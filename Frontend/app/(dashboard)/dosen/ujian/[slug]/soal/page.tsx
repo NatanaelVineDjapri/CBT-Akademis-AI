@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { toSlug } from "@/utils/slug";
 import useSWR from "swr";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Loader2 } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import ConfirmModal from "@/components/ConfirmModal";
 import SearchInput from "@/components/filtering/SearchInput";
