@@ -46,7 +46,12 @@ type FormState = { judul: string; isi: string; target_role: string; expired_at: 
 const emptyForm: FormState = { judul: "", isi: "", target_role: "", expired_at: "" };
 
 export default function PengumumanPage() {
-  const { data, isLoading, mutate } = useSWR("/pengumuman", getPengumuman, { revalidateOnFocus: false });
+  const { data: response, isLoading, mutate } = useSWR(
+    ["/pengumuman", "created_at", "desc"],
+    () => getPengumuman({ sort_by: "created_at", sort_dir: "desc", per_page: 100 }),
+    { revalidateOnFocus: false }
+  );
+  const data = response?.data;
   const [search, setSearch]           = useState("");
   const [roleFilter, setRoleFilter]   = useState("");
   const [showModal, setShowModal]     = useState(false);
