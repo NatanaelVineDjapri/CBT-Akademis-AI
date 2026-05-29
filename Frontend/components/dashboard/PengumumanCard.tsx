@@ -5,7 +5,12 @@ import { TriangleAlert } from "lucide-react";
 import { getPengumuman, type Pengumuman } from "@/services/PengumumanService";
 
 export default function PengumumanCard() {
-  const { data, isLoading } = useSWR("/pengumuman", getPengumuman, { revalidateOnFocus: false });
+  const { data: response, isLoading } = useSWR(
+    ["/pengumuman", "created_at", "desc"],
+    () => getPengumuman({ sort_by: "created_at", sort_dir: "desc", per_page: 20 }),
+    { revalidateOnFocus: false }
+  );
+  const data = response?.data;
 
   if (isLoading || !data) return null;
   if (data.length === 0) return null;
