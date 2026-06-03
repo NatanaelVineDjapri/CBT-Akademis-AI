@@ -102,12 +102,34 @@ class PengumumanController extends Controller
         ], 201);
     }
 
+    /**
+     * Cek apakah user boleh kelola (edit/hapus) pengumuman.
+     * - Pembuat sendiri selalu boleh.
+     * - Admin universitas boleh kelola pengumuman dari user di universitasnya
+     *   (bukan pengumuman global dari super admin).
+     */
+    private function canManagePengumuman($pengumuman, $authUser): bool
+    {
+        if ($pengumuman->created_by === $authUser->id) {
+            return true;
+        }
+
+        if ($authUser->role === 'admin_universitas') {
+            $creator = $pengumuman->creator ?? \App\Models\User::find($pengumuman->created_by);
+            return $creator
+                && $creator->universitas_id
+                && $creator->universitas_id === $authUser->universitas_id;
+        }
+
+        return false;
+    }
+
     public function update(Request $request, $id)
     {
         $authUser = $request->user();
         $pengumuman = Pengumuman::findOrFail($id);
 
-        if ($pengumuman->created_by !== $authUser->id) {
+        if (!$this->canManagePengumuman($pengumuman, $authUser)) {
             return response()->json(['message' => 'Tidak punya akses!'], 403);
         }
 
@@ -140,7 +162,7 @@ class PengumumanController extends Controller
         $authUser = $request->user();
         $pengumuman = Pengumuman::findOrFail($id);
 
-        if ($pengumuman->created_by !== $authUser->id) {
+        if (!$this->canManagePengumuman($pengumuman, $authUser)) {
             return response()->json(['message' => 'Tidak punya akses!'], 403);
         }
 
