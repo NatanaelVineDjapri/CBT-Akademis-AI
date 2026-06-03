@@ -18,7 +18,7 @@ export function getEcho(): Echo<"pusher"> | null {
   const cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER;
   if (!key) return null;
 
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ?? "http://localhost:8000";
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") ?? "http://localhost:8000";
   const csrfToken  = () => decodeURIComponent(document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? "");
 
   window.Pusher = Pusher;

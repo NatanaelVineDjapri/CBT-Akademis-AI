@@ -2,7 +2,7 @@ import api from "./api";
 import { User, LoginCredentials } from "../types";
 
 const getCsrfCookie = async () => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ?? "";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") ?? "";
   await fetch(`${baseUrl}/sanctum/csrf-cookie`, {
     credentials: "include",
   });
