@@ -10,7 +10,7 @@ use App\Events\WebRtcSignal;
 
 class ProctoringController extends Controller
 {
-    private const TIPE_ALLOWED = ['tab','fullscreen','copypaste','no_face','multiple_faces','looking_away'];
+    private const TIPE_ALLOWED = ['tab','fullscreen','copypaste','screenshot','no_face','multiple_faces','looking_away'];
 
     public function webrtcSignal(Request $request)
     {

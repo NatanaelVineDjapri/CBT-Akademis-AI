@@ -55,6 +55,11 @@ class UjianController extends Controller
 
         $authUser = $request->user();
 
+        // Lazy auto-enroll: hanya untuk mahasiswa reguler (bukan PMB)
+        if ($authUser->role === 'peserta_mahasiswa_baru') {
+            goto skip_enroll;
+        }
+
         // Lazy auto-enroll: daftarkan ke ujian yang belum terdaftar tapi punya KRS
         $matkulIds = UserMataKuliah::where('user_id', $authUser->id)
             ->where('is_aktif', true)
@@ -101,6 +106,7 @@ class UjianController extends Controller
                 }
             }
         }
+        skip_enroll:
         $search = $request->query('search', '');
         $status = $request->query('status', '');
         $sortDir = in_array($request->query('sort_dir'), ['asc', 'desc']) ? $request->query('sort_dir') : 'desc';

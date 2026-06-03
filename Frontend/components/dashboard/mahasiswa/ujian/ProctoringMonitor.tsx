@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Maximize } from "lucide-react";
 import { logPelanggaran, logPelanggaranWithFoto } from "@/services/ProctoringService";
 
-type ViolationType = "tab" | "fullscreen" | "copypaste";
+type ViolationType = "tab" | "fullscreen" | "copypaste" | "screenshot";
 
 const MESSAGES: Record<ViolationType, string> = {
   tab:        "Terdeteksi pindah tab atau jendela browser!",
   fullscreen: "Kamu keluar dari mode fullscreen!",
   copypaste:  "Terdeteksi aksi copy/paste!",
+  screenshot: "Terdeteksi percobaan screenshot!",
 };
 
 const MAX_TAB_VIOLATIONS = 5;
@@ -89,6 +90,28 @@ export default function ProctoringMonitor({
       document.removeEventListener("paste", block);
       document.removeEventListener("cut", block);
       document.removeEventListener("contextmenu", blockCtx);
+    };
+  }, []);
+
+  // Screenshot detection
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "PrintScreen") {
+        e.preventDefault();
+        trigger("screenshot");
+      }
+      // Windows Snipping Tool: Win+Shift+S
+      if (e.shiftKey && e.metaKey && e.key === "s") {
+        e.preventDefault();
+        trigger("screenshot");
+      }
+    };
+    const onPrint = () => { trigger("screenshot"); };
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("beforeprint", onPrint);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("beforeprint", onPrint);
     };
   }, []);
 

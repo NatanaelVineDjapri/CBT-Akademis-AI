@@ -38,6 +38,8 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
   const [saved,  setSaved]            = useState<Set<number>>(new Set());
   const [timeLeft, setTimeLeft]       = useState<number | null>(null);
   const [confirmSelesai, setConfirmSelesai] = useState(false);
+  const [show10MinWarning, setShow10MinWarning] = useState(false);
+  const warned10MinRef  = useRef(false);
   const selesaiRef      = useRef(false);
   const essayTimers     = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const captureFrameRef    = useRef<(() => Blob | null) | null>(null);
@@ -82,6 +84,10 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
     const tick = () => {
       const left = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
       setTimeLeft(left);
+      if (left <= 600 && left > 0 && !warned10MinRef.current) {
+        warned10MinRef.current = true;
+        setShow10MinWarning(true);
+      }
       if (left === 0 && !selesaiRef.current) handleAutoSelesai();
     };
     tick();
@@ -192,6 +198,26 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
 
   return (
     <div className="flex flex-col gap-4 pb-24">
+      {show10MinWarning && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 flex flex-col items-center gap-4 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+              <Clock size={28} className="text-red-500" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-gray-800 mb-1">10 Menit Tersisa!</h3>
+              <p className="text-sm text-gray-500">Segera periksa dan selesaikan jawaban kamu sebelum waktu habis.</p>
+            </div>
+            <button
+              onClick={() => setShow10MinWarning(false)}
+              className="w-full py-2.5 rounded-xl text-white text-sm font-semibold"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              Lanjutkan Ujian
+            </button>
+          </div>
+        </div>
+      )}
       {session.proctoring_aktif && <ProctoringCamera pesertaUjianId={session.peserta_ujian_id} onCaptureReady={fn => { captureFrameRef.current = fn; }} onScreenShareReady={fn => { startScreenShareRef.current = fn; }} />}
       {session.proctoring_aktif && <ProctoringMonitor pesertaUjianId={session.peserta_ujian_id} onAutoSubmit={handleAutoSelesai} captureFrame={() => captureFrameRef.current?.() ?? null} startScreenShare={() => startScreenShareRef.current?.() ?? Promise.resolve()} submitting={confirmSelesai || selesaiRef.current} />}
 

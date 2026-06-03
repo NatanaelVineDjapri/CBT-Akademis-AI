@@ -1,258 +1,116 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Calendar, Clock, Headphones } from "lucide-react";
 
-const ujianData = {
-  akanDatang: [
-    {
-      id: 1,
-      nama: "Ujian PMB",
-      status: "Sedang Berlangsung",
-      tanggal: "20 Maret 2026",
-      jamMulai: "08:00",
-      jamSelesai: "10:00",
-      durasi: 120,
-      soal: 40,
-    },
-  ],
-  selesai: [
-    {
-      id: 2,
-      nama: "PMB Gel A 2025/2026",
-      status: "Selesai",
-      tanggal: "5 Oktober 2025",
-      jamMulai: "08:00",
-      jamSelesai: "10:00",
-      durasi: 90,
-      soal: 12,
-      nilai: 78,
-      grade: "B",
-    },
-    {
-      id: 3,
-      nama: "PMB Gel B 2025/2026",
-      status: "Selesai",
-      tanggal: "10 November 2025",
-      jamMulai: "08:00",
-      jamSelesai: "10:00",
-      durasi: 90,
-      soal: 12,
-      nilai: 82,
-      grade: "B",
-    },
-  ],
-};
+import useSWR from "swr";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { getMyUjian } from "../../../../services/UjianServices";
+import { useDebounce } from "../../../../hooks/useDebounce";
+import { usePerPage } from "../../../../hooks/usePerPage";
+import SearchInput from "../../../../components/filtering/SearchInput";
+import SortButton, { SortOrder } from "../../../../components/filtering/SortButton";
+import Pagination from "../../../../components/filtering/Pagination";
+import UjianCard from "../../../../components/dashboard/mahasiswa/ujian/UjianCard";
+import EmptyState from "../../../../components/EmptyState";
+import UjianCardSkeleton from "../../../../components/skeleton/UjianCardSkeleton";
 
-export default function UjianPesertaPage() {
-  const [activeTab, setActiveTab] = useState<keyof typeof ujianData>("akanDatang");
+type Tab = "berlangsung" | "akan_datang" | "selesai";
 
-  const items: any[] = ujianData[activeTab];
+const TABS: { key: Tab; label: string; status: string }[] = [
+  { key: "berlangsung", label: "Berlangsung", status: "sedang_berlangsung" },
+  { key: "akan_datang", label: "Akan Datang", status: "belum_mulai" },
+  { key: "selesai",     label: "Selesai",     status: "selesai" },
+];
+
+export default function UjianPmbPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialTab = (searchParams.get("tab") as Tab) ?? "berlangsung";
+  const [tab, setTab] = useState<Tab>(initialTab);
+
+  const handleTabChange = (newTab: Tab) => {
+    setTab(newTab);
+    router.replace(`/pmb/ujian?tab=${newTab}`, { scroll: false });
+  };
+
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortOrder>(null);
+  const [page, setPage] = useState(1);
+  const debouncedSearch = useDebounce(search);
+  const perPage = usePerPage(245, 4, 255);
+
+  useEffect(() => { setPage(1); }, [tab, debouncedSearch, sort]);
+  useEffect(() => { setPage(1); }, [perPage]);
+
+  const currentTab = TABS.find(t => t.key === tab)!;
+  const sortDir = sort === null ? undefined : sort;
+
+  const { data, isValidating } = useSWR(
+    ["/ujian/my", currentTab.status, debouncedSearch, sortDir ?? "", page, perPage],
+    ([, st, s, sd, p, pp]: [string, string, string, string, number, number]) =>
+      getMyUjian({ status: st, search: s, sort_dir: (sd || undefined) as "asc" | "desc" | undefined, page: p, per_page: pp }),
+    { keepPreviousData: true, revalidateOnFocus: false }
+  );
+
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  useEffect(() => {
+    if (!isValidating || !data) { setShowSkeleton(false); return; }
+    const t = setTimeout(() => setShowSkeleton(true), 150);
+    return () => clearTimeout(t);
+  }, [isValidating, data]);
+
+  const ujianList = data?.data ?? [];
+  const meta = data?.meta ?? null;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "transparent",
-        fontFamily: "'Nunito', 'Plus Jakarta Sans', sans-serif",
-      }}
-    >
-      <h1
-        style={{
-          margin: "0 0 4px",
-          fontSize: 22,
-          fontWeight: 800,
-          color: "var(--color-primary)",
-          letterSpacing: "-0.2px",
-        }}
-      >
-        Ujian
-      </h1>
-      <p style={{ margin: "0 0 22px", fontSize: 13.5, color: "#6b7280" }}>
-        Lihat dan kelola semua ujian Anda di sini
-      </p>
-      <div
-        style={{
-          display: "inline-flex",
-          background: "#ffffff",
-          borderRadius: 50,
-          padding: 4,
-          marginBottom: 24,
-          boxShadow: "0 1px 6px rgba(0,0,0,0.07)",
-        }}
-      >
-        {[
-          { key: "akanDatang" as keyof typeof ujianData, label: "Akan Datang" },
-          { key: "selesai" as keyof typeof ujianData, label: "Selesai" },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            style={{
-              padding: "9px 28px",
-              borderRadius: 50,
-              border: "none",
-              cursor: "pointer",
-              fontSize: 14,
-              fontWeight: 700,
-              transition: "background 0.2s, color 0.2s, box-shadow 0.2s",
-              background: activeTab === key ? "var(--color-primary)" : "transparent",
-              color: activeTab === key ? "#ffffff" : "#9ca3af",
-              boxShadow: activeTab === key ? "0 2px 8px rgba(9,119,151,0.25)" : "none",
-            }}
-          >
-            {label}
-          </button>
-        ))}
+    <div className="flex flex-col h-full gap-4">
+      <div className="shrink-0">
+        <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>Ujian</h1>
+        <p className="text-sm text-gray-500 mt-1">Lihat dan ikuti semua ujian kamu di sini</p>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-        {items.length === 0 ? (
-          <p style={{ color: "#9ca3af", fontSize: 14 }}>Tidak ada ujian.</p>
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
+        <div className="flex p-1 rounded-full gap-1 bg-white">
+          {TABS.map(t => (
+            <button
+              key={t.key}
+              onClick={() => { handleTabChange(t.key); setPage(1); }}
+              className="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
+              style={tab === t.key
+                ? { backgroundColor: "var(--color-primary)", color: "white" }
+                : { color: "var(--color-primary)" }
+              }
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Cari ujian..." />
+          <SortButton value={sort} onChange={(v) => { setSort(v); setPage(1); }} />
+        </div>
+      </div>
+
+      <div className="flex-1">
+        {showSkeleton ? (
+          <UjianCardSkeleton count={perPage} />
+        ) : !data ? null : ujianList.length === 0 ? (
+          <EmptyState message="Tidak ada ujian." />
         ) : (
-          items.map((ujian) => (
-            <UjianCard key={ujian.id} ujian={ujian} tab={activeTab} />
-          ))
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {ujianList.map(u => <UjianCard key={u.peserta_ujian_id} ujian={u} basePath="/pmb" />)}
+          </div>
         )}
       </div>
-    </div>
-  );
-}
 
-function UjianCard({ ujian, tab }: { ujian: any; tab: string }) {
-  const router = useRouter();
-
-  return (
-    <div
-      style={{
-        background: "#ffffff",
-        borderRadius: 18,
-        padding: "22px 24px 20px",
-        width: 280,
-        boxShadow: "0 2px 14px rgba(0,0,0,0.07)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 0,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 12,
-            background: "var(--color-primary)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Headphones size={22} color="#fff" strokeWidth={2} />
-        </div>
-        <span
-          style={{
-            background:
-              ujian.status === "Sedang Berlangsung"
-                ? "var(--color-primary)"
-                : ujian.status === "Akan Datang"
-                ? "rgba(9,119,151,0.12)"
-                : "rgba(34,197,94,0.12)",
-            color:
-              ujian.status === "Sedang Berlangsung"
-                ? "#fff"
-                : ujian.status === "Akan Datang"
-                ? "var(--color-primary)"
-                : "#16a34a",
-            fontSize: 12,
-            fontWeight: 700,
-            borderRadius: 50,
-            padding: "5px 14px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {ujian.status}
-        </span>
-      </div>
-      <h3
-        style={{
-          margin: "0 0 18px",
-          fontSize: 18,
-          fontWeight: 800,
-          color: "#1f2937",
-          lineHeight: 1.3,
-        }}
-      >
-        {ujian.nama}
-      </h3>
-      <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-          <Calendar size={14} color="#9ca3af" strokeWidth={2} />
-          <span style={{ fontSize: 13.5, color: "#6b7280" }}>{ujian.tanggal}</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-          <Clock size={14} color="#9ca3af" strokeWidth={2} />
-          <span style={{ fontSize: 13.5, color: "#6b7280" }}>
-            {ujian.jamMulai} - {ujian.jamSelesai}
-          </span>
-        </div>
-      </div>
-      <div style={{ borderTop: "1px solid #f3f4f6", marginBottom: 12 }} />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: tab === "selesai" ? 10 : 16,
-        }}
-      >
-        <span style={{ fontSize: 13.5, color: "#6b7280" }}>
-          Durasi: <strong style={{ color: "#374151" }}>{ujian.durasi} menit</strong>
-        </span>
-        <span style={{ fontSize: 13.5, color: "#6b7280" }}>
-          Soal: <strong style={{ color: "#374151" }}>{ujian.soal}</strong>
-        </span>
-      </div>
-      {tab === "selesai" && ujian.nilai !== undefined && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <span style={{ fontSize: 13.5, color: "#6b7280" }}>
-            Nilai: <strong style={{ color: "var(--color-primary)" }}>{ujian.nilai}</strong>
-          </span>
-          <span style={{ fontSize: 13.5, color: "#6b7280" }}>
-            Grade:{" "}
-            <strong style={{ color: "var(--color-primary)" }}>{ujian.grade}</strong>
-          </span>
-        </div>
+      {meta && (
+        <Pagination
+          currentPage={meta.current_page}
+          lastPage={meta.last_page}
+          total={meta.total}
+          perPage={meta.per_page}
+          onPageChange={setPage}
+        />
       )}
-      <button
-        onClick={() =>
-          tab === "selesai"
-            ? router.push(`/pmb/ujian/hasil/${ujian.id}`)
-            : router.push(`/pmb/ujian/${ujian.id}`)
-        }
-        style={{
-          width: "100%",
-          padding: "10px 0",
-          borderRadius: 50,
-          border: "none",
-          background: "var(--color-primary)",
-          color: "#fff",
-          fontWeight: 700,
-          fontSize: 14,
-          cursor: "pointer",
-          transition: "opacity 0.15s",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-      >
-        {tab === "selesai" ? "Lihat Hasil" : "Mulai"}
-      </button>
     </div>
   );
 }

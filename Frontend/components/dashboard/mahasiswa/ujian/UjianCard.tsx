@@ -7,7 +7,7 @@ import { Calendar, Clock, ClipboardList, Timer } from "lucide-react";
 import type { UjianMahasiswa } from "@/types";
 import { formatDate, formatTime } from "@/utils/format";
 
-export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
+export default function UjianCard({ ujian, basePath = "/mahasiswa" }: { ujian: UjianMahasiswa; basePath?: string }) {
   const selesai = ujian.status === "selesai";
   const now = new Date();
   const isActive = ujian.start_date && ujian.end_date
@@ -90,7 +90,7 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
             </div>
           </div>
           <Link
-            href={`/mahasiswa/nilai/${ujian.nilai_akhir_id}`}
+            href={`${basePath}/nilai/${ujian.nilai_akhir_id}`}
             className="block w-full py-2 rounded-lg text-white text-xs font-medium text-center"
             style={{ background: "var(--color-primary)" }}
             onMouseEnter={() =>
@@ -104,7 +104,7 @@ export default function UjianCard({ ujian }: { ujian: UjianMahasiswa }) {
         </div>
       ) : canStart ? (
         <Link
-          href={`/mahasiswa/ujian/${ujian.peserta_ujian_id}`}
+          href={`${basePath}/ujian/${ujian.peserta_ujian_id}`}
           className="w-full py-2 rounded-lg text-white text-xs font-medium text-center block"
           style={{ background: "var(--color-primary)" }}
         >

@@ -13,6 +13,7 @@ const POIN: Record<string, number> = {
   tab:            5,
   fullscreen:     10,
   copypaste:      8,
+  screenshot:     15,
   no_face:        10,
   multiple_faces: 20,
   looking_away:   5,

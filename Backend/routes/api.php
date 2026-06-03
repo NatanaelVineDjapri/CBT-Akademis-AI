@@ -61,7 +61,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
     Route::get('/mata-kuliah/my/{id}', [MataKuliahController::class, 'myMataKuliahDetail']);
     Route::get('/mata-kuliah/my/{matkulId}/bab/{babId}/soal', [MataKuliahController::class, 'myMataKuliahBabSoal']);
     // Tambah middleware role mahasiswa
-    Route::middleware('role:mahasiswa')->group(function () {
+    Route::middleware('role:mahasiswa,peserta_mahasiswa_baru')->group(function () {
         Route::get('/jadwal', [UjianController::class, 'jadwalMahasiswa']);
         Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
         Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);

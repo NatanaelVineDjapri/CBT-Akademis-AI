@@ -19,11 +19,12 @@ interface Props {
 export default function AkademikCard({ user }: Props) {
   const isDosen = user.role === "dosen";
 
-  const { data: dosenMatkul } = useSWR(
+  const { data: dosenMatkulRaw } = useSWR(
     isDosen ? "/mata-kuliah/dosen" : null,
     getDosenMataKuliah,
     { revalidateOnFocus: false }
   );
+  const dosenMatkul = Array.isArray(dosenMatkulRaw) ? dosenMatkulRaw : dosenMatkulRaw === undefined ? undefined : [];
 
   const baseItems = [
     {
