@@ -24,7 +24,7 @@ export default function UjianBerlangsungCard({ data }: { data: DosenUjianItem[] 
       {data.length === 0 ? (
         <p className="text-xs text-gray-400 flex-1">Tidak ada ujian yang sedang berlangsung.</p>
       ) : (
-        <div className="flex flex-col flex-1 justify-between gap-3">
+        <div className="flex flex-col gap-3">
           {data.map((ujian) => (
             <div key={ujian.id}
               className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">

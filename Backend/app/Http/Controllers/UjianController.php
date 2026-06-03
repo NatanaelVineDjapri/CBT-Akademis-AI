@@ -29,6 +29,26 @@ class UjianController extends Controller
         return $kode;
     }
 
+    public function getActiveSession(Request $request)
+    {
+        $active = PesertaUjian::where('user_id', $request->user()->id)
+            ->where('status', 'sedang_berlangsung')
+            ->whereHas('ujian', fn($q) => $q->where('end_date', '>=', now()))
+            ->latest('mulai_at')
+            ->first();
+
+        if (!$active) {
+            return response()->json(['active' => null]);
+        }
+
+        return response()->json([
+            'active' => [
+                'peserta_ujian_id' => $active->id,
+                'nama_ujian'       => $active->ujian->nama_ujian,
+            ],
+        ]);
+    }
+
     public function ujianMahasiswa(Request $request)
     {
         PesertaUjian::autoExpire();
@@ -97,13 +117,13 @@ class UjianController extends Controller
             ->select('peserta_ujian.*')
             ->when($status === 'sedang_berlangsung', fn($q) => $q
                 ->whereIn('peserta_ujian.status', ['belum_mulai', 'sedang_berlangsung'])
-                ->whereRaw('ujian.start_date <= NOW()')
-                ->whereRaw('ujian.end_date >= NOW()')
+                ->where('ujian.start_date', '<=', now())
+                ->where('ujian.end_date', '>=', now())
                 ->whereExists(fn($q) => $q->select(DB::raw(1))->from('ujian_soal')->whereColumn('ujian_soal.ujian_id', 'ujian.id'))
             )
             ->when($status === 'belum_mulai', fn($q) => $q
                 ->where('peserta_ujian.status', 'belum_mulai')
-                ->whereRaw('ujian.start_date > NOW()')
+                ->where('ujian.start_date', '>', now())
             )
             ->when($status === 'selesai', fn($q) => $q
                 ->where('peserta_ujian.status', 'selesai')
@@ -1872,7 +1892,7 @@ class UjianController extends Controller
 
         $ujianList = Ujian::where('created_by', $dosen->id)
             ->where('start_date', '<=', $now)
-            ->where('end_date', '>=', $now)
+            ->where('start_date', '>=', $now->copy()->subDays(30))
             ->with([
                 'mataKuliah:id,nama',
                 'pesertaUjian:id,ujian_id,user_id,attempt_ke,status',
@@ -1880,7 +1900,7 @@ class UjianController extends Controller
             ])
             ->get();
 
-        $data = $ujianList->map(function ($ujian) {
+        $data = $ujianList->map(function ($ujian) use ($now) {
             $latestPerUser = $ujian->pesertaUjian
                 ->groupBy('user_id')
                 ->map(fn($g) => $g->sortByDesc('attempt_ke')->first());
@@ -1901,6 +1921,7 @@ class UjianController extends Controller
                 'start_date'       => $ujian->start_date?->format('Y-m-d H:i'),
                 'end_date'         => $ujian->end_date?->format('Y-m-d H:i'),
                 'durasi_menit'     => $ujian->durasi_menit,
+                'status'           => $ujian->end_date?->gt($now) ? 'berlangsung' : 'selesai',
                 'peserta_aktif'    => $latestPerUser->where('status', 'sedang_berlangsung')->count(),
                 'total_peserta'    => $latestPerUser->count(),
                 'total_violations' => $totalViolations,

@@ -2,6 +2,7 @@
 
 import useSWR, { preload } from "swr";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { ShieldCheck, Clock, Users, AlertTriangle, Timer } from "lucide-react";
 import { fmt } from "@/components/dosen/ujian/constants";
 import Breadcrumb from "@/components/BreadCrumb";
@@ -19,7 +20,12 @@ function UjianMonitorCard({ ujian }: { ujian: MonitoringUjian }) {
             <ShieldCheck className="w-5 h-5" style={{ color: "var(--color-primary)" }} />
           </div>
           <div className="flex flex-col gap-0.5 min-w-0">
-            <p className="text-sm font-bold text-white leading-snug truncate">{ujian.nama_ujian}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold text-white leading-snug truncate">{ujian.nama_ujian}</p>
+              <span className={`shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${ujian.status === "berlangsung" ? "bg-green-400/20 text-green-200" : "bg-white/20 text-white/60"}`}>
+                {ujian.status === "berlangsung" ? "Live" : "Selesai"}
+              </span>
+            </div>
             <p className="text-xs text-white/60 truncate">{ujian.mata_kuliah ?? "—"}</p>
           </div>
         </div>
@@ -73,22 +79,43 @@ function UjianMonitorCard({ ujian }: { ujian: MonitoringUjian }) {
 }
 
 export default function DosenMonitoringPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = (searchParams.get("tab") ?? "berlangsung") as "berlangsung" | "selesai";
+
   const { data, isLoading } = useSWR("/ujian/dosen/monitoring", getMonitoringList, {
     refreshInterval: 15000,
     revalidateOnFocus: true,
   });
 
   const ujianList = data?.data ?? [];
+  const filtered = ujianList.filter(u => u.status === tab);
+
+  const tabs: { key: "berlangsung" | "selesai"; label: string }[] = [
+    { key: "berlangsung", label: "Berlangsung" },
+    { key: "selesai",     label: "Selesai" },
+  ];
 
   return (
     <div className="flex flex-col gap-4 pb-6">
       <Breadcrumb />
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Monitoring</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Ujian yang sedang berlangsung.</p>
         </div>
-        <div className="p-5">
+        <div className="px-5 pt-4 flex gap-2">
+          {tabs.map(t => (
+            <button
+              key={t.key}
+              onClick={() => router.push(`?tab=${t.key}`)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${tab === t.key ? "text-white border-transparent" : "text-gray-500 bg-white hover:bg-gray-50"}`}
+              style={tab === t.key ? { backgroundColor: "var(--color-primary)" } : { borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="p-5 flex flex-col gap-6">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -112,11 +139,11 @@ export default function DosenMonitoringPage() {
                 </div>
               ))}
             </div>
-          ) : ujianList.length === 0 ? (
-            <EmptyState message="Tidak ada ujian yang sedang berlangsung." />
+          ) : filtered.length === 0 ? (
+            <EmptyState message={tab === "berlangsung" ? "Tidak ada ujian yang sedang berlangsung." : "Tidak ada ujian selesai dalam 30 hari terakhir."} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ujianList.map(u => <UjianMonitorCard key={u.id} ujian={u} />)}
+              {filtered.map(u => <UjianMonitorCard key={u.id} ujian={u} />)}
             </div>
           )}
         </div>

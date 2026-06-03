@@ -1,16 +1,13 @@
 "use client";
 
-import { use, useEffect, useRef, useState } from "react";
+import { use, useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, CalendarDays, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import { getAdminMonitoringList, getAdminMonitoringDetail, getAdminMonitoringPesertaDetail } from "@/services/MonitoringServices";
-import { sendWebRtcSignal, getWebRtcOffer } from "@/services/ProctoringService";
-import { ICE_SERVERS } from "@/lib/iceServers";
 import { toSlug } from "@/utils/slug";
-import { useMonitoringConnection } from "@/contexts/MonitoringConnectionContext";
 import MonitoringPesertaSkeleton from "@/components/skeleton/MonitoringPesertaSkeleton";
 import { getEcho } from "@/lib/echo";
 
@@ -90,15 +87,13 @@ export default function AdminMonitoringPesertaPage({ params }: { params: Promise
     { revalidateOnFocus: true, refreshInterval: 10000 },
   );
 
-  const { onCam, onScreen } = useMonitoringConnection();
-
-  const [attemptSortBy, setAttemptSortBy]     = useState<"violations" | "risk_score">("violations");
-  const [attemptSortDir, setAttemptSortDir]   = useState<SortDir>("desc");
+  const [attemptSortBy, setAttemptSortBy]     = useState<"violations" | "risk_score" | "attempt_ke">("attempt_ke");
+  const [attemptSortDir, setAttemptSortDir]   = useState<SortDir>("asc");
   const [pelanggaranSortDir, setPelanggaranSortDir] = useState<SortDir>("desc");
   const [jawabanSortBy, setJawabanSortBy]     = useState<"nomor" | "nilai">("nomor");
   const [jawabanSortDir, setJawabanSortDir]   = useState<SortDir>("asc");
 
-  const handleAttemptSort = (col: "violations" | "risk_score") => {
+  const handleAttemptSort = (col: "violations" | "risk_score" | "attempt_ke") => {
     const newDir: SortDir = col === attemptSortBy ? (attemptSortDir === "asc" ? "desc" : "asc") : "desc";
     setAttemptSortBy(col); setAttemptSortDir(newDir);
   };
@@ -106,22 +101,6 @@ export default function AdminMonitoringPesertaPage({ params }: { params: Promise
     const newDir: SortDir = col === jawabanSortBy ? (jawabanSortDir === "asc" ? "desc" : "asc") : (col === "nilai" ? "desc" : "asc");
     setJawabanSortBy(col); setJawabanSortDir(newDir);
   };
-
-  const [liveId, setLiveId]                       = useState<number | null>(pidFromUrl);
-  const [hasStream, setHasStream]                 = useState(false);
-  const [hasScreenStream, setHasScreenStream]     = useState(false);
-  const liveVideoRef                              = useRef<HTMLVideoElement>(null);
-  const screenVideoRef                            = useRef<HTMLVideoElement>(null);
-  const pcRef                                     = useRef<RTCPeerConnection | null>(null);
-  const screenPcRef                               = useRef<RTCPeerConnection | null>(null);
-  const camOkRef                                  = useRef(false);
-  const screenOkRef                               = useRef(false);
-
-  useEffect(() => {
-    if (!data) return;
-    const active = data.attempts?.find(a => a.status === "sedang_berlangsung");
-    if (active?.peserta_ujian_id) setLiveId(active.peserta_ujian_id);
-  }, [data]);
 
   useEffect(() => {
     if (!ujianId) return;
@@ -137,125 +116,6 @@ export default function AdminMonitoringPesertaPage({ params }: { params: Promise
     return () => { echo.leaveChannel(`ujian.${ujianId}`); };
   }, [ujianId, userId, mutate]);
 
-  useEffect(() => {
-    if (!liveId) return;
-    const unsubCam = onCam(liveId, (stream) => {
-      if (liveVideoRef.current && !camOkRef.current) {
-        liveVideoRef.current.srcObject = stream;
-        liveVideoRef.current.play().catch(() => {});
-      }
-    });
-    const unsubScreen = onScreen(liveId, (stream) => {
-      if (screenVideoRef.current && !screenOkRef.current) {
-        screenVideoRef.current.srcObject = stream;
-        screenVideoRef.current.play().catch(() => {});
-      }
-    });
-    return () => { unsubCam(); unsubScreen(); };
-  }, [liveId, onCam, onScreen]);
-
-  useEffect(() => {
-    if (!liveId) return;
-    const echo = getEcho();
-    if (!echo) return;
-
-    camOkRef.current    = false;
-    screenOkRef.current = false;
-
-    const decodeSdp   = (s: string) => { try { return atob(s); } catch { return s; } };
-    const fixSdp      = (sdp: string) =>
-      window.location.hostname !== "localhost" ? sdp :
-      sdp.replace(/[\w-]+\.local/g, "127.0.0.1");
-    const waitIceGather = (pc: RTCPeerConnection, ms: number) => new Promise<void>(resolve => {
-      if (pc.iceGatheringState === "complete") { resolve(); return; }
-      const t = setTimeout(resolve, ms);
-      pc.onicegatheringstatechange = () => { if (pc.iceGatheringState === "complete") { clearTimeout(t); resolve(); } };
-    });
-
-    const answerCam = async (offerSdp: string) => {
-      if (camOkRef.current) return;
-      pcRef.current?.close();
-      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-      pcRef.current = pc;
-      pc.ontrack = (e) => {
-        if (liveVideoRef.current) {
-          const s = e.streams?.[0] ?? new MediaStream([e.track]);
-          liveVideoRef.current.srcObject = s;
-          liveVideoRef.current.play().catch(() => {});
-        }
-      };
-      pc.onconnectionstatechange = () => {
-        if ((pc.connectionState === "failed" || pc.connectionState === "disconnected") && camOkRef.current) {
-          camOkRef.current = false;
-          setHasStream(false);
-          if (liveVideoRef.current) liveVideoRef.current.srcObject = null;
-        }
-      };
-      await pc.setRemoteDescription({ type: "offer", sdp: fixSdp(decodeSdp(offerSdp)) });
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      await waitIceGather(pc, 2000);
-      sendWebRtcSignal({ peserta_ujian_id: liveId, type: "answer", from: "dosen", sdp: btoa(fixSdp(pc.localDescription!.sdp)) }).catch(() => {});
-    };
-
-    const answerScreen = async (offerSdp: string) => {
-      if (screenOkRef.current) return;
-      screenPcRef.current?.close();
-      const spc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-      screenPcRef.current = spc;
-      spc.ontrack = (e) => {
-        if (screenVideoRef.current) {
-          const s = e.streams?.[0] ?? new MediaStream([e.track]);
-          screenVideoRef.current.srcObject = s;
-          screenVideoRef.current.play().catch(() => {});
-        }
-      };
-      spc.onconnectionstatechange = () => {
-        if ((spc.connectionState === "failed" || spc.connectionState === "disconnected") && screenOkRef.current) {
-          screenOkRef.current = false;
-          setHasScreenStream(false);
-          if (screenVideoRef.current) screenVideoRef.current.srcObject = null;
-        }
-      };
-      await spc.setRemoteDescription({ type: "offer", sdp: fixSdp(decodeSdp(offerSdp)) });
-      const answer = await spc.createAnswer();
-      await spc.setLocalDescription(answer);
-      await waitIceGather(spc, 2000);
-      sendWebRtcSignal({ peserta_ujian_id: liveId, type: "screen-answer", from: "dosen", sdp: btoa(fixSdp(spc.localDescription!.sdp)) }).catch(() => {});
-    };
-
-    const ch = echo.channel(`proctoring-signal.${liveId}`);
-    ch.listen(".webrtc-signal", async (msg: { type: string; from: string; sdp?: string }) => {
-      if (msg.from !== "student") return;
-      if (msg.type === "offer"        && msg.sdp) answerCam(msg.sdp);
-      if (msg.type === "screen-offer" && msg.sdp) answerScreen(msg.sdp);
-    });
-
-    const sendRequests = () => {
-      if (!camOkRef.current)    sendWebRtcSignal({ peserta_ujian_id: liveId, type: "watch-request",        from: "dosen" }).catch(() => {});
-      if (!screenOkRef.current) sendWebRtcSignal({ peserta_ujian_id: liveId, type: "watch-screen-request", from: "dosen" }).catch(() => {});
-    };
-    getWebRtcOffer(liveId, "cam").then(sdp => { if (sdp && !camOkRef.current) answerCam(sdp); }).catch(() => {});
-    getWebRtcOffer(liveId, "screen").then(sdp => { if (sdp && !screenOkRef.current) answerScreen(sdp); }).catch(() => {});
-
-    const initialId = setTimeout(sendRequests, 1000);
-    const retryId   = setInterval(() => {
-      if (camOkRef.current && screenOkRef.current) return;
-      sendRequests();
-    }, 4000);
-
-    return () => {
-      clearTimeout(initialId);
-      clearInterval(retryId);
-      echo.leaveChannel(`proctoring-signal.${liveId}`);
-      pcRef.current?.close();       pcRef.current = null;
-      screenPcRef.current?.close(); screenPcRef.current = null;
-      if (liveVideoRef.current)   liveVideoRef.current.srcObject = null;
-      if (screenVideoRef.current) screenVideoRef.current.srcObject = null;
-      setHasStream(false);
-      setHasScreenStream(false);
-    };
-  }, [liveId]);
 
   const peserta   = data?.peserta;
   const attempts  = data?.attempts ?? [];
@@ -273,37 +133,6 @@ export default function AdminMonitoringPesertaPage({ params }: { params: Promise
 
       {!data && <MonitoringPesertaSkeleton />}
 
-      {liveId && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-700">Live Camera</span>
-          </div>
-          <div className="relative bg-gray-900 rounded-b-2xl overflow-hidden" style={{ minHeight: 320 }}>
-            <video ref={screenVideoRef} autoPlay playsInline muted
-              onPlaying={() => { screenOkRef.current = true; setHasScreenStream(true); }}
-              className="w-full object-contain rounded-b-2xl"
-              style={{ display: "block", maxHeight: 480, minHeight: 320 }} />
-            {!hasScreenStream && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-900">
-                <span className="w-2 h-2 rounded-full bg-gray-600 animate-pulse" />
-                <span className="text-xs text-gray-500">Menunggu layar...</span>
-              </div>
-            )}
-
-            <div className="absolute bottom-3 right-3 rounded-xl overflow-hidden border-2 shadow-lg"
-              style={{ width: 180, height: 120, borderColor: "var(--color-primary)" }}>
-              <video ref={liveVideoRef} autoPlay playsInline muted
-                onPlaying={() => { camOkRef.current = true; setHasStream(true); }}
-                className="w-full h-full object-cover scale-x-[-1]" />
-              {!hasStream && (
-                <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
-                  <span className="text-[9px] text-gray-500 animate-pulse">cam...</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {data && <>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -343,7 +172,11 @@ export default function AdminMonitoringPesertaPage({ params }: { params: Promise
               {attempts.length === 0 ? (
                 <tr><td colSpan={4 + Object.keys(summary).length + 4} className="text-center py-8 text-sm text-gray-400">Belum ada data</td></tr>
               ) : [...attempts].sort((a, b) => {
-                  const cmp = attemptSortBy === "violations" ? a.violations - b.violations : a.risk_score - b.risk_score;
+                  if (a.status === "sedang_berlangsung" && b.status !== "sedang_berlangsung") return -1;
+                  if (b.status === "sedang_berlangsung" && a.status !== "sedang_berlangsung") return 1;
+                  const cmp = attemptSortBy === "violations" ? a.violations - b.violations
+                            : attemptSortBy === "risk_score" ? a.risk_score - b.risk_score
+                            : a.attempt_ke - b.attempt_ke;
                   return attemptSortDir === "asc" ? cmp : -cmp;
                 }).map(a => (
                 <tr key={a.attempt_ke} className="hover:bg-gray-50 transition-colors">

@@ -18,12 +18,21 @@ export function getEcho(): Echo<"pusher"> | null {
   const cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER;
   if (!key) return null;
 
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ?? "http://localhost:8000";
+  const csrfToken  = () => decodeURIComponent(document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? "");
+
   window.Pusher = Pusher;
   echo = new Echo({
-    broadcaster: "pusher",
+    broadcaster:  "pusher",
     key,
     cluster,
-    forceTLS: true,
+    forceTLS:     true,
+    authEndpoint: `${backendUrl}/broadcasting/auth`,
+    auth: {
+      headers: {
+        "X-XSRF-TOKEN": csrfToken(),
+      },
+    },
   });
 
   return echo;

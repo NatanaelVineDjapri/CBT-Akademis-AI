@@ -193,7 +193,7 @@ export default function UjianPage({ params }: { params: Promise<{ pesertaUjianId
   return (
     <div className="flex flex-col gap-4 pb-24">
       {session.proctoring_aktif && <ProctoringCamera pesertaUjianId={session.peserta_ujian_id} onCaptureReady={fn => { captureFrameRef.current = fn; }} onScreenShareReady={fn => { startScreenShareRef.current = fn; }} />}
-      {session.proctoring_aktif && <ProctoringMonitor pesertaUjianId={session.peserta_ujian_id} onAutoSubmit={handleAutoSelesai} captureFrame={() => captureFrameRef.current?.() ?? null} startScreenShare={() => startScreenShareRef.current?.() ?? Promise.resolve()} />}
+      {session.proctoring_aktif && <ProctoringMonitor pesertaUjianId={session.peserta_ujian_id} onAutoSubmit={handleAutoSelesai} captureFrame={() => captureFrameRef.current?.() ?? null} startScreenShare={() => startScreenShareRef.current?.() ?? Promise.resolve()} submitting={confirmSelesai || selesaiRef.current} />}
 
       {/* ── Header ── */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-4">

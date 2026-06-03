@@ -7,6 +7,7 @@ export interface MonitoringUjian {
   start_date: string | null;
   end_date: string | null;
   durasi_menit: number;
+  status: "berlangsung" | "selesai";
   peserta_aktif: number;
   total_peserta: number;
   total_violations: number;

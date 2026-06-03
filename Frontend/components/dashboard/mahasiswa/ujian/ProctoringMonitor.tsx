@@ -12,8 +12,7 @@ const MESSAGES: Record<ViolationType, string> = {
   copypaste:  "Terdeteksi aksi copy/paste!",
 };
 
-// set manual dlu 
-const MAX_TAB_VIOLATIONS = 300; 
+const MAX_TAB_VIOLATIONS = 5;
 
 const enterFullscreen = () =>
   document.documentElement.requestFullscreen?.().catch(() => {});
@@ -23,14 +22,17 @@ export default function ProctoringMonitor({
   onAutoSubmit,
   captureFrame,
   startScreenShare,
+  submitting = false,
 }: {
   pesertaUjianId: number;
   onAutoSubmit: () => void;
   captureFrame?: () => Blob | null;
   startScreenShare?: () => Promise<void>;
+  submitting?: boolean;
 }) {
   const [warning, setWarning]   = useState<ViolationType | null>(null);
   const [needFs, setNeedFs]     = useState(!document.fullscreenElement);
+  const [tabCount, setTabCount] = useState(0);
   const tabCountRef              = useRef(0);
   const onAutoSubmitRef          = useRef(onAutoSubmit);
   onAutoSubmitRef.current        = onAutoSubmit;
@@ -44,6 +46,7 @@ export default function ProctoringMonitor({
     }
     if (type === "tab") {
       tabCountRef.current += 1;
+      setTabCount(tabCountRef.current);
       if (tabCountRef.current >= MAX_TAB_VIOLATIONS) { onAutoSubmitRef.current(); return; }
     }
     setWarning(type);
@@ -69,13 +72,8 @@ export default function ProctoringMonitor({
   // Tab / window switch — hanya aktif kalau sedang fullscreen
   useEffect(() => {
     const onVisibility = () => { if (document.hidden && document.fullscreenElement) trigger("tab"); };
-    const onBlur       = () => { if (document.fullscreenElement) trigger("tab"); };
     document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("blur", onBlur);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("blur", onBlur);
-    };
+    return () => { document.removeEventListener("visibilitychange", onVisibility); };
   }, []);
 
   // Copy / paste / cut / right-click block
@@ -94,6 +92,8 @@ export default function ProctoringMonitor({
     };
   }, []);
 
+  if (submitting) return null;
+
   // Fullscreen entry prompt — harus user gesture
   if (needFs) return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
@@ -106,7 +106,10 @@ export default function ProctoringMonitor({
           <p className="text-sm text-gray-500">Ujian ini wajib dijalankan dalam mode fullscreen. Klik tombol di bawah untuk melanjutkan.</p>
         </div>
         <button
-          onClick={async () => { await startScreenShare?.(); enterFullscreen(); setNeedFs(false); }}
+          onClick={() => {
+            enterFullscreen();
+            setNeedFs(false);
+          }}
           className="w-full py-2.5 rounded-xl text-white text-sm font-semibold cursor-pointer"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
@@ -129,6 +132,11 @@ export default function ProctoringMonitor({
           <p className="text-xs text-red-500 font-medium mt-2">
             Pelanggaran Telah Terjadi! Aktivitas ini dicatat.
           </p>
+          {warning === "tab" && (
+            <p className="text-xs text-orange-500 font-medium mt-1">
+              Peringatan tab: {tabCount}/{MAX_TAB_VIOLATIONS} , ujian otomatis dikumpulkan jika batas tercapai.
+            </p>
+          )}
         </div>
         <button
           onClick={() => {

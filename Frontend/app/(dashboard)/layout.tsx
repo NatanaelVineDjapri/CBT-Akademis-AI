@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, AlertTriangle } from "lucide-react";
+import Link from "next/link";
 import { UserProvider, useUser } from "../../context/UserContext";
 import Sidebar from "../../components/Sidebar";
 import Avatar from "../../components/Avatar";
+import { getActiveSession } from "../../services/UjianServices";
 
 const roleLabelMap: Record<string, string> = {
   admin_akademis_ai: "Admin Akademis AI",
@@ -28,10 +30,18 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [activeSession, setActiveSession] = useState<{ peserta_ujian_id: number; nama_ujian: string } | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("sidebar-collapsed") === "true") setCollapsed(true);
   }, []);
+
+  useEffect(() => {
+    if (user?.role !== "mahasiswa" || isExamPage) return;
+    getActiveSession().then(session => {
+      if (session) setActiveSession(session);
+    }).catch(() => {});
+  }, [user, isExamPage]);
 
   const toggleCollapsed = () => {
     setIsTransitioning(true);
@@ -96,6 +106,27 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             >
               <Menu size={20} style={{ color: "var(--color-primary)" }} />
             </button>
+          </div>
+        )}
+        {activeSession && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 flex flex-col items-center gap-5 text-center">
+              <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+                <AlertTriangle size={28} className="text-amber-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-800 mb-1">Ujian Sedang Berlangsung</h3>
+                <p className="text-sm text-gray-500">Kamu masih memiliki sesi ujian aktif yang belum diselesaikan.</p>
+                <p className="text-sm font-semibold mt-2" style={{ color: "var(--color-primary)" }}>{activeSession.nama_ujian}</p>
+              </div>
+              <Link
+                href={`/mahasiswa/ujian/${activeSession.peserta_ujian_id}`}
+                className="w-full py-2.5 rounded-xl text-white text-sm font-semibold text-center"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                Lanjutkan Ujian
+              </Link>
+            </div>
           </div>
         )}
         <main

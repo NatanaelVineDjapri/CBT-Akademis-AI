@@ -2,6 +2,11 @@ import api from "./api";
 import * as XLSX from "xlsx";
 import { UjianMahasiswa, UjianMeta, HasilUjianDosenItem, HasilUjianDosenDetail, DetailPesertaDosen, UjianSession } from "../types";
 
+export const getActiveSession = async (): Promise<{ peserta_ujian_id: number; nama_ujian: string } | null> => {
+  const res = await api.get("/ujian/active-session");
+  return res.data.active;
+};
+
 export const mulaiUjian = async (pesertaUjianId: number, kodeAkses?: string): Promise<UjianSession> => {
   const res = await api.post(`/ujian/${pesertaUjianId}/mulai`, kodeAkses ? { kode_akses: kodeAkses } : {});
   return res.data.data;

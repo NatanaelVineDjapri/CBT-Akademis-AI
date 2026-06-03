@@ -20,11 +20,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ProctoringController;
 use App\Http\Controllers\KrsController;
 
-Route::post('/proctoring/save',              [ProctoringController::class, 'save']);
-Route::post('/proctoring/save-bukti',        [ProctoringController::class, 'saveBukti']);
-Route::post('/proctoring/webrtc/signal',     [ProctoringController::class, 'webrtcSignal']);
-Route::post('/proctoring/webrtc/offer',      [ProctoringController::class, 'storeOffer']);
-Route::get('/proctoring/webrtc/offer/{id}',  [ProctoringController::class, 'getOffer']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -35,6 +30,12 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
+
+    Route::post('/proctoring/save',             [ProctoringController::class, 'save']);
+    Route::post('/proctoring/save-bukti',       [ProctoringController::class, 'saveBukti']);
+    Route::post('/proctoring/webrtc/signal',    [ProctoringController::class, 'webrtcSignal']);
+    Route::post('/proctoring/webrtc/offer',     [ProctoringController::class, 'storeOffer']);
+    Route::get('/proctoring/webrtc/offer/{id}', [ProctoringController::class, 'getOffer']);
 
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
@@ -65,6 +66,7 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/nilai', [UjianController::class, 'nilaiMahasiswa']);
         Route::get('/nilai/{id}', [UjianController::class, 'nilaiDetail']);
         Route::get('/ujian/my', [UjianController::class, 'ujianMahasiswa']);
+        Route::get('/ujian/active-session', [UjianController::class, 'getActiveSession']);
         Route::post('/ujian/{pesertaUjianId}/mulai', [UjianController::class, 'mulaiUjian']);
         Route::get('/ujian/{pesertaUjianId}/soal', [UjianController::class, 'getSoalMahasiswa']);
         Route::post('/ujian/submit-jawaban', [UjianController::class, 'submitJawaban']);

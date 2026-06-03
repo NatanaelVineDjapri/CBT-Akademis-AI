@@ -89,6 +89,7 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptur
   const startScreenShare = async () => {
     if (screenStreamRef.current?.active) return;
     try {
+      if (!navigator.mediaDevices) return;
       const s = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
       screenStreamRef.current = s;
       setScreenShared(true);
@@ -112,23 +113,28 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptur
     let stream: MediaStream | null = null;
     let deniedIntervalId: ReturnType<typeof setInterval> | null = null;
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then(s => {
-        stream = s;
-        streamRef.current = s;
-        if (videoRef.current) {
-          videoRef.current.srcObject = s;
-          videoRef.current.play().catch(() => {});
-        }
-        setActive(true);
-        prewarmCam();
-      })
-      .catch(() => {
-        setDenied(true);
-        deniedIntervalId = setInterval(() => {
-          logPelanggaran(pesertaUjianId, "no_face");
-        }, FRAME_INTERVAL_MS);
-      });
+    if (!navigator.mediaDevices) {
+      setDenied(true);
+      deniedIntervalId = setInterval(() => logPelanggaran(pesertaUjianId, "no_face"), FRAME_INTERVAL_MS);
+    } else {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(s => {
+          stream = s;
+          streamRef.current = s;
+          if (videoRef.current) {
+            videoRef.current.srcObject = s;
+            videoRef.current.play().catch(() => {});
+          }
+          setActive(true);
+          prewarmCam();
+        })
+        .catch(() => {
+          setDenied(true);
+          deniedIntervalId = setInterval(() => {
+            logPelanggaran(pesertaUjianId, "no_face");
+          }, FRAME_INTERVAL_MS);
+        });
+    }
 
     const ws = new WebSocket(`${WS_BASE}/ws/proctoring/${pesertaUjianId}`);
     wsRef.current = ws;

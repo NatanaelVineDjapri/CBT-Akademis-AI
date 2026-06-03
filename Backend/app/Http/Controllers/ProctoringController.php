@@ -10,6 +10,8 @@ use App\Events\WebRtcSignal;
 
 class ProctoringController extends Controller
 {
+    private const TIPE_ALLOWED = ['tab','fullscreen','copypaste','no_face','multiple_faces','looking_away'];
+
     public function webrtcSignal(Request $request)
     {
         $data = $request->validate([
@@ -18,7 +20,11 @@ class ProctoringController extends Controller
             'from'             => 'required|string',
         ]);
 
-        broadcast(new WebRtcSignal((int) $data['peserta_ujian_id'], $request->all()));
+        try {
+            broadcast(new WebRtcSignal((int) $data['peserta_ujian_id'], $data));
+        } catch (\Throwable $e) {
+            \Log::warning('[webrtcSignal] Broadcast failed: ' . $e->getMessage());
+        }
 
         return response()->json(['ok' => true]);
     }
@@ -65,11 +71,16 @@ class ProctoringController extends Controller
     {
         $data = $request->validate([
             'peserta_ujian_id' => 'required|integer|exists:peserta_ujian,id',
-            'tipe_pelanggaran' => 'required|string',
+            'tipe_pelanggaran' => ['required', 'string', 'in:' . implode(',', self::TIPE_ALLOWED)],
             'risk_score'       => 'required|numeric',
             'waktu'            => 'required|string',
             'foto'             => 'nullable|image|max:5120',
         ]);
+
+        $pesertaCheck = PesertaUjian::select('id', 'user_id')->find($data['peserta_ujian_id']);
+        if (!$pesertaCheck || $pesertaCheck->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $fotoBukti = null;
         if ($request->hasFile('foto')) {
@@ -97,16 +108,20 @@ class ProctoringController extends Controller
 
         $peserta = PesertaUjian::select('id', 'ujian_id', 'user_id')->find($data['peserta_ujian_id']);
         if ($peserta) {
-            event(new PelanggaranMasuk([
-                'ujian_id'         => $peserta->ujian_id,
-                'peserta_ujian_id' => $peserta->id,
-                'user_id'          => $peserta->user_id,
-                'events'           => [[
-                    'tipe_pelanggaran' => $data['tipe_pelanggaran'],
-                    'risk_score'       => $data['risk_score'],
-                ]],
-                'total_risk_score' => $data['risk_score'],
-            ]));
+            try {
+                event(new PelanggaranMasuk([
+                    'ujian_id'         => $peserta->ujian_id,
+                    'peserta_ujian_id' => $peserta->id,
+                    'user_id'          => $peserta->user_id,
+                    'events'           => [[
+                        'tipe_pelanggaran' => $data['tipe_pelanggaran'],
+                        'risk_score'       => $data['risk_score'],
+                    ]],
+                    'total_risk_score' => $data['risk_score'],
+                ]));
+            } catch (\Throwable $e) {
+                \Log::warning('[saveBukti] Broadcast failed: ' . $e->getMessage());
+            }
         }
 
         return response()->json(['message' => 'Proctoring log saved', 'id' => $log->id], 201);
@@ -149,11 +164,16 @@ class ProctoringController extends Controller
         $data = $request->validate([
             'peserta_ujian_id'          => 'required|integer|exists:peserta_ujian,id',
             'events'                    => 'required|array|min:1',
-            'events.*.tipe_pelanggaran' => 'required|string',
+            'events.*.tipe_pelanggaran' => ['required', 'string', 'in:' . implode(',', self::TIPE_ALLOWED)],
             'events.*.risk_score'       => 'required|numeric',
             'events.*.waktu'            => 'required|string',
         ]);
- 
+
+        $pesertaCheck = PesertaUjian::select('id', 'user_id')->find($data['peserta_ujian_id']);
+        if (!$pesertaCheck || $pesertaCheck->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $rows = array_map(fn($ev) => [
             'peserta_ujian_id' => $data['peserta_ujian_id'],
             'tipe_pelanggaran' => $ev['tipe_pelanggaran'],
@@ -165,16 +185,19 @@ class ProctoringController extends Controller
  
         ProctoringLog::insert($rows);
 
-        // Broadcast ke monitoring dosen via Pusher
         $peserta = PesertaUjian::select('id', 'ujian_id', 'user_id')->find($data['peserta_ujian_id']);
         if ($peserta) {
-            event(new PelanggaranMasuk([
-                'ujian_id'        => $peserta->ujian_id,
-                'peserta_ujian_id'=> $peserta->id,
-                'user_id'         => $peserta->user_id,
-                'events'          => $data['events'],
-                'total_risk_score'=> array_sum(array_column($data['events'], 'risk_score')),
-            ]));
+            try {
+                event(new PelanggaranMasuk([
+                    'ujian_id'         => $peserta->ujian_id,
+                    'peserta_ujian_id' => $peserta->id,
+                    'user_id'          => $peserta->user_id,
+                    'events'           => $data['events'],
+                    'total_risk_score' => array_sum(array_column($data['events'], 'risk_score')),
+                ]));
+            } catch (\Throwable $e) {
+                \Log::warning('[save] Broadcast failed: ' . $e->getMessage());
+            }
         }
 
         return response()->json([
