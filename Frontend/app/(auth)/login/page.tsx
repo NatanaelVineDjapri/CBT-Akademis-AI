@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthLayout from "../../../components/AuthLayout";
 import { login, verify2FA } from "../../../services/AuthServices";
@@ -9,7 +8,6 @@ import { Eye, EyeOff } from "lucide-react";
 import OtpInput from "@/components/OtpInput";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,11 +18,18 @@ export default function LoginPage() {
   const [twoFaCode, setTwoFaCode] = useState("");
 
   const redirectByRole = (role: string) => {
-    if (role === "admin_akademis_ai") router.push("/admin-akademis");
-    else if (role === "admin_universitas") router.push("/admin-universitas");
-    else if (role === "dosen") router.push("/dosen");
-    else if (role === "mahasiswa") router.push("/mahasiswa");
-    else if (role === "peserta_mahasiswa_baru") router.push("/pmb");
+    // Pakai full reload (window.location), BUKAN router.push — supaya cookie session
+    // kebaca fresh sama middleware & bypass cache prefetch Next.js (yang nyimpen hasil
+    // redirect ke /login dari sebelum login). Ini ngilangin bug "login 2x baru masuk".
+    const map: Record<string, string> = {
+      admin_akademis_ai: "/admin-akademis",
+      admin_universitas: "/admin-universitas",
+      dosen: "/dosen",
+      mahasiswa: "/mahasiswa",
+      peserta_mahasiswa_baru: "/pmb",
+    };
+    const dest = map[role];
+    if (dest) window.location.href = dest;
   };
 
   const handleLogin = async (e: React.FormEvent) => {
