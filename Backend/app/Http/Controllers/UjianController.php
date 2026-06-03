@@ -133,6 +133,13 @@ class UjianController extends Controller
             )
             ->when($status === 'selesai', fn($q) => $q
                 ->where('peserta_ujian.status', 'selesai')
+                // Hanya ambil attempt selesai tertinggi per ujian (satu kartu per ujian)
+                ->whereRaw('peserta_ujian.attempt_ke = (
+                    SELECT MAX(pu2.attempt_ke) FROM peserta_ujian pu2
+                    WHERE pu2.ujian_id = peserta_ujian.ujian_id
+                      AND pu2.user_id = peserta_ujian.user_id
+                      AND pu2.status = ?
+                )', ['selesai'])
             )
             ->when(
                 $search,
@@ -161,11 +168,6 @@ class UjianController extends Controller
             'grade' => $p->nilaiAkhir?->grade,
             'lulus' => $p->nilaiAkhir?->lulus,
         ]);
-
-        // Untuk tab selesai: satu kartu per ujian (attempt tertinggi saja)
-        if ($status === 'selesai') {
-            $data = $data->sortByDesc('attempt_ke')->unique('ujian_id')->values();
-        }
 
         return response()->json([
             'message' => 'Daftar ujian berhasil diambil!',

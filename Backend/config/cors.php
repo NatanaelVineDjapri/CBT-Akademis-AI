@@ -19,7 +19,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'http://192.168.100.11:3000'],
+    'allowed_origins' => array_values(array_filter([
+        'http://localhost:3000',
+        'http://192.168.100.11:3000',
+        'https://cbtakademis-ai.my.id',
+        'https://www.cbtakademis-ai.my.id',
+        env('FRONTEND_URL'),
+    ])),
 
     'allowed_origins_patterns' => [],
 

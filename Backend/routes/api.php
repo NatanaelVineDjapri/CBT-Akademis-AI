@@ -114,12 +114,6 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::delete('/{id}', [ProdiController::class, 'destroy']);
         });
 
-        Route::prefix('pengumuman')->group(function () {
-            Route::post('/', [PengumumanController::class, 'store']);
-            Route::put('/{id}', [PengumumanController::class, 'update']);
-            Route::delete('/{id}', [PengumumanController::class, 'destroy']);
-        });
-
         Route::get('/audit/global', [AuditController::class, 'adminAkademisIndex']);
         Route::get('/audit/global/{model}/{id}', [AuditController::class, 'show']);
 
@@ -139,6 +133,13 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::get('/universitas', [UniversitasController::class, 'index']);
         Route::get('/fakultas', [FakultasController::class, 'index']);
         Route::get('/prodi', [ProdiController::class, 'index']);
+
+        // Pengumuman: bisa diakses admin akademis & admin universitas (satu route, dua role)
+        Route::prefix('pengumuman')->group(function () {
+            Route::post('/', [PengumumanController::class, 'store']);
+            Route::put('/{id}', [PengumumanController::class, 'update']);
+            Route::delete('/{id}', [PengumumanController::class, 'destroy']);
+        });
     });
 
     Route::middleware('role:admin_universitas')->group(function () {
@@ -161,12 +162,6 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
             Route::put('/{id}', [UserController::class, 'updateByAdmin']);
             Route::delete('/{id}', [UserController::class, 'destroy']);
             Route::post('/import', [UserController::class, 'importBulk']);
-        });
-
-        Route::prefix('pengumuman')->group(function () {
-            Route::post('/', [PengumumanController::class, 'store']);
-            Route::put('/{id}', [PengumumanController::class, 'update']);
-            Route::delete('/{id}', [PengumumanController::class, 'destroy']);
         });
 
         Route::prefix('mata-kuliah')->group(function () {
