@@ -15,8 +15,8 @@ class UniversitasController extends Controller
             'users as total_mahasiswa' => fn($q) => $q->where('role', 'mahasiswa'),
             'users as total_dosen' => fn($q) => $q->where('role', 'dosen'),
         ])
-            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('kode', 'like', '%' . $request->search . '%'))
+            ->when($request->search, fn($q) => $q->where('nama', 'ilike', '%' . $request->search . '%')
+                ->orWhere('kode', 'ilike', '%' . $request->search . '%'))
             ->paginate($request->per_page ?? 10);
 
         return response()->json([

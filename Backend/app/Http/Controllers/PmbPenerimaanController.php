@@ -36,9 +36,9 @@ class PmbPenerimaanController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('nama',  'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('nim',   'like', "%{$search}%");
+                $q->where('nama',  'ilike', "%{$search}%")
+                  ->orWhere('email', 'ilike', "%{$search}%")
+                  ->orWhere('nim',   'ilike', "%{$search}%");
             });
         }
 

@@ -24,8 +24,8 @@ class UserController extends Controller
             ->where('universitas_id', $authUser->universitas_id)
             ->when($request->role, fn($q) => $q->where('role', $request->role))
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
-            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('email', 'like', '%' . $request->search . '%'))
+            ->when($request->search, fn($q) => $q->where('nama', 'ilike', '%' . $request->search . '%')
+                ->orWhere('email', 'ilike', '%' . $request->search . '%'))
             ->when(in_array($sortBy, ['nama', 'email', 'role']),
                 fn($q) => $q->orderByRaw("LOWER({$sortBy}) {$sortDir}"),
                 fn($q) => $q->orderByRaw("{$sortBy} {$sortDir} NULLS LAST")
@@ -353,8 +353,8 @@ class UserController extends Controller
             ->when($request->universitas_id, fn($q) => $q->where('universitas_id', $request->universitas_id))
             ->when($request->role, fn($q) => $q->where('role', $request->role))
             ->when($request->prodi_id, fn($q) => $q->where('prodi_id', $request->prodi_id))
-            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('email', 'like', '%' . $request->search . '%'))
+            ->when($request->search, fn($q) => $q->where('nama', 'ilike', '%' . $request->search . '%')
+                ->orWhere('email', 'ilike', '%' . $request->search . '%'))
             ->when(in_array($sortBy, ['nama', 'email', 'role']),
                 fn($q) => $q->orderByRaw("LOWER({$sortBy}) {$sortDir}"),
                 fn($q) => $q->orderByRaw("{$sortBy} {$sortDir} NULLS LAST")

@@ -15,8 +15,8 @@ class FakultasController extends Controller
             'users as total_dosen' => fn($q) => $q->where('role', 'dosen'),
         ])
             ->when($request->universitas_id, fn($q) => $q->where('universitas_id', $request->universitas_id))
-            ->when($request->search, fn($q) => $q->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('kode', 'like', '%' . $request->search . '%'))
+            ->when($request->search, fn($q) => $q->where('nama', 'ilike', '%' . $request->search . '%')
+                ->orWhere('kode', 'ilike', '%' . $request->search . '%'))
             ->paginate($request->per_page ?? 10);
 
         return response()->json([
