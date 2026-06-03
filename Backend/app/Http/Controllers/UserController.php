@@ -186,10 +186,12 @@ class UserController extends Controller
         }
 
         $user->update([
-            'nama'    => $request->nama ?? $user->nama,
-            'nim'     => $request->nim ?? $user->nim,
-            'no_telp' => $request->no_telp ?? $user->no_telp,
-            'alamat'  => $request->alamat ?? $user->alamat,
+            // Pakai has() biar field yang dikirim kosong (null setelah ConvertEmptyStringsToNull)
+            // tetap ikut ke-update jadi kosong. Kalau key-nya ga dikirim sama sekali, baru keep lama.
+            'nama'    => $request->has('nama')    ? $request->nama    : $user->nama,
+            'nim'     => $request->has('nim')     ? $request->nim     : $user->nim,
+            'no_telp' => $request->has('no_telp') ? $request->no_telp : $user->no_telp,
+            'alamat'  => $request->has('alamat')  ? $request->alamat  : $user->alamat,
             'foto'    => $user->foto,
         ]);
 
