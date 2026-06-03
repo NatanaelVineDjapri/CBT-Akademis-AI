@@ -116,9 +116,10 @@ class PengumumanController extends Controller
 
         if ($authUser->role === 'admin_universitas') {
             $creator = $pengumuman->creator ?? \App\Models\User::find($pengumuman->created_by);
-            return $creator
-                && $creator->universitas_id
-                && $creator->universitas_id === $authUser->universitas_id;
+            if (!$creator) return false;
+            // Boleh kelola pengumuman dari universitasnya, ATAU pengumuman global super admin
+            return ($creator->universitas_id && $creator->universitas_id === $authUser->universitas_id)
+                || $creator->role === 'admin_akademis_ai';
         }
 
         return false;
