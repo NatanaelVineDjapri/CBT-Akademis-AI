@@ -109,7 +109,7 @@ export default function UjianModal({
       const res = await api.post(apiPath, buildPayload());
       const newId = res.data?.data?.id ?? res.data?.id;
       if (newId && gradeRows.length > 0) {
-        await api.put(`/ujian/dosen/${newId}/grade-setting`, {
+        await api.put(`${apiPath}/${newId}/grade-setting`, {
           rows: gradeRows.map(r => ({
             grade: r.grade,
             nilai_min: parseFloat(r.nilai_min) || 0,
@@ -159,7 +159,7 @@ export default function UjianModal({
 
   useEffect(() => {
     if (mode !== "edit" || tab !== "grade" || gradeLoaded || !form.id) return;
-    api.get(`/ujian/dosen/${form.id}/grade-setting`).then(r => {
+    api.get(`${apiPath}/${form.id}/grade-setting`).then(r => {
       const rows = r.data.data;
       setGradeRows(rows.length > 0
         ? rows.map((g: any) => ({ grade: g.grade, nilai_min: String(g.nilai_min), nilai_max: String(g.nilai_max) }))
@@ -172,7 +172,7 @@ export default function UjianModal({
   const handleSaveGrade = async () => {
     setGradeSaving(true); setGradeError("");
     try {
-      await api.put(`/ujian/dosen/${form.id}/grade-setting`, { rows: gradeRows.map(r => ({
+      await api.put(`${apiPath}/${form.id}/grade-setting`, { rows: gradeRows.map(r => ({
         grade: r.grade,
         nilai_min: parseFloat(r.nilai_min) || 0,
         nilai_max: parseFloat(r.nilai_max) || 0,

@@ -208,6 +208,9 @@ Route::middleware(['auth:sanctum', 'maintenance'])->group(function () {
         Route::post('/ujian/pmb/{id}/soal/random', [UjianController::class, 'addSoalRandom']);
         Route::post('/ujian/pmb/{id}/soal/buat-baru', [UjianController::class, 'buatSoal']);
         Route::delete('/ujian/pmb/{id}/soal/{ujianSoalId}', [UjianController::class, 'removeSoal']);
+
+        Route::get('/ujian/pmb/{id}/grade-setting', [UjianController::class, 'getGradeSetting']);
+        Route::put('/ujian/pmb/{id}/grade-setting', [UjianController::class, 'saveGradeSetting']);
     });
 
     Route::middleware('role:dosen')->group(function () {
