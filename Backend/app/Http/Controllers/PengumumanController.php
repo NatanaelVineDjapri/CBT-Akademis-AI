@@ -45,9 +45,15 @@ class PengumumanController extends Controller
             ->orderBy($sortBy, $sortDir)
             ->paginate($request->per_page ?? 10);
 
+        $items = collect($pengumuman->items())->map(function ($p) use ($authUser) {
+            $arr = $p->toArray();
+            $arr['can_manage'] = $this->canManagePengumuman($p, $authUser);
+            return $arr;
+        });
+
         return response()->json([
             'message' => 'Data pengumuman berhasil diambil!',
-            'data' => $pengumuman->items(),
+            'data' => $items,
             'meta' => [
                 'total' => $pengumuman->total(),
                 'per_page' => $pengumuman->perPage(),
@@ -116,10 +122,9 @@ class PengumumanController extends Controller
 
         if ($authUser->role === 'admin_universitas') {
             $creator = $pengumuman->creator ?? \App\Models\User::find($pengumuman->created_by);
-            if (!$creator) return false;
-            // Boleh kelola pengumuman dari universitasnya, ATAU pengumuman global super admin
-            return ($creator->universitas_id && $creator->universitas_id === $authUser->universitas_id)
-                || $creator->role === 'admin_akademis_ai';
+            return $creator
+                && $creator->universitas_id
+                && $creator->universitas_id === $authUser->universitas_id;
         }
 
         return false;

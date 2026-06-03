@@ -7,6 +7,7 @@ export interface Pengumuman {
   target_role: string | null;
   expired_at: string | null;
   created_at: string;
+  can_manage?: boolean;
 }
 
 export interface PengumumanMeta {

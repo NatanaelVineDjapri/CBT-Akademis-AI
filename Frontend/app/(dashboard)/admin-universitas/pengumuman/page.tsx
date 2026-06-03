@@ -212,14 +212,18 @@ export default function PengumumanPage() {
                       : <span className="text-gray-300">—</span>}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => openEdit(item)} className="cursor-pointer transition-colors" title="Edit">
-                        <Pencil size={15} className="text-green-500 hover:text-green-600" />
-                      </button>
-                      <button onClick={() => setConfirmDelete(item)} className="cursor-pointer transition-colors" title="Hapus">
-                        <Trash2 size={15} className="text-red-400 hover:text-red-500" />
-                      </button>
-                    </div>
+                    {item.can_manage !== false ? (
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => openEdit(item)} className="cursor-pointer transition-colors" title="Edit">
+                          <Pencil size={15} className="text-green-500 hover:text-green-600" />
+                        </button>
+                        <button onClick={() => setConfirmDelete(item)} className="cursor-pointer transition-colors" title="Hapus">
+                          <Trash2 size={15} className="text-red-400 hover:text-red-500" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-300">—</span>
+                    )}
                   </td>
                 </tr>
               ))}
