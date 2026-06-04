@@ -70,11 +70,25 @@ export default function ProctoringMonitor({
     };
   }, []);
 
-  // Tab / window switch — hanya aktif kalau sedang fullscreen
+  // Tab / window switch — deteksi pindah tab (visibilitychange) DAN pindah aplikasi/window
+  // lain seperti File Explorer (window blur). Dedup biar tab switch yang men-trigger dua
+  // event sekaligus ga kehitung dobel.
   useEffect(() => {
-    const onVisibility = () => { if (document.hidden && document.fullscreenElement) trigger("tab"); };
+    let lastLeave = 0;
+    const onLeave = () => {
+      if (!document.fullscreenElement) return;
+      const now = Date.now();
+      if (now - lastLeave < 1000) return; // dedup dalam 1 detik
+      lastLeave = now;
+      trigger("tab");
+    };
+    const onVisibility = () => { if (document.hidden) onLeave(); };
     document.addEventListener("visibilitychange", onVisibility);
-    return () => { document.removeEventListener("visibilitychange", onVisibility); };
+    window.addEventListener("blur", onLeave);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onLeave);
+    };
   }, []);
 
   // Copy / paste / cut / right-click block

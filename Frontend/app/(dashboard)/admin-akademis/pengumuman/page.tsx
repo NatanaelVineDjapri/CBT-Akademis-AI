@@ -61,6 +61,7 @@ export default function PengumumanPage() {
   const [editItem, setEditItem]       = useState<Pengumuman | null>(null);
   const [form, setForm]               = useState<FormState>(emptyForm);
   const [saving, setSaving]           = useState(false);
+  const [formError, setFormError]     = useState("");
   const [confirmDelete, setConfirmDelete] = useState<Pengumuman | null>(null);
   const [deleting, setDeleting]       = useState(false);
 
@@ -89,9 +90,10 @@ export default function PengumumanPage() {
     setSortDir(newDir);
   };
 
-  const openAdd = () => { setEditItem(null); setForm(emptyForm); setShowModal(true); };
+  const openAdd = () => { setEditItem(null); setForm(emptyForm); setFormError(""); setShowModal(true); };
   const openEdit = (item: Pengumuman) => {
     setEditItem(item);
+    setFormError("");
     setForm({
       judul:       item.judul,
       isi:         item.isi,
@@ -100,11 +102,17 @@ export default function PengumumanPage() {
     });
     setShowModal(true);
   };
-  const closeModal = () => { setShowModal(false); setEditItem(null); };
+  const closeModal = () => { setShowModal(false); setEditItem(null); setFormError(""); };
 
   const handleSubmit = async () => {
     if (!form.judul.trim() || !form.isi.trim()) return;
+    // Validasi expired_at di frontend biar pesannya jelas (bukan 422 mendadak)
+    if (form.expired_at && new Date(form.expired_at) <= new Date()) {
+      setFormError("Tanggal expired harus setelah waktu sekarang.");
+      return;
+    }
     setSaving(true);
+    setFormError("");
     try {
       if (editItem) {
         await updatePengumuman(editItem.id, { judul: form.judul, isi: form.isi, target_role: form.target_role || undefined, expired_at: form.expired_at || undefined });
@@ -113,6 +121,8 @@ export default function PengumumanPage() {
       }
       await mutate();
       closeModal();
+    } catch (err: any) {
+      setFormError(err?.response?.data?.message ?? "Gagal menyimpan pengumuman.");
     } finally {
       setSaving(false);
     }
@@ -267,6 +277,9 @@ export default function PengumumanPage() {
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 outline-none focus:border-[var(--color-primary)] transition-colors" />
               </div>
             </form>
+            {formError && (
+              <p className="px-5 pb-2 text-xs text-red-500">{formError}</p>
+            )}
             <div className="px-5 pb-5 flex gap-3 shrink-0">
               <button type="button" onClick={closeModal}
                 className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-lg cursor-pointer hover:bg-gray-50">

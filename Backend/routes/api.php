@@ -21,7 +21,7 @@ use App\Http\Controllers\ProctoringController;
 use App\Http\Controllers\KrsController;
 
 
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->middleware('throttle:login')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/login/2fa-verify', [AuthController::class, 'verifyLogin']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
