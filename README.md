@@ -143,20 +143,6 @@ Open http://localhost:3000
 
 ---
 
-## 🔐 Default Credentials (Seeder)
-
-**Password for all accounts:** `password123`
-
-| Role             | Email                                                                                           |
-| ---------------- | ----------------------------------------------------------------------------------------------- |
-| Academic Admin   | [admin@akademis.ai](mailto:admin@akademis.ai)                                                   |
-| University Admin | [admin@untar.ac.id](mailto:admin@untar.ac.id)                                                   |
-| Lecturer         | [irvan.lewenusa@untar.ac.id](mailto:irvan.lewenusa@untar.ac.id)                                 |
-| Student          | [agus.santoso.535210001@student.untar.ac.id](mailto:agus.santoso.535210001@student.untar.ac.id) |
-
-
----
-
 ## 📁 Project Structure
 
 ```
