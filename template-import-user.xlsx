@@ -1,0 +1,6 @@
+nama,email,role,nim,nidn,no_telp,alamat,tahun_masuk,kode_prodi
+Budi Santoso,budi.santoso@student.untar.ac.id,mahasiswa,535240001,,08123456789,Jakarta Barat,2024,TI
+Andi Wijaya,andi.wijaya@student.untar.ac.id,mahasiswa,535240002,,08129876543,Bandung,2024,TI
+Citra Lestari,citra.lestari@student.untar.ac.id,mahasiswa,535240003,,08134567890,Surabaya,2024,TI
+Dr. Siti Rahma,siti.rahma@untar.ac.id,dosen,,0312345678,08111222333,Jakarta Pusat,,TI
+Ahmad Fauzi,ahmad.fauzi@untar.ac.id,dosen,,0398765432,08144555666,Tangerang,,TI

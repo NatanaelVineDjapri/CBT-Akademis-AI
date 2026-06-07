@@ -8,7 +8,7 @@ export default function UjianTerbaruCard({ data }: { data: AdminUniversitasDashb
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ClipboardList size={16} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Ujian Terbaru</span>
+          <span className="text-sm font-medium text-gray-800">Ujian PMB Terbaru</span>
         </div>
         {data.length > 0 && (
           <Link

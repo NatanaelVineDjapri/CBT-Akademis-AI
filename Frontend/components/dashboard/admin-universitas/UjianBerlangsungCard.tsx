@@ -8,7 +8,7 @@ export default function UjianBerlangsungCard({ data }: { data: AdminUniversitasD
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Clock size={16} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Ujian Sedang Berlangsung</span>
+          <span className="text-sm font-medium text-gray-800">Ujian PMB Sedang Berlangsung</span>
         </div>
         <Link
           href="/admin-universitas/monitoring"
@@ -20,7 +20,7 @@ export default function UjianBerlangsungCard({ data }: { data: AdminUniversitasD
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400 flex-1">Tidak ada ujian yang sedang berlangsung.</p>
+        <p className="text-xs text-gray-400 flex-1">Tidak ada ujian PMB yang sedang berlangsung.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {data.map((u) => (
