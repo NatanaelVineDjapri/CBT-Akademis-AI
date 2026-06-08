@@ -2043,7 +2043,7 @@ class UjianController extends Controller
                     'url'        => $l->foto_bukti,
                     'tipe'       => $l->tipe_pelanggaran,
                     'risk_score' => $l->risk_score,
-                    'waktu'      => $l->waktu?->utc()->format('Y-m-d H:i:s'),
+                    'waktu'      => $l->waktu?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
                 ])->values(),
                 'jawaban' => $p->jawabanPeserta->sortBy(fn($j) => $j->ujianSoal?->urutan ?? 999)->map(fn($j) => [
                     'nomor'   => $j->ujianSoal?->urutan ?? '-',
@@ -2227,7 +2227,7 @@ class UjianController extends Controller
                     'url'        => $l->foto_bukti,
                     'tipe'       => $l->tipe_pelanggaran,
                     'risk_score' => $l->risk_score,
-                    'waktu'      => $l->waktu?->utc()->format('Y-m-d H:i:s'),
+                    'waktu'      => $l->waktu?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
                 ])->values(),
                 'jawaban' => $p->jawabanPeserta->sortBy(fn($j) => $j->ujianSoal?->urutan ?? 999)->map(fn($j) => [
                     'nomor'   => $j->ujianSoal?->urutan ?? '-',
