@@ -1,9 +1,4 @@
 """
-CBT Proctoring – FastAPI WebSocket Service
-==========================================
-Endpoint utama:
-  WS  /ws/proctoring/{exam_id}/{user_id}
-  GET /health
 
 Alur WebSocket:
   1. Client (Next.js) kirim frame tiap ~500ms:
@@ -30,7 +25,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from detector import ProctoringDetector
 
-# ── Konfigurasi ─────────────────────────────────────────────────────────────
 LARAVEL_API_URL  = os.getenv("LARAVEL_API_URL", "http://localhost:8000/api")
 LARAVEL_API_KEY  = os.getenv("LARAVEL_API_KEY", "")          # opsional bearer token
 YAW_THRESHOLD       = float(os.getenv("YAW_THRESHOLD", "20"))    # derajat
@@ -40,22 +34,19 @@ LOOKING_AWAY_SECS   = float(os.getenv("LOOKING_AWAY_SECS", "5"))  # detik
 
 RISK_WEIGHTS = {"no_face": 10, "multiple_faces": 20, "looking_away": 5}
 
-# ── App ──────────────────────────────────────────────────────────────────────
 app = FastAPI(title="CBT Proctoring Service", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # ganti ke domain Next.js lu di production
+    allow_origins=["*"],   # ganti ke domain Next.js di production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# session_key → ProctoringDetector
 _sessions: Dict[str, ProctoringDetector] = {}
 
 
-# ── WebSocket endpoint ───────────────────────────────────────────────────────
 @app.websocket("/ws/proctoring/{peserta_ujian_id}")
 async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
     await websocket.accept()
@@ -75,7 +66,6 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
             raw     = await websocket.receive_text()
             payload = json.loads(raw)
 
-            # ── Akhir sesi ──────────────────────────────────────────
             if payload.get("action") == "end_session":
                 summary = detector.get_session_summary()
 
@@ -86,7 +76,6 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
                 print(f"[-] Session ended    -> peserta_ujian_id={peserta_ujian_id}  risk={summary['risk_score']}")
                 break
 
-            # ── Proses frame ─────────────────────────────────────────
             if "frame" in payload:
                 loop   = asyncio.get_event_loop()
                 result = await loop.run_in_executor(
@@ -106,15 +95,12 @@ async def proctoring_ws(websocket: WebSocket, peserta_ujian_id: str):
         _sessions.pop(peserta_ujian_id, None)
 
 
-# ── Push ke Laravel ──────────────────────────────────────────────────────────
 async def _push_to_laravel(peserta_ujian_id: str, summary: dict):
     url     = f"{LARAVEL_API_URL}/proctoring/save"
     headers = {"Content-Type": "application/json"}
     if LARAVEL_API_KEY:
         headers["Authorization"] = f"Bearer {LARAVEL_API_KEY}"
 
-    # Sesuaikan format ke kolom ProctoringLog:
-    # peserta_ujian_id | tipe_pelanggaran | risk_score | waktu
     events_payload = [
         {
             "tipe_pelanggaran": ev["type"],
@@ -141,7 +127,6 @@ async def _push_to_laravel(peserta_ujian_id: str, summary: dict):
             print(f"[Laravel] Gagal push: {exc}")
 
 
-# ── Health check ─────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
     return {
@@ -150,7 +135,6 @@ def health():
     }
 
 
-# ── Entry point ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

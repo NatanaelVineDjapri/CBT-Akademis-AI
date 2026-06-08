@@ -8,7 +8,6 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-# ── Konfigurasi ──────────────────────────────────────────────────────────────
 YAW_THRESHOLD = 20   # derajat nengok kiri/kanan
 
 MODEL_POINTS = np.array([
@@ -21,7 +20,6 @@ MODEL_POINTS = np.array([
 ], dtype=np.float64)
 LM_INDICES = [4, 152, 263, 33, 287, 57]
 
-# ── Init MediaPipe ────────────────────────────────────────────────────────────
 mp_detection = mp.solutions.face_detection.FaceDetection(
     model_selection=1, min_detection_confidence=0.65
 )
@@ -32,7 +30,6 @@ mp_mesh = mp.solutions.face_mesh.FaceMesh(
     min_tracking_confidence=0.5,
 )
 
-# ── Buka kamera ──────────────────────────────────────────────────────────────
 cap = cv2.VideoCapture(0)
 print("Kamera nyala! Tekan Q untuk keluar.\n")
 
@@ -47,7 +44,6 @@ while True:
     status = ""
     color  = (0, 255, 0)   # hijau = aman
 
-    # ── Deteksi wajah ────────────────────────────────────────────────────────
     det = mp_detection.process(rgb)
 
     if not det.detections:
@@ -62,7 +58,6 @@ while True:
             color  = (0, 165, 255)   # oranye
 
         else:
-            # ── Head pose ─────────────────────────────────────────────────
             mesh = mp_mesh.process(rgb)
             if mesh.multi_face_landmarks:
                 lm = mesh.multi_face_landmarks[0].landmark
@@ -97,7 +92,6 @@ while True:
                         status = f"OK (yaw {yaw:.1f} deg)"
                         color  = (0, 255, 0)
 
-    # ── Tampilkan di frame ────────────────────────────────────────────────────
     cv2.rectangle(frame, (0, 0), (w, 40), (0, 0, 0), -1)
     cv2.putText(frame, status, (10, 28),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
