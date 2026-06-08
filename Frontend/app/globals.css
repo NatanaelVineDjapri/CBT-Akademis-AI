@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+
+button:not(:disabled),
+[role="button"]:not(:disabled),
+label[for],
+summary,
+select:not(:disabled) {
+  cursor: pointer;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
