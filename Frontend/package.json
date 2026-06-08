@@ -15,6 +15,7 @@
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
     "@heroicons/react": "^2.2.0",
+    "@vercel/analytics": "^2.0.1",
     "axios": "^1.14.0",
     "laravel-echo": "^2.3.4",
     "lucide-react": "^1.8.0",

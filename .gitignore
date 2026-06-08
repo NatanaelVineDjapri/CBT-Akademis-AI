@@ -18,3 +18,5 @@ Proctoring-services/venv/
 Proctoring-services/__pycache__/
 Proctoring-services/*.pyc
 gen_template.py
+
+.vscode
