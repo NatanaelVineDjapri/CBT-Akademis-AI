@@ -37,4 +37,8 @@ return [
         'inboxId' => env('MAILTRAP_INBOX_ID'),
     ],
 
+    'resend' => [
+        'key' => env('RESEND_API_KEY'),
+    ],
+
 ];
