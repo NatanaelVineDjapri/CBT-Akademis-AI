@@ -20,9 +20,9 @@ export default function JawabanPilihanGanda({ data }: { data: JawabanPG[] }) {
         <SearchInput value={search} onChange={setSearch} placeholder="Cari soal..." />
       </div>
 
-      <div className="overflow-y-auto max-h-[240px] rounded-xl border border-gray-100">
+      <div className="rounded-xl border border-gray-100 overflow-hidden">
         <table className="w-full text-xs">
-          <thead className="sticky top-0 bg-gray-50 z-10">
+          <thead className="bg-gray-50">
             <tr>
               <th className="text-left text-gray-400 font-medium px-3 py-2 w-10">#</th>
               <th className="text-left text-gray-400 font-medium px-3 py-2">Soal</th>
