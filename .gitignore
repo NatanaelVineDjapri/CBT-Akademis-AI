@@ -18,5 +18,7 @@ Proctoring-services/venv/
 Proctoring-services/__pycache__/
 Proctoring-services/*.pyc
 gen_template.py
+jira-import.csv
+jira-sprint-plan.md
 
 .vscode

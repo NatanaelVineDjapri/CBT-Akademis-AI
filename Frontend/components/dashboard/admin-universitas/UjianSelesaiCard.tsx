@@ -14,7 +14,7 @@ export default function UjianSelesaiCard({ data }: { data: AdminUniversitasDashb
       {data.length === 0 ? (
         <p className="text-xs text-gray-400">Belum ada ujian selesai.</p>
       ) : (
-        <div className="flex flex-col flex-1 justify-between gap-3">
+        <div className="flex flex-col gap-3">
           {data.map((u) => (
             <div key={u.id}
               className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">

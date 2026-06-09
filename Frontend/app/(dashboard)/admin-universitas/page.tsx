@@ -43,7 +43,7 @@ export default function AdminUniversitasDashboardPage() {
             <StatCard label="Total Ujian"     value={data.stats.total_ujian}      icon={FileText}     color="#f59e0b" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
             <BankSoalCard data={data.bank_soal} />
             <UjianBerlangsungCard data={data.ujian_berlangsung} />
             <UjianTerbaruCard data={data.ujian_terbaru} />
