@@ -10,6 +10,7 @@ import SearchInput from "@/components/filtering/SearchInput";
 import EmptyState from "@/components/EmptyState";
 import { useDebounce } from "@/hooks/useDebounce";
 import api from "@/services/api";
+import type { UjianSoalItem, AvailableSoalItem, BabOption, BankSoalOption } from "@/components/dosen/ujian/types";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -17,39 +18,6 @@ interface UjianInfo {
   id: number;
   nama_ujian: string;
   mata_kuliah_id: number | null;
-}
-
-interface UjianSoalItem {
-  ujian_soal_id: number;
-  soal_id: number;
-  urutan: number;
-  bobot: number;
-  deskripsi: string | null;
-  bab: string | null;
-  jenis_soal: string | null;
-  tingkat_kesulitan: string | null;
-  dari_bank_soal: string | null;
-}
-
-interface AvailableSoalItem {
-  id: number;
-  deskripsi: string;
-  bab: string | null;
-  bab_id: number | null;
-  jenis_soal: string | null;
-  tingkat_kesulitan: string | null;
-  bank_soal: string | null;
-}
-
-interface BabOption {
-  id: number;
-  nama_bab: string;
-  urutan: number;
-}
-
-interface BankSoalOption {
-  id: number;
-  nama: string;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────

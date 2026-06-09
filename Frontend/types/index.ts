@@ -39,6 +39,12 @@ export interface MataKuliah {
   dosen_matkul?: { id: number; user_id: number; tahun_ajaran?: string; user: { id: number; nama: string; nidn?: string } }[];
 }
 
+export interface MataKuliahOption {
+  id: number;
+  nama: string;
+  kode: string;
+}
+
 export interface KrsMahasiswaItem {
   id: number;
   nama: string;

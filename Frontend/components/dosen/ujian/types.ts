@@ -14,7 +14,7 @@ export interface UjianItem {
   status: "belum_mulai" | "berlangsung" | "selesai";
 }
 
-export interface MataKuliahOption { id: number; nama: string; kode: string }
+export type { MataKuliahOption } from "@/types";
 
 export interface UjianForm {
   id?: number;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import useSWR from "swr";
-import type { BankSoalItem } from "@/types";
+import type { BankSoalItem, MataKuliahOption } from "@/types";
 import { getBabByMataKuliah, type BabOption } from "@/services/BankSoalServices";
 
 const PERMISSIONS = [
@@ -11,12 +11,6 @@ const PERMISSIONS = [
   { value: "shared", label: "Shared" },
   { value: "private", label: "Private" },
 ];
-
-interface MataKuliahOption {
-  id: number;
-  nama: string;
-  kode: string;
-}
 
 interface Props {
   mode: "create" | "edit";
