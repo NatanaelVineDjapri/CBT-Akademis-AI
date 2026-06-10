@@ -61,7 +61,7 @@ export default function UjianPage() {
   const meta = data?.meta ?? null;
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>Ujian</h1>
         <p className="text-sm text-gray-500 mt-1">Lihat dan ikuti semua ujian kamu di sini</p>
@@ -89,7 +89,7 @@ export default function UjianPage() {
         </div>
       </div>
 
-      <div className="flex-1">
+      <div>
         {showSkeleton ? (
           <UjianCardSkeleton count={perPage} />
         ) : !data ? null : ujianList.length === 0 ? (

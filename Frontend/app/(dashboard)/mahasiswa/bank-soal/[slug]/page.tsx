@@ -54,7 +54,7 @@ export default function SharedBankSoalPage({ params }: { params: Promise<{ slug:
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               {bankSoal?.nama ?? "Bank Soal"}

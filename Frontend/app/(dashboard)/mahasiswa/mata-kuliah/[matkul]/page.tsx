@@ -73,7 +73,7 @@ export default function MataKuliahDetailPage() {
 
       {/* Bab List */}
       <div className="bg-white rounded-2xl overflow-hidden flex flex-col">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-4 shrink-0">
+        <div className="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
             Daftar Bab
           </h2>

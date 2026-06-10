@@ -52,14 +52,14 @@ export default function MahasiswaSharedBankSoalPage() {
   const list = data?.data ?? [];
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>Shared</h1>
         <p className="text-sm text-gray-500 mt-1">Bank soal yang dibagikan kepada Anda</p>
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Daftar Bank Soal</h2>
             <p className="text-xs text-gray-400 mt-0.5">Klik bank soal untuk melihat daftar soal.</p>
@@ -68,7 +68,7 @@ export default function MahasiswaSharedBankSoalPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>

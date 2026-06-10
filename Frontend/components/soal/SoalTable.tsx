@@ -53,7 +53,7 @@ export default function SoalTable({ soalList, isLoading, canEdit = false, onEdit
       </div>
     )}
     <div className="overflow-x-auto flex-1">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[640px] text-sm">
         <thead>
           <tr className="border-b border-gray-100">
             <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-12">#</th>

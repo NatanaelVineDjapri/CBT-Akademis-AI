@@ -22,33 +22,33 @@ export default function ProfileCard({ user, onUbahProfil }: Props) {
       <div className="space-y-3">
         <div>
           <label className="text-xs text-gray-500">Nama Lengkap</label>
-          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50">
+          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 break-words">
             {user.nama || "-"}
           </div>
         </div>
         {(user.role === "mahasiswa" || user.role === "dosen") && (
           <div>
             <label className="text-xs text-gray-500">{user.role === "dosen" ? "NIDN" : "NIM"}</label>
-            <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50">
+            <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 break-words">
               {(user.role === "dosen" ? user.nidn : user.nim) || "-"}
             </div>
           </div>
         )}
         <div>
           <label className="text-xs text-gray-500">Email</label>
-          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50">
+          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 break-words">
             {user.email || "-"}
           </div>
         </div>
         <div>
           <label className="text-xs text-gray-500">Nomor Telepon</label>
-          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50">
+          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 break-words">
             {user.no_telp || "-"}
           </div>
         </div>
         <div>
           <label className="text-xs text-gray-500">Alamat</label>
-          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 min-h-[60px]">
+          <div className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 break-words min-h-[60px]">
             {user.alamat || "-"}
           </div>
         </div>

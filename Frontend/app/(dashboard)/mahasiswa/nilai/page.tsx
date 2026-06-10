@@ -46,13 +46,13 @@ export default function NilaiPage() {
   const meta = data?.meta ?? null;
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>Nilai</h1>
         <p className="text-sm text-gray-500 mt-1">Lihat hasil ujian dan perkembangan belajar Anda</p>
       </div>
 
-      <div className="flex-1">
+      <div>
         <NilaiTable
           nilaiList={nilaiList}
           meta={meta}

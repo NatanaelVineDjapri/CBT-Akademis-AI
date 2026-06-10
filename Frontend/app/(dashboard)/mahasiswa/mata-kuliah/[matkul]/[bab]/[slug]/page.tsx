@@ -89,7 +89,7 @@ export default function MahasiswaBankSoalSoalPage({ params }: Props) {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
             Daftar Soal
           </h2>

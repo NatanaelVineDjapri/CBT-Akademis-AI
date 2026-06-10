@@ -65,7 +65,7 @@ export default function MahasiswaBabBankSoalPage({ params }: Props) {
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Daftar Bank Soal</h2>
             <p className="text-xs text-gray-400 mt-0.5">Pilih bank soal untuk mulai belajar.</p>

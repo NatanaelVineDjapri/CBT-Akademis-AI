@@ -40,7 +40,7 @@ export default function MataKuliahPage() {
   }, [isValidating, data]);
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
@@ -54,7 +54,7 @@ export default function MataKuliahPage() {
         </div>
       </div>
 
-      <div className="flex-1">
+      <div>
         {showSkeleton ? (
           <MataKuliahSkeleton count={perPage} />
         ) : isLoading ? null : mataKuliah.length === 0 ? (
