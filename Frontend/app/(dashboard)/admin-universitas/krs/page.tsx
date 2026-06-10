@@ -462,7 +462,7 @@ export default function KrsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[760px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col className="w-56" />

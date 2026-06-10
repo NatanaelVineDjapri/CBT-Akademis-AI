@@ -42,7 +42,7 @@ function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
 export default function UjianTable({ items, perPage, isLoading, meta, onEdit, onDelete, basePath, onRowHover, sortBy, sortDir, onSort }: UjianTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm table-fixed">
+      <table className="w-full min-w-[880px] text-sm table-fixed">
         <colgroup>
           <col className="w-12" />
           <col className="w-56" />

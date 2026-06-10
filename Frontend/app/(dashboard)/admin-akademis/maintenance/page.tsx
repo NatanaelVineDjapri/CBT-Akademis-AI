@@ -50,7 +50,7 @@ export default function MaintenancePage() {
 
       {/* Status + Toggle Card */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h2 className="text-sm font-bold" style={{ color: "var(--color-primary)" }}>Maintenance Break</h2>
             <p className="text-xs text-gray-400 mt-0.5">Kendalikan akses sistem untuk semua pengguna.</p>
@@ -90,7 +90,7 @@ export default function MaintenancePage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[560px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col className="w-32" />

@@ -128,7 +128,7 @@ export default function UniversitasDetailPage({ params }: Props) {
       <Breadcrumb overrides={{ [slug]: univ?.nama ?? "..." }} />
 
       <div className="bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3 shrink-0">
+        <div className="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Daftar Fakultas</h2>
             <p className="text-xs text-gray-400 mt-0.5">{univ?.nama ?? "..."}</p>
@@ -137,17 +137,17 @@ export default function UniversitasDetailPage({ params }: Props) {
             <SearchInput value={search} onChange={handleSearch} placeholder="Cari fakultas..." />
             <button
               onClick={() => { setEditItem(null); setShowModal(true); }}
-              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg"
+              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg shrink-0"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               <Plus size={15} />
-              Tambah Baru
+              <span className="hidden sm:inline">Tambah Baru</span>
             </button>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[640px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col />

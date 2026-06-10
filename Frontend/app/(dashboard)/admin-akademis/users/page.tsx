@@ -411,55 +411,57 @@ export default function AdminAkademisUsersPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb />
       </div>
 
-      <div className="flex-1">
+      <div>
         <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 gap-3 flex-wrap">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
             <div>
               <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
                 Manajemen User
               </h2>
               <p className="text-xs text-gray-400 mt-0.5">Semua pengguna di seluruh universitas.</p>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:flex-wrap gap-2">
               <select
                 value={universitasFilter}
                 onChange={e => setUniversitasFilter(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-[var(--color-primary)]"
+                className="border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-[var(--color-primary)] w-full sm:w-auto"
               >
                 <option value="">Semua Universitas</option>
                 {univList.map(u => <option key={u.id} value={String(u.id)}>{u.nama}</option>)}
               </select>
-              <SearchInput value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Cari user..." />
-              <button
-                onClick={() => setShowImport(true)}
-                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap"
-                style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
-              >
-                <Upload size={15} />
-                Import
-              </button>
-              <button
-                onClick={() => setShowCreate(true)}
-                className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                <Plus size={15} />
-                Tambah User
-              </button>
+              <div className="flex items-center gap-2">
+                <SearchInput value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Cari user..." />
+                <button
+                  onClick={() => setShowImport(true)}
+                  className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+                >
+                  <Upload size={15} />
+                  <span className="hidden sm:inline">Import</span>
+                </button>
+                <button
+                  onClick={() => setShowCreate(true)}
+                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ backgroundColor: "var(--color-primary)" }}
+                >
+                  <Plus size={15} />
+                  <span className="hidden sm:inline">Tambah User</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-1 px-5 pt-3 pb-0 border-b border-gray-100">
+          <div className="flex gap-1 px-5 pt-3 pb-0 border-b border-gray-100 overflow-x-auto">
             {TABS.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setRoleTab(tab.key)}
-                className="px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                 style={roleTab === tab.key
                   ? { backgroundColor: "var(--color-primary)", color: "white" }
                   : { color: "#6b7280" }
@@ -471,7 +473,7 @@ export default function AdminAkademisUsersPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-sm table-fixed">
+            <table className="w-full min-w-[860px] text-sm table-fixed">
               <colgroup>
                 <col className="w-12" />
                 <col className="w-44" />
