@@ -47,7 +47,7 @@ export default function PerformaProdi() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center gap-2 mb-3">
           <BarChart2 size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Rata-rata Nilai per Prodi</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Rata-rata Nilai per Prodi</span>
         </div>
         <p className="text-xs text-gray-400">Belum ada data nilai mahasiswa.</p>
       </div>
@@ -58,7 +58,7 @@ export default function PerformaProdi() {
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <div className="flex items-center gap-2 mb-4">
         <BarChart2 size={15} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-800">Rata-rata Nilai per Prodi</span>
+        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Rata-rata Nilai per Prodi</span>
       </div>
 
       <div style={{ height: data.data.length * 36 + 20 }} className="min-h-[120px]">

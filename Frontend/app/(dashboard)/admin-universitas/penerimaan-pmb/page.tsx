@@ -209,44 +209,47 @@ export default function PenerimaanPMBPage() {
   const tahunOptions = Array.from({ length: 5 }, (_, i) => tahunSekarang - i);
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb />
       </div>
 
-      <div className="flex-1">
+      <div>
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Penerimaan PMB
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">Tandai peserta yang diterima atau ditolak, lalu proses.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="flex items-center gap-2">
             <select
               value={tahun}
               onChange={e => setTahun(Number(e.target.value))}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)]"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] shrink-0"
             >
               {tahunOptions.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
 
             <SearchInput value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Cari peserta..." />
+            </div>
 
+            <div className="flex items-center gap-2 shrink-0">
             {/* Auto-isi */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 onClick={() => setShowAutoFill(v => !v)}
-                className="flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-lg cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-lg cursor-pointer transition-colors whitespace-nowrap"
                 style={showAutoFill
                   ? { backgroundColor: "var(--color-primary)", color: "#fff" }
                   : { backgroundColor: "var(--color-primary-light, #eff6ff)", color: "var(--color-primary)" }
                 }
               >
                 <Wand2 size={14} />
-                Auto-isi
+                <span className="hidden sm:inline">Auto-isi</span>
               </button>
               {showAutoFill && (
                 <div className="absolute right-0 top-full mt-1.5 bg-white rounded-xl z-20 w-64 border border-gray-200"
@@ -290,6 +293,7 @@ export default function PenerimaanPMBPage() {
               {processing ? <Loader2 size={14} className="animate-spin" /> : null}
               Proses ({diterimaList.length + ditolakList.length})
             </button>
+            </div>
           </div>
         </div>
 
@@ -320,7 +324,7 @@ export default function PenerimaanPMBPage() {
 
         {/* Table */}
         <div className="overflow-auto flex-1">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[760px] text-sm table-fixed">
             <colgroup>
               <col className="w-10" />
               <col className="w-44" />

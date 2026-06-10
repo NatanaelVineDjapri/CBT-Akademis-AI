@@ -128,7 +128,7 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
 
       {/* Daftar Peserta */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Daftar Peserta
@@ -164,7 +164,7 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[700px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col />
@@ -237,7 +237,7 @@ export default function AdminDetailUjianPMBPage({ params }: { params: Promise<{ 
 
       {/* Distribusi Jawaban PG dan Checkbox */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
             Distribusi Jawaban PG dan Check Box
           </h2>

@@ -235,41 +235,43 @@ export default function MataKuliahPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0"><Breadcrumb /></div>
 
-      <div className="flex-1">
+      <div>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Mata Kuliah
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">Kelola daftar mata kuliah per program studi.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <select
               value={prodiId ?? ""}
               onChange={e => setProdiId(e.target.value ? Number(e.target.value) : undefined)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)]"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] w-full sm:w-auto"
             >
               <option value="">Semua Prodi</option>
               {prodis.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
             </select>
-            <SearchInput value={search} onChange={setSearch} placeholder="Cari nama / kode" />
-            <button
-              onClick={() => setFormModal({ open: true, item: null })}
-              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              <Plus size={15} />
-              Tambah
-            </button>
+            <div className="flex items-center gap-2">
+              <SearchInput value={search} onChange={setSearch} placeholder="Cari nama / kode" />
+              <button
+                onClick={() => setFormModal({ open: true, item: null })}
+                className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap shrink-0"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                <Plus size={15} />
+                <span className="hidden sm:inline">Tambah</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[700px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col className="w-28" />

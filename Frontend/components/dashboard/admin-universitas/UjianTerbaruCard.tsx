@@ -5,15 +5,15 @@ import type { AdminUniversitasDashboard } from "@/types";
 export default function UjianTerbaruCard({ data }: { data: AdminUniversitasDashboard['ujian_terbaru'] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <ClipboardList size={16} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Ujian PMB Terbaru</span>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <ClipboardList size={16} className="text-gray-500 shrink-0" />
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>Ujian PMB Terbaru</span>
         </div>
         {data.length > 0 && (
           <Link
             href="/admin-universitas/ujian-pmb"
-            className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80"
+            className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80 shrink-0 whitespace-nowrap"
             style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
           >
             Lihat Semua

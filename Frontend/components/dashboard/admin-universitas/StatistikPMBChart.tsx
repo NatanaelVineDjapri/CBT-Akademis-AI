@@ -55,7 +55,7 @@ export default function StatistikPMBChart() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp size={15} className="text-teal-600" />
-          <span className="text-sm font-medium text-gray-800">Statistik Ujian PMB</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Statistik Ujian PMB</span>
         </div>
         <p className="text-xs text-gray-400">Belum ada data ujian PMB yang selesai.</p>
       </div>
@@ -78,10 +78,10 @@ export default function StatistikPMBChart() {
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp size={15} className="text-teal-600" />
-        <span className="text-sm font-medium text-gray-800">Statistik Ujian PMB</span>
+        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Statistik Ujian PMB</span>
       </div>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
         {statCards.map((s) => (
           <div key={s.label} className="flex-1 rounded-xl px-3 py-2.5" style={{ backgroundColor: s.bg }}>
             <p className="text-[10px] font-medium mb-0.5" style={{ color: s.color }}>{s.label}</p>
@@ -129,7 +129,7 @@ export default function StatistikPMBChart() {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex items-center gap-4 mt-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
         <span className="flex items-center gap-1.5 text-xs text-gray-500">
           <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: "var(--color-primary)" }} />
           Di atas passing grade

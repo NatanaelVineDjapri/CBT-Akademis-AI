@@ -146,37 +146,39 @@ export default function PengumumanPage() {
     });
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0"><BreadCrumb /></div>
 
-      <div className="flex-1">
+      <div>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Pengumuman</h2>
             <p className="text-xs text-gray-400 mt-0.5">Kelola pengumuman yang tampil ke pengguna.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:flex-wrap gap-2">
             <select
               value={roleFilter}
               onChange={e => setRoleFilter(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)]"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-[var(--color-primary)] w-full sm:w-auto"
             >
               {roleOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
-            <SearchInput value={search} onChange={setSearch} placeholder="Cari pengumuman..." />
-            <button
-              onClick={openAdd}
-              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              <Plus size={15} /> Tambah
-            </button>
+            <div className="flex items-center gap-2">
+              <SearchInput value={search} onChange={setSearch} placeholder="Cari pengumuman..." />
+              <button
+                onClick={openAdd}
+                className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap shrink-0"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                <Plus size={15} /><span className="hidden sm:inline">Tambah</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[680px] text-sm table-fixed">
             <colgroup>
               <col className="w-10" />
               <col />

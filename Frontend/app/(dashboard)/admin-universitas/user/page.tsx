@@ -230,7 +230,7 @@ export default function AdminUserFakultasPage() {
         <Breadcrumb />
       </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-base font-bold mb-1" style={{ color: "var(--color-primary)" }}>
             Manajemen User
@@ -239,7 +239,7 @@ export default function AdminUserFakultasPage() {
         </div>
         <button
           onClick={() => setShowExport(true)}
-          className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap"
+          className="flex items-center justify-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap shrink-0 self-start sm:self-auto"
           style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
         >
           <Download size={15} />

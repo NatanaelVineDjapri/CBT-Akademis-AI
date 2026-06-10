@@ -6,9 +6,9 @@ import { toSlug } from "@/utils/slug";
 export default function UjianSelesaiCard({ data }: { data: AdminUniversitasDashboard['ujian_selesai'] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
-      <div className="flex items-center gap-2 mb-4">
-        <CheckCircle size={16} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-800">Ujian PMB Selesai</span>
+      <div className="flex items-center gap-2 mb-4 min-w-0">
+        <CheckCircle size={16} className="text-gray-500 shrink-0" />
+        <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>Ujian PMB Selesai</span>
       </div>
 
       {data.length === 0 ? (

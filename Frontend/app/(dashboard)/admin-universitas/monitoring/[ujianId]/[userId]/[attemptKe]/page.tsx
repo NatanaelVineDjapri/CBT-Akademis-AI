@@ -80,7 +80,7 @@ export default function AdminBuktiPage({ params }: { params: Promise<{ ujianId: 
 
         <div className="p-5">
           {!data && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="rounded-xl overflow-hidden">
                   <div className="aspect-video bg-gray-100 animate-pulse" />
@@ -99,7 +99,7 @@ export default function AdminBuktiPage({ params }: { params: Promise<{ ujianId: 
           )}
 
           {data && fotos.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {fotos.map((f, i) => {
                 const color = VIOLATION_COLOR[f.tipe] ?? "#6b7280";
                 return (

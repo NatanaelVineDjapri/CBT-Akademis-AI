@@ -40,7 +40,7 @@ export default function TingkatKelulusan() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center gap-2 mb-3">
           <CheckCircle size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Tingkat Kelulusan per Fakultas</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Tingkat Kelulusan per Fakultas</span>
         </div>
         <p className="text-xs text-gray-400">Belum ada data nilai mahasiswa.</p>
       </div>
@@ -51,7 +51,7 @@ export default function TingkatKelulusan() {
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <div className="flex items-center gap-2 mb-4">
         <CheckCircle size={15} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-800">Tingkat Kelulusan per Fakultas</span>
+        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Tingkat Kelulusan per Fakultas</span>
       </div>
 
       <div style={{ height: data.length * 36 + 20 }} className="min-h-[120px]">

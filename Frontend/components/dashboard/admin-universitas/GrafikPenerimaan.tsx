@@ -43,7 +43,7 @@ export default function GrafikPenerimaan() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center gap-2 mb-3">
           <Users size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Penerimaan PMB per Tahun</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Penerimaan PMB per Tahun</span>
         </div>
         <p className="text-xs text-gray-400">Belum ada data penerimaan PMB.</p>
       </div>
@@ -55,7 +55,7 @@ export default function GrafikPenerimaan() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Users size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Penerimaan PMB per Tahun</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Penerimaan PMB per Tahun</span>
         </div>
       </div>
 

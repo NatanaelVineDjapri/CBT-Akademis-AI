@@ -40,7 +40,7 @@ export default function TrenNilai() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp size={15} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Tren Rata-rata Nilai (6 Bulan)</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Tren Rata-rata Nilai (6 Bulan)</span>
         </div>
         <p className="text-xs text-gray-400">Belum ada data nilai dalam 6 bulan terakhir.</p>
       </div>
@@ -51,7 +51,7 @@ export default function TrenNilai() {
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-4 shrink-0">
         <TrendingUp size={15} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-800">Tren Rata-rata Nilai (6 Bulan)</span>
+        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Tren Rata-rata Nilai (6 Bulan)</span>
       </div>
 
       <div className="flex-1 min-h-[160px]">

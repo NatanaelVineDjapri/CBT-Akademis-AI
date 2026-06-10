@@ -199,3 +199,14 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-primary);
 }
+
+/* Sidebar: sembunyikan native scrollbar di HP (pakai custom indicator JS) */
+@media (max-width: 1023px) {
+  .scrollbar-hide-mobile {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide-mobile::-webkit-scrollbar {
+    display: none;
+  }
+}

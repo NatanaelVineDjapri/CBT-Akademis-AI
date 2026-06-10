@@ -369,7 +369,7 @@ export default function AdminUserListPage({
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb hrefOverrides={{
           [`/admin-universitas/user/fakultas/${fakultasSlug}`]: fakultasNama,
@@ -377,9 +377,9 @@ export default function AdminUserListPage({
         }} />
       </div>
 
-      <div className="flex-1">
+      <div>
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               {prodiNama}
@@ -390,29 +390,29 @@ export default function AdminUserListPage({
             <SearchInput value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Cari user..." />
             <button
               onClick={() => setShowImport(true)}
-              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border cursor-pointer whitespace-nowrap shrink-0"
               style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
             >
               <Upload size={15} />
-              Import
+              <span className="hidden sm:inline">Import</span>
             </button>
             <button
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap shrink-0"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               <Plus size={15} />
-              Tambah User
+              <span className="hidden sm:inline">Tambah User</span>
             </button>
           </div>
         </div>
 
-        <div className="flex gap-1 px-5 pt-3 pb-0 border-b border-gray-100">
+        <div className="flex gap-1 px-5 pt-3 pb-0 border-b border-gray-100 overflow-x-auto">
           {USER_ROLE_TABS.map(tab => (
             <button
               key={tab.key}
               onClick={() => setRoleTab(tab.key)}
-              className="px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors cursor-pointer shrink-0 whitespace-nowrap"
               style={roleTab === tab.key
                 ? { backgroundColor: "var(--color-primary)", color: "white" }
                 : { color: "#6b7280" }
@@ -424,7 +424,7 @@ export default function AdminUserListPage({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[720px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col className="w-48" />

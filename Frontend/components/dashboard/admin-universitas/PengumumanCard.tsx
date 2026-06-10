@@ -5,14 +5,14 @@ import type { AdminUniversitasDashboard } from "@/types";
 export default function PengumumanCard({ data }: { data: AdminUniversitasDashboard['pengumuman'] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Bell size={16} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">Pengumuman Aktif</span>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <Bell size={16} className="text-gray-500 shrink-0" />
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>Pengumuman Aktif</span>
         </div>
         <Link
           href="/admin-universitas/pengumuman"
-          className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80"
+          className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80 shrink-0 whitespace-nowrap"
           style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
         >
           Kelola

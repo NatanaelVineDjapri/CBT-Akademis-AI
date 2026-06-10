@@ -81,7 +81,7 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
       </div>
 
       <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               {bankSoal?.nama ?? "Bank Soal"}
@@ -96,19 +96,19 @@ export default function AdminBankSoalDetailPage({ params }: Props) {
               <>
                 <button
                   onClick={() => setShowAddSoal(true)}
-                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer shrink-0"
                   style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   <Plus size={15} />
-                  Tambah Soal
+                  <span className="hidden sm:inline">Tambah Soal</span>
                 </button>
                 <button
                   onClick={() => setShowGenerateAI(true)}
-                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg whitespace-nowrap cursor-pointer shrink-0"
                   style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   <Sparkles size={15} />
-                  Generate Soal dengan AI
+                  <span className="hidden sm:inline">Generate Soal dengan AI</span>
                 </button>
               </>
             )}

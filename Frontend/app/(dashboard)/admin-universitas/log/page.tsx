@@ -73,13 +73,13 @@ export default function SystemLog() {
   };
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb />
       </div>
 
-      <div className="flex-1 bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col">
-        <div className="px-7 pt-6 pb-3 flex items-center justify-between flex-wrap gap-3 shrink-0">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col">
+        <div className="px-7 pt-6 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-3 shrink-0">
           <h2 className="text-base font-bold text-[var(--color-primary)]">System Log</h2>
 
           <div className="flex items-center gap-2.5 flex-wrap">
@@ -108,7 +108,7 @@ export default function SystemLog() {
               <option value="deleted">Dihapus</option>
             </select>
 
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <circle cx="6" cy="6" r="4.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5" />
                 <line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="var(--color-primary)" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
@@ -118,14 +118,14 @@ export default function SystemLog() {
                 placeholder="Cari keterangan, user..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none bg-white w-56 focus:border-[var(--color-primary)] transition-colors"
+                className="pl-8 pr-4 py-2 border border-gray-200 rounded-full text-sm text-gray-700 outline-none bg-white w-full sm:w-56 focus:border-[var(--color-primary)] transition-colors"
               />
             </div>
           </div>
         </div>
 
         <div className="px-7 overflow-x-auto flex-1">
-          <table className="w-full border-collapse table-fixed">
+          <table className="w-full min-w-[760px] border-collapse table-fixed">
             <colgroup>
               <col className="w-[55%]" />
               <col className="w-[12%]" />

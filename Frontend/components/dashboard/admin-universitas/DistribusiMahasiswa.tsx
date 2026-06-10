@@ -32,7 +32,7 @@ export default function DistribusiMahasiswa() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col">
         <div className="flex items-center gap-2 mb-4">
           <GraduationCap size={15} style={{ color: "var(--color-primary)" }} />
-          <span className="text-sm font-semibold text-gray-800">Distribusi Mahasiswa per Fakultas</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Distribusi Mahasiswa per Fakultas</span>
         </div>
         <p className="text-sm text-gray-400 text-center py-8">Belum ada data mahasiswa.</p>
       </div>
@@ -50,8 +50,8 @@ export default function DistribusiMahasiswa() {
         <span className="text-sm font-semibold text-gray-800">Distribusi Mahasiswa per Fakultas</span>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative w-44 h-44 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="relative w-44 h-44 flex-shrink-0 mx-auto sm:mx-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

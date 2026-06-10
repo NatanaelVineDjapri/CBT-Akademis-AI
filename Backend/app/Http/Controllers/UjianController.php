@@ -2098,6 +2098,7 @@ class UjianController extends Controller
         $admin = $request->user();
 
         $ujianList = Ujian::whereHas('creator', fn($q) => $q->where('universitas_id', $admin->universitas_id))
+            ->where('jenis_ujian', 'pmb')
             ->where('start_date', '<=', $now)
             ->where('end_date', '>=', $now)
             ->with([
@@ -2143,6 +2144,7 @@ class UjianController extends Controller
         $admin = $request->user();
 
         $ujian = Ujian::whereHas('creator', fn($q) => $q->where('universitas_id', $admin->universitas_id))
+            ->where('jenis_ujian', 'pmb')
             ->with([
                 'mataKuliah:id,nama',
                 'ujianSoal:id,ujian_id',
@@ -2205,6 +2207,7 @@ class UjianController extends Controller
         $admin = $request->user();
 
         $ujian = Ujian::whereHas('creator', fn($q) => $q->where('universitas_id', $admin->universitas_id))
+            ->where('jenis_ujian', 'pmb')
             ->with([
                 'pesertaUjian' => fn($q) => $q
                     ->where('user_id', $userId)

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRef, useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -328,6 +329,29 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
   const menuSections = menuSectionsByRole[user.role] ?? null;
   const menuItems = menuByRole[user.role] ?? [];
 
+  const navRef = useRef<HTMLElement>(null);
+  const [thumb, setThumb] = useState({ top: 0, height: 0, show: false });
+
+  const updateThumb = () => {
+    const el = navRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    if (scrollHeight <= clientHeight + 2) {
+      setThumb(t => (t.show ? { ...t, show: false } : t));
+      return;
+    }
+    const h   = Math.max(28, (clientHeight / scrollHeight) * clientHeight);
+    const top = (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - h);
+    setThumb({ top, height: h, show: true });
+  };
+
+  useEffect(() => {
+    updateThumb();
+    window.addEventListener("resize", updateThumb);
+    return () => window.removeEventListener("resize", updateThumb);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collapsed, user.role, isOpen]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -359,7 +383,7 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
         </button>
 
         {/* Scrollable inner container */}
-        <div className="h-full flex flex-col bg-white border-r border-gray-100 shadow-sm py-3 overflow-y-auto">
+        <div className="h-full flex flex-col bg-white border-r border-gray-100 shadow-sm py-3 overflow-hidden">
 
         {/* Logo */}
         <div className={`${collapsed ? "px-2 py-5" : "px-6 py-6"} flex items-center justify-center`}>
@@ -395,7 +419,12 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
         </div>
 
         {/* Menu */}
-        <nav className={`flex-1 ${collapsed ? "px-1" : "px-3"} overflow-y-auto`}>
+        <div className="relative flex-1 min-h-0">
+        <nav
+          ref={navRef}
+          onScroll={updateThumb}
+          className={`h-full ${collapsed ? "px-1" : "px-3"} overflow-y-auto scrollbar-hide-mobile`}
+        >
           {(() => {
             const renderItem = (item: MenuItem) => {
               const isActive = pathname === item.href;
@@ -510,6 +539,13 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
             return menuItems.map(renderItem);
           })()}
         </nav>
+        {thumb.show && (
+          <div
+            className="lg:hidden absolute left-1 w-1.5 rounded-full pointer-events-none"
+            style={{ top: thumb.top, height: thumb.height, backgroundColor: "var(--color-primary)" }}
+          />
+        )}
+        </div>{/* end menu scroll wrapper */}
 
         {/* Logout */}
         <div className={`${collapsed ? "px-1" : "px-4"} py-2 border-t border-gray-100 mt-auto`}>
