@@ -390,21 +390,37 @@ class UjianController extends Controller
             ->orderBy('urutan')
             ->get();
 
+        // Acak urutan soal — di-seed pakai peserta_ujian_id supaya beda antar peserta,
+        // tapi stabil (urutan tetap sama walau peserta refetch/reconnect saat ujian).
         if ($randomize) {
-            $soalList = $soalList->shuffle()->values();
+            $soalList = $soalList
+                ->sortBy(fn($us) => md5($peserta->id . '-' . $us->id))
+                ->values();
         }
 
-        $soal = $soalList->map(fn($us) => [
-            'ujian_soal_id' => $us->id,
-            'urutan'        => $us->urutan,
-            'bobot'         => $us->bobot,
-            'deskripsi'     => $us->soal?->deskripsi,
-            'jenis_soal'    => $us->soal?->jenisSoal->first()?->jenis_soal,
-            'opsi'          => $us->soal?->jenisSoal->first()?->opsiJawaban
-                                ->map(fn($o) => ['opsi' => $o->opsi, 'teks' => $o->teks])
-                                ->values(),
-            'jawaban'       => $existingJawaban[$us->id] ?? null,
-        ])->values();
+        $soal = $soalList->map(function ($us) use ($existingJawaban, $randomize, $peserta) {
+            $opsi = $us->soal?->jenisSoal->first()?->opsiJawaban
+                        ->map(fn($o) => ['opsi' => $o->opsi, 'teks' => $o->teks])
+                        ->values();
+
+            // Acak urutan opsi jawaban dengan seed unik per peserta + per soal.
+            // Jawaban disimpan berbasis HURUF opsi (bukan posisi), jadi penilaian tetap akurat.
+            if ($randomize && $opsi) {
+                $opsi = $opsi
+                    ->sortBy(fn($o) => md5($peserta->id . '-' . $us->id . '-' . $o['opsi']))
+                    ->values();
+            }
+
+            return [
+                'ujian_soal_id' => $us->id,
+                'urutan'        => $us->urutan,
+                'bobot'         => $us->bobot,
+                'deskripsi'     => $us->soal?->deskripsi,
+                'jenis_soal'    => $us->soal?->jenisSoal->first()?->jenis_soal,
+                'opsi'          => $opsi,
+                'jawaban'       => $existingJawaban[$us->id] ?? null,
+            ];
+        })->values();
 
         return response()->json([
             'message' => 'Berhasil.',
