@@ -93,7 +93,7 @@ export default function BankSoalTable({
   return (
     <div className="flex flex-col gap-3">
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Bank Soal</h2>
             <p className="text-xs text-gray-400 mt-0.5">Kelola bank soal dan soal-soal Anda.</p>
@@ -108,20 +108,20 @@ export default function BankSoalTable({
               (onTambah ? (
                 <button
                   onClick={onTambah}
-                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg"
+                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg shrink-0"
                   style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   <Plus size={15} />
-                  Tambah Baru
+                  <span className="hidden sm:inline">Tambah Baru</span>
                 </button>
               ) : createHref ? (
                 <Link
                   href={createHref}
-                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg"
+                  className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg shrink-0"
                   style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   <Plus size={15} />
-                  Tambah Baru
+                  <span className="hidden sm:inline">Tambah Baru</span>
                 </Link>
               ) : null)}
           </div>

@@ -82,22 +82,26 @@ export default function KelulusanMatkulCard() {
           </div>
 
           {data.length > 1 && best && worst && best.matkul_id !== worst.matkul_id && (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="rounded-xl px-3 py-2.5" style={{ backgroundColor: "var(--color-primary-light)" }}>
                 <div className="flex items-center gap-1 mb-1">
                   <TrendingUp size={11} style={{ color: "var(--color-primary)" }} />
                   <span className="text-xs text-gray-500">Tertinggi</span>
                 </div>
-                <p className="text-xs font-semibold text-gray-800 truncate">{best.matkul_nama}</p>
-                <p className="text-sm font-bold mt-0.5" style={{ color: "var(--color-primary)" }}>{best.persentase_kelulusan}%</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-semibold text-gray-800 truncate">{best.matkul_nama}</p>
+                  <p className="text-sm font-bold shrink-0" style={{ color: "var(--color-primary)" }}>{best.persentase_kelulusan}%</p>
+                </div>
               </div>
               <div className="rounded-xl px-3 py-2.5" style={{ backgroundColor: "var(--color-danger-light)" }}>
                 <div className="flex items-center gap-1 mb-1">
                   <TrendingDown size={11} style={{ color: "var(--color-danger)" }} />
                   <span className="text-xs text-gray-500">Terendah</span>
                 </div>
-                <p className="text-xs font-semibold text-gray-800 truncate">{worst.matkul_nama}</p>
-                <p className="text-sm font-bold mt-0.5" style={{ color: "var(--color-danger)" }}>{worst.persentase_kelulusan}%</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-semibold text-gray-800 truncate">{worst.matkul_nama}</p>
+                  <p className="text-sm font-bold shrink-0" style={{ color: "var(--color-danger)" }}>{worst.persentase_kelulusan}%</p>
+                </div>
               </div>
             </div>
           )}

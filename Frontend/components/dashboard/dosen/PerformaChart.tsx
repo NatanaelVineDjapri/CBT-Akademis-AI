@@ -79,15 +79,15 @@ export default function PerformaChart() {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
           <TrendingUp size={15} className="text-teal-600" />
           <span className="text-sm font-medium text-gray-800">Performa Ujian</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-normal">
           <button
             onClick={() => setIndex((i) => (i - 1 + matkulList.length) % matkulList.length)}
-            className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:opacity-80 transition-opacity"
+            className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:opacity-80 transition-opacity shrink-0"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             <ChevronLeft size={14} />
@@ -100,7 +100,7 @@ export default function PerformaChart() {
           </div>
           <button
             onClick={() => setIndex((i) => (i + 1) % matkulList.length)}
-            className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:opacity-80 transition-opacity"
+            className="w-7 h-7 flex items-center justify-center rounded-full text-white hover:opacity-80 transition-opacity shrink-0"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             <ChevronRight size={14} />
@@ -109,7 +109,7 @@ export default function PerformaChart() {
       </div>
 
       {/* Stats row */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
         {stats.map((s) => (
           <div
             key={s.label}

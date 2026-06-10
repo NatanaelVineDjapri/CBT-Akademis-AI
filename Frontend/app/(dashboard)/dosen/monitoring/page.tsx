@@ -7,6 +7,8 @@ import { ShieldCheck, Clock, Users, AlertTriangle, Timer } from "lucide-react";
 import { fmt } from "@/components/dosen/ujian/constants";
 import Breadcrumb from "@/components/BreadCrumb";
 import EmptyState from "@/components/EmptyState";
+import SearchInput from "@/components/filtering/SearchInput";
+import { useState } from "react";
 import { getMonitoringList, getMonitoringDetail, type MonitoringUjian } from "@/services/MonitoringServices";
 import { toSlug } from "@/utils/slug";
 
@@ -82,6 +84,7 @@ export default function DosenMonitoringPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tab = (searchParams.get("tab") ?? "berlangsung") as "berlangsung" | "selesai";
+  const [search, setSearch] = useState("");
 
   const { data, isLoading } = useSWR("/ujian/dosen/monitoring", getMonitoringList, {
     refreshInterval: 15000,
@@ -89,7 +92,11 @@ export default function DosenMonitoringPage() {
   });
 
   const ujianList = data?.data ?? [];
-  const filtered = ujianList.filter(u => u.status === tab);
+  const q = search.toLowerCase();
+  const filtered = ujianList.filter(u =>
+    u.status === tab &&
+    ((u.nama_ujian ?? "").toLowerCase().includes(q) || (u.mata_kuliah ?? "").toLowerCase().includes(q))
+  );
 
   const tabs: { key: "berlangsung" | "selesai"; label: string }[] = [
     { key: "berlangsung", label: "Berlangsung" },
@@ -100,8 +107,9 @@ export default function DosenMonitoringPage() {
     <div className="flex flex-col gap-4 pb-6">
       <Breadcrumb />
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Monitoring</h2>
+          <SearchInput value={search} onChange={setSearch} placeholder="Cari ujian..." />
         </div>
         <div className="px-5 pt-4 flex gap-2">
           {tabs.map(t => (
@@ -140,7 +148,7 @@ export default function DosenMonitoringPage() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <EmptyState message={tab === "berlangsung" ? "Tidak ada ujian yang sedang berlangsung." : "Tidak ada ujian selesai dalam 30 hari terakhir."} />
+            <EmptyState message={search ? "Ujian tidak ditemukan." : (tab === "berlangsung" ? "Tidak ada ujian yang sedang berlangsung." : "Tidak ada ujian selesai dalam 30 hari terakhir.")} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map(u => <UjianMonitorCard key={u.id} ujian={u} />)}

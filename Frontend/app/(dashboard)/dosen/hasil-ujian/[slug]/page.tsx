@@ -123,13 +123,13 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ slu
 
       {/* Daftar Siswa */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Daftar Siswa
             </h2>
             {data && (
-              <span className="text-xs font-semibold px-3 py-1 rounded-full text-white"
+              <span className="text-xs font-semibold px-3 py-1 rounded-full text-white whitespace-nowrap"
                 style={{ backgroundColor: "var(--color-primary)" }}>
                 Total Siswa: {data.info.total_peserta}
               </span>
@@ -139,27 +139,27 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ slu
             <button
               onClick={() => data && exportHasilUjianExcel(data, data.info.nama_ujian)}
               disabled={!data}
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default"
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default shrink-0"
               style={{ borderColor: "var(--color-semantic-success)", color: "var(--color-semantic-success)" }}
             >
               <Sheet className="w-3.5 h-3.5" />
-              Export Excel
+              <span className="hidden sm:inline">Export Excel</span>
             </button>
             <button
               onClick={handleExportPDF}
               disabled={!data || downloading}
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default"
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default shrink-0"
               style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
             >
               <FileDown className="w-3.5 h-3.5" />
-              {downloading ? "Mengunduh..." : "Export PDF"}
+              <span className="hidden sm:inline">{downloading ? "Mengunduh..." : "Export PDF"}</span>
             </button>
             <SearchInput value={pesertaSearch} onChange={setPesertaSearch} placeholder="Search" />
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
+          <table className="w-full min-w-[560px] text-sm table-fixed">
             <colgroup>
               <col className="w-12" />
               <col />
@@ -231,7 +231,7 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ slu
 
       {/* Distribusi Jawaban PG dan Checkbox */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
             Distribusi Jawaban PG dan Check Box
           </h2>
@@ -239,7 +239,7 @@ export default function DosenDetailUjianPage({ params }: { params: Promise<{ slu
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-left text-xs text-gray-400 font-bold px-5 py-3 w-12">#</th>

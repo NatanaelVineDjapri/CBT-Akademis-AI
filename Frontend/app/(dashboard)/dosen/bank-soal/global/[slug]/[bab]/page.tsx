@@ -49,7 +49,7 @@ export default function GlobalBabSoalPage({ params }: Props) {
     ?? allSoal.find((s) => toSlug(s.bab?.nama_bab ?? "") === bab)?.bab?.nama_bab;
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb
           overrides={{
@@ -59,9 +59,9 @@ export default function GlobalBabSoalPage({ params }: Props) {
         />
       </div>
 
-      <div className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1">
+      <div className="bg-white rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Daftar Soal

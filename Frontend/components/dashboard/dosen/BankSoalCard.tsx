@@ -7,17 +7,17 @@ import type { DosenBankSoalItem } from "@/types";
 export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <BookOpen size={16} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-800">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <BookOpen size={16} className="text-gray-500 shrink-0" />
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>
             Bank Soal Terbaru
           </span>
         </div>
         {data.length > 0 && (
           <Link
             href="/dosen/bank-soal"
-            className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80"
+            className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80 shrink-0 whitespace-nowrap"
             style={{
               color: "var(--color-primary)",
               borderColor: "var(--color-primary)",
@@ -35,16 +35,16 @@ export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
           {data.map((soal) => (
             <div
               key={soal.id}
-              className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between gap-2 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   <BookOpen size={16} className="text-white" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-medium text-gray-800">
                     {soal.nama}
                   </p>
@@ -66,7 +66,7 @@ export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
               </div>
               <Link
                 href={`/dosen/bank-soal`}
-                className="text-xs text-white rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                className="text-xs text-white rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap shrink-0"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Lihat Detail

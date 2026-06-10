@@ -29,15 +29,15 @@ export default function BankSoalGlobalPage() {
   );
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb />
       </div>
 
       {/* White container */}
-      <div className="bg-white rounded-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl overflow-hidden shrink-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Bank Soal Global
@@ -64,8 +64,6 @@ export default function BankSoalGlobalPage() {
           )}
         </div>
       </div>
-
-      <div className="flex-1" />
 
       {data?.meta && (
         <Pagination

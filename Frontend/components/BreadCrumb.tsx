@@ -22,14 +22,14 @@ export default function Breadcrumb({ overrides, hrefOverrides }: Props = {}) {
   }, []);
 
   return (
-    <nav className="inline-flex items-center gap-1 text-xl font-bold px-4 py-2 rounded-xl"
+    <nav className="flex flex-wrap items-center gap-1 text-base sm:text-xl font-bold px-4 py-2 rounded-xl"
       style={{ color: "var(--color-primary)" }}>
       <Link href="/" className="hover:underline" style={{ color: "var(--color-primary)" }}>Home</Link>
       {items.map(({ seg, href }, i) => {
         const isLast = i === items.length - 1;
         const label = hrefOverrides?.[href] ?? overrides?.[seg] ?? labels[seg] ?? seg;
         return (
-          <span key={href + i} className="flex items-center gap-1">
+          <span key={href + i} className="flex items-center gap-1 whitespace-nowrap">
             <span style={{ color: "var(--color-primary)" }}>»</span>
             {isLast ? (
               <span style={{ color: "var(--color-primary)" }}>{label}</span>

@@ -13,15 +13,15 @@ export default function JawabanPilihanGanda({ data }: { data: JawabanPG[] }) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h2 className="text-base font-semibold text-[var(--color-primary)]">
           Jawaban Pilihan Ganda
         </h2>
         <SearchInput value={search} onChange={setSearch} placeholder="Cari soal..." />
       </div>
 
-      <div className="rounded-xl border border-gray-100 overflow-hidden">
-        <table className="w-full text-xs">
+      <div className="rounded-xl border border-gray-100 overflow-x-auto">
+        <table className="w-full min-w-[480px] text-xs">
           <thead className="bg-gray-50">
             <tr>
               <th className="text-left text-gray-400 font-medium px-3 py-2 w-10">#</th>

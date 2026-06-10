@@ -39,8 +39,8 @@ export default function GrafikPelanggaranCard({ data }: Props) {
         <span className="text-sm font-semibold text-gray-800">Tingkat Pelanggaran per Mata Kuliah</span>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative w-44 h-44 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="relative w-44 h-44 flex-shrink-0 mx-auto sm:mx-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -102,7 +102,7 @@ export default function GrafikPelanggaranCard({ data }: Props) {
       </div>
 
       <div
-        className="mt-16 flex items-center gap-2 px-3 py-2.5 rounded-xl"
+        className="mt-6 lg:mt-auto flex items-center gap-2 px-3 py-2.5 rounded-xl"
         style={{ backgroundColor: "var(--color-warning-light)" }}
       >
         <ShieldAlert size={13} style={{ color: "var(--color-warning)" }} className="flex-shrink-0" />

@@ -80,7 +80,7 @@ function JawabanEssayCard({
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-base font-semibold text-[var(--color-primary)]">Jawaban Essay</h2>
           {needsGrading ? (
@@ -179,11 +179,11 @@ function JawabanEssayCard({
           {saveError && (
             <p className="text-xs text-red-500 text-center bg-red-50 py-2 rounded-lg">{saveError}</p>
           )}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <button
               onClick={handleReset}
               disabled={resetting || saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default"
+              className="flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border cursor-pointer disabled:opacity-50 disabled:cursor-default"
               style={{ borderColor: "#fca5a5", color: "#ef4444" }}
             >
               <RotateCcw className="w-3 h-3" />
@@ -238,20 +238,20 @@ export default function DetailPesertaDosenPage({ params }: { params: Promise<{ s
         <>
           {/* Info Card */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: "var(--color-primary)" }}>
                   <User className="w-5 h-5 text-white" />
                 </div>
-                <div>
-                  <p className="text-base font-bold text-gray-800">{data.info.nama_peserta}</p>
-                  <p className="text-xs text-gray-400">{data.info.nim} · {data.info.mata_kuliah}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{data.info.nama_ujian}</p>
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-gray-800 truncate">{data.info.nama_peserta}</p>
+                  <p className="text-xs text-gray-400 truncate">{data.info.nim} · {data.info.mata_kuliah}</p>
+                  <p className="text-xs text-gray-500 mt-0.5 truncate">{data.info.nama_ujian}</p>
                 </div>
               </div>
               {data.info.nilai !== null && (
-                <div className="text-white text-sm font-semibold px-5 py-2 rounded-xl shrink-0"
+                <div className="text-white text-sm font-semibold px-5 py-2 rounded-xl shrink-0 self-start"
                   style={{ background: data.info.lulus ? "var(--color-primary)" : "#ef4444" }}>
                   Nilai: {data.info.nilai}
                 </div>

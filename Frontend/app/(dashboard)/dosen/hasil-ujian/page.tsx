@@ -53,12 +53,12 @@ export default function DosenHasilUjianPage() {
   const meta: UjianMeta | null = data?.meta ?? null;
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <Breadcrumb />
 
-      <div className="flex-1">
+      <div>
         <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100">
             <div>
               <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>Hasil Ujian</h2>
               <p className="text-xs text-gray-400 mt-0.5">Lihat hasil dan statistik ujian yang telah selesai.</p>

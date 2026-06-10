@@ -155,40 +155,43 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
 
         {/* Stats + Search row */}
         {(ujian || ujianMeta) && (
-          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-5 flex-wrap">
-            <div className="flex items-center gap-1.5">
-              <Users size={13} className="text-blue-400 shrink-0" />
-              <span className="text-xs text-gray-400">Peserta aktif</span>
-              <span className="text-xs font-bold text-blue-600">{aktif}/{peserta.length}</span>
+          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-x-5 gap-y-2 flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <Users size={13} className="text-blue-400 shrink-0" />
+                <span className="text-xs text-gray-400">Peserta aktif</span>
+                <span className="text-xs font-bold text-blue-600">{aktif}/{peserta.length}</span>
+              </div>
+              <div className="w-px h-4 bg-gray-200 shrink-0" />
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle size={13} className="text-red-400 shrink-0" />
+                <span className="text-xs text-gray-400">Pelanggaran</span>
+                <span className={`text-xs font-bold ${totalViolations > 0 ? "text-red-500" : "text-gray-400"}`}>
+                  {totalViolations}
+                </span>
+              </div>
+              <div className="w-px h-4 bg-gray-200 shrink-0" />
+              <div className="flex items-center gap-1.5">
+                <Clock size={13} className="text-gray-400 shrink-0" />
+                <span className="text-xs text-gray-400">Durasi</span>
+                <span className="text-xs font-bold text-gray-600">
+                  {ujian?.durasi_menit ?? ujianMeta?.durasi_menit} menit
+                </span>
+              </div>
             </div>
-            <div className="w-px h-4 bg-gray-200 shrink-0" />
-            <div className="flex items-center gap-1.5">
-              <AlertTriangle size={13} className="text-red-400 shrink-0" />
-              <span className="text-xs text-gray-400">Pelanggaran</span>
-              <span className={`text-xs font-bold ${totalViolations > 0 ? "text-red-500" : "text-gray-400"}`}>
-                {totalViolations}
-              </span>
+            <div className="flex items-center gap-2 sm:ml-auto">
+              {aktif > 0 && (
+                <Link
+                  href={`/dosen/monitoring/${slug}/live-view`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 shrink-0 whitespace-nowrap"
+                  style={{ backgroundColor: "var(--color-primary)" }}
+                >
+                  <MonitorPlay size={13} />
+                  Live View
+                </Link>
+              )}
+              <SearchInput value={search} onChange={v => setSearch(v)} placeholder="Cari nama / NIM..." />
             </div>
-            <div className="w-px h-4 bg-gray-200 shrink-0" />
-            <div className="flex items-center gap-1.5">
-              <Clock size={13} className="text-gray-400 shrink-0" />
-              <span className="text-xs text-gray-400">Durasi</span>
-              <span className="text-xs font-bold text-gray-600">
-                {ujian?.durasi_menit ?? ujianMeta?.durasi_menit} menit
-              </span>
-            </div>
-            <div className="flex-1" />
-            {aktif > 0 && (
-              <Link
-                href={`/dosen/monitoring/${slug}/live-view`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                <MonitorPlay size={13} />
-                Live View
-              </Link>
-            )}
-            <SearchInput value={search} onChange={v => setSearch(v)} placeholder="Cari nama / NIM..." />
           </div>
         )}
 

@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { toSlug } from "@/utils/slug";
 import useSWR from "swr";
-import { Plus, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Trash2, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import ConfirmModal from "@/components/ConfirmModal";
 import SearchInput from "@/components/filtering/SearchInput";
@@ -555,11 +555,36 @@ function TambahSoalModal({
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+type SoalSortBy = "urutan" | "deskripsi" | "bab" | "jenis_soal" | "tingkat_kesulitan" | "bobot";
+
+function ColHeader({ label, col, sortBy, sortDir, onSort, className }: {
+  label: string; col: SoalSortBy;
+  sortBy: SoalSortBy; sortDir: "asc" | "desc";
+  onSort: (col: SoalSortBy) => void; className?: string;
+}) {
+  const active = sortBy === col;
+  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th className={`text-left text-xs text-gray-400 font-medium px-4 py-3 cursor-pointer select-none whitespace-nowrap ${className ?? ""}`}
+      onClick={() => onSort(col)}>
+      <span className="flex items-center gap-1">{label}<Icon size={11} className={active ? "text-gray-500" : "text-gray-300"} /></span>
+    </th>
+  );
+}
+
 export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [showModal, setShowModal]         = useState(false);
   const [deleteTarget, setDeleteTarget]   = useState<UjianSoalItem | null>(null);
   const [deleting, setDeleting]           = useState(false);
+  const [search, setSearch]               = useState("");
+  const [sortBy, setSortBy]               = useState<SoalSortBy>("urutan");
+  const [sortDir, setSortDir]             = useState<"asc" | "desc">("asc");
+
+  const handleSort = (col: SoalSortBy) => {
+    if (col === sortBy) setSortDir(d => (d === "asc" ? "desc" : "asc"));
+    else { setSortBy(col); setSortDir("asc"); }
+  };
 
   const { data: allUjian } = useSWR(
     "/ujian/dosen/all",
@@ -577,6 +602,22 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug:
   const soalList: UjianSoalItem[]   = data?.data ?? [];
   const ujian: UjianInfo | undefined = data?.ujian;
 
+  const q = search.toLowerCase();
+  const sortedSoal = soalList
+    .filter(s =>
+      (s.deskripsi ?? "").toLowerCase().includes(q) ||
+      (s.bab ?? "").toLowerCase().includes(q)
+    )
+    .sort((a, b) => {
+      const dir = sortDir === "asc" ? 1 : -1;
+      if (sortBy === "urutan" || sortBy === "bobot") {
+        return ((Number(a[sortBy]) || 0) - (Number(b[sortBy]) || 0)) * dir;
+      }
+      const av = (a[sortBy] ?? "").toString().toLowerCase();
+      const bv = (b[sortBy] ?? "").toString().toLowerCase();
+      return av.localeCompare(bv) * dir;
+    });
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -592,15 +633,15 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug:
   };
 
   return (
-    <div className="flex flex-col h-full gap-4">
+    <div className="flex flex-col gap-4">
       <div className="shrink-0">
         <Breadcrumb
           overrides={{ [slug]: ujian?.nama_ujian ?? "...", soal: "Kelola Soal" }}
         />
       </div>
 
-      <div className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1 shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+      <div className="bg-white rounded-2xl overflow-hidden flex flex-col shadow-sm border border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--color-primary)" }}>
               Kelola Soal Ujian
@@ -609,24 +650,36 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug:
               {ujian ? `${ujian.nama_ujian} · ` : ""}{soalList.length} soal
             </p>
           </div>
-          <button onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap"
-            style={{ backgroundColor: "var(--color-primary)" }}>
-            <Plus size={15} />Tambah Soal
-          </button>
+          <div className="flex items-center gap-2">
+            <SearchInput value={search} onChange={setSearch} placeholder="Cari soal..." />
+            <button onClick={() => setShowModal(true)}
+              className="flex items-center gap-1.5 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap shrink-0"
+              style={{ backgroundColor: "var(--color-primary)" }}>
+              <Plus size={15} /><span className="hidden sm:inline">Tambah Soal</span>
+            </button>
+          </div>
         </div>
 
-        <div className="overflow-x-auto flex-1">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-12" />
+              <col className="w-80" />
+              <col className="w-32" />
+              <col className="w-24" />
+              <col className="w-28" />
+              <col className="w-20" />
+              <col className="w-16" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3 w-10">#</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Soal</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-28">Bab</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Jenis</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-24">Kesulitan</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-16">Bobot</th>
-                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3 w-16">Aksi</th>
+                <th className="text-left text-xs text-gray-400 font-medium px-5 py-3">#</th>
+                <ColHeader label="Soal" col="deskripsi" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Bab" col="bab" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Jenis" col="jenis_soal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Kesulitan" col="tingkat_kesulitan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <ColHeader label="Bobot" col="bobot" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -638,7 +691,7 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug:
                     ))}
                   </tr>
                 ))
-              ) : soalList.map(item => (
+              ) : sortedSoal.map(item => (
                 <tr key={item.ujian_soal_id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3 text-xs text-gray-400">{String(item.urutan).padStart(2, "0")}</td>
                   <td className="px-4 py-3">
@@ -675,8 +728,11 @@ export default function DosenUjianSoalPage({ params }: { params: Promise<{ slug:
               ))}
             </tbody>
           </table>
-          {!isLoading && soalList.length === 0 && (
-            <EmptyState message="Belum ada soal di ujian ini. Klik Tambah Soal untuk mulai." flat />
+          {!isLoading && sortedSoal.length === 0 && (
+            <EmptyState
+              message={search ? "Soal tidak ditemukan." : "Belum ada soal di ujian ini. Klik Tambah Soal untuk mulai."}
+              flat
+            />
           )}
         </div>
       </div>

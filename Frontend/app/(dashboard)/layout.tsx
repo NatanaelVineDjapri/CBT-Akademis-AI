@@ -130,7 +130,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <main
-          className={`flex-1 overflow-y-auto p-8${isTransitioning ? " pointer-events-none" : ""}`}
+          className={`flex-1 overflow-y-auto px-7 pt-5 pb-10 sm:px-8 sm:pt-8 sm:pb-8${isTransitioning ? " pointer-events-none" : ""}`}
           style={{
             backgroundImage: "url('/images/background-dashboard.png')",
             backgroundSize: "cover",
