@@ -5,6 +5,7 @@ import type { DashboardUjianItem } from "@/types";
 import { formatDateShort, formatTime } from "@/utils/format";
 import { getMyUjian } from "@/services/UjianServices";
 import { calcPerPage } from "@/hooks/usePerPage";
+import EmptyState from "@/components/EmptyState";
 
 export default function UjianAkanDatangCard({
   data,
@@ -35,7 +36,7 @@ export default function UjianAkanDatangCard({
         </Link>
       </div>
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">Tidak ada ujian akan datang.</p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Tidak ada ujian akan datang." /></div>
       ) : (
         <div className="flex flex-col gap-2">
           {data.map((d) => (

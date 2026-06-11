@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import type { DosenBankSoalItem } from "@/types";
+import EmptyState from "@/components/EmptyState";
 
 export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
   return (
@@ -29,7 +30,7 @@ export default function BankSoalCard({ data }: { data: DosenBankSoalItem[] }) {
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">Belum ada Bank Soal terbaru </p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Belum ada bank soal terbaru." /></div>
       ) : (
         <div className="flex flex-col flex-1 justify-between gap-3">
           {data.map((soal) => (

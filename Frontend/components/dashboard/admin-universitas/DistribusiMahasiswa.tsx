@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { GraduationCap } from "lucide-react";
 import { getAdminUniversitasDistribusi } from "@/services/DashboardServices";
+import EmptyState from "@/components/EmptyState";
 
 const COLORS = [
   "var(--color-primary)",
@@ -34,7 +35,7 @@ export default function DistribusiMahasiswa() {
           <GraduationCap size={15} style={{ color: "var(--color-primary)" }} />
           <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Distribusi Mahasiswa per Fakultas</span>
         </div>
-        <p className="text-sm text-gray-400 text-center py-8">Belum ada data mahasiswa.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data mahasiswa." /></div>
       </div>
     );
   }
@@ -91,7 +92,7 @@ export default function DistribusiMahasiswa() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col gap-2.5 overflow-y-auto max-h-44 pr-1 scrollbar-thin">
+        <div className="flex-1 flex flex-col gap-2.5 sm:overflow-y-auto sm:max-h-44 sm:pr-1 sm:scrollbar-thin">
           {slices.map((d) => {
             const pct = Math.round((d.total / total) * 100);
             return (

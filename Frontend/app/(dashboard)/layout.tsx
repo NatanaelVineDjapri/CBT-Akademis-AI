@@ -89,8 +89,8 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             >
               <Menu size={20} style={{ color: "var(--color-primary)" }} />
             </button>
-            <div className="flex items-center gap-3 bg-white rounded-lg px-4 py-3 shadow-sm">
-              <div className="text-right">
+            <div className="flex items-center gap-3 bg-white rounded-full sm:rounded-lg p-1 sm:px-4 sm:py-3 shadow-sm">
+              <div className="text-right hidden sm:block">
                 <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-primary)" }}>{user.nama}</p>
                 <p className="text-xs text-gray-400">{getRoleLabel(user)}</p>
               </div>

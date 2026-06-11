@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { GraduationCap } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 
 const GRADE_COLORS: Record<string, string> = {
   A: "var(--nilai-a)",
@@ -26,7 +27,7 @@ export default function DistribusiNilaiCard({ data }: Props) {
       </div>
 
       {total === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-8 flex-1">Belum ada data nilai.</p>
+        <div className="flex-1 min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data nilai." /></div>
       ) : (
         <>
           <div className="h-60">

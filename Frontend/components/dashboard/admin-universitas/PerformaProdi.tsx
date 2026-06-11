@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { BarChart2 } from "lucide-react";
 import { getAdminUniversitasPerformaProdi } from "@/services/DashboardServices";
+import EmptyState from "@/components/EmptyState";
 
 const COLORS = [
   "#0ea5e9","#22c55e","#f59e0b","#a855f7","#ef4444",
@@ -49,7 +50,7 @@ export default function PerformaProdi() {
           <BarChart2 size={15} className="text-gray-500" />
           <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Rata-rata Nilai per Prodi</span>
         </div>
-        <p className="text-xs text-gray-400">Belum ada data nilai mahasiswa.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data nilai mahasiswa." /></div>
       </div>
     );
   }

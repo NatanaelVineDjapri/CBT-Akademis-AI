@@ -7,6 +7,7 @@ import { getAdminAkademisDashboard } from "@/services/DashboardServices";
 import { getMaintenanceStatus } from "@/services/SettingsService";
 import { getPengumuman, type Pengumuman } from "@/services/PengumumanService";
 import { Building2, Users, ClipboardList, BookOpen, Bell, Wrench } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 import StatCard from "@/components/dashboard/admin-universitas/StatCard";
 import DashboardSkeleton from "@/components/dashboard/admin-akademis/DashboardSkeleton";
 import DistribusiPengguna from "@/components/dashboard/admin-akademis/DistribusiPengguna";
@@ -109,7 +110,7 @@ function PengumumanCard() {
           {Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />)}
         </div>
       ) : items.length === 0 ? (
-        <p className="text-xs text-gray-400">Belum ada pengumuman aktif.</p>
+        <EmptyState flat size={56} message="Belum ada pengumuman aktif." />
       ) : (
         <div className="flex flex-col gap-2">
           {items.map((p: Pengumuman) => (

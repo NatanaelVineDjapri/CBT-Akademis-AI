@@ -7,19 +7,37 @@ import type { DosenUjianItem } from "@/types";
 import { getDetailUjianDosen } from "@/services/UjianServices";
 import { getHasilUjianDosen } from "@/services/UjianServices";
 import { calcPerPage } from "@/hooks/usePerPage";
+import EmptyState from "@/components/EmptyState";
 
 export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-4">
-        <CheckCircle size={16} className="text-gray-500" />
-        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Ujian Selesai</span>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <CheckCircle size={16} className="text-gray-500 shrink-0" />
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>Ujian Selesai</span>
+        </div>
+        {data.length > 0 && (
+          <Link
+            href="/dosen/hasil-ujian"
+            className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80 shrink-0 whitespace-nowrap"
+            style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
+            onMouseEnter={() => {
+              const pp = calcPerPage(53, 1, 395);
+              preload(["/ujian/dosen/hasil", "", 1, pp, "tanggal", "desc"],
+                ([, s, p, perPg]: [string, string, number, number, string, string]) =>
+                  getHasilUjianDosen({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" }));
+            }}
+          >
+            Lihat Semua
+          </Link>
+        )}
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">Belum ada ujian selesai </p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Belum ada ujian selesai." /></div>
       ) : (
-        <div className="flex flex-col flex-1 justify-between gap-3">
+        <div className="flex flex-col flex-1 gap-3">
           {data.map((ujian) => (
             <div
               key={ujian.id}
@@ -52,24 +70,6 @@ export default function UjianSelesaiCard({ data }: { data: DosenUjianItem[] }) {
         </div>
       )}
 
-      {data.length > 0 && (
-        <Link
-          href="/dosen/hasil-ujian"
-          className="mt-4 block w-full text-xs border text-center rounded-lg px-3 py-2 transition-colors hover:opacity-80"
-          style={{
-            color: "var(--color-primary)",
-            borderColor: "var(--color-primary)",
-          }}
-          onMouseEnter={() => {
-            const pp = calcPerPage(53, 1, 395);
-            preload(["/ujian/dosen/hasil", "", 1, pp, "tanggal", "desc"],
-              ([, s, p, perPg]: [string, string, number, number, string, string]) =>
-                getHasilUjianDosen({ search: s, page: p, per_page: perPg, sort_by: "tanggal", sort_dir: "desc" }));
-          }}
-        >
-          Lihat Semua
-        </Link>
-      )}
     </div>
   );
 }

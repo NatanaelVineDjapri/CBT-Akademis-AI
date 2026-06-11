@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ClipboardList, Calendar, Clock } from "lucide-react";
 import type { DosenUjianItem } from "@/types";
+import EmptyState from "@/components/EmptyState";
 
 export default function UjianTerbaruCard({ data }: { data: DosenUjianItem[] }) {
   return (
@@ -24,10 +25,9 @@ export default function UjianTerbaruCard({ data }: { data: DosenUjianItem[] }) {
       </div>
 
       {data.length === 0 ? (
-<p className="text-xs text-gray-400">
-          Tidak ada ujian terbaru.
-        </p>      ) : (
-        <div className="flex flex-col flex-1 justify-between gap-3">
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Tidak ada ujian terbaru." /></div>
+      ) : (
+        <div className="flex flex-col flex-1 gap-3">
           {data.map((ujian) => (
             <div
               key={ujian.id}

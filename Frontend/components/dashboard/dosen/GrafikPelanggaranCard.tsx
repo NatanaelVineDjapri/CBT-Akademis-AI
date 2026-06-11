@@ -2,6 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { ShieldAlert } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 
 const COLORS = [
   "var(--color-primary)",
@@ -23,7 +24,7 @@ export default function GrafikPelanggaranCard({ data }: Props) {
           <ShieldAlert size={15} style={{ color: "var(--color-primary)" }} />
           <span className="text-sm font-semibold text-gray-800">Tingkat Pelanggaran per Mata Kuliah</span>
         </div>
-        <p className="text-sm text-gray-400 text-center py-8">Belum ada data pelanggaran.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data pelanggaran." /></div>
       </div>
     );
   }

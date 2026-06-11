@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, ReferenceLine, Tooltip } from "recharts";
 import { BarChart2, TrendingUp, TrendingDown } from "lucide-react";
 import { getDosenPerforma } from "@/services/DashboardServices";
+import EmptyState from "@/components/EmptyState";
 
 const KKM = 60;
 
@@ -35,7 +36,7 @@ export default function RataRataNilaiCard() {
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">Belum ada data nilai.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data nilai." /></div>
       ) : (
         <>
           <div className="h-44">

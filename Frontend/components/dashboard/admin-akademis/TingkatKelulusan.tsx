@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from "recharts";
 import { CheckCircle } from "lucide-react";
 import { getAdminAkademisKelulusan } from "@/services/DashboardServices";
+import EmptyState from "@/components/EmptyState";
 
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
@@ -42,7 +43,7 @@ export default function TingkatKelulusan() {
           <CheckCircle size={15} className="text-gray-500" />
           <span className="text-sm font-medium text-gray-800">Tingkat Kelulusan per Universitas</span>
         </div>
-        <p className="text-xs text-gray-400">Belum ada data nilai mahasiswa.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data nilai mahasiswa." /></div>
       </div>
     );
   }

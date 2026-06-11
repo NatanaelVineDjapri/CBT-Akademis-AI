@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Bell, Calendar, Clock } from "lucide-react";
 import type { DashboardUjianItem } from "@/types";
 import { formatDate, formatTime } from "@/utils/format";
+import EmptyState from "@/components/EmptyState";
 
 export default function UjianSegeraPMBCard({
   data,
@@ -31,9 +32,7 @@ export default function UjianSegeraPMBCard({
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">
-          Tidak ada ujian yang sedang berlangsung.
-        </p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Tidak ada ujian yang sedang berlangsung." /></div>
       ) : (
         <div className="flex flex-col gap-2">
           {data.map((item) => (

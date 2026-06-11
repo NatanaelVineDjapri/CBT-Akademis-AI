@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Clock, ClipboardList, Calendar } from "lucide-react";
 import type { DosenUjianItem } from "@/types";
+import EmptyState from "@/components/EmptyState";
 
 export default function UjianBerlangsungCard({ data }: { data: DosenUjianItem[] }) {
   return (
@@ -22,7 +23,7 @@ export default function UjianBerlangsungCard({ data }: { data: DosenUjianItem[] 
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400 flex-1">Tidak ada ujian yang sedang berlangsung.</p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Tidak ada ujian yang sedang berlangsung." /></div>
       ) : (
         <div className="flex flex-col gap-3">
           {data.map((ujian) => (

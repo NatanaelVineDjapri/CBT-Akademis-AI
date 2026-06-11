@@ -7,6 +7,7 @@ import type { DashboardNilaiItem } from "@/types";
 import { getBarColor, getInsight } from "@/utils/nilai";
 import { getNilai } from "@/services/NilaiServices";
 import { calcPerPage } from "@/hooks/usePerPage";
+import EmptyState from "@/components/EmptyState";
 
 export default function NilaiTerbaruCard({
   data,
@@ -23,7 +24,7 @@ export default function NilaiTerbaruCard({
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400">Belum ada riwayat nilai.</p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Belum ada riwayat nilai." /></div>
       ) : (
         <div className="flex flex-col divide-y divide-gray-50">
           {data.map((d, i) => {

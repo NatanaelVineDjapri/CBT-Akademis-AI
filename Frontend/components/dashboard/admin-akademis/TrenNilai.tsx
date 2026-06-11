@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { getAdminAkademisTrenNilai } from "@/services/DashboardServices";
+import EmptyState from "@/components/EmptyState";
 
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
@@ -40,7 +41,7 @@ export default function TrenNilai() {
           <TrendingUp size={15} className="text-gray-500" />
           <span className="text-sm font-medium text-gray-800">Tren Rata-rata Nilai (6 Bulan)</span>
         </div>
-        <p className="text-xs text-gray-400">Belum ada data nilai dalam 6 bulan terakhir.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data nilai dalam 6 bulan terakhir." /></div>
       </div>
     );
   }

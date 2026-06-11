@@ -15,6 +15,7 @@ import {
 import { TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { getDosenPerforma } from "@/services/DashboardServices";
 import { PERFORMA_STATS } from "@/types";
+import EmptyState from "@/components/EmptyState";
 
 function CustomDot(props: any) {
   const { cx, cy, payload } = props;
@@ -125,7 +126,7 @@ export default function PerformaChart() {
       {/* Chart */}
       {current.ujian.length === 0 ? (
         <div className="h-[180px] flex items-center justify-center rounded-xl bg-gray-50">
-          <p className="text-xs text-gray-400">Belum ada ujian untuk mata kuliah ini</p>
+          <EmptyState flat size={56} message="Belum ada ujian untuk mata kuliah ini." />
         </div>
       ) : (
         <>

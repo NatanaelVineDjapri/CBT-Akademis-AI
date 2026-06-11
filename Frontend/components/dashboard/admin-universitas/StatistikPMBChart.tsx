@@ -7,6 +7,7 @@ import {
 } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { getAdminUniversitasPerforma } from "@/services/DashboardServices";
+import EmptyState from "@/components/EmptyState";
 
 function CustomDot(props: any) {
   const { cx, cy, payload } = props;
@@ -57,7 +58,7 @@ export default function StatistikPMBChart() {
           <TrendingUp size={15} className="text-teal-600" />
           <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Statistik Ujian PMB</span>
         </div>
-        <p className="text-xs text-gray-400">Belum ada data ujian PMB yang selesai.</p>
+        <div className="min-h-[180px] flex items-center justify-center"><EmptyState flat size={64} message="Belum ada data ujian PMB yang selesai." /></div>
       </div>
     );
   }

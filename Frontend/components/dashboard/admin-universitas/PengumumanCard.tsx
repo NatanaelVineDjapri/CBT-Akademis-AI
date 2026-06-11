@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bell } from "lucide-react";
 import type { AdminUniversitasDashboard } from "@/types";
+import EmptyState from "@/components/EmptyState";
 
 export default function PengumumanCard({ data }: { data: AdminUniversitasDashboard['pengumuman'] }) {
   return (
@@ -20,7 +21,7 @@ export default function PengumumanCard({ data }: { data: AdminUniversitasDashboa
       </div>
 
       {data.length === 0 ? (
-        <p className="text-xs text-gray-400 flex-1">Belum ada pengumuman aktif.</p>
+        <div className="flex-1 flex items-center justify-center"><EmptyState flat size={56} message="Belum ada pengumuman aktif." /></div>
       ) : (
         <div className="flex flex-col gap-3">
           {data.map((p) => (
