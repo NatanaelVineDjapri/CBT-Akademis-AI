@@ -37,7 +37,7 @@ export default function SystemLog() {
   const [sortDir, setSortDir]         = useState<SortDir>("desc");
 
   const debouncedSearch = useDebounce(search);
-  const perPage = usePerPage(52, 1, 310);
+  const perPage = usePerPage(52, 1, 530);
 
   const handleSort = (col: LogSortBy) => {
     if (col === sortBy) {
@@ -73,12 +73,12 @@ export default function SystemLog() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 h-full">
       <div className="shrink-0">
         <Breadcrumb />
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0">
         <div className="px-7 pt-6 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-3 shrink-0">
           <h2 className="text-base font-bold text-[var(--color-primary)]">System Log</h2>
 
@@ -124,7 +124,7 @@ export default function SystemLog() {
           </div>
         </div>
 
-        <div className="px-7 overflow-x-auto flex-1">
+        <div className="px-7 overflow-auto flex-1">
           <table className="w-full min-w-[760px] border-collapse table-fixed">
             <colgroup>
               <col className="w-[55%]" />

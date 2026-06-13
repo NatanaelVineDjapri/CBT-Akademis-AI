@@ -12,7 +12,7 @@ import { usePerPage } from "@/hooks/usePerPage";
 import { getBankSoalGlobal } from "@/services/BankSoalServices";
 import { useUser } from "@/context/UserContext";
 
-export default function BankSoalGlobalPage() {
+export default function AdminBankSoalGlobalPage() {
   const { user } = useUser();
   const perPage = usePerPage(290, 4, 240);
   const [search, setSearch] = useState("");
@@ -58,7 +58,7 @@ export default function BankSoalGlobalPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
               {data.data.map((item) => (
-                <BankSoalGlobalCard key={item.id} item={item} />
+                <BankSoalGlobalCard key={item.id} item={item} basePath="/admin-universitas/bank-soal-global" />
               ))}
             </div>
           )}

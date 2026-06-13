@@ -9,16 +9,17 @@ import { toSlug } from "@/utils/slug";
 
 interface Props {
   item: BankSoalItem;
+  basePath?: string;
 }
 
-export default function BankSoalGlobalCard({ item }: Props) {
+export default function BankSoalGlobalCard({ item, basePath = "/dosen/bank-soal/global" }: Props) {
   const babs = item.mata_kuliah?.bab ?? [];
   const primary = item.nama;
   const secondary = item.creator?.universitas?.nama ?? "";
 
   return (
     <Link
-      href={`/dosen/bank-soal/global/${toSlug(item.nama)}`}
+      href={`${basePath}/${toSlug(item.nama)}`}
       onMouseEnter={() => {
         preload("/bank-soal/global/all", () => getBankSoalGlobal({ per_page: 200 }));
         preload(["/bank-soal/global", item.id], () => getBankSoalGlobalDetail(item.id));

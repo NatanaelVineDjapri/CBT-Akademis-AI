@@ -142,8 +142,9 @@ const menuSectionsByRole: Record<string, MenuSection[]> = {
     {
       label: "Akademik",
       items: [
-        { label: "Mata Kuliah", href: "/admin-universitas/mata-kuliah", icon: <BookOpen size={18} /> },
-        { label: "KRS",         href: "/admin-universitas/krs",         icon: <ListChecks size={18} /> },
+        { label: "Mata Kuliah",      href: "/admin-universitas/mata-kuliah",      icon: <BookOpen size={18} /> },
+        { label: "Bank Soal Global", href: "/admin-universitas/bank-soal-global", icon: <Share2 size={18} /> },
+        { label: "KRS",              href: "/admin-universitas/krs",              icon: <ListChecks size={18} /> },
       ],
     },
     {
@@ -505,9 +506,9 @@ export default function Sidebar({ user, isOpen, onClose, collapsed, onToggle }: 
                           getFakultas({ universitas_id: univId, per_page: 100 }));
                       }
                     } else if (item.href === "/admin-universitas/log") {
-                      const pp = calcPerPage(52, 1, 310);
-                      preload(["/audit", "", "", "", 1, pp], () =>
-                        getAudits({ page: 1, per_page: pp }));
+                      const pp = calcPerPage(52, 1, 530);
+                      preload(["/audit", "", "", "", 1, pp, "created_at", "desc"], () =>
+                        getAudits({ page: 1, per_page: pp, sort_by: "created_at", sort_dir: "desc" }));
                     } else if (item.href === "/pmb") {
                       preload("/dashboard/mahasiswa", getMahasiswaDashboard);
                     }

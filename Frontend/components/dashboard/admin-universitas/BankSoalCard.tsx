@@ -9,11 +9,11 @@ export default function BankSoalCard({ data }: { data: AdminUniversitasDashboard
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2 min-w-0">
           <BookOpen size={16} className="text-gray-500 shrink-0" />
-          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>Bank Soal Terbaru</span>
+          <span className="text-sm font-semibold truncate" style={{ color: "var(--color-primary)" }}>Bank Soal PMB</span>
         </div>
         {data.length > 0 && (
           <Link
-            href="/admin-universitas/bank-soal"
+            href="/admin-universitas/bank-soal-pmb"
             className="text-xs border rounded-lg px-3 py-1 transition-colors hover:opacity-80 shrink-0 whitespace-nowrap"
             style={{ color: "var(--color-primary)", borderColor: "var(--color-primary)" }}
           >
@@ -45,7 +45,7 @@ export default function BankSoalCard({ data }: { data: AdminUniversitasDashboard
                 </div>
               </div>
               <Link
-                href="/admin-universitas/bank-soal"
+                href={`/admin-universitas/bank-soal/${b.id}`}
                 className="text-xs text-white rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
