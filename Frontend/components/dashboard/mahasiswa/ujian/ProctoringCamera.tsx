@@ -8,7 +8,7 @@ import { ICE_SERVERS } from "@/lib/iceServers";
 
 const WS_BASE = process.env.NEXT_PUBLIC_PROCTORING_WS_URL ?? "";
 const FRAME_INTERVAL_MS = 5000;
-const ICE_TIMEOUT = 500;
+const ICE_TIMEOUT = 3000; // beri waktu cukup agar kandidat TURN relay ikut terkumpul (penting di production/NAT)
 
 interface Props {
   pesertaUjianId: number;
@@ -212,7 +212,7 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptur
         stream.getTracks().forEach(t => pc.addTrack(t, stream));
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        await waitIceGather(pc, 2000);
+        await waitIceGather(pc, 3000);
         pcRef.current = pc;
         sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "offer", from: "student", sdp: btoa(fixSdp(pc.localDescription!.sdp)) }).catch(() => {});
 
@@ -227,7 +227,7 @@ export default function ProctoringCamera({ pesertaUjianId, onViolation, onCaptur
         screenStream.getTracks().forEach(t => spc.addTrack(t, screenStream));
         const screenOffer = await spc.createOffer();
         await spc.setLocalDescription(screenOffer);
-        await waitIceGather(spc, 2000);
+        await waitIceGather(spc, 3000);
         screenPcRef.current = spc;
         sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "screen-offer", from: "student", sdp: btoa(fixSdp(spc.localDescription!.sdp)) }).catch(() => {});
 

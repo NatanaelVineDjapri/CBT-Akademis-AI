@@ -19,7 +19,10 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const okRef     = { current: false };
+    const okRef      = { current: false };  // media benar-benar mengalir (connectionState=connected)
+    const pendingRef = { current: false };  // sebuah attempt connect sedang berjalan
+    let pendingTimer: ReturnType<typeof setTimeout> | null = null;
+    const clearPending = () => { pendingRef.current = false; if (pendingTimer) { clearTimeout(pendingTimer); pendingTimer = null; } };
     const decodeSdp = (s: string) => { try { return atob(s); } catch { return s; } };
     const fixSdp    = (sdp: string) =>
       window.location.hostname !== "localhost" ? sdp :
@@ -31,31 +34,53 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
     });
 
     const connect = async (offerSdp: string) => {
-      if (okRef.current) return;
+      if (okRef.current || pendingRef.current) return;
+      pendingRef.current = true;
+      // Kalau attempt ini mandek (offer basi / ICE gak komplit), bebaskan lagi biar watch-request retry jalan
+      pendingTimer = setTimeout(() => { pendingRef.current = false; pendingTimer = null; }, 6000);
       pcRef.current?.close();
       const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
       pcRef.current = pc;
+
+      const markUp = () => {
+        if (pcRef.current !== pc) return;
+        okRef.current = true;
+        clearPending();
+        setConnected(true);
+      };
+      const markDown = () => {
+        if (pcRef.current !== pc) return;
+        okRef.current = false;
+        clearPending();
+        setConnected(false);
+        if (videoRef.current) videoRef.current.srcObject = null;
+      };
+
       pc.ontrack = (e) => {
+        // ontrack nembak pas signaling, BUKAN tanda media sudah mengalir — cuma attach stream di sini
         if (videoRef.current) {
           const s = e.streams?.[0] ?? new MediaStream([e.track]);
           videoRef.current.srcObject = s;
           videoRef.current.play().catch(() => {});
-          setConnected(true);
-          okRef.current = true;
         }
       };
+      // Status "connected" hanya saat koneksi/ICE benar-benar terhubung (media mengalir)
       pc.onconnectionstatechange = () => {
-        if (pc.connectionState === "failed" && okRef.current) {
-          okRef.current = false;
-          setConnected(false);
-          if (videoRef.current) videoRef.current.srcObject = null;
-        }
+        if (pc.connectionState === "connected") markUp();
+        else if (["failed", "disconnected", "closed"].includes(pc.connectionState)) markDown();
       };
-      await pc.setRemoteDescription({ type: "offer", sdp: fixSdp(decodeSdp(offerSdp)) });
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      await waitIceGather(pc, 2000);
-      sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "answer", from: "dosen", sdp: btoa(fixSdp(pc.localDescription!.sdp)) }).catch(() => {});
+      pc.oniceconnectionstatechange = () => {
+        if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") markUp();
+        else if (pc.iceConnectionState === "failed") markDown();
+      };
+
+      try {
+        await pc.setRemoteDescription({ type: "offer", sdp: fixSdp(decodeSdp(offerSdp)) });
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await waitIceGather(pc, 3000);
+        await sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "answer", from: "dosen", sdp: btoa(fixSdp(pc.localDescription!.sdp)) });
+      } catch { clearPending(); }
     };
 
     const echo = getEcho();
@@ -70,15 +95,16 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
     getWebRtcOffer(pesertaUjianId, "cam").then(sdp => { if (sdp && !okRef.current) connect(sdp); }).catch(() => {});
 
     const initialId = setTimeout(() => {
-      if (!okRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
+      if (!okRef.current && !pendingRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
     }, 1000);
     const retryId = setInterval(() => {
-      if (!okRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
+      if (!okRef.current && !pendingRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
     }, 4000);
 
     return () => {
       clearTimeout(initialId);
       clearInterval(retryId);
+      clearPending();
       if (echo) echo.leaveChannel(`proctoring-signal.${pesertaUjianId}`);
       pcRef.current?.close();
       pcRef.current = null;
