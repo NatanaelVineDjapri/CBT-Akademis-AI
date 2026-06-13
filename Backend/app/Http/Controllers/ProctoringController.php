@@ -18,6 +18,7 @@ class ProctoringController extends Controller
             'peserta_ujian_id' => 'required|integer',
             'type'             => 'required|string',
             'from'             => 'required|string',
+            'sdp'              => 'nullable|string', // WAJIB: tanpa ini, validate() buang SDP -> WebRTC gak akan pernah connect
         ]);
 
         try {
