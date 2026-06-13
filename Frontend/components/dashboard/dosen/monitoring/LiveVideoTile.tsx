@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { User } from "lucide-react";
-import { sendWebRtcSignal, getWebRtcOffer } from "@/services/ProctoringService";
+import { sendWebRtcSignal } from "@/services/ProctoringService";
 import { getEcho } from "@/lib/echo";
 import { ICE_SERVERS } from "@/lib/iceServers";
 
@@ -92,14 +92,13 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
       });
     }
 
-    getWebRtcOffer(pesertaUjianId, "cam").then(sdp => { if (sdp && !okRef.current) connect(sdp); }).catch(() => {});
-
-    const initialId = setTimeout(() => {
+    // Selalu pakai jalur watch-request (PC fresh per penonton, tahan refresh, kandidat relay lengkap).
+    // Prewarm cache offer dibuang karena rapuh (sekali pakai & sering basi) dan bikin koneksi "ngaku" connect tapi item.
+    const requestWatch = () => {
       if (!okRef.current && !pendingRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
-    }, 1000);
-    const retryId = setInterval(() => {
-      if (!okRef.current && !pendingRef.current) sendWebRtcSignal({ peserta_ujian_id: pesertaUjianId, type: "watch-request", from: "dosen" }).catch(() => {});
-    }, 4000);
+    };
+    const initialId = setTimeout(requestWatch, 400);
+    const retryId   = setInterval(requestWatch, 3000);
 
     return () => {
       clearTimeout(initialId);
