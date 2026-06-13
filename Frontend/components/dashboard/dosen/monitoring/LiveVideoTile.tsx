@@ -99,7 +99,7 @@ export default function LiveVideoTile({ pesertaUjianId, nama, nim }: Props) {
     };
     const initialId = setTimeout(requestWatch, 400);
     const retryId   = setInterval(requestWatch, 3000);
-
+ 
     return () => {
       clearTimeout(initialId);
       clearInterval(retryId);
