@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Users, AlertTriangle, Clock, MonitorPlay, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronLeft, Users, AlertTriangle, Clock, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import Breadcrumb from "@/components/BreadCrumb";
 import SearchInput from "@/components/filtering/SearchInput";
 import Pagination from "@/components/filtering/Pagination";
@@ -180,16 +180,6 @@ export default function MonitoringDetailPage({ params }: { params: Promise<{ uji
               </div>
             </div>
             <div className="flex items-center gap-2 sm:ml-auto">
-              {aktif > 0 && (
-                <Link
-                  href={`/dosen/monitoring/${slug}/live-view`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 shrink-0 whitespace-nowrap"
-                  style={{ backgroundColor: "var(--color-primary)" }}
-                >
-                  <MonitorPlay size={13} />
-                  Live View
-                </Link>
-              )}
               <SearchInput value={search} onChange={v => setSearch(v)} placeholder="Cari nama / NIM..." />
             </div>
           </div>
