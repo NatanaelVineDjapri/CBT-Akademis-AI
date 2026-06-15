@@ -55,8 +55,20 @@ class UjianController extends Controller
 
         $authUser = $request->user();
 
-        // Lazy auto-enroll: hanya untuk mahasiswa reguler (bukan PMB)
+        // Lazy auto-enroll PMB: daftarkan peserta PMB ke semua ujian PMB yang masih aktif (belum berakhir)
         if ($authUser->role === 'peserta_mahasiswa_baru') {
+            $sudahTerdaftarPmb = PesertaUjian::where('user_id', $authUser->id)->pluck('ujian_id');
+            $ujianPmbBaru = Ujian::where('jenis_ujian', 'pmb')
+                ->where('end_date', '>=', now())
+                ->whereNotIn('id', $sudahTerdaftarPmb)
+                ->pluck('id');
+
+            foreach ($ujianPmbBaru as $ujianId) {
+                PesertaUjian::firstOrCreate(
+                    ['ujian_id' => $ujianId, 'user_id' => $authUser->id],
+                    ['attempt_ke' => 1, 'status' => 'belum_mulai'],
+                );
+            }
             goto skip_enroll;
         }
 
