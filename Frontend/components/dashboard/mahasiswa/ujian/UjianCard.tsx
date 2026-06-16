@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { preload } from "swr";
 import { getNilaiDetail } from "@/services/NilaiServices";
-import { Calendar, Clock, ClipboardList, Timer } from "lucide-react";
+import { Calendar, ClipboardList, Timer, RotateCcw } from "lucide-react";
 import type { UjianMahasiswa } from "@/types";
 import { formatDate, formatTime } from "@/utils/format";
 
@@ -34,17 +34,20 @@ export default function UjianCard({ ujian, basePath = "/mahasiswa" }: { ujian: U
 
       <div className="border-t border-gray-200" />
 
-      <div className="flex items-center gap-3 text-xs text-gray-500">
-        <div className="flex items-center gap-1">
-          <Calendar size={11} className="shrink-0" />
-          <span>{formatDate(ujian.start_date)}</span>
+      <div className="flex items-start justify-between gap-2 text-xs text-gray-500">
+        <div className="flex items-start gap-1.5 min-w-0">
+          <Calendar size={11} className="shrink-0 mt-0.5" />
+          <div className="flex flex-col leading-tight">
+            <span>{formatDate(ujian.start_date)} · {formatTime(ujian.start_date)}</span>
+            <span className="text-gray-400">s/d {formatDate(ujian.end_date)} · {formatTime(ujian.end_date)}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <Clock size={11} className="shrink-0" />
-          <span>
-            {formatTime(ujian.start_date)} – {formatTime(ujian.end_date)}
-          </span>
-        </div>
+        {ujian.max_attempt != null && (
+          <div className="flex items-center gap-1 shrink-0" title="Percobaan">
+            <RotateCcw size={11} className="shrink-0" />
+            <span>{ujian.attempt_ke}/{ujian.max_attempt}</span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-200 pt-1">
