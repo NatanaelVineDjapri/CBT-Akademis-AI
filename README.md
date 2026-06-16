@@ -1,4 +1,4 @@
-# 🎓 CBT Akademis
+# 🎓 CBT Akademis AI
 **CBT Akademis** is a web-based Computer Based Test platform that enables educational institutions to conduct exams online, covering question bank management, exam scheduling, automated grading, and real-time proctoring.
 
 > 🧩 Designed to be scalable, modular, and easily extendable for future development.
@@ -92,14 +92,14 @@
 ### 🔧 Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/NatanaelVineDjapri/cbt-akademis.git
-cd cbt-akademis
+git clone https://github.com/NatanaelVineDjapri/CBT-Akademis-AI.git
+cd CBT-Akademis-AI
 ```
 
 ### 🧱 Step 2 — Setup Backend (Laravel)
 
 ```bash
-cd BackEnd
+cd Backend
 composer install
 cp .env.example .env
 php artisan key:generate
@@ -124,7 +124,7 @@ php artisan serve
 ### 📱 Step 3 — Setup Frontend (Next.js)
 
 ```bash
-cd FrontEnd
+cd Frontend
 npm install
 cp .env.example .env.local
 ```
@@ -141,12 +141,48 @@ npm run dev
 
 Open http://localhost:3000
 
+### 🤖 Step 4 — Setup Proctoring Service (Python)
+
+```bash
+cd Proctoring-services
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+```bash
+python main.py
+```
+
+The AI proctoring WebSocket server runs on http://localhost:8001.
+Make sure the frontend `.env.local` points to it:
+
+```env
+NEXT_PUBLIC_PROCTORING_WS_URL=ws://localhost:8001
+```
+
 ---
 
 ## 📁 Project Structure
 
 ```
-cbt-akademis/
-├── BackEnd/       # Laravel REST API
-└── FrontEnd/      # Next.js App
+CBT-Akademis-AI/
+├── Backend/                      # Laravel REST API
+│   ├── app/                      # Models, Controllers, Events
+│   ├── routes/                   # API routes
+│   ├── database/                 # Migrations & seeders
+│   └── config/                   # App configuration
+│
+├── Frontend/                     # Next.js App (React + TypeScript + Tailwind)
+│   ├── app/                      # App Router pages (per role)
+│   ├── components/               # Shared & dashboard components
+│   ├── services/                 # API client services
+│   ├── hooks/ · context/         # SWR hooks & global state
+│   ├── lib/ · utils/             # Echo, ICE servers, formatters
+│   └── public/                   # Static assets
+│
+└── Proctoring-services/          # Python AI proctoring (FastAPI + OpenCV DNN)
+    ├── main.py                   # WebSocket server (analisis frame)
+    ├── detector.py               # Logika deteksi wajah
+    └── face_detector.caffemodel  # Model Caffe pretrained
 ```
